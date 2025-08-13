@@ -1,0 +1,12 @@
+.idea
+target
+*.iml
+.classpath
+.project
+.gradle
+build
+/api/bin/
+org.eclipse.jdt.core.prefs
+*.backup.json
+gradle.properties
+*.xml
