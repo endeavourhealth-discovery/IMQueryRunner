@@ -1,0 +1,25 @@
+generator pgclient {
+  provider = "prisma-client-js"
+  output   = "./generated/postgres"
+}
+
+datasource pgdb {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model QueueItem {
+  id            String    @id @default(uuid())
+  query_iri     String    @pgdb.VarChar(255)
+  query_name    String    @pgdb.VarChar(255)
+  query_request Json
+  user_id       String    @default(uuid())
+  user_name     String    @pgdb.VarChar(255)
+  queued_at     DateTime?
+  started_at    DateTime?
+  pid           Int
+  finished_at   DateTime?
+  killed_at     DateTime?
+  status        String    @pgdb.Text
+  error         String?   @pgdb.Text
+}

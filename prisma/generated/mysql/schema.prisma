@@ -1,0 +1,9 @@
+generator mysqlclient {
+  provider = "prisma-client-js"
+  output   = "./generated/mysql"
+}
+
+datasource mysqldb {
+  provider = "mysql"
+  url      = env("MYSQL_URL")
+}
