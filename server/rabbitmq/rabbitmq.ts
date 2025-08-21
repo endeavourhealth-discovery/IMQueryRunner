@@ -3,7 +3,7 @@ import { PrismaClient as PostgresPrismaClient } from "@@/prisma/generated/postgr
 import { PrismaClient as MYSQLPrismaClient } from "~~/prisma/generated/mysql";
 import { QueueItemStatus } from "~~/enums";
 import { QueryRequest } from "~~/models/AutoGen";
-import { useFetch } from "nuxt/app";
+import { $fetch } from "ofetch";
 import hash from "object-hash";
 
 const postgresPrisma = new PostgresPrismaClient();
@@ -49,10 +49,9 @@ const sub = rabbit.createConsumer(
       data: { status: QueueItemStatus.RUNNING, started_at: new Date() },
     });
     const queryRequest: QueryRequest = JSON.parse(queueItem);
-    const { data, error } = await useFetch(
+    const { data, error } = await $fetch(
       process.env.IMAPI_URL! + "query/public/sql",
       {
-        server: true,
         body: queryRequest,
         method: "get",
       }
