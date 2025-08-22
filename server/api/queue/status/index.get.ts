@@ -1,25 +1,21 @@
 import { PrismaClient } from "@@/prisma/generated/postgres";
-import { isQueueItemStatus } from "~~/enums/QueueItemStatus";
+import z from "zod";
+import { isQueueItemStatus, QueueItemStatus } from "~~/enums/QueueItemStatus";
 import { schemaToQueueItem } from "~~/server/helpers/schemaToQueueItem";
 
 const prisma = new PrismaClient();
 
+const querySchema = z.object({
+  status: z.enum(QueueItemStatus),
+  page: z.number().default(1),
+  size: z.number().default(25),
+});
+
 export default defineEventHandler(async (event) => {
-  const queryParams = getQuery(event);
-  if (
-    queryParams.status?.valueOf() !== "string" ||
-    isQueueItemStatus(queryParams.status?.toString())
-  )
-    throw createError("status is required");
-  const status = queryParams.status.toString();
-  const page: number =
-    queryParams.page?.valueOf() === "number"
-      ? parseInt(queryParams.page.toString())
-      : 1;
-  const size: number =
-    queryParams.size?.valueOf() === "number"
-      ? parseInt(queryParams.size.toString())
-      : 2;
+  const { status, page, size } = await getValidatedQuery(
+    event,
+    querySchema.parse
+  );
   const totalCount = await prisma.queueItem.count({
     where: {
       status: { equals: status },

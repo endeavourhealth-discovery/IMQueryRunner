@@ -25,3 +25,7 @@ logs
 
 # Local conf files
 **/*.conf
+
+# prisma
+prisma/generated/
+prisma/migrations/

@@ -17,7 +17,7 @@ model QueueItem {
   user_name     String    @pgdb.VarChar(255)
   queued_at     DateTime?
   started_at    DateTime?
-  pid           Int
+  pid           Int?
   finished_at   DateTime?
   killed_at     DateTime?
   status        String    @pgdb.Text

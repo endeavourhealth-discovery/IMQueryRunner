@@ -1,22 +1,21 @@
 import { PrismaClient } from "@@/prisma/generated/postgres";
+import z from "zod";
 import { QueueItem } from "~~/models";
 import { schemaToQueueItem } from "~~/server/helpers/schemaToQueueItem";
 
 const prisma = new PrismaClient();
 
+const querySchema = z.object({
+  page: z.number().default(1),
+  size: z.number().default(25),
+  userId: z.uuid(),
+});
+
 export default defineEventHandler(async (event) => {
-  const queryParams = getQuery(event);
-  if (typeof queryParams.userId !== "string")
-    throw createError("userId is required");
-  const userId = queryParams.userId.toString();
-  const page: number =
-    typeof queryParams.page === "number"
-      ? parseInt(queryParams.page.toString())
-      : 1;
-  const size: number =
-    typeof queryParams.size === "number"
-      ? parseInt(queryParams.size.toString())
-      : 2;
+  const { page, size, userId } = await getValidatedQuery(
+    event,
+    querySchema.parse
+  );
 
   const totalCount = await prisma.queueItem.count({
     where: {
