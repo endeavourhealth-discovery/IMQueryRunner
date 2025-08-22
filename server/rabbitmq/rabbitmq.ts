@@ -49,18 +49,22 @@ const sub = rabbit.createConsumer(
       data: { status: QueueItemStatus.RUNNING, started_at: new Date() },
     });
     const queryRequest: QueryRequest = JSON.parse(queueItem);
-    const { data, error } = await $fetch(
-      process.env.IMAPI_URL! + "query/public/sql",
-      {
-        body: queryRequest,
-        method: "get",
-      }
-    );
-    if (data.value && typeof data.value === "string") {
+    const sql = await $fetch(process.env.IMAPI_URL! + "query/public/sql", {
+      body: queryRequest,
+      method: "post",
+    }).catch(async (err) => {
+      await postgresPrisma.queueItem.update({
+        where: { id: id },
+        data: {
+          status: QueueItemStatus.ERRORED,
+          error: JSON.stringify(err),
+          killed_at: new Date(),
+        },
+      });
+    });
+    if (sql && typeof sql === "string") {
       const requestHash = hash(queryRequest);
-      const queryResults: string[] = await mysqlPrisma.$queryRawUnsafe(
-        data.value
-      );
+      const queryResults: string[] = await mysqlPrisma.$queryRawUnsafe(sql);
       resultsMap.set(requestHash, queryResults);
       mysqlPrisma.$executeRaw`
         CREATE TABLE IF NOT EXISTS ${requestHash} (
@@ -74,16 +78,6 @@ const sub = rabbit.createConsumer(
       await postgresPrisma.queueItem.update({
         where: { id: id },
         data: { status: QueueItemStatus.COMPLETED, finished_at: new Date() },
-      });
-    }
-    if (error.value) {
-      await postgresPrisma.queueItem.update({
-        where: { id: id },
-        data: {
-          status: QueueItemStatus.ERRORED,
-          error: JSON.stringify(error.value),
-          killed_at: new Date(),
-        },
       });
     }
   }
@@ -104,6 +98,10 @@ export async function sendMessage(userId: string, message: any) {
     { exchange: "query_runner", routingKey: "query.execute." + userId },
     message
   );
+}
+
+export function getCachedResults(requestHash: string) {
+  if (resultsMap.has(requestHash)) return resultsMap.get(requestHash);
 }
 
 async function onShutdown() {
