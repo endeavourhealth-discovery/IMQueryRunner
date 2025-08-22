@@ -9,7 +9,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "update-postgres-from-schema": "npx prisma migrate dev --schema prisma/schema.postgres.prisma",
-    "update-mysql-from-schema": "npx prisma migrate dev --schema prisma/schema.mysql.prisma"
+    "update-mysql-from-schema": "npx prisma migrate dev --schema prisma/schema.mysql.prisma",
+    "prisma": "pnpm update-mysql-from-schema && pnpm update-postgres-from-schema"
   },
   "dependencies": {
     "@primeuix/themes": "^1.2.3",
