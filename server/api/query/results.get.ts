@@ -6,6 +6,22 @@ import { $fetch } from "ofetch";
 
 const prisma = new PrismaClient();
 
+defineRouteMeta({
+  openAPI: {
+    tags: ["query"],
+    description: "Get results of query",
+    requestBody: {
+      description: "Query Request object",
+      content: {
+        "application/json": {
+          description: "Query Request object",
+          schema: {type: "object"}
+        }
+      }
+    }
+  },
+});
+
 export default defineEventHandler(async (event) => {
   const queryRequest: QueryRequest = await readBody(event);
   const cachedResults = getCachedResults(hash(queryRequest));

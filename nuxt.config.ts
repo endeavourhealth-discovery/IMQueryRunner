@@ -19,6 +19,11 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  nitro: {
+    experimental: {
+      openAPI: true
+    }
+  },
   compatibilityDate: "2025-07-15",
-  devtools: { enabled: true },
+  devtools: {enabled: true},
 });
