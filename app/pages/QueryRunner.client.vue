@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen w-screen overflow-auto">
+  <div class="flex-auto overflow-auto">
     <div class="h-[calc(100% - 3.5rem)] overflow-auto">
       <div
         class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
@@ -95,6 +95,17 @@ import type { Ref } from "vue";
 import type { QueryRequest } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
+import { io } from "socket.io-client";
+
+const socket = io({
+  // extraHeaders:{
+  //   authorization:`bearer ${userToken}`
+  // }
+});
+
+if (socket.connected) {
+  onConnect();
+}
 
 const queryQueueItems: Ref<QueueItem[]> = ref([]);
 const loading = ref(true);
@@ -105,6 +116,8 @@ const rows = ref(25);
 const rowsOriginal = ref(25);
 const selectedQuery: Ref<QueueItem | undefined> = ref();
 const showQueryResults = ref(false);
+const websocketIsConnected = ref(false);
+const transport = ref("N/A");
 
 await init();
 
@@ -218,6 +231,31 @@ function scrollToTop() {
   )[0] as HTMLElement;
   scrollArea?.scrollIntoView({ block: "start", behavior: "smooth" });
 }
+
+function onConnect() {
+  websocketIsConnected.value = true;
+  transport.value = socket.io.engine.transport.name;
+  socket.io.engine.on("upgrade", (rawTransport) => {
+    transport.value = rawTransport.name;
+  });
+}
+
+function onDisconnect() {
+  websocketIsConnected.value = false;
+  transport.value = "N/A";
+}
+
+socket.on("connect", onConnect);
+socket.on("disconnect", onDisconnect);
+
+onBeforeUnmount(() => {
+  socket.off("connect", onConnect);
+  socket.off("disconnect", onDisconnect);
+});
+
+socket.on("queueUpdate", (value) => {
+  queryQueueItems.value = value;
+});
 </script>
 
 <style scoped></style>

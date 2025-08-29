@@ -1,7 +1,7 @@
 <script setup>
-import { CasdoorSDK, Cookies } from "~/plugins/casdoor";
+const CasdoorSDK = getCasdoorSDK();
 
-const login = async () => {
+async function login() {
   await CasdoorSDK.signin_redirect().then(async () => {
     await CasdoorSDK.exchangeForAccessToken()
       .then((res) => {
@@ -13,9 +13,11 @@ const login = async () => {
         Cookies.set("casdoorUser", JSON.stringify(res));
       });
   });
-};
+}
 </script>
 
 <template>
-  <button @click="login">Login with Casdoor</button>
+  <div class="flex-auto flex justify-center items-center">
+    <Button @click="login">Login with Casdoor</Button>
+  </div>
 </template>

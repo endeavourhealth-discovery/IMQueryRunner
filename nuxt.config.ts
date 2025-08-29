@@ -21,4 +21,16 @@ export default defineNuxtConfig({
   },
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
+  nitro: {
+    experimental: {
+      websocket: true,
+    },
+  },
+  runtimeConfig: {
+    public: {
+      casdoorClientId: "",
+      casdoorUrl: "",
+      casdoorClientSecret: "",
+    },
+  },
 });
