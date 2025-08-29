@@ -24,6 +24,7 @@ export default defineNuxtConfig({
   nitro: {
     experimental: {
       websocket: true,
+      openAPI: true,
     },
   },
   runtimeConfig: {
