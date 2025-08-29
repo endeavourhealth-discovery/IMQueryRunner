@@ -8,9 +8,9 @@ const prisma = new PrismaClient();
 
 const querySchema = z.object({
   status: z.enum(QueueItemStatus),
-  page: z.number().default(1),
-  size: z.number().default(25),
-  userId: z.uuid(),
+  page: z.coerce.number().default(1),
+  size: z.coerce.number().default(25),
+  userId: z.string(),
 });
 
 export default defineEventHandler(async (event) => {

@@ -90,17 +90,20 @@
 <script setup lang="ts">
 import type { QueueItem } from "~~/models";
 import { QueueItemStatus } from "~~/enums";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import type { Ref } from "vue";
 import type { QueryRequest } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
+import { useUserStore } from "~/stores/userStore";
 
+const userStore = useUserStore();
+const currentUser = computed(() => userStore.currentUser);
 const socket = io({
-  // extraHeaders:{
-  //   authorization:`bearer ${userToken}`
-  // }
+  extraHeaders: {
+    authorization: `bearer ${currentUser.value!.token}`,
+  },
 });
 
 if (socket.connected) {
@@ -132,7 +135,11 @@ async function initSearch() {
   const results = await useFetch<{ totalCount: number; result: QueueItem[] }>(
     "/api/queue/user/",
     {
-      query: { userId: "test", page: page.value, size: rows.value },
+      query: {
+        userId: currentUser.value?.id,
+        page: page.value,
+        size: rows.value,
+      },
     }
   );
   if (results.data.value) {
@@ -154,7 +161,11 @@ async function refresh() {
   const results = await $fetch<{ totalCount: number; result: QueueItem[] }>(
     "/api/queue/user/",
     {
-      query: { userId: "test", page: page.value, size: rows.value },
+      query: {
+        userId: currentUser.value?.id,
+        page: page.value,
+        size: rows.value,
+      },
     }
   );
   if (results) {
