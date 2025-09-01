@@ -3,6 +3,8 @@ import { useRoute, useRouter } from "vue-router";
 import { onMounted } from "vue";
 import { useUserStore } from "~/stores/userStore";
 import type { User } from "~~/models";
+import Cookies from "js-cookie";
+import { getUserFromToken } from "~/utils/getUserFromToken";
 
 const route = useRoute();
 const router = useRouter();
@@ -16,20 +18,10 @@ onMounted(async () => {
   if (code) {
     await CasdoorSDK.exchangeForAccessToken().then(async (res) => {
       if (res && res.access_token) {
-        console.log("getting user details");
-        const userJson: any = await CasdoorSDK.getUserInfo(res.access_token);
-        if (userJson.name && userJson.aud && userJson.sub) {
-          const user: User = {
-            name: userJson.name,
-            id: userJson.aud,
-            token: userJson.sub,
-          };
-          userStore.updateCurrentUser(user);
-          console.log("success logged in");
-          await navigateTo("/QueryRunner");
-        } else {
-          throw createError("User is invalid");
-        }
+        Cookies.set("casdoorUser", JSON.stringify(res));
+        await getUserFromToken(res.access_token);
+        console.log("success logged in");
+        await navigateTo("/QueryRunner");
       }
     });
   }
