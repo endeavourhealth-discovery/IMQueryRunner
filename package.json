@@ -13,6 +13,7 @@
     "prisma": "pnpm update-mysql-from-schema && pnpm update-postgres-from-schema"
   },
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.879.0",
     "@pinia/nuxt": "0.11.2",
     "@primeuix/themes": "^1.2.3",
     "@prisma/client": "^6.14.0",

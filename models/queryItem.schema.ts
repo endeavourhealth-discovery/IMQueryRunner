@@ -17,3 +17,5 @@ export const queueItemSchema = z.object({
   queryResult: z.array(z.string()),
   error: z.any(),
 });
+
+export type QueueItem = z.infer<typeof queueItemSchema>;
