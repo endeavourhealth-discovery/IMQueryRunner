@@ -1,4 +1,5 @@
 import Authenticator from "~~/server/utils/auth/authenticator.base";
+import type {EventHandlerRequest, H3Event} from "h3";
 
 export default class AuthenticatorCasdoor extends Authenticator {
   async getMachineToken(clientId: string, clientSecret: string): Promise<any> {
@@ -50,5 +51,9 @@ export default class AuthenticatorCasdoor extends Authenticator {
         error: error.message || 'Failed to revoke token'
       }
     }
+  }
+
+  checkPermissions(event:H3Event<EventHandlerRequest>) {
+
   }
 }

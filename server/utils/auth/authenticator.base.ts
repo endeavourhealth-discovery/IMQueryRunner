@@ -15,7 +15,7 @@ export default abstract class Authenticator {
     return decodedToken.sub;
   }
 
-  requiresAuth(event: H3Event<EventHandlerRequest>): boolean {
+  checkPermissions(event: H3Event<EventHandlerRequest>): void {
     const header = event.headers.get("Authorization")
     if (!header) {
       throw createError({
@@ -29,7 +29,5 @@ export default abstract class Authenticator {
 
     console.log(this.getUserId(token));
     console.log(this.getUserName(token));
-
-    return true;
   }
 }

@@ -102,7 +102,7 @@ const userStore = useUserStore();
 const currentUser = computed(() => userStore.currentUser);
 const socket = io({
   extraHeaders: {
-    authorization: `bearer ${currentUser.value!.token}`,
+    authorization: `bearer ${currentUser.value?.token}`,
   },
 });
 
