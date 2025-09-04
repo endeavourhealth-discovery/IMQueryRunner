@@ -1,10 +1,20 @@
 import {oathTokenRequestSchema, type OauthTokenRequest} from "~~/models/oauth.token.request.schema";
-import {authenticator} from "~~/server/services/auth/authenticator";
 
 defineRouteMeta({
   openAPI: {
     tags: ["auth", "smartlife"],
     description: "Revoke authentication token",
+    parameters: [
+      {
+        name: "authorization",
+        in: "header",
+        description: "Bearer token",
+        required: true,
+        schema: {
+          type: "string"
+        }
+      } as const
+    ],
     requestBody: {
       description: "Credentials",
       content: {
@@ -29,6 +39,8 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   console.log("revoke token");
+  authenticator.requiresAuth(event);
+
   const data: OauthTokenRequest = await readValidatedBody(event, oathTokenRequestSchema.parse);
   return await authenticator.revokeToken(data.token!);
 });

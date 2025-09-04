@@ -1,25 +1,11 @@
-import {Authenticator} from "~~/server/services/auth/authenticator";
-import {CognitoIdentityProvider} from "@aws-sdk/client-cognito-identity-provider";
+import Authenticator from "~~/server/utils/auth/authenticator.base";
 
-export class AuthenticatorCognito implements Authenticator {
-  private cognito = new CognitoIdentityProvider();
-
+export default class AuthenticatorCasdoor extends Authenticator {
   async getMachineToken(clientId: string, clientSecret: string): Promise<any> {
     const config = useRuntimeConfig()
 
     try {
-      const response = await this.cognito.adminInitiateAuth({
-        AuthFlow: 'ADMIN_NO_SRP_AUTH',
-        UserPoolId: config.public.cognitoUserPool,
-        ClientId: config.public.cognitoWebClient,
-        AuthParameters: {
-          USERNAME: clientId,
-          PASSWORD: clientSecret
-        }
-      })
-
-
-      return await $fetch(`${config.public.CognitoUrl}/api/login/oauth/access_token`, {
+      return await $fetch(`${config.public.casdoorUrl}/api/login/oauth/access_token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -32,11 +18,11 @@ export class AuthenticatorCognito implements Authenticator {
       });
 
     } catch (error: any) {
-      console.error('Error getting Cognito token:', error)
+      console.error('Error getting Casdoor token:', error)
 
       return {
         success: false,
-        error: error.message || 'Failed to obtain Cognito token'
+        error: error.message || 'Failed to obtain Casdoor token'
       }
     }
   }
@@ -45,12 +31,12 @@ export class AuthenticatorCognito implements Authenticator {
     const config = useRuntimeConfig()
 
     try {
-      return await $fetch(`${config.public.cognitoUrl}/api/delete-token`, {
+      return await $fetch(`${config.public.casdoorUrl}/api/delete-token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'Authorization': 'Basic ' + config.public.cognitoCredentials
+          'Authorization': 'Basic ' + config.public.casdoorCredentials
         },
         body: {
           "accessToken": token

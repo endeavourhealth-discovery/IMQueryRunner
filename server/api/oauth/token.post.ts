@@ -1,5 +1,4 @@
 import {oathTokenRequestSchema, type OauthTokenRequest} from "~~/models/oauth.token.request.schema";
-import {authenticator} from "~~/server/services/auth/authenticator";
 
 defineRouteMeta({
   openAPI: {
@@ -46,13 +45,13 @@ export default defineEventHandler(async (event) => {
 
   const tokenResponse = await authenticator.getMachineToken(data.client_id, data.client_secret);
 
-    const {access_token, token_type, expires_in} = tokenResponse
+  const {access_token, token_type, expires_in} = tokenResponse
 
-    return {
-      success: true,
-      token: access_token,
-      type: token_type,
-      expiresIn: expires_in,
-      timestamp: new Date().toISOString()
-    }
+  return {
+    success: true,
+    token: access_token,
+    type: token_type,
+    expiresIn: expires_in,
+    timestamp: new Date().toISOString()
+  }
 });

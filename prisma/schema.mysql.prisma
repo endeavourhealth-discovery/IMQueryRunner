@@ -1,9 +1,229 @@
 generator mysqlclient {
   provider = "prisma-client-js"
-  output = "./generated/mysql"
+  output   = "./generated/mysql"
 }
 
 datasource mysqldb {
   provider = "mysql"
-  url = env("MYSQL_URL")
+  url      = env("MYSQL_URL")
+}
+
+model allergy_intolerance {
+  id                        BigInt    @id
+  organization_id           BigInt
+  patient_id                BigInt
+  person_id                 BigInt
+  encounter_id              BigInt?
+  practitioner_id           BigInt?
+  clinical_effective_date   DateTime? @mysqldb.DateTime(0)
+  date_precision_concept_id Int?
+  is_review                 Boolean
+  core_concept_id           Int?
+  non_core_concept_id       Int?
+  age_at_event              Decimal?  @mysqldb.Decimal(5, 2)
+  date_recorded             DateTime? @mysqldb.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model concept {
+  dbid        Int      @id @default(autoincrement())
+  document    Int
+  id          String   @unique(map: "concept_id_uq") @mysqldb.VarChar(150)
+  draft       Boolean  @default(false)
+  name        String?  @mysqldb.VarChar(255)
+  description String?  @mysqldb.VarChar(400)
+  scheme      BigInt?
+  code        String?  @mysqldb.VarChar(40)
+  use_count   BigInt   @default(0)
+  updated     DateTime @default(now()) @mysqldb.DateTime(0)
+
+  @@unique([scheme, code], map: "concept_scheme_code_idx")
+  @@index([draft], map: "concept_draft")
+}
+
+model concept_map {
+  legacy  Int
+  core    Int
+  updated DateTime @default(now()) @mysqldb.DateTime(0)
+  id      Int      @id @default(autoincrement())
+  deleted Boolean  @default(false)
+
+  @@unique([legacy, deleted, updated], map: "concept_map_uq")
+}
+
+model concept_set_member {
+  id     Int      @id @default(autoincrement())
+  set    String   @mysqldb.VarChar(512)
+  member String   @mysqldb.VarChar(512)
+  im1id  String   @mysqldb.VarChar(150)
+  self   Boolean? @mysqldb.Bit(1)
+
+  @@index([set, self], map: "idx_set_self")
+}
+
+model encounter {
+  id                               BigInt    @id
+  organization_id                  BigInt
+  patient_id                       BigInt
+  person_id                        BigInt
+  practitioner_id                  BigInt?
+  appointment_id                   BigInt?
+  clinical_effective_date          DateTime? @mysqldb.DateTime(0)
+  date_precision_concept_id        Int?
+  episode_of_care_id               BigInt?
+  service_provider_organization_id BigInt?
+  core_concept_id                  Int?
+  non_core_concept_id              Int?
+  age_at_event                     Decimal?  @mysqldb.Decimal(5, 2)
+  type                             String?   @mysqldb.Text
+  sub_type                         String?   @mysqldb.Text
+  admission_method                 String?   @mysqldb.VarChar(40)
+  end_date                         DateTime? @mysqldb.DateTime(0)
+  institution_location_id          String?   @mysqldb.Text
+  date_recorded                    DateTime? @mysqldb.DateTime(0)
+}
+
+model episode_of_care {
+  id                             BigInt    @id
+  organization_id                BigInt
+  patient_id                     BigInt
+  person_id                      BigInt
+  registration_type_concept_id   Int?
+  registration_status_concept_id Int?
+  date_registered                DateTime? @mysqldb.Date
+  date_registered_end            DateTime? @mysqldb.Date
+  usual_gp_practitioner_id       BigInt?
+}
+
+model medication_order {
+  id                        BigInt    @id
+  organization_id           BigInt
+  patient_id                BigInt
+  person_id                 BigInt
+  encounter_id              BigInt?
+  practitioner_id           BigInt?
+  clinical_effective_date   DateTime? @mysqldb.DateTime(0)
+  date_precision_concept_id Int?
+  dose                      String?   @mysqldb.VarChar(1000)
+  quantity_value            Float?
+  quantity_unit             String?   @mysqldb.VarChar(255)
+  duration_days             Int?
+  estimated_cost            Float?
+  medication_statement_id   BigInt?
+  core_concept_id           Int?
+  non_core_concept_id       Int?
+  bnf_reference             String?   @mysqldb.VarChar(6)
+  age_at_event              Decimal?  @mysqldb.Decimal(5, 2)
+  issue_method              String?   @mysqldb.Text
+  date_recorded             DateTime? @mysqldb.DateTime(0)
+}
+
+model medication_statement {
+  id                            BigInt    @id
+  organization_id               BigInt
+  patient_id                    BigInt
+  person_id                     BigInt
+  encounter_id                  BigInt?
+  practitioner_id               BigInt?
+  clinical_effective_date       DateTime? @mysqldb.DateTime(0)
+  date_precision_concept_id     Int?
+  cancellation_date             DateTime? @mysqldb.Date
+  dose                          String?   @mysqldb.VarChar(1000)
+  quantity_value                Float?
+  quantity_unit                 String?   @mysqldb.VarChar(255)
+  authorisation_type_concept_id Int?
+  core_concept_id               Int?
+  non_core_concept_id           Int?
+  bnf_reference                 String?   @mysqldb.VarChar(6)
+  age_at_event                  Decimal?  @mysqldb.Decimal(5, 2)
+  issue_method                  String?   @mysqldb.Text
+  date_recorded                 DateTime? @mysqldb.DateTime(0)
+}
+
+model observation {
+  id                        BigInt    @id
+  organization_id           BigInt
+  patient_id                BigInt
+  person_id                 BigInt
+  encounter_id              BigInt?
+  practitioner_id           BigInt?
+  clinical_effective_date   DateTime? @mysqldb.DateTime(0)
+  date_precision_concept_id Int?
+  result_value              Float?
+  result_value_units        String?   @mysqldb.VarChar(50)
+  result_date               DateTime? @mysqldb.Date
+  result_text               String?   @mysqldb.Text
+  result_concept_id         Int?
+  is_problem                Boolean
+  is_review                 Boolean
+  problem_end_date          DateTime? @mysqldb.Date
+  parent_observation_id     BigInt?
+  core_concept_id           Int?
+  non_core_concept_id       Int?
+  age_at_event              Decimal?  @mysqldb.Decimal(5, 2)
+  episodicity_concept_id    Int?
+  is_primary                Boolean?
+  date_recorded             DateTime? @mysqldb.DateTime(0)
+}
+
+model patient {
+  id                                  BigInt    @id
+  organization_id                     BigInt
+  person_id                           BigInt
+  title                               String?   @mysqldb.VarChar(255)
+  first_names                         String?   @mysqldb.VarChar(255)
+  last_name                           String?   @mysqldb.VarChar(255)
+  gender_concept_id                   Int?
+  nhs_number                          String?   @mysqldb.VarChar(255)
+  date_of_birth                       DateTime? @mysqldb.Date
+  date_of_death                       DateTime? @mysqldb.Date
+  current_address_id                  BigInt?
+  ethnic_code_concept_id              Int?
+  registered_practice_organization_id BigInt?
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model patient_address {
+  id                         BigInt    @id
+  organization_id            BigInt
+  patient_id                 BigInt
+  person_id                  BigInt
+  address_line_1             String?   @mysqldb.VarChar(255)
+  address_line_2             String?   @mysqldb.VarChar(255)
+  address_line_3             String?   @mysqldb.VarChar(255)
+  address_line_4             String?   @mysqldb.VarChar(255)
+  city                       String?   @mysqldb.VarChar(255)
+  postcode                   String?   @mysqldb.VarChar(255)
+  use_concept_id             Int
+  start_date                 DateTime? @mysqldb.Date
+  end_date                   DateTime? @mysqldb.Date
+  lsoa_2001_code             String?   @mysqldb.VarChar(9)
+  lsoa_2011_code             String?   @mysqldb.VarChar(9)
+  msoa_2001_code             String?   @mysqldb.VarChar(9)
+  msoa_2011_code             String?   @mysqldb.VarChar(9)
+  ward_code                  String?   @mysqldb.VarChar(9)
+  local_authority_code       String?   @mysqldb.VarChar(9)
+  townsend_deprivation_index Float?
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model patient_contact {
+  id              BigInt    @id
+  organization_id BigInt
+  patient_id      BigInt
+  person_id       BigInt
+  use_concept_id  Int?
+  type_concept_id Int?
+  start_date      DateTime? @mysqldb.Date
+  end_date        DateTime? @mysqldb.Date
+  value           String?   @mysqldb.VarChar(255)
+}
+
+model practitioner {
+  id              BigInt  @id
+  organization_id BigInt
+  name            String? @mysqldb.VarChar(1024)
+  role_code       String? @mysqldb.VarChar(50)
+  role_desc       String? @mysqldb.VarChar(255)
+  gmc_code        String? @mysqldb.VarChar(50)
 }
