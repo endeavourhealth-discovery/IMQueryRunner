@@ -1,0 +1,2 @@
+p, admin, *, *, deny
+p, admin, /api/query/run, POST, allow

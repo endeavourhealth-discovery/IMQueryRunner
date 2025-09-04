@@ -5,17 +5,17 @@ export default abstract class Authenticator {
 
   abstract revokeToken(token: string): Promise<any>;
 
+  abstract checkPermissions(event: H3Event<EventHandlerRequest>): Promise<void>;
+
   getUserId(token: string): string {
-    const decodedToken = JSON.parse(atob(token.split(".")[1]));
-    return decodedToken.id;
+    return this.getUserInfoFromToken(token).id;
   }
 
   getUserName(token: string): string {
-    const decodedToken = JSON.parse(atob(token.split(".")[1]));
-    return decodedToken.sub;
+    return this.getUserInfoFromToken(token).sub;
   }
 
-  checkPermissions(event: H3Event<EventHandlerRequest>): void {
+  getUserInfo(event: H3Event<EventHandlerRequest>): any {
     const header = event.headers.get("Authorization")
     if (!header) {
       throw createError({
@@ -24,10 +24,11 @@ export default abstract class Authenticator {
         statusMessage: "Unauthorized",
       })
     }
-
     const token = header.split(" ")[1];
+    return this.getUserInfoFromToken(token);
+  }
 
-    console.log(this.getUserId(token));
-    console.log(this.getUserName(token));
+  getUserInfoFromToken(token: string): any {
+    return JSON.parse(atob(token.split(".")[1]));
   }
 }
