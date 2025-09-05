@@ -48,7 +48,6 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   console.log("query run");
-  await authenticator.checkPermissions(event)
 
   const token = event.headers.get("authorization")!;
   const userId = authenticator.getUserId(token);
