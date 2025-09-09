@@ -6,7 +6,6 @@ export default function getUserFromTokenCasdoor(token: string) {
   if (jwtParts.length >= 2) {
     const b64Payload = jwtParts[1]!;
     const payload = JSON.parse(atob(b64Payload));
-    console.log(payload)
     return {
       id: payload.sub,
       name: payload.name,
