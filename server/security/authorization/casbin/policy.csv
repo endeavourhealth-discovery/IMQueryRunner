@@ -1,0 +1,11 @@
+p, true, /callback*, *, allow
+p, true, /socket.io/*, *, allow
+p, true, /api/*, *, allow
+p, true, /__nuxt_error*, *, allow
+
+p, true, /, *, allow
+p, true, /login, *, allow
+p, true, /callback, *, allow
+p, true, /unauthorized, *, allow
+p, r.sub.name == "test", /QueryRunner, *, allow
+p, r.sub.age > 18, /QueryRunner, *, allow

@@ -30,7 +30,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       casdoorUrl: process.env.CASDOOR_URL,
-      casdoorCredentials: process.env.CASDOOR_CREDENTIALS,
+      casdoorOrganisationName: process.env.CASDOOR_ORGANISATION_NAME,
+      casdoorClientId: process.env.CASDOOR_CLIENT_ID,
+      casdoorClientSecret: process.env.CASDOOR_CLIENT_SECRET,
       // cognitoIdentityPoolId: process.env.COGNITO_IDENTITY_POOL,
       // cognitoRegion: process.env.COGNITO_REGION,
       // cognitoUserPool: process.env.COGNITO_USER_POOL,

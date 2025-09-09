@@ -7,7 +7,7 @@ export const useUserStore = defineStore("user", {
     currentUser: undefined,
   }),
   getters: {
-    isLoggedIn: (state) => (state.currentUser ? true : false),
+    isLoggedIn: (state) => (!!state.currentUser),
   },
   actions: {
     updateCurrentUser(user: User | undefined) {

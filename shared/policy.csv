@@ -1,2 +1,0 @@
-p, *, /api/public/*, *, allow
-p, admin, /api/query/run, POST, allow

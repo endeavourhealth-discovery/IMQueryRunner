@@ -78,6 +78,7 @@ const sub = rabbit.createConsumer(
     console.log(sql);
     if (sql && typeof sql === "string") {
       const requestHash = hash(queryRequest);
+      sql = 'INSERT INTO imqcache.' + requestHash + ' ' + sql;
       try {
         const queryResults: string[] = await mysqlPrisma.$queryRawUnsafe(sql);
         resultsMap.set(requestHash, queryResults);

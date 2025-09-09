@@ -19,6 +19,7 @@
     "@prisma/client": "^6.14.0",
     "@tailwindcss/vite": "^4.1.12",
     "casbin": "^5.38.0",
+    "casdoor-js-sdk": "^0.16.0",
     "engine.io": "^6.6.4",
     "js-cookie": "^3.0.5",
     "lodash-es": "^4.17.21",

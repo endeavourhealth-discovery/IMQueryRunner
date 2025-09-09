@@ -48,10 +48,14 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   console.log("query run");
+  const currentUser = auth.getUser();
 
-  const token = event.headers.get("authorization")!;
-  const userId = authenticator.getUserId(token);
-  const userName = authenticator.getUserName(token);
+  const userId = currentUser.id;
+  const userName = currentUser.name;
+
+  console.log("userId", userId);
+  console.log("userName", userName);
+
   const data: QueryRunRequest = await readValidatedBody(event, queryRunRequestSchema.parse);
 
   const entity = await imapi.getPartialEntity(data.query_id, [IM.DEFINITION]);
@@ -62,6 +66,7 @@ export default defineEventHandler(async (event) => {
     referenceDate: data.reference_date,
   } as QueryRequest;
 
+/*
   await prisma.$transaction(async (tx) => {
     const id = await sendMessage(userId, queryRequest);
 
@@ -86,4 +91,5 @@ export default defineEventHandler(async (event) => {
         console.error("Error creating queue item", error);
       });
   })
+*/
 });
