@@ -1,14 +1,15 @@
 import type {User} from "~~/models";
 import {type Enforcer, newEnforcer} from "casbin";
-import Guard from "~~/server/security/authorization/guard.base";
+import Guard from "~~/server/utils/security/guard/guard.base";
 import AuthorizationError from "~~/server/errors/authorization.error";
+
 
 export class GuardCasbin implements Guard {
   private enforcer: Enforcer | undefined = undefined;
 
   async checkPermissions(subject: User, path: string, action: string): Promise<boolean> {
     try {
-      this.enforcer ??= await newEnforcer("server/security/authorization/casbin/model.conf", "server/security/authorization/casbin/policy.csv");
+      this.enforcer ??= await newEnforcer("server/utils/security/guard/casbin/model.conf", "server/utils/security/guard/casbin/policy.csv");
 
       return await this.enforcer.enforce(subject, path, action);
 

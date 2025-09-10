@@ -1,7 +1,7 @@
-import Authenticator from "~/utils/authentication/authenticator";
 import type {SharedPublicRuntimeConfig} from "#build/types/runtime-config";
 import getUserFromTokenCasdoor from "#shared/jwtCasdoor";
 import type {User} from "~~/models";
+import Authenticator from "~/utils/security/authentication/authenticator";
 
 export default class AuthenticatorCasdoor extends Authenticator {
   private serverUrl: string = "";

@@ -1,4 +1,4 @@
-import type {User} from "~~/models";
+import {User} from "~~/models";
 
 export default abstract class Authenticator {
   private user: User = {} as User;
@@ -22,5 +22,4 @@ export default abstract class Authenticator {
   isLoggedIn(): boolean {
     return this.user.id !== undefined && this.user.id !== "";
   }
-
 }

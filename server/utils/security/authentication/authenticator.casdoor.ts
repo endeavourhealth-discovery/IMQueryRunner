@@ -1,7 +1,9 @@
 import {$fetch} from "ofetch";
 import {User} from "~~/models";
-import Authenticator from "~~/server/security/authentication/authenticator";
+
 import getUserFromTokenCasdoor from "#shared/jwtCasdoor";
+import Authenticator from "~~/server/utils/security/authentication/authenticator.base";
+
 
 export default class AuthenticatorCasdoor extends Authenticator {
   private casdoorUrl: string = "";

@@ -1,4 +1,4 @@
-p, r.sub.admin, *, *, allow
+p, r.sub.admin == true, *, *, allow
 
 p, true, /callback*, *, allow
 p, true, /socket.io/*, *, allow

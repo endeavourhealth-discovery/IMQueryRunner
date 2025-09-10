@@ -1,5 +1,5 @@
-import {apiAuth} from "~~/server/security/api.auth";
-import {apiGuard} from "~~/server/security/api.guard";
+import {apiAuth} from "~~/server/utils/security/api.auth";
+import {apiGuard} from "~~/server/utils/security/api.guard";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);

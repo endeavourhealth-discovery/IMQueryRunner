@@ -1,5 +1,5 @@
 import type {User} from "~~/models";
-import Authenticator from "~~/server/security/authentication/authenticator";
+import Authenticator from "~~/server/utils/security/authentication/authenticator.base";
 
 export default class AuthenticatorCognito extends Authenticator {
   getMachineToken(clientId: string, clientSecret: string): Promise<any> {

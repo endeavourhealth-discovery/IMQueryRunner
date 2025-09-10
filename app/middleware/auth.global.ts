@@ -1,4 +1,5 @@
-import {uiAuth} from "~/utils/ui.auth";
+import {uiAuth} from "~/utils/security/ui.auth";
+import {uiGuard} from "~/utils/security/ui.guard";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   if (to.path.startsWith("/api"))
