@@ -106,10 +106,6 @@ const socket = io({
   },
 });
 
-if (socket.connected) {
-  onConnect();
-}
-
 const queryQueueItems: Ref<QueueItem[]> = ref([]);
 const loading = ref(true);
 const searchLoading = ref(false);
@@ -122,13 +118,18 @@ const showQueryResults = ref(false);
 const websocketIsConnected = ref(false);
 const transport = ref("N/A");
 
-await init();
-
-async function init() {
+onMounted(async () => {
+  console.log("QueryRunner mounted");
   loading.value = true;
-  await initSearch();
   loading.value = false;
-}
+  console.log("Socket room joining")
+  socket.emit("joinRoom", "test-room", currentUser.value?.name);
+  console.log("Adding listener");
+  socket.on("message", function(data) {
+    alert(data);
+  });
+  socket.emit("hello")
+});
 
 async function initSearch() {
   searchLoading.value = true;
@@ -157,6 +158,7 @@ async function initSearch() {
 }
 
 async function refresh() {
+
   searchLoading.value = true;
   const results = await $fetch<{ totalCount: number; result: QueueItem[] }>(
     "/api/queue/user/",
@@ -256,12 +258,8 @@ function onDisconnect() {
   transport.value = "N/A";
 }
 
-socket.on("connect", onConnect);
-socket.on("disconnect", onDisconnect);
-
 onBeforeUnmount(() => {
-  socket.off("connect", onConnect);
-  socket.off("disconnect", onDisconnect);
+  socket.disconnect()
 });
 
 socket.on("queueUpdate", (value) => {

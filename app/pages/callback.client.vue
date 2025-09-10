@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {useRoute} from "vue-router";
+import {uiAuth} from "~/utils/security/ui.auth";
 
 const route = useRoute();
 const userStore = useUserStore();

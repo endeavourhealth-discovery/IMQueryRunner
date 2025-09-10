@@ -1,6 +1,5 @@
 import { PrismaClient } from "@@/prisma/generated/postgres";
 import z from "zod";
-import { QueueItem } from "~~/models";
 import { schemaToQueueItem } from "~~/server/helpers/schemaToQueueItem";
 
 const prisma = new PrismaClient();
@@ -12,6 +11,10 @@ const querySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  console.log("EMITTING...")
+  socketServer.to('test-room').emit("message", "Hello from server!");
+  console.log("DONE.")
+
   const { page, size, userId } = await getValidatedQuery(
     event,
     querySchema.parse

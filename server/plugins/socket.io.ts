@@ -1,33 +1,38 @@
 import type { NitroApp } from "nitropack";
 import { Server as Engine } from "engine.io";
-import { Server } from "socket.io";
 import { defineEventHandler } from "h3";
 
 export default defineNitroPlugin((nitroApp: NitroApp) => {
   const engine = new Engine();
-  const io = new Server();
 
-  io.bind(engine);
+  socketServer.bind(engine);
 
-  io.on("connection", (socket) => {
+  socketServer.on("connection", (socket) => {
     console.log("socket connected", socket.id);
     socket.on("disconnect", () => {
       console.log("socket disconnected", socket.id);
     });
 
+    socket.on("hello", () => {
+      console.log("============= hello ============", socket.id);
+    });
+
+
     socket.on("joinRoom", (room, user) => {
+      console.log("===================== Attempting to join room")
       socket.join(room);
-      io.to(room).emit("join", {
-        from_id: user.id,
-        from_name: user.name,
-        system: true,
-        content: `${user.name ?? user.id} joined the room`,
-      });
+      console.log("User " + user + " joined room " + room);
+      // server.to(room).emit("join", {
+      //   from_id: user.id,
+      //   from_name: user.name,
+      //   system: true,
+      //   content: `${user.name ?? user.id} joined the room`,
+      // });
     });
 
     socket.on("leaveRoom", (room, user) => {
       socket.leave(room);
-      io.to(room).emit("leave", {
+      server.to(room).emit("leave", {
         from_id: user.id,
         from_name: user.name,
         system: true,
@@ -37,7 +42,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
 
     socket.on("message", (room, message) => {
       console.log(`[Socket.io] message received to room ${room}`);
-      io.to(room).emit("message", message);
+      server.to(room).emit("message", message);
     });
   });
 
