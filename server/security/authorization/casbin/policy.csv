@@ -1,3 +1,5 @@
+p, r.sub.admin, *, *, allow
+
 p, true, /callback*, *, allow
 p, true, /socket.io/*, *, allow
 p, true, /api/*, *, allow

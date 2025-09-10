@@ -15,6 +15,11 @@ export default defineNuxtConfig({
       ripple: true,
     },
   },
+  routeRules: {
+    "/": {
+      redirect: "/QueryRunner"
+    }
+  },
   css: ["~/assets/css/main.css"],
   vite: {
     plugins: [tailwindcss()],

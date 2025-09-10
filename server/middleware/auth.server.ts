@@ -3,6 +3,9 @@ import {apiGuard} from "~~/server/security/api.guard";
 
 
 export default defineEventHandler(async (event) => {
+  const path = getRequestURL(event).pathname;
+  if  (!path.startsWith("/api"))
+    return;
 
   // Authentication
   const token = getCookie(event,"jwtToken");
@@ -11,7 +14,6 @@ export default defineEventHandler(async (event) => {
 
   // Authorization
   const user = apiAuth.getUser();
-  const path = getRequestURL(event).pathname;
   const method = event.method;
 
   const allowed = await apiGuard.checkPermissions(user, path, method);
