@@ -4,6 +4,8 @@ export default abstract class Authenticator {
   private user: User = {} as User;
 
   abstract initialize(token: string | null | undefined, options?: any): void;
+  abstract getMachineToken(clientId: string, clientSecret: string): Promise<any>;
+  abstract revokeToken(token: string): Promise<any>;
 
   protected setToken(token: any): void {
     if (token) {

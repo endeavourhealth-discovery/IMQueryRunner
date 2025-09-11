@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
   console.log("get token");
   const data: OauthTokenRequest = await readValidatedBody(event, oathTokenRequestSchema.parse);
 
-  const tokenResponse = await authenticator.getMachineToken(data.client_id, data.client_secret);
+  const tokenResponse = await apiAuth.getMachineToken(data.client_id, data.client_secret);
 
   const {access_token, token_type, expires_in} = tokenResponse
 

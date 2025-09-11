@@ -11,14 +11,13 @@ export class GuardCasbin implements Guard {
     try {
       this.enforcer ??= await newEnforcer("server/utils/security/guard/casbin/model.conf", "server/utils/security/guard/casbin/policy.csv");
 
-      return await this.enforcer.enforce(subject, path, action);
+      // return await this.enforcer.enforce(subject, path, action);
 
-      /* FOR DEBUG TO SEE WHICH RULE(S) PASSED
-      const permission = await this.enforcer.enforceEx(subject, object, action)
+       // FOR DEBUG TO SEE WHICH RULE(S) PASSED
+      const permission = await this.enforcer.enforceEx(subject, path, action)
       console.log("========== PERMISSION ==========")
       console.log(permission[1])
       return permission[0].valueOf();
-      */
     } catch (error:any) {
       console.error('API: Error checking permissions:', error)
 

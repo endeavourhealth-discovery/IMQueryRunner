@@ -9,6 +9,7 @@ export default defineEventHandler(async (event) => {
   // Authentication
   const token = getCookie(event,"jwtToken");
   apiAuth.initialize(token, useRuntimeConfig());
+  // apiAuth.validateToken(); // This is done in apiGuard.checkPermissions() if needed
 
 
   // Authorization
