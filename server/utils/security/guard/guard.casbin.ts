@@ -9,7 +9,7 @@ export class GuardCasbin implements Guard {
 
   async checkPermissions(subject: User, path: string, action: string): Promise<boolean> {
     try {
-      this.enforcer ??= await newEnforcer("server/utils/security/guard/casbin/model.conf", "server/utils/security/guard/casbin/policy.csv");
+      this.enforcer ??= await newEnforcer("public/casbin/model.conf", "public/casbin/policy.csv");
 
       // return await this.enforcer.enforce(subject, path, action);
 

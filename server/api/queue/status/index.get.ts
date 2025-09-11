@@ -1,9 +1,9 @@
-import { PrismaClient } from "@@/prisma/generated/postgres";
 import z from "zod";
 import { isQueueItemStatus, QueueItemStatus } from "~~/enums/QueueItemStatus";
 import { schemaToQueueItem } from "~~/server/helpers/schemaToQueueItem";
-
-const prisma = new PrismaClient();
+import {postgresDb} from "~~/server/db/postgres";
+import {queueItem} from "~~/server/db/postgres/schema";
+import {desc, eq} from "drizzle-orm";
 
 const querySchema = z.object({
   status: z.enum(QueueItemStatus),
@@ -16,20 +16,14 @@ export default defineEventHandler(async (event) => {
     event,
     querySchema.parse
   );
-  const totalCount = await prisma.queueItem.count({
-    where: {
-      status: { equals: status },
-    },
-  });
-  const items = await prisma.queueItem.findMany({
-    where: {
-      status: { equals: status },
-    },
-    orderBy: {
-      queued_at: "desc",
-    },
-    skip: (+page - 1) * +size,
-    take: size,
+  const totalCount = await postgresDb
+    .$count(queueItem, eq(queueItem.status, status));
+
+  const items = await postgresDb.query.queueItem.findMany({
+    where: eq(queueItem.status, status),
+    orderBy: [desc(queueItem.queuedAt)],
+    offset: (+page - 1) * +size,
+    limit: size,
   });
   const itemsAsQueueItem = items.map((item) => schemaToQueueItem(item));
   return {

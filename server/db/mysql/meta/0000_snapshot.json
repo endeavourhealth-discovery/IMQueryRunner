@@ -1,0 +1,1615 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "5",
+  "dialect": "mysql",
+  "tables": {
+    "allergy_intolerance": {
+      "name": "allergy_intolerance",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "autoincrement": false,
+          "name": "organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "patient_id": {
+          "autoincrement": false,
+          "name": "patient_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "person_id": {
+          "autoincrement": false,
+          "name": "person_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encounter_id": {
+          "autoincrement": false,
+          "name": "encounter_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "practitioner_id": {
+          "autoincrement": false,
+          "name": "practitioner_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "clinical_effective_date": {
+          "autoincrement": false,
+          "name": "clinical_effective_date",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_precision_concept_id": {
+          "autoincrement": false,
+          "name": "date_precision_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_review": {
+          "autoincrement": false,
+          "name": "is_review",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "core_concept_id": {
+          "autoincrement": false,
+          "name": "core_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "non_core_concept_id": {
+          "autoincrement": false,
+          "name": "non_core_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "age_at_event": {
+          "autoincrement": false,
+          "name": "age_at_event",
+          "type": "decimal(5,2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_recorded": {
+          "autoincrement": false,
+          "name": "date_recorded",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "allergy_intolerance_id": {
+          "name": "allergy_intolerance_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "concept": {
+      "name": "concept",
+      "columns": {
+        "dbid": {
+          "autoincrement": true,
+          "name": "dbid",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "document": {
+          "autoincrement": false,
+          "name": "document",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "draft": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "draft",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "autoincrement": false,
+          "name": "description",
+          "type": "varchar(400)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "scheme": {
+          "autoincrement": false,
+          "name": "scheme",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "code": {
+          "autoincrement": false,
+          "name": "code",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "use_count": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "use_count",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "updated",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "concept_dbid": {
+          "name": "concept_dbid",
+          "columns": [
+            "dbid"
+          ]
+        }
+      },
+      "indexes": {
+        "concept_draft": {
+          "name": "concept_draft",
+          "columns": [
+            "draft"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {
+        "concept_id_uq": {
+          "name": "concept_id_uq",
+          "columns": [
+            "id"
+          ]
+        },
+        "concept_scheme_code_idx": {
+          "name": "concept_scheme_code_idx",
+          "columns": [
+            "scheme",
+            "code"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "concept_map": {
+      "name": "concept_map",
+      "columns": {
+        "legacy": {
+          "autoincrement": false,
+          "name": "legacy",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "core": {
+          "autoincrement": false,
+          "name": "core",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated": {
+          "default": "(CURRENT_TIMESTAMP)",
+          "autoincrement": false,
+          "name": "updated",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "id": {
+          "autoincrement": true,
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "deleted": {
+          "default": 0,
+          "autoincrement": false,
+          "name": "deleted",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "compositePrimaryKeys": {
+        "concept_map_id": {
+          "name": "concept_map_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {
+        "concept_map_uq": {
+          "name": "concept_map_uq",
+          "columns": [
+            "legacy",
+            "deleted",
+            "updated"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "concept_set_member": {
+      "name": "concept_set_member",
+      "columns": {
+        "id": {
+          "autoincrement": true,
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "set": {
+          "autoincrement": false,
+          "name": "set",
+          "type": "varchar(512)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "member": {
+          "autoincrement": false,
+          "name": "member",
+          "type": "varchar(512)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "im1id": {
+          "autoincrement": false,
+          "name": "im1id",
+          "type": "varchar(150)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "self": {
+          "autoincrement": false,
+          "name": "self",
+          "type": "bit(1)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "concept_set_member_id": {
+          "name": "concept_set_member_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "indexes": {
+        "idx_set_self": {
+          "name": "idx_set_self",
+          "columns": [
+            "set",
+            "self"
+          ],
+          "isUnique": false
+        },
+        "idx_csm": {
+          "name": "idx_csm",
+          "columns": [
+            "im1id",
+            "self"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "encounter": {
+      "name": "encounter",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "autoincrement": false,
+          "name": "organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "patient_id": {
+          "autoincrement": false,
+          "name": "patient_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "person_id": {
+          "autoincrement": false,
+          "name": "person_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "practitioner_id": {
+          "autoincrement": false,
+          "name": "practitioner_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "appointment_id": {
+          "autoincrement": false,
+          "name": "appointment_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "clinical_effective_date": {
+          "autoincrement": false,
+          "name": "clinical_effective_date",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_precision_concept_id": {
+          "autoincrement": false,
+          "name": "date_precision_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "episode_of_care_id": {
+          "autoincrement": false,
+          "name": "episode_of_care_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "service_provider_organization_id": {
+          "autoincrement": false,
+          "name": "service_provider_organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "core_concept_id": {
+          "autoincrement": false,
+          "name": "core_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "non_core_concept_id": {
+          "autoincrement": false,
+          "name": "non_core_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "age_at_event": {
+          "autoincrement": false,
+          "name": "age_at_event",
+          "type": "decimal(5,2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "autoincrement": false,
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sub_type": {
+          "autoincrement": false,
+          "name": "sub_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "admission_method": {
+          "autoincrement": false,
+          "name": "admission_method",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "autoincrement": false,
+          "name": "end_date",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institution_location_id": {
+          "autoincrement": false,
+          "name": "institution_location_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_recorded": {
+          "autoincrement": false,
+          "name": "date_recorded",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "encounter_id": {
+          "name": "encounter_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "episode_of_care": {
+      "name": "episode_of_care",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "autoincrement": false,
+          "name": "organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "patient_id": {
+          "autoincrement": false,
+          "name": "patient_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "person_id": {
+          "autoincrement": false,
+          "name": "person_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "registration_type_concept_id": {
+          "autoincrement": false,
+          "name": "registration_type_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "registration_status_concept_id": {
+          "autoincrement": false,
+          "name": "registration_status_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_registered": {
+          "autoincrement": false,
+          "name": "date_registered",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_registered_end": {
+          "autoincrement": false,
+          "name": "date_registered_end",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "usual_gp_practitioner_id": {
+          "autoincrement": false,
+          "name": "usual_gp_practitioner_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "episode_of_care_id": {
+          "name": "episode_of_care_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "medication_order": {
+      "name": "medication_order",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "autoincrement": false,
+          "name": "organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "patient_id": {
+          "autoincrement": false,
+          "name": "patient_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "person_id": {
+          "autoincrement": false,
+          "name": "person_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encounter_id": {
+          "autoincrement": false,
+          "name": "encounter_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "practitioner_id": {
+          "autoincrement": false,
+          "name": "practitioner_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "clinical_effective_date": {
+          "autoincrement": false,
+          "name": "clinical_effective_date",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_precision_concept_id": {
+          "autoincrement": false,
+          "name": "date_precision_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dose": {
+          "autoincrement": false,
+          "name": "dose",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity_value": {
+          "autoincrement": false,
+          "name": "quantity_value",
+          "type": "double",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity_unit": {
+          "autoincrement": false,
+          "name": "quantity_unit",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "duration_days": {
+          "autoincrement": false,
+          "name": "duration_days",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "estimated_cost": {
+          "autoincrement": false,
+          "name": "estimated_cost",
+          "type": "double",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "medication_statement_id": {
+          "autoincrement": false,
+          "name": "medication_statement_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "core_concept_id": {
+          "autoincrement": false,
+          "name": "core_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "non_core_concept_id": {
+          "autoincrement": false,
+          "name": "non_core_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bnf_reference": {
+          "autoincrement": false,
+          "name": "bnf_reference",
+          "type": "varchar(6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "age_at_event": {
+          "autoincrement": false,
+          "name": "age_at_event",
+          "type": "decimal(5,2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_method": {
+          "autoincrement": false,
+          "name": "issue_method",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_recorded": {
+          "autoincrement": false,
+          "name": "date_recorded",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "medication_order_id": {
+          "name": "medication_order_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "medication_statement": {
+      "name": "medication_statement",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "autoincrement": false,
+          "name": "organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "patient_id": {
+          "autoincrement": false,
+          "name": "patient_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "person_id": {
+          "autoincrement": false,
+          "name": "person_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encounter_id": {
+          "autoincrement": false,
+          "name": "encounter_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "practitioner_id": {
+          "autoincrement": false,
+          "name": "practitioner_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "clinical_effective_date": {
+          "autoincrement": false,
+          "name": "clinical_effective_date",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_precision_concept_id": {
+          "autoincrement": false,
+          "name": "date_precision_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cancellation_date": {
+          "autoincrement": false,
+          "name": "cancellation_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dose": {
+          "autoincrement": false,
+          "name": "dose",
+          "type": "varchar(1000)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity_value": {
+          "autoincrement": false,
+          "name": "quantity_value",
+          "type": "double",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quantity_unit": {
+          "autoincrement": false,
+          "name": "quantity_unit",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "authorisation_type_concept_id": {
+          "autoincrement": false,
+          "name": "authorisation_type_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "core_concept_id": {
+          "autoincrement": false,
+          "name": "core_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "non_core_concept_id": {
+          "autoincrement": false,
+          "name": "non_core_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bnf_reference": {
+          "autoincrement": false,
+          "name": "bnf_reference",
+          "type": "varchar(6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "age_at_event": {
+          "autoincrement": false,
+          "name": "age_at_event",
+          "type": "decimal(5,2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "issue_method": {
+          "autoincrement": false,
+          "name": "issue_method",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_recorded": {
+          "autoincrement": false,
+          "name": "date_recorded",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "medication_statement_id": {
+          "name": "medication_statement_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "observation": {
+      "name": "observation",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "autoincrement": false,
+          "name": "organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "patient_id": {
+          "autoincrement": false,
+          "name": "patient_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "person_id": {
+          "autoincrement": false,
+          "name": "person_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encounter_id": {
+          "autoincrement": false,
+          "name": "encounter_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "practitioner_id": {
+          "autoincrement": false,
+          "name": "practitioner_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "clinical_effective_date": {
+          "autoincrement": false,
+          "name": "clinical_effective_date",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_precision_concept_id": {
+          "autoincrement": false,
+          "name": "date_precision_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "result_value": {
+          "autoincrement": false,
+          "name": "result_value",
+          "type": "double",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "result_value_units": {
+          "autoincrement": false,
+          "name": "result_value_units",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "result_date": {
+          "autoincrement": false,
+          "name": "result_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "result_text": {
+          "autoincrement": false,
+          "name": "result_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "result_concept_id": {
+          "autoincrement": false,
+          "name": "result_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_problem": {
+          "autoincrement": false,
+          "name": "is_problem",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_review": {
+          "autoincrement": false,
+          "name": "is_review",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "problem_end_date": {
+          "autoincrement": false,
+          "name": "problem_end_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parent_observation_id": {
+          "autoincrement": false,
+          "name": "parent_observation_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "core_concept_id": {
+          "autoincrement": false,
+          "name": "core_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "non_core_concept_id": {
+          "autoincrement": false,
+          "name": "non_core_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "age_at_event": {
+          "autoincrement": false,
+          "name": "age_at_event",
+          "type": "decimal(5,2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "episodicity_concept_id": {
+          "autoincrement": false,
+          "name": "episodicity_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_primary": {
+          "autoincrement": false,
+          "name": "is_primary",
+          "type": "tinyint(1)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_recorded": {
+          "autoincrement": false,
+          "name": "date_recorded",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "observation_id": {
+          "name": "observation_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "indexes": {
+        "idx_obs": {
+          "name": "idx_obs",
+          "columns": [
+            "core_concept_id",
+            "clinical_effective_date",
+            "patient_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "patient": {
+      "name": "patient",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "autoincrement": false,
+          "name": "organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "person_id": {
+          "autoincrement": false,
+          "name": "person_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "autoincrement": false,
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_names": {
+          "autoincrement": false,
+          "name": "first_names",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_name": {
+          "autoincrement": false,
+          "name": "last_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gender_concept_id": {
+          "autoincrement": false,
+          "name": "gender_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nhs_number": {
+          "autoincrement": false,
+          "name": "nhs_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_of_birth": {
+          "autoincrement": false,
+          "name": "date_of_birth",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_of_death": {
+          "autoincrement": false,
+          "name": "date_of_death",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_address_id": {
+          "autoincrement": false,
+          "name": "current_address_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ethnic_code_concept_id": {
+          "autoincrement": false,
+          "name": "ethnic_code_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "registered_practice_organization_id": {
+          "autoincrement": false,
+          "name": "registered_practice_organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "patient_id": {
+          "name": "patient_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "patient_address": {
+      "name": "patient_address",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "autoincrement": false,
+          "name": "organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "patient_id": {
+          "autoincrement": false,
+          "name": "patient_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "person_id": {
+          "autoincrement": false,
+          "name": "person_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "address_line_1": {
+          "autoincrement": false,
+          "name": "address_line_1",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address_line_2": {
+          "autoincrement": false,
+          "name": "address_line_2",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address_line_3": {
+          "autoincrement": false,
+          "name": "address_line_3",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address_line_4": {
+          "autoincrement": false,
+          "name": "address_line_4",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "autoincrement": false,
+          "name": "city",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "postcode": {
+          "autoincrement": false,
+          "name": "postcode",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "use_concept_id": {
+          "autoincrement": false,
+          "name": "use_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_date": {
+          "autoincrement": false,
+          "name": "start_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "autoincrement": false,
+          "name": "end_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lsoa_2001_code": {
+          "autoincrement": false,
+          "name": "lsoa_2001_code",
+          "type": "varchar(9)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lsoa_2011_code": {
+          "autoincrement": false,
+          "name": "lsoa_2011_code",
+          "type": "varchar(9)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "msoa_2001_code": {
+          "autoincrement": false,
+          "name": "msoa_2001_code",
+          "type": "varchar(9)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "msoa_2011_code": {
+          "autoincrement": false,
+          "name": "msoa_2011_code",
+          "type": "varchar(9)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ward_code": {
+          "autoincrement": false,
+          "name": "ward_code",
+          "type": "varchar(9)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "local_authority_code": {
+          "autoincrement": false,
+          "name": "local_authority_code",
+          "type": "varchar(9)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "townsend_deprivation_index": {
+          "autoincrement": false,
+          "name": "townsend_deprivation_index",
+          "type": "double",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "patient_address_id": {
+          "name": "patient_address_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "patient_contact": {
+      "name": "patient_contact",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "autoincrement": false,
+          "name": "organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "patient_id": {
+          "autoincrement": false,
+          "name": "patient_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "person_id": {
+          "autoincrement": false,
+          "name": "person_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "use_concept_id": {
+          "autoincrement": false,
+          "name": "use_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type_concept_id": {
+          "autoincrement": false,
+          "name": "type_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "autoincrement": false,
+          "name": "start_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_date": {
+          "autoincrement": false,
+          "name": "end_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "value": {
+          "autoincrement": false,
+          "name": "value",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "patient_contact_id": {
+          "name": "patient_contact_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "practitioner": {
+      "name": "practitioner",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "autoincrement": false,
+          "name": "organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "autoincrement": false,
+          "name": "name",
+          "type": "varchar(1024)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role_code": {
+          "autoincrement": false,
+          "name": "role_code",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role_desc": {
+          "autoincrement": false,
+          "name": "role_desc",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gmc_code": {
+          "autoincrement": false,
+          "name": "gmc_code",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {
+        "practitioner_id": {
+          "name": "practitioner_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "small_pat": {
+      "name": "small_pat",
+      "columns": {
+        "id": {
+          "autoincrement": false,
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organization_id": {
+          "autoincrement": false,
+          "name": "organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "person_id": {
+          "autoincrement": false,
+          "name": "person_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "autoincrement": false,
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_names": {
+          "autoincrement": false,
+          "name": "first_names",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_name": {
+          "autoincrement": false,
+          "name": "last_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gender_concept_id": {
+          "autoincrement": false,
+          "name": "gender_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nhs_number": {
+          "autoincrement": false,
+          "name": "nhs_number",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_of_birth": {
+          "autoincrement": false,
+          "name": "date_of_birth",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date_of_death": {
+          "autoincrement": false,
+          "name": "date_of_death",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "current_address_id": {
+          "autoincrement": false,
+          "name": "current_address_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ethnic_code_concept_id": {
+          "autoincrement": false,
+          "name": "ethnic_code_concept_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "registered_practice_organization_id": {
+          "autoincrement": false,
+          "name": "registered_practice_organization_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "compositePrimaryKeys": {},
+      "indexes": {},
+      "foreignKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    }
+  },
+  "views": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "tables": {
+      "concept": {
+        "columns": {
+          "updated": {
+            "isDefaultAnExpression": true
+          }
+        }
+      },
+      "concept_map": {
+        "columns": {
+          "updated": {
+            "isDefaultAnExpression": true
+          }
+        }
+      }
+    },
+    "indexes": {}
+  }
+}

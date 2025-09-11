@@ -1,8 +1,8 @@
-import { PrismaClient } from "@@/prisma/generated/postgres";
 import { QueueItemStatus } from "~~/enums";
 import { z } from "zod";
-
-const prisma = new PrismaClient();
+import {postgresDb} from "~~/server/db/postgres";
+import {queueItem} from "~~/server/db/postgres/schema";
+import {eq} from "drizzle-orm";
 
 const paramSchema = z.object({
   queueId: z.string(),
@@ -10,25 +10,27 @@ const paramSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
-  const item = await prisma.queueItem.findFirst({
-    where: { id: { equals: queueId } },
+  const item = await postgresDb.query.queueItem.findFirst({
+    where: eq(queueItem.id, queueId ),
   });
   if (item) {
-    const activeQuery = prisma.$queryRaw`
-    SELECT * FROM pg_stat_activity WHERE state = 'active' LIMIT 1
-    `;
-    const result = prisma.$queryRaw`
+    const activeQuery = postgresDb.execute(`
+        SELECT *
+        FROM pg_stat_activity
+        WHERE state = 'active' LIMIT 1
+    `);
+    const result = postgresDb.execute(`
     SELECT pg_cancel_backend(${activeQuery})
-    `;
+    `);
     if (!result) {
-      prisma.$queryRaw`
+      postgres.execute(`
       SELECT pg_terminate_backend(${activeQuery})
-      `;
+      `);
     }
-    await prisma.queueItem.update({
-      where: { id: item.id },
-      data: { status: QueueItemStatus.CANCELLED, killed_at: new Date() },
-    });
+    await postgresDb
+      .update(queueItem)
+      .set({status: QueueItemStatus.CANCELLED, killedAt: new Date().toISOString()})
+      .where(eq(queueItem.id, item.id));
   } else {
     createError("Query queue item not found for id: " + queueId);
   }

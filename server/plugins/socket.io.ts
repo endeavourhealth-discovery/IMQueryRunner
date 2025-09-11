@@ -32,7 +32,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
 
     socket.on("leaveRoom", (room, user) => {
       socket.leave(room);
-      server.to(room).emit("leave", {
+      socketServer.to(room).emit("leave", {
         from_id: user.id,
         from_name: user.name,
         system: true,
@@ -42,7 +42,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
 
     socket.on("message", (room, message) => {
       console.log(`[Socket.io] message received to room ${room}`);
-      server.to(room).emit("message", message);
+      socketServer.to(room).emit("message", message);
     });
   });
 

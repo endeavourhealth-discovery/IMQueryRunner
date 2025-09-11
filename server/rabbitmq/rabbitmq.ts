@@ -1,15 +1,12 @@
 import {Connection} from "rabbitmq-client";
-import {PrismaClient as PostgresPrismaClient} from "@@/prisma/generated/postgres";
-import {PrismaClient as MYSQLPrismaClient} from "~~/prisma/generated/mysql";
 import {QueueItemStatus} from "~~/enums";
 import {QueryRequest} from "~~/models/AutoGen";
-import {$fetch} from "ofetch";
 import hash from "object-hash";
 import {v4 as uuidv4} from "uuid";
 import {imapi} from "~~/server/utils/imapi";
-
-const postgresPrisma = new PostgresPrismaClient();
-const mysqlPrisma = new MYSQLPrismaClient();
+import {postgresDb} from "~~/server/db/postgres";
+import {eq} from "drizzle-orm";
+import {mysqlDb} from "~~/server/db/mysql";
 
 const resultsMap: Map<string, string[]> = new Map();
 
@@ -38,8 +35,8 @@ const sub = rabbit.createConsumer(
     console.log("Received message from queue");
     const id = msg.messageId;
     const queueItem = msg.body;
-    const entry = await postgresPrisma.queueItem.findFirst({
-      where: {id: {equals: id}},
+    const entry = await postgresDb.query.queueItem.findFirst({
+      where: eq(queueItem.id, id),
     });
     if (entry && QueueItemStatus.CANCELLED === entry.status) {
       throw new Error("Item is cancelled. Query rejected.");
@@ -49,10 +46,10 @@ const sub = rabbit.createConsumer(
     }
 
     console.log("Updating queue item to `RUNNING` status " + id);
-    await postgresPrisma.queueItem.update({
-      where: {id: id},
-      data: {status: QueueItemStatus.RUNNING, started_at: new Date()},
-    });
+    await postgresDb
+      .update(queueItem)
+      .set({status: QueueItemStatus.RUNNING, started_at: new Date()})
+      .where(eq(queueItem.id, id));
 
     console.log("Parsing request");
     const queryRequest: QueryRequest = queueItem;
@@ -62,15 +59,15 @@ const sub = rabbit.createConsumer(
       .catch(async (err) => {
         console.log("IMAPI call failed");
         console.log(err);
-        await postgresPrisma.queueItem.update({
-          where: {id: id},
-          data: {
+        await postgresDb
+          .update(queueItem)
+          .set({
             status: QueueItemStatus.ERRORED,
             error: JSON.stringify(err),
-            killed_at: new Date(),
-          },
+            killedAt: new Date().toISOString(),
+          })
+          .where(eq(queueItem.id, id));
         });
-      });
 
     sql = sql.replaceAll("$searchDate", '"' + queryRequest.referenceDate! + '"');
 
@@ -78,42 +75,19 @@ const sub = rabbit.createConsumer(
     console.log(sql);
     if (sql && typeof sql === "string") {
       const requestHash = hash(queryRequest);
-      sql = 'INSERT INTO imqcache.' + requestHash + ' ' + sql;
+      sql = `DROP TABLE IF EXISTS imqcache.${requestHash};` +
+            `INSERT INTO imqcache.${requestHash} ${sql}`;
       try {
-        const queryResults: string[] = await mysqlPrisma.$queryRawUnsafe(sql);
-        resultsMap.set(requestHash, queryResults);
-        console.log("Creating result table " + requestHash)
-        mysqlPrisma.$executeRaw`
-            CREATE TABLE IF NOT EXISTS ${requestHash}
-            (
-                id
-                BIGINT
-                NOT
-                NULL,
-                PRIMARY
-                KEY
-            (
-                id
-            )
-                )
-        `;
-
-        if (queryResults.length === 0) {
-          console.log("No results to insert");
-        } else {
-          console.log("Inserting " + queryResults?.length + " results into table " + requestHash)
-          await mysqlPrisma.$queryRaw`
-              INSERT INTO ${requestHash} (id)
-              VALUES ${queryResults}
-          `;
-          console.log("Done inserting");
-        }
+        await mysqlDb.execute(sql);
 
         console.log("Updating queue item to `COMPLETED` status " + id);
-        await postgresPrisma.queueItem.update({
-          where: {id: id},
-          data: {status: QueueItemStatus.COMPLETED, finished_at: new Date()},
-        });
+        await postgresDb
+          .update(queueItem)
+          .set({
+            status: QueueItemStatus.COMPLETED,
+            finishedAt: new Date(),
+          })
+          .where(eq(queueItem.id, id));
       } catch (err) {
         console.log("Error running query or caching results");
         console.log(sql);

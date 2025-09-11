@@ -1,12 +1,10 @@
-import { v4 as uuidv4 } from 'uuid';
-import {PrismaClient} from "@@/prisma/generated/postgres";
 import {QueryRunRequest, queryRunRequestSchema} from "~~/models/queryRunRequest.schema";
 import {sendMessage} from "~~/server/rabbitmq/rabbitmq";
 import {QueueItemStatus} from "~~/enums";
 import {IM, type QueryRequest} from "~~/models/AutoGen";
 import {imapi} from "~~/server/utils/imapi";
-
-const prisma = new PrismaClient();
+import {postgresDb} from "~~/server/db/postgres";
+import {queueItem} from "~~/server/db/postgres/schema";
 
 defineRouteMeta({
   openAPI: {
@@ -66,30 +64,20 @@ export default defineEventHandler(async (event) => {
     referenceDate: data.reference_date,
   } as QueryRequest;
 
-/*
-  await prisma.$transaction(async (tx) => {
+  await postgresDb.transaction(async (tx) => {
     const id = await sendMessage(userId, queryRequest);
 
-    await tx.queueItem.create({
-      data: {
-        id: id,
-        query_iri: data.query_id,
-        query_name: "",
-        query_request: JSON.stringify(queryRequest),
-        user_id: userId,
-        user_name: userName,
-        queued_at: new Date(data.reference_date),
-        status: QueueItemStatus.QUEUED,
-        pid: -1,
-        started_at: null,
-        killed_at: null,
-        finished_at: null,
-        error: null,
-      },
-    })
-      .catch(error => {
-        console.error("Error creating queue item", error);
-      });
-  })
-*/
+    tx.insert(queueItem).values({
+      id: id,
+      queryIri: data.query_id,
+      queryName: "",
+      queryRequest: queryRequest,
+      userId: userId,
+      userName: userName,
+      queuedAt: data.reference_date,
+      status: QueueItemStatus.QUEUED,
+    });
+  }).catch(error => {
+    console.error("Error creating queue item", error);
+  });
 });
