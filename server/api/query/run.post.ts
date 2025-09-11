@@ -48,7 +48,7 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   console.log("query run");
-  const currentUser = auth.getUser();
+  const currentUser = apiAuth.getUser();
 
   const userId = currentUser.id;
   const userName = currentUser.name;
