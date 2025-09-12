@@ -3,7 +3,7 @@ import Aura from "@primeuix/themes/aura";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
-  modules: ["@primevue/nuxt-module", "@pinia/nuxt"],
+  modules: ["@primevue/nuxt-module", "@pinia/nuxt", "nuxt-auth-utils"],
   primevue: {
     options: {
       theme: {

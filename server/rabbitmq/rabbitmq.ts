@@ -1,12 +1,12 @@
-import {Connection} from "rabbitmq-client";
-import {PrismaClient as PostgresPrismaClient} from "@@/prisma/generated/postgres";
-import {PrismaClient as MYSQLPrismaClient} from "~~/prisma/generated/mysql";
-import {QueueItemStatus} from "~~/enums";
-import {QueryRequest} from "~~/models/AutoGen";
-import {$fetch} from "ofetch";
+import { Connection } from "rabbitmq-client";
+import { PrismaClient as PostgresPrismaClient } from "@@/prisma/generated/postgres";
+import { PrismaClient as MYSQLPrismaClient } from "~~/prisma/generated/mysql";
+import { QueueItemStatus } from "~~/enums";
+import { QueryRequest } from "~~/models/AutoGen";
+import { $fetch } from "ofetch";
 import hash from "object-hash";
-import {v4 as uuidv4} from "uuid";
-import {imapi} from "~~/server/utils/imapi";
+import { v4 as uuidv4 } from "uuid";
+import { imapi } from "~~/server/utils/imapi";
 
 const postgresPrisma = new PostgresPrismaClient();
 const mysqlPrisma = new MYSQLPrismaClient();
@@ -24,8 +24,8 @@ rabbit.on("connection", () => {
 const sub = rabbit.createConsumer(
   {
     queue: "query.execute",
-    queueOptions: {durable: true},
-    exchanges: [{exchange: "query_runner", type: "topic"}],
+    queueOptions: { durable: true },
+    exchanges: [{ exchange: "query_runner", type: "topic" }],
     queueBindings: [
       {
         exchange: "query_runner",
@@ -37,9 +37,10 @@ const sub = rabbit.createConsumer(
   async (msg) => {
     console.log("Received message from queue");
     const id = msg.messageId;
-    const queueItem = msg.body;
+    const userId = msg.body.userId;
+    const queueItem = msg.body.data;
     const entry = await postgresPrisma.queueItem.findFirst({
-      where: {id: {equals: id}},
+      where: { id: { equals: id } },
     });
     if (entry && QueueItemStatus.CANCELLED === entry.status) {
       throw new Error("Item is cancelled. Query rejected.");
@@ -50,39 +51,51 @@ const sub = rabbit.createConsumer(
 
     console.log("Updating queue item to `RUNNING` status " + id);
     await postgresPrisma.queueItem.update({
-      where: {id: id},
-      data: {status: QueueItemStatus.RUNNING, started_at: new Date()},
+      where: { id: id },
+      data: { status: QueueItemStatus.RUNNING, started_at: new Date() },
+    });
+    globalThis.io.to(userId).emit("message", {
+      msg: "queue updated",
+      timestamp: new Date(),
     });
 
     console.log("Parsing request");
     const queryRequest: QueryRequest = queueItem;
 
     console.log("Getting SQL from IMAPI");
-    let sql: string = await imapi.getQuerySql(queryRequest)
+    let sql: string = await imapi
+      .getQuerySql(queryRequest)
       .catch(async (err) => {
         console.log("IMAPI call failed");
         console.log(err);
         await postgresPrisma.queueItem.update({
-          where: {id: id},
+          where: { id: id },
           data: {
             status: QueueItemStatus.ERRORED,
             error: JSON.stringify(err),
             killed_at: new Date(),
           },
         });
+        globalThis.io.to(userId).emit("message", {
+          msg: "queue updated",
+          timestamp: new Date(),
+        });
       });
 
-    sql = sql.replaceAll("$searchDate", '"' + queryRequest.referenceDate! + '"');
+    sql = sql.replaceAll(
+      "$searchDate",
+      '"' + queryRequest.referenceDate! + '"'
+    );
 
     console.log("Executing SQL and caching results");
     console.log(sql);
     if (sql && typeof sql === "string") {
       const requestHash = hash(queryRequest);
-      sql = 'INSERT INTO imqcache.' + requestHash + ' ' + sql;
+      sql = "INSERT INTO imqcache." + requestHash + " " + sql;
       try {
         const queryResults: string[] = await mysqlPrisma.$queryRawUnsafe(sql);
         resultsMap.set(requestHash, queryResults);
-        console.log("Creating result table " + requestHash)
+        console.log("Creating result table " + requestHash);
         mysqlPrisma.$executeRaw`
             CREATE TABLE IF NOT EXISTS ${requestHash}
             (
@@ -101,7 +114,12 @@ const sub = rabbit.createConsumer(
         if (queryResults.length === 0) {
           console.log("No results to insert");
         } else {
-          console.log("Inserting " + queryResults?.length + " results into table " + requestHash)
+          console.log(
+            "Inserting " +
+              queryResults?.length +
+              " results into table " +
+              requestHash
+          );
           await mysqlPrisma.$queryRaw`
               INSERT INTO ${requestHash} (id)
               VALUES ${queryResults}
@@ -111,8 +129,12 @@ const sub = rabbit.createConsumer(
 
         console.log("Updating queue item to `COMPLETED` status " + id);
         await postgresPrisma.queueItem.update({
-          where: {id: id},
-          data: {status: QueueItemStatus.COMPLETED, finished_at: new Date()},
+          where: { id: id },
+          data: { status: QueueItemStatus.COMPLETED, finished_at: new Date() },
+        });
+        globalThis.io.to(userId).emit("message", {
+          msg: "queue updated",
+          timestamp: new Date(),
         });
       } catch (err) {
         console.log("Error running query or caching results");
@@ -135,14 +157,18 @@ sub.on("error", (err) => {
 const pub = rabbit.createPublisher({
   confirm: true,
   maxAttempts: 2,
-  exchanges: [{exchange: "query_runner", type: "topic"}],
+  exchanges: [{ exchange: "query_runner", type: "topic" }],
 });
 
 export async function sendMessage(userId: string, message: any) {
   const id = uuidv4();
 
   await pub.send(
-    {messageId: id, exchange: "query_runner", routingKey: "query.execute." + userId},
+    {
+      messageId: id,
+      exchange: "query_runner",
+      routingKey: "query.execute." + userId,
+    },
     message
   );
 

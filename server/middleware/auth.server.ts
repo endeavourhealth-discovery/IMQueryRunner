@@ -1,28 +1,36 @@
-import {apiAuth} from "~~/server/utils/security/api.auth";
-import {apiGuard} from "~~/server/utils/security/api.guard";
+import { apiGuard } from "~~/server/utils/security/api.guard";
 
 export default defineEventHandler(async (event) => {
+  console.log("API : server auth middleware");
+  console.log(getHeaders(event));
   const path = getRequestURL(event).pathname;
-  if  (!path.startsWith("/api"))
-    return;
+  console.log("API : path=" + path);
+  if (!path.startsWith("/api")) return;
 
   // Authentication
-  const token = getCookie(event,"jwtToken");
-  apiAuth.initialize(token, useRuntimeConfig());
-  // apiAuth.validateToken(); // This is done in apiGuard.checkPermissions() if needed
-
+  const publicRoutes = [
+    "/api/auth/login",
+    "/api/oauth/token",
+    "/api/public/auth/hasPermission",
+  ];
+  if (!publicRoutes.includes(path)) {
+    await requireUserSession(event);
+  }
 
   // Authorization
-  const user = apiAuth.getUser();
+  const user = await getUserSession(event);
+  console.log("API : middleware user ");
+  console.log(user);
   const method = event.method;
+  if (user?.user) {
+    const allowed = await apiGuard.checkPermissions(user.user, path, method);
 
-  const allowed = await apiGuard.checkPermissions(user, path, method);
-
-  console.log(`API: Permission on route [${method}:${path}] = ${allowed}`);
-  if (!allowed) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
+    console.log(`API: Permission on route [${method}:${path}] = ${allowed}`);
+    if (!allowed) {
+      throw createError({
+        statusCode: 401,
+        statusMessage: "Unauthorized",
+      });
+    }
   }
-})
+});

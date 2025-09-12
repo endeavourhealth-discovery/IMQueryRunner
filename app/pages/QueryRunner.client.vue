@@ -98,11 +98,10 @@ import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
 import { useUserStore } from "~/stores/userStore";
 
-const userStore = useUserStore();
-const currentUser = computed(() => userStore.currentUser);
+const { user } = useUserSession();
 const socket = io({
   extraHeaders: {
-    authorization: `bearer ${currentUser.value?.token}`,
+    authorization: `bearer ${user.value?.id}`,
   },
 });
 
@@ -122,13 +121,13 @@ onMounted(async () => {
   console.log("QueryRunner mounted");
   loading.value = true;
   loading.value = false;
-  console.log("Socket room joining")
-  socket.emit("joinRoom", "test-room", currentUser.value?.name);
+  console.log("Socket room joining");
+  socket.emit("joinRoom", "test-room", user.value?.name);
   console.log("Adding listener");
-  socket.on("message", function(data) {
+  socket.on("message", function (data) {
     alert(data);
   });
-  socket.emit("hello")
+  socket.emit("hello");
 });
 
 async function initSearch() {
@@ -137,7 +136,7 @@ async function initSearch() {
     "/api/queue/user/",
     {
       query: {
-        userId: currentUser.value?.id,
+        userId: user.value?.id,
         page: page.value,
         size: rows.value,
       },
@@ -158,13 +157,12 @@ async function initSearch() {
 }
 
 async function refresh() {
-
   searchLoading.value = true;
   const results = await $fetch<{ totalCount: number; result: QueueItem[] }>(
     "/api/queue/user/",
     {
       query: {
-        userId: currentUser.value?.id,
+        userId: user.value?.id,
         page: page.value,
         size: rows.value,
       },
@@ -205,7 +203,7 @@ function getStatusSeverity(
 
 async function cancelQuery(queryId: string) {
   await useFetch("/api/queue/query/cancel", { params: { queueId: queryId } });
-  await init();
+  await initSearch();
 }
 
 function goToQuery(queryIri: string) {}
@@ -217,14 +215,14 @@ async function viewQueryResults(queryItem: QueueItem) {
 
 async function deleteQuery(queryId: string) {
   await useFetch("/api/queue/query/delete", { params: { queueId: queryId } });
-  await init();
+  await initSearch();
 }
 
 async function requeueQuery(queryId: string) {
   const found = getById(queryId);
   if (found)
     await useFetch("/api/queue/query/requeue", { method: "post", body: found });
-  await init();
+  await initSearch();
 }
 
 function getById(queryId: string): QueueItem | undefined {
@@ -259,7 +257,7 @@ function onDisconnect() {
 }
 
 onBeforeUnmount(() => {
-  socket.disconnect()
+  socket.disconnect();
 });
 
 socket.on("queueUpdate", (value) => {

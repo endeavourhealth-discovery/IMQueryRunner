@@ -1,10 +1,12 @@
-import {apiAuth} from "~~/server/utils/security/api.auth";
-import {apiGuard} from "~~/server/utils/security/api.guard";
+import { apiGuard } from "~~/server/utils/security/api.guard";
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
-  const user = apiAuth.getUser();
+  const user = await getUserSession(event);
 
-  return await apiGuard.checkPermissions(user, body.object, body.action);
+  if (!user.user)
+    throw createError({ statusCode: 401, message: "No user found" });
+
+  return await apiGuard.checkPermissions(user.user, body.object, body.action);
 });

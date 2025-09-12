@@ -1,13 +1,16 @@
 import type { NitroApp } from "nitropack";
 import { Server as Engine } from "engine.io";
 import { defineEventHandler } from "h3";
+import { Server } from "socket.io";
 
 export default defineNitroPlugin((nitroApp: NitroApp) => {
   const engine = new Engine();
+  const io = new Server();
 
-  socketServer.bind(engine);
+  globalThis.io = io;
+  io.bind(engine);
 
-  socketServer.on("connection", (socket) => {
+  io.on("connection", (socket) => {
     console.log("socket connected", socket.id);
     socket.on("disconnect", () => {
       console.log("socket disconnected", socket.id);
@@ -17,9 +20,8 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
       console.log("============= hello ============", socket.id);
     });
 
-
     socket.on("joinRoom", (room, user) => {
-      console.log("===================== Attempting to join room")
+      console.log("===================== Attempting to join room");
       socket.join(room);
       console.log("User " + user + " joined room " + room);
       // server.to(room).emit("join", {
@@ -32,7 +34,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
 
     socket.on("leaveRoom", (room, user) => {
       socket.leave(room);
-      server.to(room).emit("leave", {
+      socket.to(room).emit("leave", {
         from_id: user.id,
         from_name: user.name,
         system: true,
@@ -42,7 +44,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
 
     socket.on("message", (room, message) => {
       console.log(`[Socket.io] message received to room ${room}`);
-      server.to(room).emit("message", message);
+      socket.to(room).emit("message", message);
     });
   });
 

@@ -1,4 +1,7 @@
-import {oathTokenRequestSchema, type OauthTokenRequest} from "~~/models/oauth.token.request.schema";
+import {
+  oathTokenRequestSchema,
+  type OauthTokenRequest,
+} from "~~/models/oauth.token.request.schema";
 
 defineRouteMeta({
   openAPI: {
@@ -11,9 +14,9 @@ defineRouteMeta({
         description: "Bearer token",
         required: true,
         schema: {
-          type: "string"
-        }
-      } as const
+          type: "string",
+        },
+      } as const,
     ],
     requestBody: {
       description: "Credentials",
@@ -22,25 +25,30 @@ defineRouteMeta({
           schema: {
             type: "object",
             properties: {
-              "token": {type: "string", description: "Token"},
-              "client_id": {type: "string", description: "Client ID"},
-              "client_secret": {type: "string", description: "Client Secret"},
+              token: { type: "string", description: "Token" },
+              client_id: { type: "string", description: "Client ID" },
+              client_secret: { type: "string", description: "Client Secret" },
             },
             required: ["client_id", "client_secret"] as const,
-          }
+          },
         },
-      }
+      },
     },
     responses: {
-      200: { description: "OK" }
-    }
+      200: { description: "OK" },
+    },
   },
 });
 
 export default defineEventHandler(async (event) => {
   console.log("revoke token");
-  authenticator.requiresAuth(event);
-
-  const data: OauthTokenRequest = await readValidatedBody(event, oathTokenRequestSchema.parse);
-  return await authenticator.revokeToken(data.token!);
+  await requireUserSession(event);
+  const userSession = await getUserSession(event);
+  if (userSession.secure?.casdoorAccessToken) {
+    const token = await globalThis.casdoor.getToken(
+      userSession.secure.casdoorAccessToken
+    );
+    await globalThis.casdoor.deleteToken(token.data.data);
+  }
+  return;
 });

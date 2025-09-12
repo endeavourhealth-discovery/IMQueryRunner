@@ -1,4 +1,8 @@
-import {oathTokenRequestSchema, type OauthTokenRequest} from "~~/models/oauth.token.request.schema";
+import {
+  oathTokenRequestSchema,
+  type OauthTokenRequest,
+} from "~~/models/oauth.token.request.schema";
+import { getMachineToken } from "~~/server/helpers/getMachineToken";
 
 defineRouteMeta({
   openAPI: {
@@ -11,13 +15,13 @@ defineRouteMeta({
           schema: {
             type: "object",
             properties: {
-              "client_id": {type: "string", description: "Client ID"},
-              "client_secret": {type: "string", description: "Client Secret"},
+              client_id: { type: "string", description: "Client ID" },
+              client_secret: { type: "string", description: "Client Secret" },
             },
             required: ["client_id", "client_secret"] as const,
-          }
+          },
         },
-      }
+      },
     },
     responses: {
       200: {
@@ -27,31 +31,46 @@ defineRouteMeta({
             schema: {
               type: "object",
               properties: {
-                "access_token": {type: "string"},
-                "token_type": {type: "string"},
-                "expires_in": {type: "number"}
-              }
-            }
-          }
-        }
-      }
-    }
+                access_token: { type: "string" },
+                token_type: { type: "string" },
+                expires_in: { type: "number" },
+              },
+            },
+          },
+        },
+      },
+    },
   },
 });
 
 export default defineEventHandler(async (event) => {
   console.log("get token");
-  const data: OauthTokenRequest = await readValidatedBody(event, oathTokenRequestSchema.parse);
+  const data: OauthTokenRequest = await readValidatedBody(
+    event,
+    oathTokenRequestSchema.parse
+  );
 
-  const tokenResponse = await apiAuth.getMachineToken(data.client_id, data.client_secret);
+  const tokenResponse = await getMachineToken(
+    data.client_id,
+    data.client_secret
+  );
 
-  const {access_token, token_type, expires_in} = tokenResponse
+  const { access_token, token_type, expires_in } = tokenResponse;
+  const user = globalThis.casdoor.parseJwtToken(access_token);
+  console.log("API : token.post user:");
+  console.log(user);
+  setUserSession(event, {
+    user: user,
+    secure: {
+      casdoorAccessToken: access_token,
+    },
+  });
 
   return {
     success: true,
     token: access_token,
     type: token_type,
     expiresIn: expires_in,
-    timestamp: new Date().toISOString()
-  }
+    timestamp: new Date().toISOString(),
+  };
 });
