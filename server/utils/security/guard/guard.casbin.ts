@@ -1,7 +1,7 @@
-import type {User} from "~~/models";
 import {type Enforcer, newEnforcer} from "casbin";
 import Guard from "~~/server/utils/security/guard/guard.base";
 import AuthorizationError from "~~/server/errors/authorization.error";
+import type {User} from "~~/models/User";
 
 
 export class GuardCasbin implements Guard {
@@ -11,13 +11,15 @@ export class GuardCasbin implements Guard {
     try {
       this.enforcer ??= await newEnforcer("public/casbin/model.conf", "public/casbin/policy.csv");
 
-      // return await this.enforcer.enforce(subject, path, action);
+      return await this.enforcer.enforce(subject, path, action);
 
        // FOR DEBUG TO SEE WHICH RULE(S) PASSED
+/*
       const permission = await this.enforcer.enforceEx(subject, path, action)
       console.log("========== PERMISSION ==========")
       console.log(permission[1])
       return permission[0].valueOf();
+*/
     } catch (error:any) {
       console.error('API: Error checking permissions:', error)
 

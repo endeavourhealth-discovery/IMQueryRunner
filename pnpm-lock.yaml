@@ -29,6 +29,9 @@ importers:
       drizzle-orm:
         specifier: ^0.44.5
         version: 0.44.5(@prisma/client@6.16.1(prisma@6.14.0(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@types/pg@8.15.5)(mysql2@3.14.3)(pg@8.16.3)(prisma@6.14.0(magicast@0.3.5)(typescript@5.9.2))
+      drizzle-zod:
+        specifier: ^0.8.3
+        version: 0.8.3(drizzle-orm@0.44.5(@prisma/client@6.16.1(prisma@6.14.0(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@types/pg@8.15.5)(mysql2@3.14.3)(pg@8.16.3)(prisma@6.14.0(magicast@0.3.5)(typescript@5.9.2)))(zod@4.0.17)
       engine.io:
         specifier: ^6.6.4
         version: 6.6.4
@@ -53,9 +56,6 @@ importers:
       primevue:
         specifier: ^4.3.7
         version: 4.3.7(vue@3.5.18(typescript@5.9.2))
-      prisma:
-        specifier: ^6.14.0
-        version: 6.14.0(magicast@0.3.5)(typescript@5.9.2)
       rabbitmq-client:
         specifier: ^5.0.5
         version: 5.0.5
@@ -2732,6 +2732,12 @@ packages:
         optional: true
       sqlite3:
         optional: true
+
+  drizzle-zod@0.8.3:
+    resolution: {integrity: sha512-66yVOuvGhKJnTdiqj1/Xaaz9/qzOdRJADpDa68enqS6g3t0kpNkwNYjUuaeXgZfO/UWuIM9HIhSlJ6C5ZraMww==}
+    peerDependencies:
+      drizzle-orm: '>=0.36.0'
+      zod: ^3.25.0 || ^4.0.0
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -6546,10 +6552,13 @@ snapshots:
       empathic: 2.0.0
     transitivePeerDependencies:
       - magicast
+    optional: true
 
-  '@prisma/debug@6.14.0': {}
+  '@prisma/debug@6.14.0':
+    optional: true
 
-  '@prisma/engines-version@6.14.0-25.717184b7b35ea05dfa71a3236b7af656013e1e49': {}
+  '@prisma/engines-version@6.14.0-25.717184b7b35ea05dfa71a3236b7af656013e1e49':
+    optional: true
 
   '@prisma/engines@6.14.0':
     dependencies:
@@ -6557,16 +6566,19 @@ snapshots:
       '@prisma/engines-version': 6.14.0-25.717184b7b35ea05dfa71a3236b7af656013e1e49
       '@prisma/fetch-engine': 6.14.0
       '@prisma/get-platform': 6.14.0
+    optional: true
 
   '@prisma/fetch-engine@6.14.0':
     dependencies:
       '@prisma/debug': 6.14.0
       '@prisma/engines-version': 6.14.0-25.717184b7b35ea05dfa71a3236b7af656013e1e49
       '@prisma/get-platform': 6.14.0
+    optional: true
 
   '@prisma/get-platform@6.14.0':
     dependencies:
       '@prisma/debug': 6.14.0
+    optional: true
 
   '@rolldown/pluginutils@1.0.0-beta.29': {}
 
@@ -6975,7 +6987,8 @@ snapshots:
 
   '@speed-highlight/core@1.2.7': {}
 
-  '@standard-schema/spec@1.0.0': {}
+  '@standard-schema/spec@1.0.0':
+    optional: true
 
   '@tailwindcss/node@4.1.12':
     dependencies:
@@ -7510,6 +7523,7 @@ snapshots:
       rc9: 2.1.2
     optionalDependencies:
       magicast: 0.3.5
+    optional: true
 
   c12@3.2.0(magicast@0.3.5):
     dependencies:
@@ -7800,7 +7814,8 @@ snapshots:
     dependencies:
       callsite: 1.0.0
 
-  deepmerge-ts@7.1.5: {}
+  deepmerge-ts@7.1.5:
+    optional: true
 
   deepmerge@4.3.1: {}
 
@@ -7930,6 +7945,11 @@ snapshots:
       pg: 8.16.3
       prisma: 6.14.0(magicast@0.3.5)(typescript@5.9.2)
 
+  drizzle-zod@0.8.3(drizzle-orm@0.44.5(@prisma/client@6.16.1(prisma@6.14.0(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@types/pg@8.15.5)(mysql2@3.14.3)(pg@8.16.3)(prisma@6.14.0(magicast@0.3.5)(typescript@5.9.2)))(zod@4.0.17):
+    dependencies:
+      drizzle-orm: 0.44.5(@prisma/client@6.16.1(prisma@6.14.0(magicast@0.3.5)(typescript@5.9.2))(typescript@5.9.2))(@types/pg@8.15.5)(mysql2@3.14.3)(pg@8.16.3)(prisma@6.14.0(magicast@0.3.5)(typescript@5.9.2))
+      zod: 4.0.17
+
   dunder-proto@1.0.1:
     dependencies:
       call-bind-apply-helpers: 1.0.2
@@ -7946,6 +7966,7 @@ snapshots:
     dependencies:
       '@standard-schema/spec': 1.0.0
       fast-check: 3.23.2
+    optional: true
 
   electron-to-chromium@1.5.200: {}
 
@@ -7953,7 +7974,8 @@ snapshots:
 
   emoji-regex@9.2.2: {}
 
-  empathic@2.0.0: {}
+  empathic@2.0.0:
+    optional: true
 
   enabled@2.0.0: {}
 
@@ -8166,6 +8188,7 @@ snapshots:
   fast-check@3.23.2:
     dependencies:
       pure-rand: 6.1.0
+    optional: true
 
   fast-fifo@1.3.2: {}
 
@@ -9557,6 +9580,7 @@ snapshots:
       typescript: 5.9.2
     transitivePeerDependencies:
       - magicast
+    optional: true
 
   process-nextick-args@2.0.1: {}
 
@@ -9574,7 +9598,8 @@ snapshots:
       end-of-stream: 1.4.5
       once: 1.4.0
 
-  pure-rand@6.1.0: {}
+  pure-rand@6.1.0:
+    optional: true
 
   qs@6.14.0:
     dependencies:

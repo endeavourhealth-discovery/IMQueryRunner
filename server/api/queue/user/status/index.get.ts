@@ -1,8 +1,6 @@
 import z from "zod";
 import { QueueItemStatus } from "~~/enums";
-import { isQueueItemStatus } from "~~/enums/QueueItemStatus";
-import { schemaToQueueItem } from "~~/server/helpers/schemaToQueueItem";
-import {postgresDb} from "~~/server/db/postgres";
+import {pgQueueItemSelect, postgresDb} from "~~/server/db/postgres";
 import {and, desc, eq} from "drizzle-orm";
 import {queueItem} from "~~/server/db/postgres/schema";
 
@@ -26,7 +24,7 @@ export default defineEventHandler(async (event) => {
     )
   );
 
-  const items = await postgresDb.query.queueItem.findMany({
+  const rs = await postgresDb.query.queueItem.findMany({
     where: and(
       eq(queueItem.userId, userId),
       eq(queueItem.status, status)
@@ -35,9 +33,9 @@ export default defineEventHandler(async (event) => {
     offset: (+page - 1) * +size,
     limit: size
   });
-  const itemsAsQueueItem = items.map((item) => schemaToQueueItem(item));
+  const items = rs.map((row) => pgQueueItemSelect.parse(row));
   return {
-    result: itemsAsQueueItem,
+    result: items,
     totalCount,
     page: page,
   };

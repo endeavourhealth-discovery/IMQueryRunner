@@ -39,8 +39,7 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   console.log("revoke token");
-  authenticator.requiresAuth(event);
 
   const data: OauthTokenRequest = await readValidatedBody(event, oathTokenRequestSchema.parse);
-  return await authenticator.revokeToken(data.token!);
+  return await apiAuth.revokeToken(data.token!);
 });

@@ -1,10 +1,16 @@
-import {QueryRunRequest, queryRunRequestSchema} from "~~/models/queryRunRequest.schema";
 import {sendMessage} from "~~/server/rabbitmq/rabbitmq";
 import {QueueItemStatus} from "~~/enums";
-import {IM, type QueryRequest} from "~~/models/AutoGen";
 import {imapi} from "~~/server/utils/imapi";
-import {postgresDb} from "~~/server/db/postgres";
+import {pgQueueItemInsert, postgresDb} from "~~/server/db/postgres";
 import {queueItem} from "~~/server/db/postgres/schema";
+import {IM} from "~~/models/AutoGen";
+import z from "zod";
+
+export const queryRunRequestSchema = z.object({
+  query_id: z.string(),
+  reference_date: z.string(),
+});
+
 
 defineRouteMeta({
   openAPI: {
@@ -54,29 +60,32 @@ export default defineEventHandler(async (event) => {
   console.log("userId", userId);
   console.log("userName", userName);
 
-  const data: QueryRunRequest = await readValidatedBody(event, queryRunRequestSchema.parse);
+  const data = await readValidatedBody(event, queryRunRequestSchema.parse);
 
   const entity = await imapi.getPartialEntity(data.query_id, [IM.DEFINITION]);
   const query = JSON.parse(entity[IM.DEFINITION]);
 
-  const queryRequest: QueryRequest = {
+  const queryRequest = {
     query: query,
     referenceDate: data.reference_date,
-  } as QueryRequest;
+  };
 
   await postgresDb.transaction(async (tx) => {
     const id = await sendMessage(userId, queryRequest);
 
-    tx.insert(queueItem).values({
-      id: id,
-      queryIri: data.query_id,
-      queryName: "",
-      queryRequest: queryRequest,
-      userId: userId,
-      userName: userName,
-      queuedAt: data.reference_date,
-      status: QueueItemStatus.QUEUED,
-    });
+    const qi = pgQueueItemInsert.parse(
+      {
+        id: id,
+        queryIri: data.query_id,
+        queryName: "",
+        queryRequest: queryRequest,
+        userId: userId,
+        userName: userName,
+        queuedAt: data.reference_date,
+        status: QueueItemStatus.QUEUED,
+      }
+    )
+    await tx.insert(queueItem).values(qi)
   }).catch(error => {
     console.error("Error creating queue item", error);
   });
