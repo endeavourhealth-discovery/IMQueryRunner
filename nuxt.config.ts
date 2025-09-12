@@ -17,7 +17,7 @@ export default defineNuxtConfig({
   },
   routeRules: {
     "/": {
-      redirect: "/QueryRunner"
+      redirect: "./QueryRunner"
     }
   },
   css: ["~/assets/css/main.css"],
