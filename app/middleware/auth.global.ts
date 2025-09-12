@@ -6,6 +6,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return;
 
   const reqUrl = useRequestURL();
+
+  console.log("========= Request URL =========");
+  console.log(reqUrl);
+
   const origin = reqUrl.origin;
   const pathname = reqUrl.pathname;
   const token = useCookie("jwtToken");
