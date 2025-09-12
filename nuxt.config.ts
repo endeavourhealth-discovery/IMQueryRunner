@@ -33,6 +33,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
+      baseUrl: process.env.BASE_URL,
       casdoorUrl: process.env.CASDOOR_URL,
       casdoorOrganisationName: process.env.CASDOOR_ORGANISATION_NAME,
       casdoorClientId: process.env.CASDOOR_CLIENT_ID,

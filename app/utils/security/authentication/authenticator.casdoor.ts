@@ -1,14 +1,16 @@
 import type {SharedPublicRuntimeConfig} from "#build/types/runtime-config";
 import getUserFromTokenCasdoor from "#shared/jwtCasdoor";
-import type {User} from "~~/models";
 import Authenticator from "~/utils/security/authentication/authenticator";
+import type {User} from "~~/models/User";
 
 export default class AuthenticatorCasdoor extends Authenticator {
+  private baseUrl: string = "";
   private serverUrl: string = "";
   private clientId: string = "";
   private organisation: string = "";
 
   configure(config: SharedPublicRuntimeConfig) {
+    this.baseUrl = config.baseUrl;
     this.serverUrl = config.casdoorUrl;
     this.clientId = config.casdoorClientId;
     this.organisation = config.casdoorOrganisationName;
@@ -19,7 +21,7 @@ export default class AuthenticatorCasdoor extends Authenticator {
   }
 
   async login(successUrl: string, failUrl: string) {
-    await navigateTo(`${this.serverUrl}/login/${this.organisation}?redirect_uri=${encodeURIComponent(successUrl)}&response_type=token&client_id=${this.clientId}`, {external: true});
+    await navigateTo(`${this.serverUrl}/login/${this.organisation}?redirect_uri=${encodeURIComponent(this.baseUrl + successUrl)}&response_type=token&client_id=${this.clientId}`, {external: true});
   }
 
   logout(): Promise<void> {

@@ -10,7 +10,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   console.log("========= Request URL =========");
   console.log(reqUrl);
 
-  const origin = reqUrl.origin;
   const pathname = reqUrl.pathname;
   const token = useCookie("jwtToken");
   const userStore = useUserStore();
@@ -30,7 +29,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       return navigateTo("/unauthorized");
     } else {
       console.log("UI : Not logged in, redirecting to login")
-      return uiAuth.login(`${origin}/callback?redirect=${to.path}`, `${origin}/unauthorized`);
+      return uiAuth.login(`/${to.path}`, `/unauthorized`);
     }
   }
 });
