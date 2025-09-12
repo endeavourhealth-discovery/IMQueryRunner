@@ -21,7 +21,7 @@ export default class AuthenticatorCasdoor extends Authenticator {
   }
 
   async login(successUrl: string, failUrl: string) {
-    await navigateTo(`${this.serverUrl}/login/${this.organisation}?redirect_uri=${encodeURIComponent(this.baseUrl + successUrl)}&response_type=token&client_id=${this.clientId}`, {external: true});
+    await navigateTo(`${this.serverUrl}/login/${this.organisation}?redirect_uri=${encodeURIComponent(this.baseUrl + "/callback?redirect=" + successUrl)}&response_type=token&client_id=${this.clientId}`, {external: true});
   }
 
   logout(): Promise<void> {
