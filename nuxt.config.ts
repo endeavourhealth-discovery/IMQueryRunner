@@ -25,7 +25,6 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   compatibilityDate: "2025-07-15",
-  devtools: { enabled: true },
   nitro: {
     experimental: {
       websocket: true,
