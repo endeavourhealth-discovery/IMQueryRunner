@@ -1,5 +1,5 @@
-import { QueueItem as QueueItemSchema } from "~~/prisma/generated/postgres";
-import { QueueItem as QueueItemModel } from "~~/models";
+import type { QueueItem as QueueItemSchema } from "~~/prisma/generated/postgres";
+import type { QueueItem as QueueItemModel } from "~~/models";
 
 export function schemaToQueueItem(schemaItem: QueueItemSchema): QueueItemModel {
   const queryRequestJson = schemaItem.query_request?.toString();

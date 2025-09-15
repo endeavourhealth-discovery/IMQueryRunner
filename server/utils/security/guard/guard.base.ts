@@ -1,4 +1,4 @@
-import { User } from "#auth-utils";
+import type { User } from "#auth-utils";
 
 export default interface Guard {
   checkPermissions(

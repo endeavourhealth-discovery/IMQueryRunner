@@ -1,8 +1,7 @@
 import { PrismaClient } from "@@/prisma/generated/postgres";
-import { QueueItem } from "@@/models";
+import type { QueueItem } from "@@/models";
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
-import {queueItemSchema} from "~~/models/queryItem.schema";
-
+import { queueItemSchema } from "~~/models/queryItem.schema";
 
 const prisma = new PrismaClient();
 

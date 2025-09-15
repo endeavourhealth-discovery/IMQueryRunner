@@ -58,12 +58,9 @@ export default defineEventHandler(async (event) => {
   const { access_token, token_type, expires_in } = tokenResponse;
   const user = globalThis.casdoor.parseJwtToken(access_token);
   console.log("API : token.post user:");
-  console.log(user);
   setUserSession(event, {
-    user: user,
-    secure: {
-      casdoorAccessToken: access_token,
-    },
+    user: { id: user.id, name: user.name },
+    loggedInAt: new Date(),
   });
 
   return {

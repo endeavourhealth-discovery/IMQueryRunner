@@ -12,7 +12,7 @@
         alt="IM logo"
         v-on:click="toLandingPage"
       />
-     <span>USER: [{{ currentUser?.name }}]</span>
+      <span>USER: [{{ user?.name }}]</span>
     </div>
     <div
       id="header-content"
@@ -28,8 +28,11 @@
 </template>
 
 <script setup lang="ts">
-  const userStore = useUserStore();
-  const { currentUser } = storeToRefs(userStore);
+const { user } = useUserSession();
+
+async function toLandingPage() {
+  return await navigateTo("/");
+}
 </script>
 
 <style scoped></style>

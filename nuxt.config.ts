@@ -17,8 +17,8 @@ export default defineNuxtConfig({
   },
   routeRules: {
     "/": {
-      redirect: "/QueryRunner"
-    }
+      redirect: "/QueryRunner",
+    },
   },
   css: ["~/assets/css/main.css"],
   vite: {
@@ -43,5 +43,8 @@ export default defineNuxtConfig({
       // cognitoUserPool: process.env.COGNITO_USER_POOL,
       // cognitoWebClient: process.env.COGNITO_WEB_CLIENT,
     },
+  },
+  typescript: {
+    typeCheck: true,
   },
 });

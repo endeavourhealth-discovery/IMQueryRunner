@@ -5,7 +5,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   console.log("UI : to: " + to.path);
   console.log("UI : from: " + from.path);
   // if (to.path === from.path) return;
-  if (to.path.startsWith("/api")) return;
 
   const publicRoutes = ["/unauthorized"];
   if (publicRoutes.includes(to.path)) return;
@@ -28,9 +27,14 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       return navigateTo("/unauthorized");
     } else {
       console.log("UI : Not logged in, redirecting to login");
-      return login(
-        `${origin}/callback?redirect=${to.path}`,
-        `${origin}/unauthorized`
+      const config = useRuntimeConfig().public;
+      return navigateTo(
+        `${config.casdoorUrl}/login/${
+          config.casdoorOrganisationName
+        }?redirect_uri=${encodeURIComponent(
+          `${origin}/callback?redirect=${to.path}`
+        )}&response_type=token&client_id=${config.casdoorClientId}`,
+        { external: true }
       );
     }
   }

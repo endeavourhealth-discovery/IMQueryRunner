@@ -4,4 +4,8 @@ import { SDK } from "casdoor-nodejs-sdk";
 declare global {
   var io: IOServer;
   var casdoor: SDK;
+  interface GlobalThis {
+    io: IOServer;
+    casdoor: SDK;
+  }
 }

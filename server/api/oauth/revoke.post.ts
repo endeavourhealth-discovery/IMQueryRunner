@@ -44,10 +44,8 @@ export default defineEventHandler(async (event) => {
   console.log("revoke token");
   await requireUserSession(event);
   const userSession = await getUserSession(event);
-  if (userSession.secure?.casdoorAccessToken) {
-    const token = await globalThis.casdoor.getToken(
-      userSession.secure.casdoorAccessToken
-    );
+  if (userSession.user?.id) {
+    const token = await globalThis.casdoor.getToken(userSession.user.id);
     await globalThis.casdoor.deleteToken(token.data.data);
   }
   return;

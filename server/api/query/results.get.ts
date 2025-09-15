@@ -1,6 +1,6 @@
 import { PrismaClient } from "@@/prisma/generated/mysql";
 import hash from "object-hash";
-import { QueryRequest } from "~~/models/AutoGen";
+import type { QueryRequest } from "~~/models/AutoGen";
 import { getCachedResults } from "~~/server/rabbitmq/rabbitmq";
 import { $fetch } from "ofetch";
 
@@ -15,10 +15,10 @@ defineRouteMeta({
       content: {
         "application/json": {
           description: "Query Request object",
-          schema: {type: "object"}
-        }
-      }
-    }
+          schema: { type: "object" },
+        },
+      },
+    },
   },
 });
 

@@ -2,7 +2,7 @@ import { Connection } from "rabbitmq-client";
 import { PrismaClient as PostgresPrismaClient } from "@@/prisma/generated/postgres";
 import { PrismaClient as MYSQLPrismaClient } from "~~/prisma/generated/mysql";
 import { QueueItemStatus } from "~~/enums";
-import { QueryRequest } from "~~/models/AutoGen";
+import type { QueryRequest } from "~~/models/AutoGen";
 import { $fetch } from "ofetch";
 import hash from "object-hash";
 import { v4 as uuidv4 } from "uuid";

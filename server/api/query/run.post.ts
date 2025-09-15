@@ -1,10 +1,13 @@
-import { v4 as uuidv4 } from 'uuid';
-import {PrismaClient} from "@@/prisma/generated/postgres";
-import {QueryRunRequest, queryRunRequestSchema} from "~~/models/queryRunRequest.schema";
-import {sendMessage} from "~~/server/rabbitmq/rabbitmq";
-import {QueueItemStatus} from "~~/enums";
-import {IM, type QueryRequest} from "~~/models/AutoGen";
-import {imapi} from "~~/server/utils/imapi";
+import { v4 as uuidv4 } from "uuid";
+import { PrismaClient } from "@@/prisma/generated/postgres";
+import {
+  type QueryRunRequest,
+  queryRunRequestSchema,
+} from "~~/models/queryRunRequest.schema";
+import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
+import { QueueItemStatus } from "~~/enums";
+import { IM, type QueryRequest } from "~~/models/AutoGen";
+import { imapi } from "~~/server/utils/imapi";
 
 const prisma = new PrismaClient();
 
@@ -19,9 +22,9 @@ defineRouteMeta({
         description: "Bearer token",
         required: true,
         schema: {
-          type: "string"
-        }
-      } as const
+          type: "string",
+        },
+      } as const,
     ],
     requestBody: {
       description: "Credentials",
@@ -30,33 +33,42 @@ defineRouteMeta({
           schema: {
             type: "object",
             properties: {
-              "query_id": {type: "string", description: "IRI of the query to run"},
-              "reference_date": {type: "string", description: "The reference date to run the query against"},
+              query_id: {
+                type: "string",
+                description: "IRI of the query to run",
+              },
+              reference_date: {
+                type: "string",
+                description: "The reference date to run the query against",
+              },
             },
             required: ["query_id", "reference_date"] as const,
-          }
+          },
         },
-      }
+      },
     },
     responses: {
       200: {
         description: "OK",
-      }
-    }
+      },
+    },
   },
 });
 
 export default defineEventHandler(async (event) => {
   console.log("query run");
-  const currentUser = apiAuth.getUser();
+  const currentUser = await getUserSession(event);
 
-  const userId = currentUser.id;
-  const userName = currentUser.name;
+  const userId = currentUser.user?.id;
+  const userName = currentUser.user?.name;
 
   console.log("userId", userId);
   console.log("userName", userName);
 
-  const data: QueryRunRequest = await readValidatedBody(event, queryRunRequestSchema.parse);
+  const data: QueryRunRequest = await readValidatedBody(
+    event,
+    queryRunRequestSchema.parse
+  );
 
   const entity = await imapi.getPartialEntity(data.query_id, [IM.DEFINITION]);
   const query = JSON.parse(entity[IM.DEFINITION]);
@@ -66,7 +78,7 @@ export default defineEventHandler(async (event) => {
     referenceDate: data.reference_date,
   } as QueryRequest;
 
-/*
+  /*
   await prisma.$transaction(async (tx) => {
     const id = await sendMessage(userId, queryRequest);
 

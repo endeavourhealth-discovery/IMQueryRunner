@@ -1,12 +1,12 @@
-import {QueryRequest} from "~~/models/AutoGen";
-import {$fetch} from "ofetch";
+import type { QueryRequest } from "~~/models/AutoGen";
+import { $fetch } from "ofetch";
 
 export class IMAPI {
   public async getQuerySql(queryRequest: QueryRequest) {
     return await $fetch(process.env.IMAPI_URL! + "query/public/sql", {
       body: queryRequest,
       method: "post",
-    })
+    });
   }
 
   public async getPartialEntity(iri: string, predicates: string[]) {

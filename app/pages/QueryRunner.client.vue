@@ -96,7 +96,6 @@ import type { QueryRequest } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
-import { useUserStore } from "~/stores/userStore";
 
 const { user } = useUserSession();
 const socket = io({
