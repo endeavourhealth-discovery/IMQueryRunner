@@ -43,6 +43,11 @@ export default defineNuxtConfig({
       // cognitoUserPool: process.env.COGNITO_USER_POOL,
       // cognitoWebClient: process.env.COGNITO_WEB_CLIENT,
     },
+    session: {
+      name: "query-runner-session",
+      password: process.env.NUXT_SESSION_PASSWORD || "",
+      maxAge: 60 * 60 * 24 * 7,
+    },
   },
   typescript: {
     typeCheck: true,

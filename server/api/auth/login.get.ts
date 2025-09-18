@@ -15,12 +15,18 @@ export default defineEventHandler(async (event) => {
   }
   const token = authHeader.split(" ")[1];
   if (token) {
-    const user = globalThis.casdoor.parseJwtToken(token);
-    await clearUserSession(event);
-    await setUserSession(event, {
-      user: { name: user.name, id: user.id },
-      loggedInAt: new Date(),
-    });
-    console.log("API : success logged in");
+    const response = await globalThis.casdoor.introspect(token, "access_token");
+    if (response.data.active) {
+      const casdoorUser = globalThis.casdoor.parseJwtToken(token);
+      await clearUserSession(event);
+      await setUserSession(event, {
+        user: { name: casdoorUser.name, id: casdoorUser.id },
+        loggedInAt: new Date(),
+      });
+      const { user } = await getUserSession(event);
+      console.log("API : success logged in");
+    } else {
+      throw createError("Invalid token");
+    }
   }
 });

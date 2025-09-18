@@ -17,8 +17,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const { loggedIn } = useUserSession();
   console.log("UI : isLoggedIn=" + loggedIn.value);
 
-  const allowed = (await uiGuard.checkPermission(pathname, "ROUTE")).data.value;
-  console.log(`UI : Permission on route [${pathname}] = ${allowed}`);
+  const allowed = (await uiGuard.checkPermission(to.path, "ROUTE")).data.value;
+  console.log(`UI : Permission on route [${to.path}] = ${allowed}`);
   if (!allowed) {
     if (loggedIn.value) {
       console.log(

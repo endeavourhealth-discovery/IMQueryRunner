@@ -13,8 +13,8 @@ export class GuardCasbin implements Guard {
   ): Promise<boolean> {
     try {
       this.enforcer ??= await newEnforcer(
-        "server/utils/security/guard/casbin/model.conf",
-        "server/utils/security/guard/casbin/policy.csv"
+        "public/casbin/model.conf",
+        "public/casbin/policy.csv"
       );
 
       // return await this.enforcer.enforce(subject, path, action);

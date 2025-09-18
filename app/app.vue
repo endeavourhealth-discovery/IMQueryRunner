@@ -1,8 +1,6 @@
 <template>
   <div>
-    <NuxtLoadingIndicator>
-      <slot><ProgressSpinner /></slot>
-    </NuxtLoadingIndicator>
+    <NuxtLoadingIndicator />
     <NuxtRouteAnnouncer />
     <NuxtLayout>
       <NuxtPage />
