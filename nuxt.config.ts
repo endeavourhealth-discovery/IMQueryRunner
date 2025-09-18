@@ -3,7 +3,7 @@ import Aura from "@primeuix/themes/aura";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
-  modules: ["@primevue/nuxt-module", "@pinia/nuxt", "nuxt-auth-utils"],
+  modules: ["@primevue/nuxt-module", "@pinia/nuxt"],
   primevue: {
     options: {
       theme: {
@@ -42,11 +42,6 @@ export default defineNuxtConfig({
       // cognitoRegion: process.env.COGNITO_REGION,
       // cognitoUserPool: process.env.COGNITO_USER_POOL,
       // cognitoWebClient: process.env.COGNITO_WEB_CLIENT,
-    },
-    session: {
-      name: "query-runner-session",
-      password: process.env.NUXT_SESSION_PASSWORD || "",
-      maxAge: 60 * 60 * 24 * 7,
     },
   },
   typescript: {

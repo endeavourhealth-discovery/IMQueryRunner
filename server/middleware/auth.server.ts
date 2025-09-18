@@ -1,4 +1,6 @@
 import { apiGuard } from "~~/server/utils/security/api.guard";
+import { getUser } from "../utils/getUser";
+import { requireUser } from "../utils/requireUser";
 
 export default defineEventHandler(async (event) => {
   console.log("API : server auth middleware");
@@ -13,14 +15,14 @@ export default defineEventHandler(async (event) => {
     "/api/public/auth/hasPermission",
   ];
   if (!publicRoutes.includes(path)) {
-    await requireUserSession(event);
+    await requireUser(event);
   }
   // Authorization
-  const user = await getUserSession(event);
+  const user = getUser(event);
   console.log("API : middleware user ");
   const method = event.method;
-  if (user?.user) {
-    const allowed = await apiGuard.checkPermissions(user.user, path, method);
+  if (user) {
+    const allowed = await apiGuard.checkPermissions(user, path, method);
     console.log(`API: Permission on route [${method}:${path}] = ${allowed}`);
     if (!allowed) {
       throw createError({

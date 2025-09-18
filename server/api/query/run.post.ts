@@ -8,6 +8,7 @@ import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
 import { QueueItemStatus } from "~~/enums";
 import { IM, type QueryRequest } from "~~/models/AutoGen";
 import { imapi } from "~~/server/utils/imapi";
+import { getUser } from "~~/server/utils/getUser";
 
 const prisma = new PrismaClient();
 
@@ -57,10 +58,10 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   console.log("query run");
-  const currentUser = await getUserSession(event);
+  const user = getUser(event);
 
-  const userId = currentUser.user?.id;
-  const userName = currentUser.user?.name;
+  const userId = user?.id;
+  const userName = user?.name;
 
   console.log("userId", userId);
   console.log("userName", userName);

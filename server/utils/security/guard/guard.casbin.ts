@@ -1,7 +1,7 @@
 import { type Enforcer, newEnforcer } from "casbin";
 import type Guard from "~~/server/utils/security/guard/guard.base";
 import AuthorizationError from "~~/server/errors/authorization.error";
-import type { User } from "#auth-utils";
+import type { User } from "casdoor-nodejs-sdk/lib/cjs/user";
 
 export class GuardCasbin implements Guard {
   private enforcer: Enforcer | undefined = undefined;

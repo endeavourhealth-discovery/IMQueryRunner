@@ -1,22 +1,16 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
+import { useUser } from "~/composables/useUser";
 
 const route = useRoute();
-const { fetch, loggedIn } = useUserSession();
 
 onMounted(async () => {
   const redirect = route.query.redirect as string;
-  const jwt = route.query.token as string;
-  if (jwt) {
-    await useFetch("/api/auth/login", {
-      async onRequest({ request, options }) {
-        const headers = new Headers(options.headers);
-        headers.set("Authorization", `Bearer ${jwt}`);
-        options.headers = headers;
-      },
-    });
-    await fetch();
-    if (!loggedIn.value) throw createError("Failed to fetch login session");
+  const code = route.query.code as string;
+  if (code) {
+    await useFetch("/api/auth/login", { query: { code: code } });
+    const { isLoggedIn } = useUser();
+    if (!isLoggedIn.value) throw createError("Failed to fetch login session");
     console.log("UI : navigating to :" + redirect);
     await navigateTo(redirect);
   }

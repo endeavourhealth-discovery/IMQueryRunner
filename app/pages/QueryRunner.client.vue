@@ -96,8 +96,10 @@ import type { QueryRequest } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
+import { useUser } from "~/composables/useUser";
 
-const { user } = useUserSession();
+const { user } = useUser();
+
 const socket = io({
   extraHeaders: {
     authorization: `bearer ${user.value?.id}`,
@@ -131,16 +133,16 @@ onMounted(async () => {
 
 async function initSearch() {
   searchLoading.value = true;
-  const results = await useFetch<{ totalCount: number; result: QueueItem[] }>(
-    "/api/queue/user/",
-    {
-      query: {
-        userId: user.value?.id,
-        page: page.value,
-        size: rows.value,
-      },
-    }
-  );
+  const results = await useFetch<{
+    totalCount: number;
+    result: QueueItem[];
+  }>("/api/queue/user/", {
+    query: {
+      userId: user.value?.id,
+      page: page.value,
+      size: rows.value,
+    },
+  });
   if (results.data.value) {
     totalCount.value = results.data.value.totalCount;
     queryQueueItems.value = results.data.value.result.sort((a, b) => {
@@ -164,6 +166,9 @@ async function refresh() {
         userId: user.value?.id,
         page: page.value,
         size: rows.value,
+      },
+      headers: {
+        Authorization: `Bearer ${useCookie("casdoor_access_token")}`,
       },
     }
   );
@@ -201,7 +206,9 @@ function getStatusSeverity(
 }
 
 async function cancelQuery(queryId: string) {
-  await useFetch("/api/queue/query/cancel", { params: { queueId: queryId } });
+  await useFetch("/api/queue/query/cancel", {
+    params: { queueId: queryId },
+  });
   await initSearch();
 }
 
@@ -213,14 +220,19 @@ async function viewQueryResults(queryItem: QueueItem) {
 }
 
 async function deleteQuery(queryId: string) {
-  await useFetch("/api/queue/query/delete", { params: { queueId: queryId } });
+  await useFetch("/api/queue/query/delete", {
+    params: { queueId: queryId },
+  });
   await initSearch();
 }
 
 async function requeueQuery(queryId: string) {
   const found = getById(queryId);
   if (found)
-    await useFetch("/api/queue/query/requeue", { method: "post", body: found });
+    await useFetch("/api/queue/query/requeue", {
+      method: "post",
+      body: found,
+    });
   await initSearch();
 }
 

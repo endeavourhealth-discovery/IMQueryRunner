@@ -4,8 +4,8 @@ class UIGuard {
       method: "POST",
       body: {
         object: object,
-        action: action
-      }
+        action: action,
+      },
     });
   }
 }

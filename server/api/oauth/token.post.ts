@@ -3,6 +3,7 @@ import {
   type OauthTokenRequest,
 } from "~~/models/oauth.token.request.schema";
 import { getMachineToken } from "~~/server/helpers/getMachineToken";
+import { setAuthCookies } from "~~/server/utils/setAuthCookies";
 
 defineRouteMeta({
   openAPI: {
@@ -56,12 +57,7 @@ export default defineEventHandler(async (event) => {
   );
 
   const { access_token, token_type, expires_in } = tokenResponse;
-  const user = globalThis.casdoor.parseJwtToken(access_token);
   console.log("API : token.post user:");
-  setUserSession(event, {
-    user: { id: user.id, name: user.name },
-    loggedInAt: new Date(),
-  });
 
   return {
     success: true,

@@ -1,7 +1,5 @@
-import {
-  oathTokenRequestSchema,
-  type OauthTokenRequest,
-} from "~~/models/oauth.token.request.schema";
+import type { Token } from "casdoor-nodejs-sdk/lib/cjs/token";
+import z from "zod";
 
 defineRouteMeta({
   openAPI: {
@@ -40,13 +38,13 @@ defineRouteMeta({
   },
 });
 
+const tokenSchema = z.object({
+  token: z.string(),
+});
+
 export default defineEventHandler(async (event) => {
   console.log("revoke token");
-  await requireUserSession(event);
-  const userSession = await getUserSession(event);
-  if (userSession.user?.id) {
-    const token = await globalThis.casdoor.getToken(userSession.user.id);
-    await globalThis.casdoor.deleteToken(token.data.data);
-  }
+  const { token } = await readValidatedBody(event, tokenSchema.parse);
+  await globalThis.casdoor.deleteToken({ accessToken: token } as Token);
   return;
 });

@@ -28,7 +28,9 @@
 </template>
 
 <script setup lang="ts">
-const { user } = useUserSession();
+import { useUser } from "~/composables/useUser";
+
+const { user } = useUser();
 
 async function toLandingPage() {
   return await navigateTo("/");
