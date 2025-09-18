@@ -77,7 +77,7 @@ const showDialog = defineModel<boolean>("showDialog");
 
 const loading = ref(false);
 const downloadLoading = ref(false);
-const queryResults: Ref<{ id: string }[]> = ref([]);
+const queryResults: Ref<any[]> = ref([]);
 const pageNumber = ref(1);
 const size = ref(25);
 const originalSize = ref(25);

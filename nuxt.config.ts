@@ -15,6 +15,11 @@ export default defineNuxtConfig({
       ripple: true,
     },
   },
+  routeRules: {
+    "/": {
+      redirect: "/QueryRunner",
+    },
+  },
   css: ["~/assets/css/main.css"],
   vite: {
     plugins: [tailwindcss()],
@@ -29,9 +34,17 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      casdoorClientId: "",
-      casdoorUrl: "",
-      casdoorClientSecret: "",
+      casdoorUrl: process.env.CASDOOR_URL,
+      casdoorOrganisationName: process.env.CASDOOR_ORGANISATION_NAME,
+      casdoorClientId: process.env.CASDOOR_CLIENT_ID,
+      casdoorClientSecret: process.env.CASDOOR_CLIENT_SECRET,
+      // cognitoIdentityPoolId: process.env.COGNITO_IDENTITY_POOL,
+      // cognitoRegion: process.env.COGNITO_REGION,
+      // cognitoUserPool: process.env.COGNITO_USER_POOL,
+      // cognitoWebClient: process.env.COGNITO_WEB_CLIENT,
     },
+  },
+  typescript: {
+    typeCheck: true,
   },
 });

@@ -1,28 +1,11 @@
-import { PrismaClient } from "@@/prisma/generated/postgres";
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
-import { queueItemSchema } from "~~/server/schemas/queryItem.schema";
-
-const prisma = new PrismaClient();
+import {pgQueueItemInsert, postgresDb} from "~~/server/db/postgres";
+import {queueItem} from "~~/server/db/postgres/schema";
 
 export default defineEventHandler(async (event) => {
-  const data = await readValidatedBody(event, queueItemSchema.parse);
-  const userId = event.context.auth;
-  await prisma.queueItem.create({
-    data: {
-      id: data.id,
-      query_iri: data.queryIri,
-      query_name: data.queryName,
-      query_request: JSON.stringify(data.queryRequest),
-      user_id: data.userId,
-      user_name: data.username,
-      queued_at: new Date(),
-      status: data.status,
-      pid: data.pid,
-      started_at: null,
-      killed_at: null,
-      finished_at: null,
-      error: null,
-    },
-  });
-  await sendMessage(userId, data);
+  const data = pgQueueItemInsert.parse(event);
+  await postgresDb
+    .insert(queueItem)
+    .values(data);
+  await sendMessage(data.userId, data);
 });

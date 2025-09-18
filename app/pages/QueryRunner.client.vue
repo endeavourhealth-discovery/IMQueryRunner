@@ -96,19 +96,15 @@ import type { QueryRequest } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
-import { useUserStore } from "~/stores/userStore";
+import { useUser } from "~/composables/useUser";
 
-const userStore = useUserStore();
-const currentUser = computed(() => userStore.currentUser);
+const { user } = useUser();
+
 const socket = io({
   extraHeaders: {
-    authorization: currentUser.value ? `bearer ${currentUser.value.token}` : "",
+    authorization: `bearer ${user.value?.id}`,
   },
 });
-
-if (socket.connected) {
-  onConnect();
-}
 
 const queryQueueItems: Ref<QueueItem[]> = ref([]);
 const loading = ref(true);
@@ -122,26 +118,31 @@ const showQueryResults = ref(false);
 const websocketIsConnected = ref(false);
 const transport = ref("N/A");
 
-await init();
-
-async function init() {
+onMounted(async () => {
+  console.log("QueryRunner mounted");
   loading.value = true;
-  await initSearch();
   loading.value = false;
-}
+  console.log("Socket room joining");
+  socket.emit("joinRoom", "test-room", user.value?.name);
+  console.log("Adding listener");
+  socket.on("message", function (data) {
+    alert(data);
+  });
+  socket.emit("hello");
+});
 
 async function initSearch() {
   searchLoading.value = true;
-  const results = await useFetch<{ totalCount: number; result: QueueItem[] }>(
-    "/api/queue/user/",
-    {
-      query: {
-        userId: currentUser.value?.id,
-        page: page.value,
-        size: rows.value,
-      },
-    }
-  );
+  const results = await useFetch<{
+    totalCount: number;
+    result: QueueItem[];
+  }>("/api/queue/user/", {
+    query: {
+      userId: user.value?.id,
+      page: page.value,
+      size: rows.value,
+    },
+  });
   if (results.data.value) {
     totalCount.value = results.data.value.totalCount;
     queryQueueItems.value = results.data.value.result.sort((a, b) => {
@@ -162,9 +163,12 @@ async function refresh() {
     "/api/queue/user/",
     {
       query: {
-        userId: currentUser.value?.id,
+        userId: user.value?.id,
         page: page.value,
         size: rows.value,
+      },
+      headers: {
+        Authorization: `Bearer ${useCookie("casdoor_access_token")}`,
       },
     }
   );
@@ -202,8 +206,10 @@ function getStatusSeverity(
 }
 
 async function cancelQuery(queryId: string) {
-  await useFetch("/api/queue/query/cancel", { params: { queueId: queryId } });
-  await init();
+  await useFetch("/api/queue/query/cancel", {
+    params: { queueId: queryId },
+  });
+  await initSearch();
 }
 
 function goToQuery(queryIri: string) {}
@@ -214,15 +220,20 @@ async function viewQueryResults(queryItem: QueueItem) {
 }
 
 async function deleteQuery(queryId: string) {
-  await useFetch("/api/queue/query/delete", { params: { queueId: queryId } });
-  await init();
+  await useFetch("/api/queue/query/delete", {
+    params: { queueId: queryId },
+  });
+  await initSearch();
 }
 
 async function requeueQuery(queryId: string) {
   const found = getById(queryId);
   if (found)
-    await useFetch("/api/queue/query/requeue", { method: "post", body: found });
-  await init();
+    await useFetch("/api/queue/query/requeue", {
+      method: "post",
+      body: found,
+    });
+  await initSearch();
 }
 
 function getById(queryId: string): QueueItem | undefined {
@@ -256,12 +267,8 @@ function onDisconnect() {
   transport.value = "N/A";
 }
 
-socket.on("connect", onConnect);
-socket.on("disconnect", onDisconnect);
-
 onBeforeUnmount(() => {
-  socket.off("connect", onConnect);
-  socket.off("disconnect", onDisconnect);
+  socket.disconnect();
 });
 
 socket.on("queueUpdate", (value) => {

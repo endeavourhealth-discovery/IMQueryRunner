@@ -1,4 +1,3 @@
-import type { QueueItem } from "./QueueItem";
-import type { User } from "./User";
+import type { QueueItem } from "./queryItem.schema";
 
-export type { QueueItem, User };
+export type { QueueItem };

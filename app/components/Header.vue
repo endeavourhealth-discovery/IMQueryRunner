@@ -1,5 +1,3 @@
-<script setup lang="ts"></script>
-
 <template>
   <div
     class="h-[3.5rem] flex flex-row flex-nowrap justify-start items-center border-b border-solid border-(--p-content-border-color)"
@@ -14,6 +12,7 @@
         alt="IM logo"
         v-on:click="toLandingPage"
       />
+      <span>USER: [{{ user?.name }}]</span>
     </div>
     <div
       id="header-content"
@@ -27,5 +26,15 @@
     ></div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useUser } from "~/composables/useUser";
+
+const { user } = useUser();
+
+async function toLandingPage() {
+  return await navigateTo("/");
+}
+</script>
 
 <style scoped></style>
