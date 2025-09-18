@@ -1,10 +1,8 @@
-import { PrismaClient } from "@@/prisma/generated/mysql";
 import hash from "object-hash";
-import type { QueryRequest } from "~~/models/AutoGen";
 import { getCachedResults } from "~~/server/rabbitmq/rabbitmq";
 import { $fetch } from "ofetch";
-
-const prisma = new PrismaClient();
+import {mysqlDb} from "~~/server/db/mysql";
+import type {QueryRequest} from "~~/models/AutoGen";
 
 defineRouteMeta({
   openAPI: {
@@ -15,10 +13,10 @@ defineRouteMeta({
       content: {
         "application/json": {
           description: "Query Request object",
-          schema: { type: "object" },
-        },
-      },
-    },
+          schema: {type: "object"}
+        }
+      }
+    }
   },
 });
 
@@ -32,7 +30,7 @@ export default defineEventHandler(async (event) => {
       method: "post",
     });
     if (sql) {
-      return await prisma.$queryRawUnsafe(sql);
+      return await mysqlDb.execute(sql);
     }
   }
 });

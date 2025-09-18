@@ -1,18 +1,16 @@
-import { Connection } from "rabbitmq-client";
-import { PrismaClient as PostgresPrismaClient } from "@@/prisma/generated/postgres";
-import { PrismaClient as MYSQLPrismaClient } from "~~/prisma/generated/mysql";
-import { QueueItemStatus } from "~~/enums";
-import type { QueryRequest } from "~~/models/AutoGen";
-import { $fetch } from "ofetch";
+import {Connection} from "rabbitmq-client";
+import {QueueItemStatus} from "~~/enums";
 import hash from "object-hash";
-import { v4 as uuidv4 } from "uuid";
-import { imapi } from "~~/server/utils/imapi";
+import {v4 as uuidv4} from "uuid";
+import {imapi} from "~~/server/utils/imapi";
+import {postgresDb} from "~~/server/db/postgres";
+import {eq} from "drizzle-orm";
+import {mysqlDb} from "~~/server/db/mysql";
+import {queueItem} from "~~/server/db/postgres/schema";
+import type {QueryRequest} from "~~/models/AutoGen";
 
-const postgresPrisma = new PostgresPrismaClient();
-const mysqlPrisma = new MYSQLPrismaClient();
-
-const resultsMap: Map<string, string[]> = new Map();
-
+console.log("Connecting to rabbitmq");
+console.log(process.env.RABBITMQ_URL);
 const rabbit = new Connection(process.env.RABBITMQ_URL);
 rabbit.on("error", (err) => {
   console.log("RabbitMQ connection error", err);
@@ -21,11 +19,13 @@ rabbit.on("connection", () => {
   console.log("Connection successfully (re)established");
 });
 
+console.log("Creating consumer");
 const sub = rabbit.createConsumer(
   {
     queue: "query.execute",
-    queueOptions: { durable: true },
-    exchanges: [{ exchange: "query_runner", type: "topic" }],
+    queueOptions: {durable: true},
+    requeue: false,
+    exchanges: [{exchange: "query_runner", type: "topic", durable: true}],
     queueBindings: [
       {
         exchange: "query_runner",
@@ -35,12 +35,9 @@ const sub = rabbit.createConsumer(
     ],
   },
   async (msg) => {
-    console.log("Received message from queue");
-    const id = msg.messageId;
-    const userId = msg.body.userId;
-    const queueItem = msg.body.data;
-    const entry = await postgresPrisma.queueItem.findFirst({
-      where: { id: { equals: id } },
+    const id = msg.messageId!;
+    const entry = await postgresDb.query.queueItem.findFirst({
+      where: eq(queueItem.id, id),
     });
     if (entry && QueueItemStatus.CANCELLED === entry.status) {
       throw new Error("Item is cancelled. Query rejected.");
@@ -49,93 +46,47 @@ const sub = rabbit.createConsumer(
       throw new Error("Could not find entry with id: " + id);
     }
 
-    console.log("Updating queue item to `RUNNING` status " + id);
-    await postgresPrisma.queueItem.update({
-      where: { id: id },
-      data: { status: QueueItemStatus.RUNNING, started_at: new Date() },
-    });
-    globalThis.io.to(userId).emit("message", {
-      msg: "queue updated",
-      timestamp: new Date(),
-    });
+    await postgresDb
+      .update(queueItem)
+      .set({status: QueueItemStatus.RUNNING, startedAt: new Date().toISOString()})
+      .where(eq(queueItem.id, id));
 
-    console.log("Parsing request");
-    const queryRequest: QueryRequest = queueItem;
+    const queryRequest: QueryRequest = JSON.parse(msg.body);
 
-    console.log("Getting SQL from IMAPI");
-    let sql: string = await imapi
-      .getQuerySql(queryRequest)
+    let sql: string = await imapi.getQuerySql(queryRequest)
       .catch(async (err) => {
         console.log("IMAPI call failed");
         console.log(err);
-        await postgresPrisma.queueItem.update({
-          where: { id: id },
-          data: {
+        await postgresDb
+          .update(queueItem)
+          .set({
             status: QueueItemStatus.ERRORED,
             error: JSON.stringify(err),
-            killed_at: new Date(),
-          },
-        });
-        globalThis.io.to(userId).emit("message", {
-          msg: "queue updated",
-          timestamp: new Date(),
-        });
+            killedAt: new Date().toISOString(),
+          })
+          .where(eq(queueItem.id, id));
       });
 
-    sql = sql.replaceAll(
-      "$searchDate",
-      '"' + queryRequest.referenceDate! + '"'
-    );
-
-    console.log("Executing SQL and caching results");
-    console.log(sql);
-    if (sql && typeof sql === "string") {
+    if (sql) {
       const requestHash = hash(queryRequest);
-      sql = "INSERT INTO imqcache." + requestHash + " " + sql;
-      try {
-        const queryResults: string[] = await mysqlPrisma.$queryRawUnsafe(sql);
-        resultsMap.set(requestHash, queryResults);
-        console.log("Creating result table " + requestHash);
-        mysqlPrisma.$executeRaw`
-            CREATE TABLE IF NOT EXISTS ${requestHash}
-            (
-                id
-                BIGINT
-                NOT
-                NULL,
-                PRIMARY
-                KEY
-            (
-                id
-            )
-                )
-        `;
 
-        if (queryResults.length === 0) {
-          console.log("No results to insert");
-        } else {
-          console.log(
-            "Inserting " +
-              queryResults?.length +
-              " results into table " +
-              requestHash
-          );
-          await mysqlPrisma.$queryRaw`
-              INSERT INTO ${requestHash} (id)
-              VALUES ${queryResults}
-          `;
-          console.log("Done inserting");
-        }
+      console.log(`Executing SQL and caching results [${requestHash}]`);
+
+      sql = sql.replaceAll("$searchDate", '"' + queryRequest.referenceDate! + '"');
+
+      await mysqlDb.execute("DROP TABLE IF EXISTS imqcache.`" + requestHash + "`");
+
+      try {
+        await mysqlDb.execute("CREATE TABLE imqcache.`" + requestHash + "` AS " + sql);
 
         console.log("Updating queue item to `COMPLETED` status " + id);
-        await postgresPrisma.queueItem.update({
-          where: { id: id },
-          data: { status: QueueItemStatus.COMPLETED, finished_at: new Date() },
-        });
-        globalThis.io.to(userId).emit("message", {
-          msg: "queue updated",
-          timestamp: new Date(),
-        });
+        await postgresDb
+          .update(queueItem)
+          .set({
+            status: QueueItemStatus.COMPLETED,
+            finishedAt: new Date().toISOString(),
+          })
+          .where(eq(queueItem.id, id));
       } catch (err) {
         console.log("Error running query or caching results");
         console.log(sql);
@@ -154,21 +105,21 @@ sub.on("error", (err) => {
   console.log("consumer error (query.execute)", err);
 });
 
+console.log("Creating publisher");
 const pub = rabbit.createPublisher({
   confirm: true,
   maxAttempts: 2,
-  exchanges: [{ exchange: "query_runner", type: "topic" }],
+  exchanges: [{exchange: "query_runner", type: "topic", durable: true}],
 });
 
 export async function sendMessage(userId: string, message: any) {
   const id = uuidv4();
 
+  if (message instanceof Object)
+    message = JSON.stringify(message);
+
   await pub.send(
-    {
-      messageId: id,
-      exchange: "query_runner",
-      routingKey: "query.execute." + userId,
-    },
+    {messageId: id, exchange: "query_runner", routingKey: "query.execute." + userId, durable: true},
     message
   );
 
@@ -176,7 +127,8 @@ export async function sendMessage(userId: string, message: any) {
 }
 
 export function getCachedResults(requestHash: string) {
-  if (resultsMap.has(requestHash)) return resultsMap.get(requestHash);
+  // This needs to pull from DB!
+  return null;
 }
 
 async function onShutdown() {
