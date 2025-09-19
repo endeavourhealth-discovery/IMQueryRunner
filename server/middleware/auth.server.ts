@@ -8,6 +8,8 @@ export default defineEventHandler(async (event) => {
   console.log("API : path=" + path);
   if (!path.startsWith("/api")) return;
   if (path.startsWith("/api/_auth/")) return;
+  console.log("API : Performing Authentication");
+
   // Authentication
   const publicRoutes = [
     "/api/auth/login",
@@ -15,6 +17,7 @@ export default defineEventHandler(async (event) => {
     "/api/public/auth/hasPermission",
   ];
   if (!publicRoutes.includes(path)) {
+    console.log("API : Require user");
     await requireUser(event);
   }
   // Authorization
@@ -25,10 +28,19 @@ export default defineEventHandler(async (event) => {
     const allowed = await apiGuard.checkPermissions(user, path, method);
     console.log(`API: Permission on route [${method}:${path}] = ${allowed}`);
     if (!allowed) {
+      console.log("API : !!!!UNAUTHORIZED!!!!")
       throw createError({
         statusCode: 401,
         statusMessage: "Unauthorized",
       });
+    } else {
+      console.log("API : Authorized");
     }
+  } else {
+    console.log("API : No user found");
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    });
   }
 });
