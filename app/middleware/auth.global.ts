@@ -30,7 +30,18 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     } else {
       console.log("UI : Not logged in, redirecting to login");
       abortNavigation();
-      await login(`${origin}/callback?redirect=${to.path}`);
+
+      const config = useRuntimeConfig().public;
+      const successUrl = `${origin}/callback?redirect=${to.path}`;
+      await navigateTo(
+        `${config.casdoorUrl}/login/${
+          config.casdoorOrganisationName
+        }?redirect_uri=${encodeURIComponent(
+          successUrl
+        )}&response_type=code&client_id=${config.casdoorClientId}`,
+        { external: true }
+      );
+      console.log("===================== Navigated to Login Page =====================");
     }
   }
 });
