@@ -10,7 +10,7 @@ onMounted(async () => {
   console.log("UI : code = " + code);
   if (code) {
     console.log("UI : redirecting to login api");
-    await useFetch("/api/auth/login", { query: { code: code } });
+    await $fetch("/api/auth/login", { query: { code: code } });
     console.log("UI : logged in, checking session status... ");
     const { isLoggedIn } = useUser();
     if (!isLoggedIn.value) throw createError("Failed to fetch login session");
