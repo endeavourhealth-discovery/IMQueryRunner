@@ -1,8 +1,12 @@
 import { useUser } from "~/composables/useUser";
-import { login } from "~/utils/login";
 import { uiGuard } from "~/utils/security/ui.guard";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
+  if(to.path.startsWith("/api")) {
+    console.log("UI : API route, skipping auth middleware");
+    return;
+  }
+
   console.log("UI : to: " + to.path);
   console.log("UI : from: " + from.path);
 
