@@ -6,6 +6,7 @@ export default defineEventHandler(async (event) => {
   console.log("API : server auth middleware");
   const path = getRequestURL(event).pathname;
   console.log("API : path=" + path);
+  console.log("Cookies: ", getCookie(event, "casdoor_user"));
   if (!path.startsWith("/api")) return;
   if (path.startsWith("/api/_auth/")) return;
   console.log("API : Performing Authentication");
@@ -28,7 +29,7 @@ export default defineEventHandler(async (event) => {
     const allowed = await apiGuard.checkPermissions(user, path, method);
     console.log(`API: Permission on route [${method}:${path}] = ${allowed}`);
     if (!allowed) {
-      console.log("API : !!!!UNAUTHORIZED!!!!")
+      console.log("API : Logged in but not authorized")
       throw createError({
         statusCode: 401,
         statusMessage: "Unauthorized",
@@ -37,6 +38,6 @@ export default defineEventHandler(async (event) => {
       console.log("API : Authorized");
     }
   } else {
-    console.log("API : No user found");
+    console.log("API : No user found (not logged in)");
   }
 });
