@@ -38,9 +38,5 @@ export default defineEventHandler(async (event) => {
     }
   } else {
     console.log("API : No user found");
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
   }
 });
