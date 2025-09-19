@@ -11,6 +11,7 @@ onMounted(async () => {
     await useFetch("/api/auth/login", { query: { code: code } });
     const { isLoggedIn } = useUser();
     if (!isLoggedIn.value) throw createError("Failed to fetch login session");
+    abortNavigation();
     console.log("UI : navigating to :" + redirect);
     await navigateTo(redirect);
   }

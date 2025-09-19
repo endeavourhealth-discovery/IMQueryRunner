@@ -28,6 +28,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       return navigateTo("/unauthorized");
     } else {
       console.log("UI : Not logged in, redirecting to login");
+      abortNavigation();
       await login(`${origin}/callback?redirect=${to.path}`);
     }
   }

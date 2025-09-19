@@ -3,7 +3,7 @@ import { getUser } from "./getUser";
 import { setAuthCookies } from "./setAuthCookies";
 
 export async function requireUser(event: H3Event<EventHandlerRequest>) {
-  const token = getCookie(event, "casdoor_tokens");
+  const token = getCookie(event, "casdoor_access_token");
   if (!token)
     throw createError({ status: 401, message: "Missing token cookie" });
   const response = await globalThis.casdoor.introspect(token, "access_token");
