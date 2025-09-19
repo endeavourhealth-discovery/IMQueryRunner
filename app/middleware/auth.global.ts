@@ -6,12 +6,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   console.log("UI : to: " + to.path);
   console.log("UI : from: " + from.path);
 
-  if (to.path === from.path) return;
-
   const publicRoutes = ["/callback", "/unauthorized"];
   if (publicRoutes.includes(to.path)) return;
-
-  if (to.path === "/callback") return;
 
   const reqUrl = useRequestURL();
   const origin = reqUrl.origin;
