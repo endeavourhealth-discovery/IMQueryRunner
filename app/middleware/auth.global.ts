@@ -5,9 +5,10 @@ import { uiGuard } from "~/utils/security/ui.guard";
 export default defineNuxtRouteMiddleware(async (to, from) => {
   console.log("UI : to: " + to.path);
   console.log("UI : from: " + from.path);
-  // if (to.path === from.path) return;
 
-  const publicRoutes = ["/unauthorized"];
+  if (to.path === from.path) return;
+
+  const publicRoutes = ["/callback", "/unauthorized"];
   if (publicRoutes.includes(to.path)) return;
 
   if (to.path === "/callback") return;
@@ -15,6 +16,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const reqUrl = useRequestURL();
   const origin = reqUrl.origin;
   const pathname = reqUrl.pathname;
+
+  console.log("UI : to.path  =" + to.path);
+  console.log("UI : pathname =" + pathname);
+
   const { isLoggedIn } = useUser();
   console.log("UI : isLoggedIn=" + isLoggedIn.value);
 

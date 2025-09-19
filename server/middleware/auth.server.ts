@@ -3,12 +3,15 @@ import { getUser } from "../utils/getUser";
 import { requireUser } from "../utils/requireUser";
 
 export default defineEventHandler(async (event) => {
-  console.log("API : server auth middleware");
   const path = getRequestURL(event).pathname;
+  if (!path.startsWith("/api")) {
+    console.log("API : Not an API route, skipping auth middleware");
+    return;
+  }
+
+  console.log("API : server auth middleware");
   console.log("API : path=" + path);
   console.log("Cookies: ", getCookie(event, "casdoor_user"));
-  if (!path.startsWith("/api")) return;
-  if (path.startsWith("/api/_auth/")) return;
   console.log("API : Performing Authentication");
 
   // Authentication
