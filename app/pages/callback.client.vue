@@ -9,9 +9,7 @@ onMounted(async () => {
   const code = route.query.code as string;
   console.log("UI : code = " + code);
   if (code) {
-    console.log("UI : redirecting to login api");
     await $fetch("/api/auth/login", { query: { code: code } });
-    console.log("UI : logged in, checking session status... ");
     const { isLoggedIn } = useUser();
     if (!isLoggedIn.value) throw createError("Failed to fetch login session");
     abortNavigation();

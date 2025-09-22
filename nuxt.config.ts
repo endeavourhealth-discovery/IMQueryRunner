@@ -14,6 +14,7 @@ export default defineNuxtConfig({
       },
       ripple: true,
     },
+    autoImport: true,
   },
   routeRules: {
     "/": {
@@ -46,5 +47,51 @@ export default defineNuxtConfig({
   },
   typescript: {
     typeCheck: true,
+  },
+  app: {
+    head: {
+      link: [
+        {
+          rel: "stylesheet",
+          href: "https://im.endhealth.co.uk/fonts/css/fontawesome.css",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://im.endhealth.co.uk/fonts/css/solid.css",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://im.endhealth.co.uk/fonts/css/regular.css",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://im.endhealth.co.uk/fonts/css/brands.css",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://im.endhealth.co.uk/fonts/css/duotone.css",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://im.endhealth.co.uk/fonts/css/light.css",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://im.endhealth.co.uk/fonts/css/sharp-light.css",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://im.endhealth.co.uk/fonts/css/sharp-regular.css",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://im.endhealth.co.uk/fonts/css/sharp-solid.css",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://im.endhealth.co.uk/fonts/css/sharp-thin.css",
+        },
+      ],
+    },
   },
 });

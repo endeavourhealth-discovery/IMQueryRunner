@@ -12,7 +12,6 @@
         alt="IM logo"
         v-on:click="toLandingPage"
       />
-      <span>USER: [{{ user?.name }}]</span>
     </div>
     <div
       id="header-content"
@@ -23,17 +22,126 @@
     <div
       id="header-end"
       class="h-full flex-grow-0 flex-shrink-1 flex-auto flex flex-row items-center justify-self-end justify-end gap-[0.25rem]"
-    ></div>
+    >
+      <Button
+        v-tooltip.left="'Account'"
+        v-if="!isLoggedIn"
+        icon="fa-duotone fa-user"
+        class="p-button-rounded p-button-text p-button-plain p-button-lg p-button-icon-only topbar-end-button"
+        @click="openUserMenu"
+        aria-haspopup="true"
+        aria-controls="overlay_menu"
+        data-testid="account-menu"
+      />
+      <Button
+        id="account-button"
+        v-tooltip.left="'Account'"
+        v-if="user && isLoggedIn"
+        class="p-button-rounded p-button-text p-button-plain p-button-lg p-button-icon-only topbar-end-button"
+        @click="openUserMenu"
+        aria-haspopup="true"
+        aria-controls="overlay_menu"
+        data-testid="account-menu-logged-in"
+      >
+        <img
+          class="avatar-icon"
+          alt="avatar icon"
+          :src="user.avatar"
+          style="min-width: 1.75rem"
+        />
+      </Button>
+      <TieredMenu
+        ref="userMenu"
+        id="account-menu"
+        :model="accountItems"
+        :popup="true"
+      >
+        <template #item="{ item, props }">
+          <div>
+            <span :class="item.icon" />
+            <span class="ml-2 cursor-pointer">{{ item.label }}</span>
+          </div>
+        </template>
+      </TieredMenu>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { MenuItem } from "primevue/menuitem";
 import { useUser } from "~/composables/useUser";
 
-const { user } = useUser();
+const { user, isLoggedIn } = useUser();
+const router = useRouter();
+const confirm = useConfirm();
+const toast = useToast();
+
+const loginItems: Ref<MenuItem[]> = ref([]);
+const accountItems: Ref<MenuItem[]> = ref([]);
+const userMenu = ref();
+
+onMounted(() => {
+  setUserMenuItems();
+});
 
 async function toLandingPage() {
   return await navigateTo("/");
+}
+
+function getItems(): MenuItem[] {
+  if (isLoggedIn.value) return accountItems.value;
+  else return loginItems.value;
+}
+
+function openUserMenu(event: MouseEvent) {
+  userMenu.value.toggle(event);
+}
+
+function setUserMenuItems(): void {
+  loginItems.value = [
+    {
+      label: "Login",
+      icon: "fa-solid fa-fw fa-user",
+      command: async () => await confirmLogin(),
+    },
+  ];
+  accountItems.value = [
+    {
+      label: "Logout",
+      icon: "fa-solid fa-fw fa-arrow-right-from-bracket",
+      command: async () => await confirmLogout(),
+    },
+  ];
+}
+
+async function confirmLogin() {
+  const route = useRoute();
+  route.fullPath;
+  await login(route.fullPath);
+}
+
+async function confirmLogout() {
+  toast.add({ severity: "success", summary: "Success" });
+  confirm.require({
+    message: "Are you sure you want to logout?",
+    header: "Logout",
+    acceptProps: {
+      label: "Logout",
+    },
+    rejectProps: {
+      label: "Cancel",
+      severity: "secondary",
+      outlined: true,
+    },
+    accept: async () => {
+      const reqUrl = useRequestURL();
+      const origin = reqUrl.origin;
+      console.log("UI : origin: " + origin);
+      await $fetch("/api/auth/logout/").catch(async (error) => {
+        if (error.statusCode === 401) await navigateTo("/");
+      });
+    },
+  });
 }
 </script>
 
