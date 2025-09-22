@@ -1,20 +1,25 @@
 import { useUser } from "~/composables/useUser";
-import { login } from "~/utils/login";
 import { uiGuard } from "~/utils/security/ui.guard";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
+  if(to.path.startsWith("/api")) {
+    console.log("UI : API route, skipping auth middleware");
+    return;
+  }
+
   console.log("UI : to: " + to.path);
   console.log("UI : from: " + from.path);
-  // if (to.path === from.path) return;
 
-  const publicRoutes = ["/unauthorized"];
+  const publicRoutes = ["/callback", "/unauthorized"];
   if (publicRoutes.includes(to.path)) return;
-
-  if (to.path === "/callback") return;
 
   const reqUrl = useRequestURL();
   const origin = reqUrl.origin;
   const pathname = reqUrl.pathname;
+
+  console.log("UI : to.path  =" + to.path);
+  console.log("UI : pathname =" + pathname);
+
   const { isLoggedIn } = useUser();
   console.log("UI : isLoggedIn=" + isLoggedIn.value);
 
@@ -28,7 +33,19 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       return navigateTo("/unauthorized");
     } else {
       console.log("UI : Not logged in, redirecting to login");
-      await login(`${origin}/callback?redirect=${to.path}`);
+      abortNavigation();
+
+      const config = useRuntimeConfig().public;
+      const successUrl = `${origin}/callback?redirect=${to.path}`;
+      await navigateTo(
+        `${config.casdoorUrl}/login/${
+          config.casdoorOrganisationName
+        }?redirect_uri=${encodeURIComponent(
+          successUrl
+        )}&response_type=code&client_id=${config.casdoorClientId}`,
+        { external: true }
+      );
+      console.log("===================== Navigated to Login Page =====================");
     }
   }
 });
