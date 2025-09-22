@@ -6,7 +6,8 @@ export default defineEventHandler(async (event) => {
 
   console.log("API : checking permissions");
   const user = getUser(event);
-  if (!user) throw createError({ statusCode: 401, message: "No user found" });
+
+  console.log("API : User ", user?.name);
 
   return await apiGuard.checkPermissions(user, body.object, body.action);
 });
