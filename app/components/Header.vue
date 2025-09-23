@@ -116,8 +116,7 @@ function setUserMenuItems(): void {
 
 async function confirmLogin() {
   const route = useRoute();
-  route.fullPath;
-  await login(route.fullPath);
+  await navigateTo(route.fullPath);
 }
 
 async function confirmLogout() {
@@ -137,9 +136,8 @@ async function confirmLogout() {
       const reqUrl = useRequestURL();
       const origin = reqUrl.origin;
       console.log("UI : origin: " + origin);
-      await $fetch("/api/auth/logout/").catch(async (error) => {
-        if (error.statusCode === 401) await navigateTo("/");
-      });
+      await $fetch("/api/auth/logout/");
+      location.reload();
     },
   });
 }

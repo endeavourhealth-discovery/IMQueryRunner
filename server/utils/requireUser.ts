@@ -5,6 +5,7 @@ import { logout } from "./logout";
 
 export async function requireUser(event: H3Event<EventHandlerRequest>) {
   const token = getCookie(event, "casdoor_access_token");
+  console.log("Access token retrieved: ", token)
   if (!token)
     throw createError({ status: 401, message: "Missing token cookie" });
   const response = await globalThis.casdoor.introspect(token, "access_token");
@@ -23,7 +24,7 @@ export async function requireUser(event: H3Event<EventHandlerRequest>) {
         throw createError({ status: 401, message: "Invalid refresh token" });
       }
       const newTokens = await globalThis.casdoor.refreshToken(refresh);
-      setAuthCookies(event, newTokens);
+      setAuthCookies(event, newTokens.access_token, newTokens.refresh_token);
     }
   }
   const user = getUser(event);

@@ -11,6 +11,6 @@ export default defineEventHandler(async (event) => {
   console.log("Swapping code ", code, " for token"  );
   const tokens = await globalThis.casdoor.getAuthToken(code);
   console.log("Got tokens", tokens);
-  setAuthCookies(event, tokens);
+  setAuthCookies(event, tokens.access_token, tokens.refresh_token);
   console.log("API : success logged in");
 });
