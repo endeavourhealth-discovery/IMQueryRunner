@@ -119,12 +119,9 @@ const websocketIsConnected = ref(false);
 const transport = ref("N/A");
 
 onMounted(async () => {
-  console.log("QueryRunner mounted");
   loading.value = true;
   loading.value = false;
-  console.log("Socket room joining");
-  socket.emit("joinRoom", "test-room", user.value?.name);
-  console.log("Adding listener");
+  socket.emit("joinRoom", "test-room", user.value?.userName);
   socket.on("message", function (data) {
     alert(data);
   });

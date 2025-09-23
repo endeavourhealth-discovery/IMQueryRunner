@@ -11,9 +11,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
   io.bind(engine);
 
   io.on("connection", (socket) => {
-    console.log("socket connected", socket.id);
     socket.on("disconnect", () => {
-      console.log("socket disconnected", socket.id);
     });
 
     socket.on("hello", () => {
@@ -21,15 +19,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
     });
 
     socket.on("joinRoom", (room, user) => {
-      console.log("===================== Attempting to join room");
       socket.join(room);
-      console.log("User " + user + " joined room " + room);
-      // server.to(room).emit("join", {
-      //   from_id: user.id,
-      //   from_name: user.name,
-      //   system: true,
-      //   content: `${user.name ?? user.id} joined the room`,
-      // });
     });
 
     socket.on("leaveRoom", (room, user) => {
@@ -43,7 +33,6 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
     });
 
     socket.on("message", (room, message) => {
-      console.log(`[Socket.io] message received to room ${room}`);
       socket.to(room).emit("message", message);
     });
   });

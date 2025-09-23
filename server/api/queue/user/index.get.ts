@@ -11,9 +11,7 @@ const querySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  console.log("EMITTING...")
   globalThis.io.to('test-room').emit("message", "Hello from server!");
-  console.log("DONE.")
 
   const { page, size, userId } = await getValidatedQuery(
     event,

@@ -43,7 +43,6 @@ const tokenSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  console.log("revoke token");
   const { token } = await readValidatedBody(event, tokenSchema.parse);
   await globalThis.authenticator.revokeTokens(event, token);
 });

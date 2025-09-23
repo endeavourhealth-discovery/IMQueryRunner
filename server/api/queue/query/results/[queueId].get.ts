@@ -18,7 +18,6 @@ export default defineEventHandler(async (event) => {
 
   if (item?.queryRequest) {
     const requestHash = hash(item.queryRequest);
-    console.log(requestHash);
 
     const results = await mysqlDb.execute(
       sql.raw(`SELECT * FROM imqcache.${requestHash}`)

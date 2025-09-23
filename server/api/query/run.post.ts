@@ -51,14 +51,10 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event) => {
-  console.log("query run");
   const currentUser = globalThis.authenticator.getUser(event);
 
-  const userId = currentUser!.id!;
-  const userName = currentUser!.name!;
-
-  console.log("userId", userId);
-  console.log("userName", userName);
+  const userId = currentUser!.id;
+  const userName = currentUser!.userName;
 
   const data = await readValidatedBody(event, queryRunRequestSchema.parse);
 
@@ -86,8 +82,6 @@ export default defineEventHandler(async (event) => {
       }
     )
     await tx.insert(queueItem).values(qi)
-
-    console.log("Added query to the queue [", id, "]");
 
     return { queueId: id };
   }).catch(error => {
