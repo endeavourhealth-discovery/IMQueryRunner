@@ -1,9 +1,9 @@
 import Authenticator from "~~/server/utils/security/auth/auth.base";
 import {SDK} from "casdoor-nodejs-sdk";
 import process from "node:process";
-import type {User} from "casdoor-nodejs-sdk/lib/cjs/user";
 import {deleteCookie, type EventHandlerRequest, type H3Event} from "h3";
 import type {Token} from "casdoor-nodejs-sdk/lib/cjs/token";
+import type {User} from "~~/models/User";
 
 export default class Casdoor extends Authenticator {
   private readonly casdoor = new SDK({
@@ -15,10 +15,18 @@ export default class Casdoor extends Authenticator {
     appName: "QueryRunner",
   });
 
+  getLoginUrl(origin: string, redirectUrl: string): string {
+    const successUrl = `${origin}/callback?redirect=${redirectUrl}`;
+
+    return `${process.env.NUXT_PUBLIC_CASDOOR_URL}/login/${
+      process.env.NUXT_PUBLIC_CASDOOR_ORGANISATION_NAME
+    }?redirect_uri=${encodeURIComponent(
+      successUrl
+    )}&response_type=code&client_id=${process.env.NUXT_PUBLIC_CASDOOR_CLIENT_ID}`
+  }
+
   async getTokensFromCodeInternal(code: string): Promise<{ accessToken: string; refreshToken?: string }> {
     const tokens = await this.casdoor.getAuthToken(code);
-
-    console.log("CAS : Got tokens")
 
     return {
       accessToken: tokens.access_token,
@@ -29,8 +37,12 @@ export default class Casdoor extends Authenticator {
   getUserInternal(accessToken: string): User {
     const casdoorUser = this.casdoor.parseJwtToken(accessToken);
     return {
-      ...casdoorUser
-    }
+      id: casdoorUser.id,
+      userName: casdoorUser.name,
+      displayName: casdoorUser.displayName,
+      email: casdoorUser.email,
+      avatar: casdoorUser.avatar
+    } as User;
   }
   async revokeTokens(event: H3Event<EventHandlerRequest>, accessToken? :string, refreshToken?: string): Promise<void> {
     if (accessToken && refreshToken)

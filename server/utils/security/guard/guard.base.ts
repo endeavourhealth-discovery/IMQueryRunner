@@ -1,4 +1,4 @@
-import type { User } from "casdoor-nodejs-sdk/lib/cjs/user";
+import type {User} from "~~/models/User";
 
 export default interface Guard {
   checkPermissions(

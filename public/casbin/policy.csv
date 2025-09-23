@@ -12,6 +12,6 @@ p, true, /, *, allow
 p, true, /login, *, allow
 p, true, /callback, *, allow
 p, true, /unauthorized, *, allow
-p, (r.sub != null) && (r.sub.name == 'rcollier'), /QueryRunner, *, allow
-p, (r.sub != null) && (r.sub.name == 'mattergosoft'), /QueryRunner, *, allow
+p, (r.sub != null) && (r.sub.userName == 'rcollier'), /QueryRunner, *, allow
+p, (r.sub != null) && (r.sub.userName == 'mattergosoft'), /QueryRunner, *, allow
 p, (r.sub != null) && (r.sub.age > 18), /QueryRunner, *, allow

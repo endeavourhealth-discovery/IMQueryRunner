@@ -3,7 +3,7 @@ import {QueueItemStatus} from "~~/enums";
 import {imapi} from "~~/server/utils/imapi";
 import {pgQueueItemInsert, postgresDb} from "~~/server/db/postgres";
 import {queueItem} from "~~/server/db/postgres/schema";
-import {IM} from "~~/models/AutoGen";
+import {IM, RDFS} from "~~/models/AutoGen";
 import z from "zod";
 
 export const queryRunRequestSchema = z.object({
@@ -51,18 +51,14 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event) => {
-  console.log("query run");
   const currentUser = globalThis.authenticator.getUser(event);
 
-  const userId = currentUser!.id!;
-  const userName = currentUser!.name!;
-
-  console.log("userId", userId);
-  console.log("userName", userName);
+  const userId = currentUser!.id;
+  const userName = currentUser!.userName;
 
   const data = await readValidatedBody(event, queryRunRequestSchema.parse);
 
-  const entity = await imapi.getPartialEntity(data.query_id, [IM.DEFINITION]);
+  const entity = await imapi.getPartialEntity(data.query_id, [RDFS.LABEL, IM.DEFINITION]);
   const query = JSON.parse(entity[IM.DEFINITION]);
 
   const queryRequest = {
@@ -77,7 +73,7 @@ export default defineEventHandler(async (event) => {
       {
         id: id,
         queryIri: data.query_id,
-        queryName: "",
+        queryName: entity[RDFS.LABEL],
         queryRequest: queryRequest,
         userId: userId,
         userName: userName,
@@ -86,8 +82,6 @@ export default defineEventHandler(async (event) => {
       }
     )
     await tx.insert(queueItem).values(qi)
-
-    console.log("Added query to the queue [", id, "]");
 
     return { queueId: id };
   }).catch(error => {

@@ -9,17 +9,12 @@ import {mysqlDb} from "~~/server/db/mysql";
 import {queueItem} from "~~/server/db/postgres/schema";
 import type {QueryRequest} from "~~/models/AutoGen";
 
-console.log("Connecting to rabbitmq");
-console.log(process.env.RABBITMQ_URL);
 const rabbit = new Connection(process.env.RABBITMQ_URL);
 rabbit.on("error", (err) => {
-  console.log("RabbitMQ connection error", err);
 });
 rabbit.on("connection", () => {
-  console.log("Connection successfully (re)established");
 });
 
-console.log("Creating consumer");
 const sub = rabbit.createConsumer(
   {
     queue: "query.execute",
@@ -55,8 +50,7 @@ const sub = rabbit.createConsumer(
 
     let sql: string = await imapi.getQuerySql(queryRequest)
       .catch(async (err) => {
-        console.log("IMAPI call failed");
-        console.log(err);
+        console.error(err);
         await postgresDb
           .update(queueItem)
           .set({
@@ -70,8 +64,6 @@ const sub = rabbit.createConsumer(
     if (sql) {
       const requestHash = hash(queryRequest);
 
-      console.log(`Executing SQL and caching results [${requestHash}]`);
-
       sql = sql.replaceAll("$searchDate", '"' + queryRequest.referenceDate! + '"');
 
       await mysqlDb.execute("DROP TABLE IF EXISTS imqcache.`" + requestHash + "`");
@@ -79,7 +71,6 @@ const sub = rabbit.createConsumer(
       try {
         await mysqlDb.execute("CREATE TABLE imqcache.`" + requestHash + "` AS " + sql);
 
-        console.log("Updating queue item to `COMPLETED` status " + id);
         await postgresDb
           .update(queueItem)
           .set({
@@ -88,24 +79,15 @@ const sub = rabbit.createConsumer(
           })
           .where(eq(queueItem.id, id));
       } catch (err) {
-        console.log("Error running query or caching results");
-        console.log(sql);
         throw err;
       }
-    } else {
-      console.log("SQL is null or not a string");
-      console.log(sql);
     }
-
-    console.log("Done");
   }
 );
 
 sub.on("error", (err) => {
-  console.log("consumer error (query.execute)", err);
 });
 
-console.log("Creating publisher");
 const pub = rabbit.createPublisher({
   confirm: true,
   maxAttempts: 2,

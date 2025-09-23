@@ -44,7 +44,6 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event) => {
-  console.log("get token");
   const data: OauthTokenRequest = await readValidatedBody(
     event,
     oathTokenRequestSchema.parse
@@ -56,7 +55,6 @@ export default defineEventHandler(async (event) => {
   );
 
   const { access_token, token_type, expires_in } = tokenResponse;
-  console.log("API : token.post user:");
 
   return {
     success: true,

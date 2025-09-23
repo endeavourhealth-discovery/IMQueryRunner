@@ -134,10 +134,7 @@ async function confirmLogout() {
     },
     accept: async () => {
       const reqUrl = useRequestURL();
-      const origin = reqUrl.origin;
-      console.log("UI : origin: " + origin);
-      await $fetch("/api/auth/logout/");
-      console.log("UI : Logged out, refreshing")
+      await $fetch("/api/auth/logout");
       location.reload();
     },
   });
