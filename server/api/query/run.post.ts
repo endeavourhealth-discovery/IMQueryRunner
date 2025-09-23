@@ -70,7 +70,7 @@ export default defineEventHandler(async (event) => {
     referenceDate: data.reference_date,
   };
 
-  await postgresDb.transaction(async (tx) => {
+  return await postgresDb.transaction(async (tx) => {
     const id = await sendMessage(userId, queryRequest);
 
     const qi = pgQueueItemInsert.parse(
@@ -87,7 +87,9 @@ export default defineEventHandler(async (event) => {
     )
     await tx.insert(queueItem).values(qi)
 
-    return id;
+    console.log("Added query to the queue [", id, "]");
+
+    return { queueId: id };
   }).catch(error => {
     console.error("Error creating queue item", error);
   });
