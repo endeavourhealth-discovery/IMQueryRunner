@@ -1,4 +1,4 @@
-p, r.sub.admin == true, *, *, allow
+p, (r.sub != null) && (r.sub.admin == true), *, *, allow
 
 p, true, /callback*, *, allow
 p, true, /socket.io/*, *, allow
@@ -9,5 +9,6 @@ p, true, /, *, allow
 p, true, /login, *, allow
 p, true, /callback, *, allow
 p, true, /unauthorized, *, allow
-p, r.sub.name == "mattergosoft", /QueryRunner, *, allow
-p, r.sub.age > 18, /QueryRunner, *, allow
+p, (r.sub != null ) && (r.sub.name == 'rcollier'), /QueryRunner, *, allow
+p, (r.sub != null ) && (r.sub.name == 'mattergosoft'), /QueryRunner, *, allow
+p, (r.sub != null ) && (r.sub.age > 18), /QueryRunner, *, allow

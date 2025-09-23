@@ -1,11 +1,14 @@
 import { Server as IOServer } from "socket.io";
-import { SDK } from "casdoor-nodejs-sdk";
+import type Guard from "~~/server/utils/security/guard/guard.base";
+import type Authenticator from "~~/server/utils/security/auth/auth.base";
 
 declare global {
   var io: IOServer;
-  var casdoor: SDK;
+  var authenticator: Authenticator;
+  var guard: Guard;
   interface GlobalThis {
     io: IOServer;
-    casdoor: SDK;
+    authenticator: Authenticator;
+    guard: Guard;
   }
 }

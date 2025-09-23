@@ -3,7 +3,6 @@ import {
   type OauthTokenRequest,
 } from "~~/models/oauth.token.request.schema";
 import { getMachineToken } from "~~/server/helpers/getMachineToken";
-import { setAuthCookies } from "~~/server/utils/setAuthCookies";
 
 defineRouteMeta({
   openAPI: {
