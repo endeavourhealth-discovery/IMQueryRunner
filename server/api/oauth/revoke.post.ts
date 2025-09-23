@@ -45,6 +45,5 @@ const tokenSchema = z.object({
 export default defineEventHandler(async (event) => {
   console.log("revoke token");
   const { token } = await readValidatedBody(event, tokenSchema.parse);
-  await globalThis.casdoor.deleteToken({ accessToken: token } as Token);
-  return;
+  await globalThis.authenticator.revokeTokens(event, token);
 });

@@ -52,7 +52,7 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   console.log("query run");
-  const currentUser = getUser(event);
+  const currentUser = globalThis.authenticator.getUser(event);
 
   const userId = currentUser!.id!;
   const userName = currentUser!.name!;
