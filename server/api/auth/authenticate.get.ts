@@ -6,5 +6,13 @@ const paramSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { code } = await getValidatedQuery(event, paramSchema.parse);
-  await globalThis.authenticator.getTokensFromCode(event, code);
+
+  try {
+    console.log("=================== TOKENS FROM CODE ===================")
+    await globalThis.authenticator.getTokensFromCode(event, code);
+  } catch (ex) {
+    console.log("Error exchanging code for token");
+    console.log(ex);
+    throw ex;
+  }
 });
