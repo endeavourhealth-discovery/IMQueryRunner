@@ -4,8 +4,11 @@ import process from "node:process";
 import {deleteCookie, type EventHandlerRequest, type H3Event} from "h3";
 import type {Token} from "casdoor-nodejs-sdk/lib/cjs/token";
 import type {User} from "~~/models/User";
+import Logger from "#shared/logger";
 
 export default class Casdoor extends Authenticator {
+  private readonly LOG = Logger("server/utils/security/auth/casdoor")
+
   private readonly casdoor = new SDK({
     endpoint: process.env.NUXT_PUBLIC_CASDOOR_URL!,
     clientId: process.env.NUXT_PUBLIC_CASDOOR_CLIENT_ID!,
@@ -55,7 +58,7 @@ export default class Casdoor extends Authenticator {
 
   async requireUserInternal(event: H3Event<EventHandlerRequest>, accessToken? :string, refreshToken?: string): Promise<void> {
     if (!accessToken)
-      throw createError({ status: 401, message: "Missing token cookie" });
+      throw createError({ status: 401, message: "Missing access token cookie" });
     const response = await this.casdoor.introspect(accessToken, "access_token");
     if (!response.data.active) {
       await this.logout(event);
