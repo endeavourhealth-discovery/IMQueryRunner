@@ -1,4 +1,5 @@
 import {pino} from "pino";
+import 'pino-pretty';
 
 export default function Logger(name: string) {
   return pino({
