@@ -2,8 +2,10 @@ import type { NitroApp } from "nitropack";
 import { Server as Engine } from "engine.io";
 import { defineEventHandler } from "h3";
 import { Server } from "socket.io";
+import Logger from "#shared/logger";
 
 export default defineNitroPlugin((nitroApp: NitroApp) => {
+  const LOG = Logger("server/plugins/socket")
   const engine = new Engine();
   const io = new Server();
 
@@ -15,7 +17,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
     });
 
     socket.on("hello", () => {
-      console.log("============= hello ============", socket.id);
+      LOG.debug(`============= hello ${socket.id} ============`);
     });
 
     socket.on("joinRoom", (room, user) => {
