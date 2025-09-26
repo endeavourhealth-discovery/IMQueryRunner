@@ -1,19 +1,17 @@
-class ConsoleLogger {
-  private readonly base: string;
-  constructor(base: string) {
-    this.base = base;
-  }
-
-  public debug(...message: any[]) {
-    console.debug(this.base + " : ", message)
-  }
-
-  public error(...message: any[]){
-    console.error(this.base + " : ", message);
-  }
-
-}
+import {pino} from "pino";
+import 'pino-pretty';
 
 export default function Logger(name: string) {
-  return new ConsoleLogger(name);
+  return pino({
+    name: name,
+    level: process.env.LOG_LEVEL || "info",
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        levelFirst: true,
+        translateTime: 'HH:MM:ss',
+      },
+    }
+  });
 }
