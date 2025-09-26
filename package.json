@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev | pino-pretty",
+    "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -30,8 +30,6 @@
     "perfect-debounce": "^2.0.0",
     "pg": "^8.16.3",
     "pinia": "^3.0.3",
-    "pino": "^9.11.0",
-    "pino-pretty": "^13.1.1",
     "primevue": "^4.3.9",
     "rabbitmq-client": "^5.0.5",
     "socket.io": "^4.8.1",
