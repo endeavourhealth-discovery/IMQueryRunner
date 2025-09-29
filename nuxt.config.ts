@@ -23,7 +23,7 @@ export default defineNuxtConfig({
   },
   css: ["~/assets/css/main.css"],
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss()]
   },
   compatibilityDate: "2025-07-15",
   $development: {
