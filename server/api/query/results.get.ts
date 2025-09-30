@@ -24,13 +24,5 @@ export default defineEventHandler(async (event) => {
   const queryRequest: QueryRequest = await readBody(event);
   const cachedResults = getCachedQueryResults(queryRequest);
   if (cachedResults) return cachedResults;
-  else {
-    const sql = await $fetch(process.env.IMAPI_URL! + "query/public/sql", {
-      body: queryRequest,
-      method: "post",
-    });
-    if (sql) {
-      return await mysqlDb.execute(sql);
-    }
-  }
+  else throw createError("Query results not found. Please run the query.");
 });
