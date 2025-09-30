@@ -44,7 +44,8 @@ export default class Casdoor extends Authenticator {
       userName: casdoorUser.name,
       displayName: casdoorUser.displayName,
       email: casdoorUser.email,
-      avatar: casdoorUser.avatar
+      avatar: casdoorUser.avatar,
+      groups: casdoorUser.groups
     } as User;
   }
   async revokeTokens(event: H3Event<EventHandlerRequest>, accessToken? :string, refreshToken?: string): Promise<void> {
@@ -59,16 +60,24 @@ export default class Casdoor extends Authenticator {
   async requireUserInternal(event: H3Event<EventHandlerRequest>, accessToken? :string, refreshToken?: string): Promise<void> {
     if (!accessToken)
       throw createError({ status: 401, message: "Missing access token cookie" });
+
+    this.LOG.debug("Introspecting access token")
     const response = await this.casdoor.introspect(accessToken, "access_token");
+
+    this.LOG.debug("Response [" + response.data.active + "]")
+
     if (!response.data.active) {
       await this.logout(event);
-      throw createError({ status: 401, message: "Invalid token" });
+      throw createError({ status: 401, message: "Inactive token" });
     } else if (refreshToken) {
+      this.LOG.debug("Introspecting refresh token")
       const refreshResponse = await this.casdoor.introspect(
-        accessToken,
+        refreshToken,
         "refresh_token"
       );
+
       if (!refreshResponse.data.active) {
+        this.LOG.error("Inactive refresh token")
         await this.logout(event);
         throw createError({status: 401, message: "Invalid refresh token"});
       }

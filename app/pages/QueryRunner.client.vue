@@ -164,9 +164,6 @@ async function refresh() {
         page: page.value,
         size: rows.value,
       },
-      headers: {
-        Authorization: `Bearer ${useCookie("casdoor_access_token")}`,
-      },
     }
   );
   if (results) {
