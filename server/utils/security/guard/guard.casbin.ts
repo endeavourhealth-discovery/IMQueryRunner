@@ -27,7 +27,9 @@ export class GuardCasbin implements Guard {
       this.LOG.debug(`[${permission[1]}]`);
       return permission[0].valueOf();
     } catch (error: any) {
-      this.LOG.error("API: Error checking permissions:", error);
+      this.LOG.error("API: Error checking permissions:");
+      this.LOG.error(error);
+      console.error(error);
 
       throw new AuthorizationError({
         code: 401,
