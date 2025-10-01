@@ -14,6 +14,7 @@
   >
     <div class="query-results-dialog-content">
       <DataTable
+        :size="'small'"
         :value="queryResults"
         :paginator="true"
         :rows="size"
