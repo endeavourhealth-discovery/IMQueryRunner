@@ -14,8 +14,8 @@ export const queueItemSchema = z.object({
   finishedAt: z.date().optional(),
   killedAt: z.date().optional(),
   status: z.enum(QueueItemStatus),
-  queryResult: z.array(z.string()),
-  error: z.any(),
+  queryResult: z.array(z.string()).optional(),
+  error: z.any().optional(),
 });
 
 export type QueueItem = z.infer<typeof queueItemSchema>;

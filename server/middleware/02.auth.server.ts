@@ -1,4 +1,8 @@
+import Logger from "~~/shared/logger";
+
 export default defineEventHandler(async (event) => {
+  const LOG = Logger("server/middleware/auth");
+  LOG.info("auth middleware");
   const path = getRequestURL(event).pathname;
   if (!path.startsWith("/api")) {
     return;
