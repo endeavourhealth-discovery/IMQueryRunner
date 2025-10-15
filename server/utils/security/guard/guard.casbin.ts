@@ -1,8 +1,10 @@
 import { type Enforcer, newEnforcer } from "casbin";
 import AuthorizationError from "~~/server/errors/authorization.error";
 import type Guard from "~~/server/utils/security/guard/guard.base";
-import type {User} from "~~/models/User";
+import type { User } from "~~/models/User";
 import Logger from "#shared/logger";
+import { BasicAdapter } from "casbin-basic-adapter";
+import mysql, { type ConnectionOptions } from "mysql2";
 
 export class GuardCasbin implements Guard {
   private LOG = Logger("server/utils/security/guard/casbin");
@@ -14,10 +16,15 @@ export class GuardCasbin implements Guard {
     action: string
   ): Promise<boolean> {
     try {
-      this.enforcer ??= await newEnforcer(
-        "public/casbin/model.conf",
-        "public/casbin/policy.csv"
-      );
+      const access: ConnectionOptions = {
+        user: process.env.MYSQL_USER,
+        database: process.env.MYSQL_DATABASE,
+        host: process.env.MYSQL_HOST,
+        password: process.env.MYSQL_PASSWORD,
+      };
+      const conn = mysql.createConnection(access);
+      const adapter = await BasicAdapter.newAdapter("mysql", conn);
+      this.enforcer ??= await newEnforcer("public/casbin/model.conf", adapter);
 
       // return await this.enforcer.enforce(subject, path, action);
 
