@@ -28,40 +28,48 @@
           <Column field="id" header="ID"></Column>
           <Column field="queryIri" header="Iri"></Column>
           <Column field="queryName" header="Query name"></Column>
+          <Column>
+            <template #body="{ data }: { data: QueueItem }">
+              <Button
+                label="View arguments"
+                @click="viewArgumentDisplay(data.queryRequest.argument)"
+              />
+            </template>
+          </Column>
           <Column field="userName" header="User"></Column>
           <Column field="queuedAt" header="Queued at">
-            <template #body="slotProps">
+            <template #body="{ data }: { data: QueueItem }">
               <span>{{
-                slotProps.data.queuedAt ? slotProps.data.queuedAt : "-"
+                data.queuedAt ? getDisplayDateTime(data.queuedAt) : "-"
               }}</span>
             </template>
           </Column>
           <Column field="startedAt" header="Started at">
-            <template #body="slotProps">
+            <template #body="{ data }: { data: QueueItem }">
               <span>{{
-                slotProps.data.startedAt ? slotProps.data.startedAt : "-"
+                data.startedAt ? getDisplayDateTime(data.startedAt) : "-"
               }}</span>
             </template>
           </Column>
           <Column field="finishedAt" header="Finished at">
-            <template #body="slotProps">
+            <template #body="{ data }: { data: QueueItem }">
               <span>{{
-                slotProps.data.finishedAt ? slotProps.data.finishedAt : "-"
+                data.finishedAt ? getDisplayDateTime(data.finishedAt) : "-"
               }}</span>
             </template>
           </Column>
           <Column field="killedAt" header="Killed at">
-            <template #body="slotProps">
+            <template #body="{ data }: { data: QueueItem }">
               <span>{{
-                slotProps.data.killedAt ? slotProps.data.killedAt : "-"
+                data.killedAt ? getDisplayDateTime(data.killedAt) : "-"
               }}</span>
             </template>
           </Column>
           <Column field="status" header="Status">
-            <template #body="slotProps">
+            <template #body="{ data }: { data: QueueItem }">
               <Tag
-                :severity="getStatusSeverity(slotProps.data.status)"
-                :value="slotProps.data.status"
+                :severity="data.status ? getStatusSeverity(data.status) : '-'"
+                :value="data.status"
               />
             </template>
           </Column>
@@ -84,6 +92,11 @@
       :queryItem="selectedQuery"
       v-model:showDialog="showQueryResults"
     />
+    <ArgumentDisplayDialog
+      :arguments="currentArguments"
+      :show-footer-buttons="false"
+      v-model:showDialog="showArgumentDisplay"
+    />
   </div>
 </template>
 
@@ -92,13 +105,14 @@ import type { QueueItem } from "~~/models";
 import { QueueItemStatus } from "~~/enums";
 import { computed, onMounted, ref } from "vue";
 import type { Ref } from "vue";
-import type { QueryRequest } from "~~/models/AutoGen";
+import type { Argument, QueryRequest } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
 import { useUser } from "~/composables/useUser";
 
 const { user } = useUser();
+const confirm = useConfirm();
 
 const socket = io({
   extraHeaders: {
@@ -117,6 +131,8 @@ const selectedQuery: Ref<QueueItem | undefined> = ref();
 const showQueryResults = ref(false);
 const websocketIsConnected = ref(false);
 const transport = ref("N/A");
+const showArgumentDisplay = ref(false);
+const currentArguments: Ref<Argument[]> = ref([]);
 
 onMounted(async () => {
   loading.value = true;
@@ -206,11 +222,37 @@ async function cancelQuery(queryId: string) {
   await initSearch();
 }
 
-function goToQuery(queryIri: string) {}
+async function goToQuery(queryIri: string) {
+  confirm.require({
+    message: "Are you sure you want to navigate away from this page?",
+    header: "Navigate",
+    acceptProps: {
+      label: "Proceed",
+    },
+    rejectProps: {
+      label: "Cancel",
+      severity: "secondary",
+      outlined: true,
+    },
+    accept: async () => {
+      const config = useRuntimeConfig();
+      await navigateTo(
+        `${config.public.imDirectoryUrl!}"directory/folder/"${encodeURI(
+          queryIri
+        )}`
+      );
+    },
+  });
+}
 
 async function viewQueryResults(queryItem: QueueItem) {
   selectedQuery.value = queryItem;
   showQueryResults.value = true;
+}
+
+async function viewArgumentDisplay(args: Argument[]) {
+  currentArguments.value = args;
+  showArgumentDisplay.value = true;
 }
 
 async function deleteQuery(queryId: string) {
@@ -246,6 +288,22 @@ function scrollToTop() {
     "p-datatable-scrollable-table"
   )[0] as HTMLElement;
   scrollArea?.scrollIntoView({ block: "start", behavior: "smooth" });
+}
+
+function getDisplayDateTime(date: Date) {
+  return (
+    date.getUTCDate() +
+    "/" +
+    (date.getUTCMonth() + 1) +
+    "/" +
+    date.getUTCFullYear() +
+    " " +
+    date.getUTCHours() +
+    ":" +
+    date.getUTCMinutes() +
+    ":" +
+    date.getUTCMilliseconds()
+  );
 }
 
 function onConnect() {

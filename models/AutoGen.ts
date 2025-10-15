@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2025-08-13 12:40:40.
+// Generated using typescript-generator version 3.2.1263 on 2025-09-19 09:09:31.
 
 export interface ConceptContextMap {
   id?: string;
@@ -151,6 +151,18 @@ export interface FunctionTemplate extends Entity {
 /**
  * Class representing an IRI
  */
+export interface Indicator extends TTIriRef {
+  query?: TTIriRef;
+  and?: Indicator[];
+  or?: Indicator[];
+  definition?: Query;
+  actionIfFalse?: TTIriRef[];
+  actionIfTrue?: TTIriRef[];
+}
+
+/**
+ * Class representing an IRI
+ */
 export interface MapFunction extends TTIriRef {
   argument?: Argument[];
   conceptMap?: { [index: string]: string };
@@ -241,6 +253,7 @@ export interface PropertyShape {
   descending?: string;
   orderable?: boolean;
   hasValueSet?: TTIriRef;
+  definingProperty?: boolean;
 }
 
 export interface SetContent {
@@ -265,11 +278,16 @@ export interface ValueTemplate extends Entity {
 export interface Argument {
   parameter?: string;
   valueData?: string;
-  valueVariable?: string;
+  valueParameter?: string;
   valueIri?: TTIriRef;
   valueIriList?: TTIriRef[];
   valueDataList?: string[];
+  valuePath?: Path;
+  valueNodeRef?: string;
+  dataType?: TTIriRef;
+  valuePathList?: Path[];
   valueObject?: any;
+  valueVariable?: string;
 }
 
 export interface ArgumentReference {
@@ -280,17 +298,17 @@ export interface ArgumentReference {
 
 export interface Assignable {
   value?: string;
-  unit?: TTIriRef;
-  operator?: Operator;
+  function?: FunctionClause;
+  units?: TTIriRef;
   valueLabel?: string;
-  valueParameter?: string;
   qualifier?: string;
+  operator?: Operator;
 }
 
 export interface BoolGroup<T> {
+  and?: T[];
   or?: T[];
   not?: T[];
-  and?: T[];
 }
 
 export interface Case {
@@ -344,16 +362,18 @@ export interface Entailment {
   descendantsOrSelfOf?: boolean;
 }
 
-export interface FunctionClause extends Value {
-  name?: Function;
+export interface FunctionClause extends IriLD {
   argument?: Argument[];
-  range?: Range;
 }
 
 export interface GroupBy extends IriLD {
   nodeRef?: string;
   valueRef?: string;
   propertyRef?: string;
+}
+
+export interface HasPaths {
+  path?: Path[];
 }
 
 export interface Instance extends IriLD {
@@ -368,7 +388,7 @@ export interface IriLD {
   uuid?: string;
 }
 
-export interface Match extends IriLD, BoolGroup<Match> {
+export interface Match extends IriLD, BoolGroup<Match>, HasPaths {
   ifTrue?: RuleAction;
   ifFalse?: RuleAction;
   nodeRef?: string;
@@ -378,24 +398,26 @@ export interface Match extends IriLD, BoolGroup<Match> {
   or?: Match[];
   not?: Match[];
   where?: Where;
+  return?: Return;
+  then?: Match;
   graph?: Element;
-  orderBy?: OrderLimit;
   optional?: boolean;
   aggregate?: FunctionClause;
   variable?: string;
   parameter?: string;
-  path?: Path[];
   function?: FunctionClause;
   entailment?: Entail;
   baseRule?: boolean;
   union?: boolean;
   ruleNumber?: number;
   inverse?: boolean;
-  then?: Match;
   rule?: Match[];
   libraryItem?: string;
   invalid?: boolean;
-  return?: Return;
+  isCohort?: TTIriRef;
+  groupBy?: GroupBy[];
+  keepAs?: string;
+  orderBy?: OrderLimit;
   returx?: Return;
   isUnion?: boolean;
 }
@@ -409,6 +431,7 @@ export interface Node extends Element {
 
 export interface OrderDirection extends RelativeTo {
   direction?: Order;
+  function?: FunctionClause;
 }
 
 export interface OrderLimit {
@@ -417,11 +440,10 @@ export interface OrderLimit {
   description?: string;
 }
 
-export interface Path extends Element {
+export interface Path extends Element, HasPaths {
   inverse?: boolean;
   optional?: boolean;
   typeOf?: Node;
-  path?: Path[];
 }
 
 export interface PathDocument {
@@ -443,14 +465,13 @@ export interface Prefix {
 }
 
 export interface Query extends Match {
+  query?: Query[];
   activeOnly?: boolean;
-  groupBy?: GroupBy[];
-  dataSet?: Query[];
   prefixes?: Prefix[];
+  columnGroup?: Match[];
   imQuery?: boolean;
   parentResult?: any;
   persistentIri?: TTIriRef;
-  subquery?: Query;
   bindAs?: string;
 }
 
@@ -465,9 +486,12 @@ export interface Range {
   to: Value;
 }
 
-export interface RelativeTo extends Node {
+export interface RelativeTo extends IriLD {
   valueVariable?: string;
   propertyRef?: string;
+  targetLabel?: string;
+  nodeRef?: string;
+  parameter?: string;
 }
 
 export interface RequeueQueryRequest {
@@ -482,6 +506,7 @@ export interface Return {
   as?: string;
   valueRef?: string;
   propertyRef?: string;
+  asDescription?: string;
 }
 
 export interface ReturnProperty {
@@ -511,7 +536,9 @@ export interface Update extends TTIriRef {
   delete?: Delete[];
 }
 
-export interface Value extends Assignable {}
+export interface Value extends Assignable {
+  valueParameter?: string;
+}
 
 export interface When {
   where?: Where;
@@ -531,11 +558,28 @@ export interface Where extends Element, Assignable, BoolGroup<Where> {
   not?: Where[];
   roleGroup?: boolean;
   isNotNull?: boolean;
-  function?: FunctionClause;
   valueVariable?: string;
   inverse?: boolean;
   or?: Where[];
   and?: Where[];
+  shortLabel?: string;
+}
+
+export interface DBEntry {
+  id?: string;
+  queryIri?: string;
+  queryName?: string;
+  queryRequest?: QueryRequest;
+  userId?: string;
+  userName?: string;
+  queuedAt?: Date;
+  startedAt?: Date;
+  pid?: number;
+  finishedAt?: Date;
+  killedAt?: Date;
+  status?: QueryExecutorStatus;
+  queryResult?: string;
+  error?: string;
 }
 
 export interface CognitoGroupRequest {
@@ -566,6 +610,11 @@ export interface EntityValidationRequest {
   graph?: Graph;
 }
 
+export interface FileDocumentRequest {
+  document?: TTDocument;
+  insertGraph?: Graph;
+}
+
 export interface FunctionRequest {
   functionIri?: string;
   arguments?: Argument[];
@@ -587,13 +636,11 @@ export interface QueryDisplayRequest {
 export interface QueryRequest extends ContextMap {
   textSearch?: string;
   argument?: Argument[];
-  referenceDate?: string;
   query: Query;
   pathQuery?: PathQuery;
   update?: Update;
   name?: string;
   page?: Page;
-  baselineDate?: string;
   queryStringDefinition?: string;
   askIri?: string;
   timings?: { [index: string]: string }[];
@@ -828,15 +875,15 @@ export interface TTDocument extends TTNode {
 export interface TTEntity extends TTNode, Serializable {
   context?: TTContext;
   crud?: TTIriRef;
-  name?: string;
   type?: TTArray;
+  name?: string;
   scheme?: TTIriRef;
   version?: number;
-  description?: string;
-  prefixes?: TTPrefix[];
   status?: TTIriRef;
+  description?: string;
   code?: string;
   types?: TTIriRef[];
+  prefixes?: TTPrefix[];
 }
 
 export interface BugReport extends Task {
@@ -918,8 +965,8 @@ export interface TTArray extends Serializable {
 }
 
 export interface TTContext extends Serializable {
-  prefixes?: TTPrefix[];
   nameSpaces?: TTPrefix[];
+  prefixes?: TTPrefix[];
 }
 
 export interface Throwable extends Serializable {
@@ -1073,15 +1120,6 @@ export const enum Entail {
   equal = "equal",
 }
 
-export const enum Function {
-  sum = "sum",
-  count = "count",
-  average = "average",
-  concatenate = "concatenate",
-  max = "max",
-  min = "min",
-}
-
 export const enum Operator {
   eq = "=",
   gte = ">=",
@@ -1089,6 +1127,7 @@ export const enum Operator {
   lte = "<=",
   lt = "<",
   start = "startsWith",
+  isTrue = "isTrue",
   contains = "contains",
 }
 
@@ -1431,6 +1470,7 @@ export const enum IM {
   SOURCE_SCHEMA = "http://endhealth.info/im#sourceSchema",
   SOURCE_TABLE = "http://endhealth.info/im#sourceTable",
   SOURCE_FIELD = "http://endhealth.info/im#sourceField",
+  TIME_DIFFERENCE = "http://endhealth.info/im#TimeDifference",
   SOURCE_CODE_SCHEME = "http://endhealth.info/im#sourceCodeScheme",
   SOURCE_VALUE = "http://endhealth.info/im#sourceValue",
   SOURCE_REGEX = "http://endhealth.info/im#sourceRegex",
@@ -1443,14 +1483,20 @@ export const enum IM {
   DELETE_ALL = "http://endhealth.info/im#DeleteAll",
   PROV_CREATION = "http://endhealth.info/im#2001000252109",
   PROV_UPDATE = "http://endhealth.info/im#1661000252106",
-  USED_IN = "http://endhealth.info/im#usedIn",
+  USES = "http://endhealth.info/im#uses",
+  COUNT = "http://endhealth.info/im#Count",
+  SUM = "http://endhealth.info/im#Sum",
+  AVERAGE = "http://endhealth.info/im#Average",
+  MIN = "http://endhealth.info/im#Min",
+  MAX = "http://endhealth.info/im#Max",
+  CONCATENATE = "http://endhealth.info/im#Concatenate",
   IN_RESULT_SET = "http://endhealth.info/im#inResultSet",
   HAS_PROFILE = "http://endhealth.info/im#inResultSet",
-  GMS_PATIENT = "http://endhealth.info/im#2751000252106",
   PROVENANCE_ACTIVITY = "http://endhealth.info/im#ProvenanceActivity",
   PROVENANCE_TARGET = "http://endhealth.info/im#provenanceTarget",
   PROVENANCE_ACTIVITY_TYPE = "http://endhealth.info/im#provenanceActivityType",
   PROVENANCE_AGENT = "http://endhealth.info/im#provenanceAgent",
+  INDICATOR = "http://endhealth.info/im#Indicator",
   START_TIME = "http://endhealth.info/im#startTime",
   EFFECTIVE_DATE = "http://endhealth.info/im#effectiveDate",
   END_DATE = "http://endhealth.info/im#endDate",
@@ -1494,7 +1540,11 @@ export const enum IM {
   NATIONALLY_ASSURED_UK = "http://endhealth.info/im#NationallyAssuredUK",
   ENTITY = "http://endhealth.info/im#Entity",
   QUERY_SET = "http://endhealth.info/im#QuerySet",
+  DEPENDENT_ON = "http://endhealth.info/im#dependentOn",
+  CARE_ACTIVITY = "http://endhealth.info/im#CareActivity",
+  CARE_TARGET = "http://endhealth.info/im#CareTarget",
   QUERY_TEMPLATE = "http://endhealth.info/im#QueryTemplate",
+  HAS_QUERY = "http://endhealth.info/im#hasQuery",
   RECORD_TYPE = "http://endhealth.info/im#RecordType",
   FEATURE = "http://endhealth.info/im#MatchClause",
   DATA_PROPERTY = "http://endhealth.info/im#DataProperty",
