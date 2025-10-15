@@ -13,7 +13,7 @@ import { QueueItemStatus } from "~~/enums";
 import { eq } from "drizzle-orm";
 import { imapi } from "~~/server/utils/imapi";
 import { cloneDeep } from "lodash-es";
-import { MySqlQueryResult } from "drizzle-orm/mysql2";
+import { type MySqlQueryResult } from "drizzle-orm/mysql2";
 
 const queryResultsMap = new Map<string, Set<string>>();
 
