@@ -16,20 +16,12 @@ export class GuardCasbin implements Guard {
     action: string
   ): Promise<boolean> {
     try {
-      const access: ConnectionOptions = {
-        user: process.env.MYSQL_USER,
-        database: process.env.MYSQL_DATABASE,
-        host: process.env.MYSQL_HOST,
-        password: process.env.MYSQL_PASSWORD,
-      };
-      const conn = mysql.createConnection(access);
-      const adapter = await BasicAdapter.newAdapter("mysql", conn);
-      this.enforcer ??= await newEnforcer("public/casbin/model.conf", adapter);
+      if (!this.enforcer) await this.setupEnforcer();
 
       // return await this.enforcer.enforce(subject, path, action);
 
       // FOR DEBUG TO SEE WHICH RULE(S) PASSED
-      const permission = await this.enforcer.enforceEx(subject, path, action);
+      const permission = await this.enforcer!.enforceEx(subject, path, action);
       this.LOG.debug("========== PERMISSION ==========");
       this.LOG.debug(`[${permission[1]}]`);
       return permission[0].valueOf();
@@ -43,5 +35,33 @@ export class GuardCasbin implements Guard {
         message: "Unauthorized",
       });
     }
+  }
+
+  async addPolicy(username: string, dataSource: string, accessRequest: string) {
+    if (!this.enforcer) await this.setupEnforcer();
+    await this.enforcer!.addPolicy(username, dataSource, accessRequest);
+    await this.enforcer!.savePolicy();
+  }
+
+  async removePolicy(
+    username: string,
+    dataSource: string,
+    accessRequest: string
+  ) {
+    if (!this.enforcer) await this.setupEnforcer();
+    await this.enforcer!.removePolicy(username, dataSource, accessRequest);
+    await this.enforcer!.savePolicy();
+  }
+
+  async setupEnforcer(): Promise<void> {
+    const access: ConnectionOptions = {
+      user: process.env.MYSQL_USER,
+      database: process.env.MYSQL_DATABASE,
+      host: process.env.MYSQL_HOST,
+      password: process.env.MYSQL_PASSWORD,
+    };
+    const conn = mysql.createConnection(access);
+    const adapter = await BasicAdapter.newAdapter("mysql", conn);
+    this.enforcer ??= await newEnforcer("public/casbin/model.conf", adapter);
   }
 }
