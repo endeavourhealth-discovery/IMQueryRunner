@@ -7,7 +7,7 @@ export const userSchema = z.object({
   email: z.string(),
   avatar: z.string(),
   type: z.string(),
-  groups: z.array(z.string())
+  groups: z.array(z.string()),
 });
 
 export type User = z.infer<typeof userSchema>;

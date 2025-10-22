@@ -1,10 +1,11 @@
 import { type Enforcer, newEnforcer } from "casbin";
 import AuthorizationError from "~~/server/errors/authorization.error";
 import type Guard from "~~/server/utils/security/guard/guard.base";
-import type { User } from "~~/models/User";
 import Logger from "#shared/logger";
 import { BasicAdapter } from "casbin-basic-adapter";
 import mysql, { type ConnectionOptions } from "mysql2";
+import { AccessRequest } from "~~/models/AutoGen";
+import { type User } from "~~/models/User";
 
 export class GuardCasbin implements Guard {
   private LOG = Logger("server/utils/security/guard/casbin");
@@ -13,7 +14,7 @@ export class GuardCasbin implements Guard {
   async checkPermissions(
     subject: User,
     path: string,
-    action: string
+    action: AccessRequest
   ): Promise<boolean> {
     try {
       if (!this.enforcer) await this.setupEnforcer();
@@ -37,19 +38,31 @@ export class GuardCasbin implements Guard {
     }
   }
 
-  async addPolicy(username: string, dataSource: string, accessRequest: string) {
+  async addPolicy(
+    user: User,
+    dataSource: string,
+    accessRequest: AccessRequest
+  ) {
     if (!this.enforcer) await this.setupEnforcer();
-    await this.enforcer!.addPolicy(username, dataSource, accessRequest);
+    await this.enforcer!.addPolicy(
+      JSON.stringify(user),
+      dataSource,
+      accessRequest
+    );
     await this.enforcer!.savePolicy();
   }
 
   async removePolicy(
-    username: string,
+    user: User,
     dataSource: string,
-    accessRequest: string
+    accessRequest: AccessRequest
   ) {
     if (!this.enforcer) await this.setupEnforcer();
-    await this.enforcer!.removePolicy(username, dataSource, accessRequest);
+    await this.enforcer!.removePolicy(
+      JSON.stringify(user),
+      dataSource,
+      accessRequest
+    );
     await this.enforcer!.savePolicy();
   }
 

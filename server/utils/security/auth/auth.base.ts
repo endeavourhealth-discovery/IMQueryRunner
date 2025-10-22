@@ -1,6 +1,6 @@
-import type {EventHandlerRequest, H3Event } from "h3";
+import type { EventHandlerRequest, H3Event } from "h3";
 import { setCookie, getCookie, deleteCookie } from "h3";
-import type {User} from "~~/models/User";
+import type { User } from "~~/models/User";
 
 export default abstract class Authenticator {
   protected readonly ACCESS_TOKEN = "access_token";
@@ -8,19 +8,42 @@ export default abstract class Authenticator {
   protected readonly REFRESH_TOKEN = "refresh_token";
 
   abstract getLoginUrl(origin: string, redirectUrl: string): string;
-  abstract getTokensFromCodeInternal(code: string): Promise<{ accessToken: string, refreshToken?: string}>;
+  abstract getTokensFromCodeInternal(
+    code: string
+  ): Promise<{ accessToken: string; refreshToken?: string }>;
   abstract getUserInternal(accessToken: string): User;
-  abstract revokeTokens(event: H3Event<EventHandlerRequest>, accessToken?: string, refreshToken?: string): Promise<void>;
-  abstract requireUserInternal(event: H3Event<EventHandlerRequest>, accessToken?: string, refreshToken?: string): Promise<void>;
+  abstract revokeTokens(
+    event: H3Event<EventHandlerRequest>,
+    accessToken?: string,
+    refreshToken?: string
+  ): Promise<void>;
+  abstract requireUserInternal(
+    event: H3Event<EventHandlerRequest>,
+    accessToken?: string,
+    refreshToken?: string
+  ): Promise<void>;
 
-  public async getTokensFromCode(event: H3Event<EventHandlerRequest>,code: string) {
-    const { accessToken, refreshToken } = await this.getTokensFromCodeInternal(code);
-    this.setCookies(event, accessToken, refreshToken)
+  public async getTokensFromCode(
+    event: H3Event<EventHandlerRequest>,
+    code: string
+  ) {
+    const { accessToken, refreshToken } = await this.getTokensFromCodeInternal(
+      code
+    );
+    this.setCookies(event, accessToken, refreshToken);
   }
 
-  public setCookies(event: H3Event<EventHandlerRequest>, accessToken: string, refreshToken?: string) {
+  public setCookies(
+    event: H3Event<EventHandlerRequest>,
+    accessToken: string,
+    refreshToken?: string
+  ) {
     setCookie(event, this.ACCESS_TOKEN, accessToken);
-    setCookie(event, this.USER_SESSION, JSON.stringify(this.getUserInternal(accessToken)));
+    setCookie(
+      event,
+      this.USER_SESSION,
+      JSON.stringify(this.getUserInternal(accessToken))
+    );
 
     if (refreshToken) {
       setCookie(event, this.REFRESH_TOKEN, refreshToken);
@@ -29,10 +52,9 @@ export default abstract class Authenticator {
     }
   }
 
-  public getUser(event: H3Event<EventHandlerRequest>) : User | undefined {
+  public getUser(event: H3Event<EventHandlerRequest>): User | undefined {
     const accessToken = getCookie(event, this.ACCESS_TOKEN);
-    if (!accessToken)
-      return undefined;
+    if (!accessToken) return undefined;
 
     return this.getUserInternal(accessToken);
   }
