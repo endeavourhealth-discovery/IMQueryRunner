@@ -46,10 +46,12 @@ export default class Casdoor extends Authenticator {
     return {
       id: casdoorUser.id,
       userName: casdoorUser.name,
-      displayName: casdoorUser.displayName,
+      firstName: casdoorUser.firstName,
+      lastName: casdoorUser.lastName,
       email: casdoorUser.email,
       avatar: casdoorUser.avatar,
-      groups: casdoorUser.groups,
+      roles: casdoorUser.roles?.map((role) => role.name),
+      password: "",
     } as User;
   }
 
@@ -109,10 +111,12 @@ export default class Casdoor extends Authenticator {
     return {
       id: casdoorUser.id,
       userName: casdoorUser.name,
-      displayName: casdoorUser.displayName,
+      firstName: casdoorUser.firstName,
+      lastName: casdoorUser.lastName,
       email: casdoorUser.email,
       avatar: casdoorUser.avatar,
-      groups: casdoorUser.groups,
+      roles: casdoorUser.roles?.map((role) => role.name),
+      password: "",
     } as User;
   }
 }

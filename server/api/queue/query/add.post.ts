@@ -1,14 +1,24 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
 import { pgQueueItemInsert, postgresDb } from "~~/server/db/postgres";
 import { queueItem } from "~~/server/db/postgres/schema";
-import { type QueryRequest, DatabaseOption } from "~~/models/AutoGen";
+import {
+  type QueryRequest,
+  DatabaseOption,
+  Resource,
+  Action,
+} from "~~/models/AutoGen";
 import { QueueItemStatus } from "~~/enums";
 import type { QueueItem } from "~~/models/queryItem.schema";
 import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
-  globalThis.authenticator.requireUser(event);
+  await globalThis.authenticator.requireUser(event);
   const user = globalThis.authenticator.getUser(event);
+  await globalThis.guard.requirePermission(
+    user!,
+    Resource.QUERY,
+    Action.EXECUTE
+  );
   const queryRequest: QueryRequest = await readBody(event);
 
   if (!queryRequest.language) queryRequest.language = DatabaseOption.MYSQL;

@@ -1,8 +1,9 @@
 import z from "zod";
-import {pgQueueItemSelect, postgresDb} from "~~/server/db/postgres";
-import {queueItem} from "~~/server/db/postgres/schema";
-import {and, desc, eq, lte, SQL} from "drizzle-orm";
+import { pgQueueItemSelect, postgresDb } from "~~/server/db/postgres";
+import { queueItem } from "~~/server/db/postgres/schema";
+import { and, desc, eq, lte, SQL } from "drizzle-orm";
 import Logger from "#shared/logger";
+import { Action, Resource } from "~~/models/AutoGen";
 
 const querySchema = z.object({
   page: z.coerce.number().default(1),
@@ -13,29 +14,38 @@ const querySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const LOG = Logger("api/queue/user");
+  await globalThis.authenticator.requireUser(event);
   const user = globalThis.authenticator.getUser(event);
+  await globalThis.guard.requirePermission(
+    user!,
+    Resource.QUERY,
+    Action.EXECUTE
+  );
 
   const { page, size, userId, date } = await getValidatedQuery(
     event,
     querySchema.parse
   );
 
-  const totalCount = await postgresDb.$count(queueItem, eq(queueItem.userId, userId));
+  const totalCount = await postgresDb.$count(
+    queueItem,
+    eq(queueItem.userId, userId)
+  );
 
   const filters: SQL[] = [];
   // if (!user?.groups.includes("Endeavour/Admin"))
-    filters.push(eq(queueItem.userId, userId));
-  if (date)
-    filters.push(lte(queueItem.queuedAt, date));
+  filters.push(eq(queueItem.userId, userId));
+  if (date) filters.push(lte(queueItem.queuedAt, date));
 
-  let qry = postgresDb.select()
+  let qry = postgresDb
+    .select()
     .from(queueItem)
     .where(and(...filters))
     .orderBy(desc(queueItem.queuedAt))
     .offset((+page - 1) * +size)
     .limit(size);
 
-  LOG.debug(qry.toSQL().sql)
+  LOG.debug(qry.toSQL().sql);
 
   const rs = await qry.execute();
 

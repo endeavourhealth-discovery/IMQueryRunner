@@ -4,7 +4,7 @@ import type Guard from "~~/server/utils/security/guard/guard.base";
 import Logger from "#shared/logger";
 import { BasicAdapter } from "casbin-basic-adapter";
 import mysql, { type ConnectionOptions } from "mysql2";
-import { AccessRequest } from "~~/models/AutoGen";
+import { Action, Resource } from "~~/models/AutoGen";
 import { type User } from "~~/models/User";
 
 export class GuardCasbin implements Guard {
@@ -13,8 +13,8 @@ export class GuardCasbin implements Guard {
 
   async checkPermissions(
     subject: User,
-    path: string,
-    action: AccessRequest
+    resource: Resource,
+    action: Action
   ): Promise<boolean> {
     try {
       if (!this.enforcer) await this.setupEnforcer();
@@ -22,7 +22,11 @@ export class GuardCasbin implements Guard {
       // return await this.enforcer.enforce(subject, path, action);
 
       // FOR DEBUG TO SEE WHICH RULE(S) PASSED
-      const permission = await this.enforcer!.enforceEx(subject, path, action);
+      const permission = await this.enforcer!.enforceEx(
+        subject,
+        resource,
+        action
+      );
       this.LOG.debug("========== PERMISSION ==========");
       this.LOG.debug(`[${permission[1]}]`);
       return permission[0].valueOf();
@@ -38,31 +42,25 @@ export class GuardCasbin implements Guard {
     }
   }
 
-  async addPolicy(
-    user: User,
-    dataSource: string,
-    accessRequest: AccessRequest
-  ) {
+  async requirePermission(
+    subject: User,
+    resource: Resource,
+    action: Action
+  ): Promise<void> {
+    const hasPermission = this.checkPermissions(subject, resource, action);
+    if (!hasPermission)
+      throw new AuthorizationError({ code: 401, message: "Unauthorized" });
+  }
+
+  async addPolicy(user: User, resource: Resource, action: Action) {
     if (!this.enforcer) await this.setupEnforcer();
-    await this.enforcer!.addPolicy(
-      JSON.stringify(user),
-      dataSource,
-      accessRequest
-    );
+    await this.enforcer!.addPolicy(JSON.stringify(user), resource, action);
     await this.enforcer!.savePolicy();
   }
 
-  async removePolicy(
-    user: User,
-    dataSource: string,
-    accessRequest: AccessRequest
-  ) {
+  async removePolicy(user: User, resource: Resource, action: Action) {
     if (!this.enforcer) await this.setupEnforcer();
-    await this.enforcer!.removePolicy(
-      JSON.stringify(user),
-      dataSource,
-      accessRequest
-    );
+    await this.enforcer!.removePolicy(JSON.stringify(user), resource, action);
     await this.enforcer!.savePolicy();
   }
 

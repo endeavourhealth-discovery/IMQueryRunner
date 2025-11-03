@@ -1,8 +1,9 @@
 import z from "zod";
 import { QueueItemStatus } from "~~/enums";
-import {pgQueueItemSelect, postgresDb} from "~~/server/db/postgres";
-import {and, desc, eq} from "drizzle-orm";
-import {queueItem} from "~~/server/db/postgres/schema";
+import { pgQueueItemSelect, postgresDb } from "~~/server/db/postgres";
+import { and, desc, eq } from "drizzle-orm";
+import { queueItem } from "~~/server/db/postgres/schema";
+import { Action, Resource } from "~~/models/AutoGen";
 
 const querySchema = z.object({
   status: z.enum(QueueItemStatus),
@@ -12,26 +13,28 @@ const querySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  await globalThis.authenticator.requireUser(event);
+  const user = globalThis.authenticator.getUser(event);
+  await globalThis.guard.requirePermission(
+    user!,
+    Resource.QUERY,
+    Action.EXECUTE
+  );
   const { status, page, size, userId } = await getValidatedQuery(
     event,
     querySchema.parse
   );
 
-  const totalCount = await postgresDb.$count(queueItem,
-    and(
-      eq(queueItem.userId, userId),
-      eq(queueItem.status, status)
-    )
+  const totalCount = await postgresDb.$count(
+    queueItem,
+    and(eq(queueItem.userId, userId), eq(queueItem.status, status))
   );
 
   const rs = await postgresDb.query.queueItem.findMany({
-    where: and(
-      eq(queueItem.userId, userId),
-      eq(queueItem.status, status)
-    ),
+    where: and(eq(queueItem.userId, userId), eq(queueItem.status, status)),
     orderBy: [desc(queueItem.queuedAt)],
     offset: (+page - 1) * +size,
-    limit: size
+    limit: size,
   });
   const items = rs.map((row) => pgQueueItemSelect.parse(row));
   return {
