@@ -65,14 +65,8 @@ export class GuardCasbin implements Guard {
   }
 
   async setupEnforcer(): Promise<void> {
-    const access: ConnectionOptions = {
-      user: process.env.MYSQL_USER,
-      database: process.env.MYSQL_DATABASE,
-      host: process.env.MYSQL_HOST,
-      password: process.env.MYSQL_PASSWORD,
-    };
-    const conn = mysql.createConnection(access);
-    const adapter = await BasicAdapter.newAdapter("mysql", conn);
+    const conn = mysql.createConnection(process.env.CASBIN_URL as string);
+    const adapter = await BasicAdapter.newAdapter("mysql", conn, "casbin_query_runner");
     this.enforcer ??= await newEnforcer("public/casbin/model.conf", adapter);
   }
 }
