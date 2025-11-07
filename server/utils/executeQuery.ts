@@ -1,11 +1,5 @@
 import hash from "object-hash";
-import {
-  DisplayMode,
-  type Argument,
-  type Match,
-  type Query,
-  type QueryRequest,
-} from "~~/models/AutoGen";
+import { type Argument, type QueryRequest } from "~~/models/AutoGen";
 import { mysqlDb } from "../db/mysql";
 import { postgresDb } from "../db/postgres";
 import { queueItem } from "~~/server/db/postgres/schema";
@@ -14,6 +8,8 @@ import { eq } from "drizzle-orm";
 import { imapi } from "~~/server/utils/imapi";
 import { cloneDeep } from "lodash-es";
 import { type MySqlQueryResult } from "drizzle-orm/mysql2";
+import Logger from "~~/shared/logger";
+const LOG = Logger("api/queue/user");
 
 const queryResultsMap = new Map<string, Set<string>>();
 
@@ -139,38 +135,40 @@ AND TABLE_NAME = '${tableName}'
 }
 
 async function runSubQueries(queryRequest: QueryRequest) {
-  const subQueries = await getSubqueryIris(queryRequest.query);
+  if (queryRequest.query.iri === undefined) return new Map();
+  const subQueries = await imapi.getSubQueries(queryRequest.query.iri);
+  const subQueryIris = subQueries.map((sq) => sq.iri);
   const queryIrisToHashCodes = await getQueryIrisToHashCodes(
-    subQueries,
-    queryRequest.argument ? queryRequest.argument : []
+    subQueryIris,
+    queryRequest.argument
   );
-  if (subQueries?.length) {
-    for (const subQueryIri of subQueries) {
-      const subQuery = await imapi.describeQuery(
-        subQueryIri,
-        DisplayMode.LOGICAL
-      );
-      const subQueryRequest = {
-        query: subQuery,
-        argument: queryRequest.argument,
-      } as QueryRequest;
-      const hashCode = hashQueryRequest(subQueryRequest);
+  if (subQueries.length)
+    for (const subQuery of subQueries) {
+      const hashCode = queryIrisToHashCodes.get(subQuery.iri)!;
+      LOG.debug(`Subquery found: ${subQuery.iri} with hash: ${hashCode}`);
       if (!queryResultsMap.has(hashCode) && !(await tableExists(hashCode))) {
+        LOG.debug(`Executing subquery: ${subQuery.iri} with hash: ${hashCode}`);
+        const subQueryRequest = await imapi.getQueryRequestForSQL({
+          query: { iri: subQuery.iri },
+          argument: queryRequest.argument,
+        } as QueryRequest);
         const resolvedSql = await getResolvedSql(
           subQueryRequest,
           queryIrisToHashCodes
         );
-        // awaiting drizzle pr #1523 for typings to work correctly. This is a fix as described in drizzle issue #661
         const [result] = (await mysqlDb.execute<PatientRow>(
           resolvedSql
         )) as unknown as QueryResult<PatientRow>;
-        await storeQueryResultsAndCache(
-          subQueryRequest,
+        storeQueryResultsAndCache(
+          queryRequest,
           result.map((r) => r.id)
+        );
+      } else {
+        LOG.debug(
+          `Query results already exist for subquery: ${subQuery.iri} with hash: ${hashCode}`
         );
       }
     }
-  }
   return queryIrisToHashCodes;
 }
 
@@ -213,18 +211,14 @@ function getIriLine(stringIris: string[]): string {
 
 async function getQueryIrisToHashCodes(
   subQueries: string[],
-  argument: Argument[]
+  argument?: Argument[]
 ) {
   const queryIrisToHashCodes = new Map<string, string>();
   for (const subQueryIri of subQueries) {
-    const subQuery = await imapi.describeQuery(
-      subQueryIri,
-      DisplayMode.LOGICAL
-    );
-    const subQueryRequest = {
-      query: subQuery,
+    const subQueryRequest = await imapi.getQueryRequestForSQL({
+      query: { iri: subQueryIri },
       argument: argument,
-    } as QueryRequest;
+    } as QueryRequest);
     const hashCode = hashQueryRequest(subQueryRequest);
     queryIrisToHashCodes.set(subQueryIri, hashCode);
   }
@@ -249,72 +243,4 @@ async function createTable(hashCode: string) {
   await mysqlDb.execute(
     `CREATE TABLE IF NOT EXISTS ${hashCode} (id BIGINT NOT NULL,PRIMARY KEY(id))`
   );
-}
-
-async function getSubqueryIris(query: Query): Promise<string[]> {
-  let subQueryIris: string[] = [];
-  await populateSubqueryIrisConclusively(query, subQueryIris);
-  subQueryIris = deduplicateKeepLast(subQueryIris);
-  return subQueryIris;
-}
-
-function deduplicateKeepLast(subQueryIris: string[]): string[] {
-  const seen = new Set<string>();
-  const copySubqueryIris = cloneDeep(subQueryIris);
-  while (copySubqueryIris.length) {
-    const last = copySubqueryIris.pop();
-    if (last) seen.add(last);
-  }
-  const result: string[] = Array.from<string>(seen);
-  return result.reverse();
-}
-
-async function populateSubqueryIrisConclusively(
-  query: Query,
-  subQueryIris: string[]
-): Promise<void> {
-  if (query.isCohort) subQueryIris.push(query.isCohort.iri);
-  if (query.and) {
-    for (const and of query.and) {
-      await processMatch(and, subQueryIris);
-    }
-  }
-  if (query.or) {
-    for (const or of query.or) {
-      await processMatch(or, subQueryIris);
-    }
-  }
-  if (query.not) {
-    for (const not of query.not) {
-      await processMatch(not, subQueryIris);
-    }
-  }
-}
-
-async function processMatch(
-  match: Match,
-  subQueryIris: string[]
-): Promise<void> {
-  if (match.isCohort) {
-    const iri = match.isCohort.iri;
-    subQueryIris.push(iri);
-    const subQuery = await imapi.describeQuery(iri, DisplayMode.LOGICAL);
-    if (!subQuery) throw createError(`Sub query with iri: ${iri} not found`);
-    await populateSubqueryIrisConclusively(subQuery, subQueryIris);
-  }
-  if (match.and) {
-    for (const nestedAnd of match.and) {
-      await processMatch(nestedAnd, subQueryIris);
-    }
-  }
-  if (match.or) {
-    for (const nestedOr of match.or) {
-      await processMatch(nestedOr, subQueryIris);
-    }
-  }
-  if (match.not) {
-    for (const nestedNot of match.not) {
-      await processMatch(nestedNot, subQueryIris);
-    }
-  }
 }
