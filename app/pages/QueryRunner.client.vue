@@ -92,7 +92,7 @@
       :queryItem="selectedQuery"
       v-model:showDialog="showQueryResults"
     />
-    <ArgumentDisplayDialog
+    <QueryRunnerArgumentDisplayDialog
       :arguments="currentArguments"
       :show-footer-buttons="false"
       v-model:showDialog="showArgumentDisplay"
