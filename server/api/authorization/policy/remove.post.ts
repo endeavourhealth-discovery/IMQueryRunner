@@ -4,8 +4,8 @@ import { userSchema } from "~~/models/User";
 import Logger from "~~/shared/logger";
 
 const policyRequestSchema = z.object({
-  resource: z.string(),
-  action: z.string(),
+  resource: z.enum(Resource),
+  action: z.enum(Action),
   policyUser: userSchema,
 });
 
