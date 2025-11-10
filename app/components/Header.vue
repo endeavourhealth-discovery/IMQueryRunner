@@ -53,7 +53,7 @@
       <TieredMenu
         ref="userMenu"
         id="account-menu"
-        :model="accountItems"
+        :model="getItems()"
         :popup="true"
       >
         <template #item="{ item, props }">

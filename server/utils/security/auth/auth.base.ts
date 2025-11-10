@@ -38,15 +38,32 @@ export default abstract class Authenticator {
     accessToken: string,
     refreshToken?: string
   ) {
-    setCookie(event, this.ACCESS_TOKEN, accessToken);
+    setCookie(event, this.ACCESS_TOKEN, accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
     setCookie(
       event,
       this.USER_SESSION,
-      JSON.stringify(this.getUserInternal(accessToken))
+      JSON.stringify(this.getUserInternal(accessToken)),
+      {
+        httpOnly: true,
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      }
     );
 
     if (refreshToken) {
-      setCookie(event, this.REFRESH_TOKEN, refreshToken);
+      setCookie(event, this.REFRESH_TOKEN, refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      });
     } else {
       deleteCookie(event, this.REFRESH_TOKEN);
     }
