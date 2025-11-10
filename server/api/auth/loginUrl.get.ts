@@ -1,4 +1,4 @@
-import {z} from "zod";
+import { z } from "zod";
 
 const paramSchema = z.object({
   origin: z.string(),
@@ -6,6 +6,9 @@ const paramSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const { origin, redirectUrl } = await getValidatedQuery(event, paramSchema.parse);
+  const { origin, redirectUrl } = await getValidatedQuery(
+    event,
+    paramSchema.parse
+  );
   return globalThis.authenticator.getLoginUrl(origin!, redirectUrl);
 });
