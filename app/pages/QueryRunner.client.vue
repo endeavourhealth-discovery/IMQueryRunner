@@ -108,6 +108,7 @@ import type { Ref } from "vue";
 import type { Argument, QueryRequest } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
+import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
 import { io } from "socket.io-client";
 import { useUser } from "~/composables/useUser";
 

@@ -66,7 +66,15 @@ export class GuardCasbin implements Guard {
 
   async setupEnforcer(): Promise<void> {
     const conn = mysql.createConnection(process.env.CASBIN_URL as string);
-    const adapter = await BasicAdapter.newAdapter("mysql", conn, "casbin_query_runner");
+    const adapter = await BasicAdapter.newAdapter(
+      "mysql",
+      conn,
+      "casbin_query_runner"
+    );
     this.enforcer ??= await newEnforcer("public/casbin/model.conf", adapter);
+    this.enforcer.addFunction("include", (roleNames, subRole) => {
+      if (!Array.isArray(roleNames)) return false;
+      return roleNames.includes(subRole);
+    });
   }
 }

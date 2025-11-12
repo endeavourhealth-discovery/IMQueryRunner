@@ -10,7 +10,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return;
   }
 
-  const publicRoutes = ["/callback"];
+  const publicRoutes = ["/callback", "/unauthorized"];
   if (publicRoutes.includes(to.path)) return;
 
   const userStore = useUser();
@@ -26,6 +26,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         Action.EXECUTE
       );
       if (!allowed) {
+        abortNavigation();
         LOG.debug("Already logged in. Redirect to Unauthorized");
         return navigateTo("/unauthorized");
       }
