@@ -119,4 +119,31 @@ export default class Casdoor extends Authenticator {
       password: "",
     } as User;
   }
+
+  async loginWithBearerToken(
+    event: H3Event<EventHandlerRequest>
+  ): Promise<void> {
+    const auth = getHeader(event, "Authorization");
+    if (!auth?.startsWith("Bearer")) throw createError("Invalid token");
+    const token = auth.substring(7);
+    const response = await this.casdoor.introspect(token, "access_token");
+    if (response.data.active) {
+      this.setCookies(event, token);
+    } else throw createError("Invalid token");
+  }
+
+  async loginWithSessionId(event: H3Event<EventHandlerRequest>): Promise<void> {
+    const casdoor_session_id = getCookie(event, "casdoor_session_id");
+    const silentUser = await $fetch<any>(
+      process.env.NUXT_PUBLIC_CASDOOR_URL + "/api/get-account",
+      {
+        headers: {
+          cookie: `casdoor_session_id=${casdoor_session_id}`,
+        },
+      }
+    );
+    if (silentUser.data.accessToken) {
+      this.setCookies(event, silentUser.data.accessToken);
+    }
+  }
 }

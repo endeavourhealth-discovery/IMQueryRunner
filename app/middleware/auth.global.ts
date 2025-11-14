@@ -13,11 +13,17 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const publicRoutes = ["/callback", "/unauthorized"];
   if (publicRoutes.includes(to.path)) return;
 
+  const token = useCookie("casdoorToken");
+  if (!token.value) {
+    try {
+      await useFetch("/api/auth/loginWithSessionId");
+      const isLoggedInApi = await useFetch("/api/auth/isLoggedIn");
+    } catch (e) {
+      LOG.debug("Failed to login using session id");
+    }
+  }
   const userStore = useUser();
   LOG.debug(`User is logged in = ${userStore.isLoggedIn.value}`);
-
-  const allowed = (await uiGuard.checkPermission(to.path, "ROUTE")).data.value;
-  LOG.debug(`User is allowed = ${allowed}`);
 
   if (userStore.isLoggedIn.value) {
     if (to.path === "/QueryRunner") {

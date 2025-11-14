@@ -22,6 +22,12 @@ export default abstract class Authenticator {
     accessToken?: string,
     refreshToken?: string
   ): Promise<void>;
+  abstract loginWithBearerToken(
+    event: H3Event<EventHandlerRequest>
+  ): Promise<void>;
+  abstract loginWithSessionId(
+    event: H3Event<EventHandlerRequest>
+  ): Promise<void>;
 
   public async getTokensFromCode(
     event: H3Event<EventHandlerRequest>,
