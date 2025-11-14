@@ -110,6 +110,7 @@ import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
 import { useUser } from "~/composables/useUser";
+import { queueService } from "~/services/queueService";
 
 const { user } = useUser();
 const confirm = useConfirm();
@@ -216,9 +217,7 @@ function getStatusSeverity(
 }
 
 async function cancelQuery(queryId: string) {
-  await useFetch("/api/queue/query/cancel", {
-    params: { queueId: queryId },
-  });
+  await queueService.cancel(queryId);
   await initSearch();
 }
 
@@ -256,24 +255,13 @@ async function viewArgumentDisplay(args: Argument[]) {
 }
 
 async function deleteQuery(queryId: string) {
-  await useFetch("/api/queue/query/delete", {
-    params: { queueId: queryId },
-  });
+  await queueService.delete(queryId);
   await initSearch();
 }
 
 async function requeueQuery(queryId: string) {
-  const found = getById(queryId);
-  if (found)
-    await useFetch("/api/queue/query/requeue", {
-      method: "post",
-      body: found,
-    });
+  await queueService.requeue(queryId);
   await initSearch();
-}
-
-function getById(queryId: string): QueueItem | undefined {
-  return queryQueueItems.value.find((item) => item.id === queryId);
 }
 
 async function onPage(event: any) {

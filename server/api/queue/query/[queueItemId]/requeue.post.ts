@@ -3,7 +3,7 @@ import { pgQueueItemInsert, postgresDb } from "~~/server/db/postgres";
 import { queueItem } from "~~/server/db/postgres/schema";
 
 export default defineEventHandler(async (event) => {
-  // accept only a queueItemId like all other calls
+  // TODO: accept only a queueItemId like all other calls
   const data = pgQueueItemInsert.parse(event);
   await postgresDb.insert(queueItem).values(data);
   await sendMessage(data.userId, data);

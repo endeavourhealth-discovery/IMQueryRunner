@@ -70,6 +70,7 @@
 <script setup lang="ts">
 import type { MenuItem } from "primevue/menuitem";
 import { useUser } from "~/composables/useUser";
+import { authService } from "~/services/authService";
 
 const { user, isLoggedIn } = useUser();
 const router = useRouter();
@@ -134,7 +135,7 @@ async function confirmLogout() {
     },
     accept: async () => {
       const reqUrl = useRequestURL();
-      await $fetch("/api/auth/logout");
+      await authService.logout();
       location.reload();
     },
   });
