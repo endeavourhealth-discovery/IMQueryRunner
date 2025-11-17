@@ -14,10 +14,16 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   if (publicRoutes.includes(to.path)) return;
 
   const userStore = useUser();
-  LOG.debug(`User is logged in = ${userStore.isLoggedIn.value}`);
+  LOG.info(`User is logged in = ${userStore.isLoggedIn.value}`);
 
-  const allowed = (await uiGuard.checkPermission(to.path, "ROUTE")).data.value;
-  LOG.debug(`User is allowed = ${allowed}`);
+  if (!userStore.isLoggedIn.value) {
+    try {
+      const result = await useFetch("/api/auth/loginWithSessionId");
+      const isLoggedInApi = await useFetch("/api/auth/isLoggedIn");
+    } catch (e) {
+      LOG.debug("Failed to login using session id");
+    }
+  }
 
   if (userStore.isLoggedIn.value) {
     if (to.path === "/QueryRunner") {
@@ -50,6 +56,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
     LOG.debug(`Navigating to ${loginUrl.data.value}`);
 
-    return navigateTo(loginUrl.data.value, { external: true });
+    // return navigateTo(loginUrl.data.value, { external: true });
   }
 });

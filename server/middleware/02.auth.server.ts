@@ -13,6 +13,9 @@ export default defineEventHandler(async (event) => {
     "/api/auth/loginUrl",
     "/api/auth/authenticate",
     "/api/auth/logout",
+    "/api/auth/loginWithBearerToken",
+    "/api/auth/loginWithSessionId",
+    "/api/auth/isLoggedIn",
     "/api/oauth/token",
     "/api/public/auth/hasPermission",
   ];
