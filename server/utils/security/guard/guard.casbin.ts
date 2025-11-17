@@ -47,7 +47,11 @@ export class GuardCasbin implements Guard {
     resource: Resource,
     action: Action
   ): Promise<void> {
-    const hasPermission = this.checkPermissions(subject, resource, action);
+    const hasPermission = await this.checkPermissions(
+      subject,
+      resource,
+      action
+    );
     if (!hasPermission)
       throw new AuthorizationError({ code: 401, message: "Unauthorized" });
   }
