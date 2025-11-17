@@ -13,17 +13,17 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const publicRoutes = ["/callback", "/unauthorized"];
   if (publicRoutes.includes(to.path)) return;
 
-  const token = useCookie("casdoorToken");
-  if (!token.value) {
+  const userStore = useUser();
+  LOG.info(`User is logged in = ${userStore.isLoggedIn.value}`);
+
+  if (!userStore.isLoggedIn.value) {
     try {
-      await useFetch("/api/auth/loginWithSessionId");
+      const result = await useFetch("/api/auth/loginWithSessionId");
       const isLoggedInApi = await useFetch("/api/auth/isLoggedIn");
     } catch (e) {
       LOG.debug("Failed to login using session id");
     }
   }
-  const userStore = useUser();
-  LOG.debug(`User is logged in = ${userStore.isLoggedIn.value}`);
 
   if (userStore.isLoggedIn.value) {
     if (to.path === "/QueryRunner") {
@@ -56,6 +56,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
     LOG.debug(`Navigating to ${loginUrl.data.value}`);
 
-    return navigateTo(loginUrl.data.value, { external: true });
+    // return navigateTo(loginUrl.data.value, { external: true });
   }
 });

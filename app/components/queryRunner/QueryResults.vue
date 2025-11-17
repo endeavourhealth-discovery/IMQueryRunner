@@ -92,7 +92,7 @@ async function downloadQueryResults() {
   if (props.queryItem?.queryRequest) {
     const request = cloneDeep(props.queryItem.queryRequest);
     // request.page = { pageNumber: pageNumber.value, pageSize: size.value }; //TODO: fix paging mechanism
-    const results = useFetch("/api/query/results", {
+    const results = await useFetch("/api/query/results", {
       method: "get",
       body: request,
     });

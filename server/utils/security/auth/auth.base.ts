@@ -56,7 +56,7 @@ export default abstract class Authenticator {
       this.USER_SESSION,
       JSON.stringify(this.getUserInternal(accessToken)),
       {
-        httpOnly: true,
+        httpOnly: false,
         path: "/",
         maxAge: 60 * 60 * 24 * 7,
       }
