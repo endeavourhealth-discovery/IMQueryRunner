@@ -73,3 +73,14 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+
+# IMQueryRunner
+
+This repository contains IMQueryRunner (Nuxt + server code).
+
+## Query Queue Spec
+
+See the query queue and results specification for details about adding, managing and storing queued queries:
+
+`QUERY_QUEUE_SPEC.md`

@@ -8,6 +8,7 @@ import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
   globalThis.authenticator.requireUser(event);
+  // TODO get user queue
   const user = globalThis.authenticator.getUser(event);
   const queryRequest: QueryRequest = await readBody(event);
 

@@ -16,7 +16,28 @@ export default defineEventHandler(async (event) => {
   const item = await postgresDb.query.queueItem.findFirst({
     where: eq(queueItem.id, queueItemId),
   });
-  if (item) {
+  if (item?.status === QueueItemStatus.QUEUED) {
+    await postgresDb
+      .update(queueItem)
+      .set({
+        status: QueueItemStatus.CANCELLED,
+        killedAt: new Date().toISOString(),
+      })
+      .where(eq(queueItem.id, item.id));
+  } else if (item?.status === QueueItemStatus.RUNNING) {
+    const activeQuery = postgresDb.execute(`
+        SELECT *
+        FROM pg_stat_activity
+        WHERE state = 'active' LIMIT 1
+    `);
+    const result = postgresDb.execute(`
+    SELECT pg_cancel_backend(${activeQuery})
+    `);
+    if (!result) {
+      postgresDb.execute(`
+      SELECT pg_terminate_backend(${activeQuery})
+      `);
+    }
     await postgresDb
       .update(queueItem)
       .set({
