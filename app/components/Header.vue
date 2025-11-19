@@ -70,8 +70,9 @@
 <script setup lang="ts">
 import type { MenuItem } from "primevue/menuitem";
 import { useUser } from "~/composables/useUser";
-import { authService } from "~/services/authService";
+import { useAuth } from "~/composables/useAuth";
 
+const { logout } = useAuth();
 const { user, isLoggedIn } = useUser();
 const router = useRouter();
 const confirm = useConfirm();
@@ -135,7 +136,7 @@ async function confirmLogout() {
     },
     accept: async () => {
       const reqUrl = useRequestURL();
-      await authService.logout();
+      await logout();
       location.reload();
     },
   });

@@ -1,8 +1,7 @@
-import { authService } from "~/services/authService";
-
+import { useAuth } from "~/composables/useAuth";
 class UIGuard {
   public async checkPermission(object: string, action: string) {
-    return await authService.hasPermission(object, action);
+    return await useAuth().hasPermission(object, action);
   }
 }
 
