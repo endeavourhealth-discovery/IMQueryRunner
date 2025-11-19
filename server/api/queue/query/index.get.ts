@@ -12,7 +12,11 @@ const querySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  // TODO: get user and user queue
+  globalThis.authenticator.requireUser(event);
+  const user = globalThis.authenticator.getUser(event);
+  if (!user) {
+    throw createError("Unauthorized");
+  }
   const { status, page, size, userId } = await getValidatedQuery(
     event,
     querySchema.parse

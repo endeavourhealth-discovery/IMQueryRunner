@@ -8,6 +8,11 @@ const paramSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  globalThis.authenticator.requireUser(event);
+  const user = globalThis.authenticator.getUser(event);
+  if (!user) {
+    throw createError("Unauthorized");
+  }
   const { queueItemId } = await getValidatedRouterParams(
     event,
     paramSchema.parse
@@ -15,9 +20,8 @@ export default defineEventHandler(async (event) => {
   const item = await postgresDb.query.queueItem.findFirst({
     where: eq(queueItem.id, queueItemId),
   });
-  if (item) {
-    await postgresDb.delete(queueItem).where(eq(queueItem.id, item.id));
-  } else {
-    createError("Query queue item not found for id: " + queueItemId);
+  if (!item) {
+    throw createError("Query queue item not found for id: " + queueItemId);
   }
+  await postgresDb.delete(queueItem).where(eq(queueItem.id, item.id));
 });

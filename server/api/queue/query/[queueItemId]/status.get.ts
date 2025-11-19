@@ -9,6 +9,11 @@ const paramSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  globalThis.authenticator.requireUser(event);
+  const user = globalThis.authenticator.getUser(event);
+  if (!user) {
+    throw createError("Unauthorized");
+  }
   const { queueItemId } = await getValidatedRouterParams(
     event,
     paramSchema.parse
@@ -17,5 +22,9 @@ export default defineEventHandler(async (event) => {
     where: eq(queueItem.id, queueItemId),
   });
 
-  return item;
+  if (!item) {
+    throw createError("Query queue item not found for id: " + queueItemId);
+  }
+
+  return item.status;
 });

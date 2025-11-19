@@ -9,6 +9,11 @@ const paramSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  globalThis.authenticator.requireUser(event);
+  const user = globalThis.authenticator.getUser(event);
+  if (!user) {
+    throw createError("Unauthorized");
+  }
   const { queueItemId } = await getValidatedRouterParams(
     event,
     paramSchema.parse
@@ -16,7 +21,12 @@ export default defineEventHandler(async (event) => {
   const item = await postgresDb.query.queueItem.findFirst({
     where: eq(queueItem.id, queueItemId),
   });
-  if (item?.status === QueueItemStatus.QUEUED) {
+
+  if (!item) {
+    throw createError("Query queue item not found for id: " + queueItemId);
+  }
+
+  if (item.status === QueueItemStatus.QUEUED) {
     await postgresDb
       .update(queueItem)
       .set({
@@ -24,7 +34,7 @@ export default defineEventHandler(async (event) => {
         killedAt: new Date().toISOString(),
       })
       .where(eq(queueItem.id, item.id));
-  } else if (item?.status === QueueItemStatus.RUNNING) {
+  } else if (item.status === QueueItemStatus.RUNNING) {
     const activeQuery = postgresDb.execute(`
         SELECT *
         FROM pg_stat_activity
@@ -46,6 +56,6 @@ export default defineEventHandler(async (event) => {
       })
       .where(eq(queueItem.id, item.id));
   } else {
-    createError("Query queue item not found for id: " + queueItemId);
+    createError("Query queue item status is: " + item.status);
   }
 });

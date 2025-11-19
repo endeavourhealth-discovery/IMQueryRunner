@@ -14,6 +14,9 @@ const querySchema = z.object({
 export default defineEventHandler(async (event) => {
   const LOG = Logger("api/queue/user");
   const user = globalThis.authenticator.getUser(event);
+  if (!user) {
+    throw createError("Unauthorized");
+  }
 
   const { page, size, userId, date } = await getValidatedQuery(
     event,
@@ -26,8 +29,9 @@ export default defineEventHandler(async (event) => {
   );
 
   const filters: SQL[] = [];
-  // if (!user?.groups.includes("Endeavour/Admin"))
-  filters.push(eq(queueItem.userId, userId));
+  if (user.groups.includes("Endeavour/Admin")) {
+    // no user filter if admin
+  } else filters.push(eq(queueItem.userId, userId));
   if (date) filters.push(lte(queueItem.queuedAt, date));
 
   let qry = postgresDb

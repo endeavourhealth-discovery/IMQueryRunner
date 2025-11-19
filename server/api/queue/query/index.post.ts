@@ -8,8 +8,10 @@ import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
   globalThis.authenticator.requireUser(event);
-  // TODO get user queue
   const user = globalThis.authenticator.getUser(event);
+  if (!user) {
+    throw createError("Unauthorized");
+  }
   const queryRequest: QueryRequest = await readBody(event);
 
   if (!queryRequest.language) queryRequest.language = DatabaseOption.MYSQL;
@@ -24,13 +26,13 @@ export default defineEventHandler(async (event) => {
     queryName: queryRequest.query.name,
     queryRequest: queryRequest,
     status: QueueItemStatus.QUEUED,
-    userId: user!.id,
-    username: user!.userName,
+    userId: user.id,
+    username: user.userName,
     queryResult: [],
     queuedAt: new Date(),
   } as QueueItem;
   await postgresDb
     .insert(queueItem)
     .values(pgQueueItemInsert.parse(queueQuery));
-  await sendMessage(user!.id, queueQuery);
+  await sendMessage(user.id, queueQuery);
 });
