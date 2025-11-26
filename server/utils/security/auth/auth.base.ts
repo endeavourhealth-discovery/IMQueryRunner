@@ -8,6 +8,7 @@ export default abstract class Authenticator {
   protected readonly REFRESH_TOKEN = "refresh_token";
 
   abstract getLoginUrl(origin: string, redirectUrl: string): string;
+  abstract getRegisterUrl(origin: string, redirectUrl: string): string;
   abstract getTokensFromCodeInternal(
     code: string
   ): Promise<{ accessToken: string; refreshToken?: string }>;

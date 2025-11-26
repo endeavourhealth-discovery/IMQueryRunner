@@ -9,8 +9,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "drizzle-pull": "pnpm drizzle-pull-postgres && pnpm drizzle-pull-mysql",
-    "drizzle-pull-postgres": "npx drizzle-kit pull --config=server/db/postgres.drizzle.ts",
-    "drizzle-pull-mysql": "npx drizzle-kit pull --config=server/db/mysql.drizzle.ts"
+    "drizzle-pull-postgres": "npx drizzle-kit pull --config=server/db/postgres.drizzle.config.ts",
+    "drizzle-pull-mysql": "npx drizzle-kit pull --config=server/db/mysql.drizzle.config.ts"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.896.0",
@@ -37,6 +37,7 @@
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
     "tailwindcss": "^4.1.13",
+    "tailwindcss-primeui": "^0.6.1",
     "uuid": "^11.1.0",
     "vue": "^3.5.22",
     "vue-router": "^4.5.1",

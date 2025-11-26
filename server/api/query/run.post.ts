@@ -1,8 +1,11 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
 import { QueueItemStatus } from "~~/enums";
 import { imapi } from "~~/server/utils/imapi";
-import { pgQueueItemInsert, postgresDb } from "~~/server/db/postgres";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { postgresDb } from "~~/server/db/postgres/postgres";
+import {
+  queueItem,
+  insertQueueItemSchema,
+} from "~~/server/db/postgres/schemas/query_runner/schema";
 import { IM, RDFS, Resource, Action } from "~~/models/AutoGen";
 import z from "zod";
 
@@ -84,7 +87,7 @@ export default defineEventHandler(async (event) => {
     .transaction(async (tx) => {
       const id = await sendMessage(userId, queryRequest);
 
-      const qi = pgQueueItemInsert.parse({
+      const qi = insertQueueItemSchema.parse({
         id: id,
         queryIri: data.query_id,
         queryName: entity[RDFS.LABEL],

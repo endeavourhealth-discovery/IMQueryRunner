@@ -1,10 +1,13 @@
 import { QueueItemStatus } from "~~/enums";
 import { z } from "zod";
-import { postgresDb } from "~~/server/db/postgres";
+import { postgresDb } from "~~/server/db/postgres/postgres";
 import { eq, sql } from "drizzle-orm";
-import { queueItem } from "~~/server/db/postgres/schema";
+import {
+  queueItem,
+  selectQueueItemSchema,
+} from "~~/server/db/postgres/schemas/query_runner/schema";
 import hash from "object-hash";
-import { mysqlDb } from "~~/server/db/mysql";
+import { mysqlDb } from "~~/server/db/mysql/mysql";
 import { Action, Resource } from "~~/models/AutoGen";
 
 const paramSchema = z.object({
@@ -24,8 +27,10 @@ export default defineEventHandler(async (event) => {
     where: eq(queueItem.id, queueId),
   });
 
-  if (item?.queryRequest) {
-    const requestHash = hash(item.queryRequest);
+  const parsed = selectQueueItemSchema.parse(item);
+
+  if (parsed.queryRequest) {
+    const requestHash = hash(parsed.queryRequest);
 
     const results = await mysqlDb.execute(
       sql.raw(`SELECT * FROM imqcache.${requestHash}`)

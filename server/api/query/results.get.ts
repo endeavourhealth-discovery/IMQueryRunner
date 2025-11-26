@@ -1,6 +1,6 @@
 import hash from "object-hash";
 import { $fetch } from "ofetch";
-import { mysqlDb } from "~~/server/db/mysql";
+import { mysqlDb } from "~~/server/db/mysql/mysql";
 import { type QueryRequest, Resource, Action } from "~~/models/AutoGen";
 import { getCachedQueryResults } from "~~/server/utils/executeQuery";
 

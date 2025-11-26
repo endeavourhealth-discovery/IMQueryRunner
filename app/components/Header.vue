@@ -63,6 +63,61 @@
           </div>
         </template>
       </TieredMenu>
+      <Popover
+        ref="themesMenu"
+        id="themes-menu"
+        @mouseleave="themesMenu.hide()"
+        scrollable
+      >
+        <div class="theme-container">
+          <h2>Primary</h2>
+          <div class="color-picker">
+            <Button
+              v-for="(color, index) in themeOptions.primaryColours"
+              rounded
+              class="round-button border-none"
+              :class="selectedPrimaryColor === color && 'selected-primary'"
+              :style="'background-color:var(--p-' + color + '-500)'"
+              v-tooltip="color"
+              @click="
+                () => {
+                  selectedPrimaryColor = color;
+                  changePrimaryColor(color);
+                }
+              "
+              v-bind:key="index"
+            />
+          </div>
+          <h2>Surface</h2>
+          <div class="color-picker">
+            <Button
+              v-for="(color, index) in themeOptions.surfaceColours"
+              rounded
+              class="round-button border-none"
+              :class="selectedSurfaceColor === color && 'selected-surface'"
+              :style="'background-color:var(--p-' + color + '-500)'"
+              v-tooltip="color"
+              @click="
+                () => {
+                  selectedSurfaceColor = color;
+                  changeSurfaceColor(color);
+                }
+              "
+              v-bind:key="index"
+            />
+          </div>
+          <h2>Presets</h2>
+          <div class="flex flex-row flex-wrap">
+            <SelectButton
+              v-model="preset"
+              :options="themeOptions.presets"
+              :allowEmpty="false"
+            />
+          </div>
+          <h2>Dark mode</h2>
+          <ToggleSwitch v-model="darkMode" />
+        </div>
+      </Popover>
     </div>
   </div>
 </template>
@@ -70,15 +125,74 @@
 <script setup lang="ts">
 import type { MenuItem } from "primevue/menuitem";
 import { useUser } from "~/composables/useUser";
+import useChangeScale from "@/composables/useChangeScale";
+import { PrimeVueColors, PrimeVuePresetThemes } from "~~/enums";
 
 const { user, isLoggedIn } = useUser();
 const router = useRouter();
+const route = useRoute();
 const confirm = useConfirm();
 const toast = useToast();
+const userStore = useUser();
+const { changeScale } = useChangeScale();
+const { changeDarkMode, changePreset, changePrimaryColor, changeSurfaceColor } =
+  useChangeThemeOptions();
 
 const loginItems: Ref<MenuItem[]> = ref([]);
 const accountItems: Ref<MenuItem[]> = ref([]);
+const themeOptions: Ref<{
+  primaryColours: PrimeVueColors[];
+  surfaceColours: PrimeVueColors[];
+  presets: PrimeVuePresetThemes[];
+}> = ref({
+  primaryColours: [
+    PrimeVueColors.EMERALD,
+    PrimeVueColors.GREEN,
+    PrimeVueColors.LIME,
+    PrimeVueColors.RED,
+    PrimeVueColors.ORANGE,
+    PrimeVueColors.AMBER,
+    PrimeVueColors.YELLOW,
+    PrimeVueColors.TEAL,
+    PrimeVueColors.CYAN,
+    PrimeVueColors.SKY,
+    PrimeVueColors.BLUE,
+    PrimeVueColors.INDIGO,
+    PrimeVueColors.VIOLET,
+    PrimeVueColors.PURPLE,
+    PrimeVueColors.FUCHSIA,
+    PrimeVueColors.PINK,
+    PrimeVueColors.ROSE,
+  ],
+  surfaceColours: [
+    PrimeVueColors.SLATE,
+    PrimeVueColors.GRAY,
+    PrimeVueColors.ZINC,
+    PrimeVueColors.NEUTRAL,
+    PrimeVueColors.STONE,
+  ],
+  presets: [
+    PrimeVuePresetThemes.AURA,
+    PrimeVuePresetThemes.LARA,
+    PrimeVuePresetThemes.NORA,
+    PrimeVuePresetThemes.MATERIAL,
+  ],
+});
+const preset = ref(themeOptions.value.presets[0]);
+const darkMode = ref(false);
+const selectedPrimaryColor = ref(themeOptions.value.primaryColours[0]);
+const selectedSurfaceColor = ref(themeOptions.value.surfaceColours[0]);
+
+watch(preset, async (newValue) => {
+  if (newValue) await changePreset(newValue);
+});
+
+watch(darkMode, async (newValue) => {
+  await changeDarkMode(newValue);
+});
+
 const userMenu = ref();
+const themesMenu = ref();
 
 onMounted(() => {
   setUserMenuItems();
@@ -102,7 +216,12 @@ function setUserMenuItems(): void {
     {
       label: "Login",
       icon: "fa-solid fa-fw fa-user",
-      command: async () => await confirmLogin(),
+      command: async () => await toLogin(),
+    },
+    {
+      label: "Register",
+      icon: "fa-solid fa-fw fa-user",
+      command: async () => await toRegister(),
     },
   ];
   accountItems.value = [
@@ -111,12 +230,59 @@ function setUserMenuItems(): void {
       icon: "fa-solid fa-fw fa-arrow-right-from-bracket",
       command: async () => await confirmLogout(),
     },
+    {
+      separator: true,
+    },
+    {
+      label: "Display settings",
+      icon: "fa-solid fa-fw fa-gear",
+      items: [
+        {
+          key: "scale",
+          label: "Change scale",
+          icon: "fa-duotone fa-text-size",
+          items: getScales(),
+        },
+        {
+          key: "themes",
+          label: "Change theme",
+          icon: "fa-regular fa-palette",
+        },
+      ],
+    },
   ];
 }
 
-async function confirmLogin() {
-  const route = useRoute();
-  await navigateTo(route.fullPath);
+async function toLogin() {
+  const reqUrl = useRequestURL();
+
+  userStore.clearUserCookie();
+
+  const loginUrl = await useFetch("/api/auth/loginUrl", {
+    method: "get",
+    params: {
+      origin: reqUrl.origin,
+      redirectUrl: route.path,
+    },
+  });
+
+  await navigateTo(loginUrl.data.value, { external: true });
+}
+
+async function toRegister() {
+  const reqUrl = useRequestURL();
+
+  userStore.clearUserCookie();
+
+  const registerUrl = await useFetch("/api/auth/registerUrl", {
+    method: "get",
+    params: {
+      origin: reqUrl.origin,
+      redirectUrl: route.path,
+    },
+  });
+
+  await navigateTo(registerUrl.data.value, { external: true });
 }
 
 async function confirmLogout() {
@@ -138,6 +304,35 @@ async function confirmLogout() {
       location.reload();
     },
   });
+}
+
+function getScales(): MenuItem[] {
+  return [
+    {
+      key: "12px",
+      label: "Small",
+      icon: "fa-regular fa-a fa-xs",
+      command: async () => await changeScale("12px"),
+    },
+    {
+      key: "14px",
+      label: "Medium",
+      icon: "fa-regular fa-a fa-sm",
+      command: async () => await changeScale("14px"),
+    },
+    {
+      key: "16px",
+      label: "Large",
+      icon: "fa-regular fa-a",
+      command: async () => await changeScale("16px"),
+    },
+    {
+      key: "18px",
+      label: "XLarge",
+      icon: "fa-regular fa-a",
+      command: async () => await changeScale("18px"),
+    },
+  ];
 }
 </script>
 

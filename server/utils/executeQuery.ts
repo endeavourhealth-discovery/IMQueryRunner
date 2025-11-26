@@ -6,9 +6,9 @@ import {
   type Query,
   type QueryRequest,
 } from "~~/models/AutoGen";
-import { mysqlDb } from "../db/mysql";
-import { postgresDb } from "../db/postgres";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { mysqlDb } from "../db/mysql/mysql";
+import { postgresDb } from "../db/postgres/postgres";
+import { queueItem } from "~~/server/db/postgres/schemas/query_runner/schema";
 import { QueueItemStatus } from "~~/enums";
 import { eq } from "drizzle-orm";
 import { imapi } from "~~/server/utils/imapi";

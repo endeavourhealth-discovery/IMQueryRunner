@@ -5,6 +5,9 @@ export default defineConfig({
   dbCredentials: {
     url: process.env.POSTGRES_URL!,
   },
-  schema: "./server/db/postgres/schema.ts",
+  schema: [
+    "./server/db/postgres/queueItemSchema.ts",
+    "./server/db/postgres/userSetting.ts",
+  ],
   out: "./server/db/postgres",
 });

@@ -1,6 +1,9 @@
 import z from "zod";
-import { pgQueueItemSelect, postgresDb } from "~~/server/db/postgres";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { postgresDb } from "~~/server/db/postgres/postgres";
+import {
+  queueItem,
+  selectQueueItemSchema,
+} from "~~/server/db/postgres/schemas/query_runner/schema";
 import { and, desc, eq, lte, SQL } from "drizzle-orm";
 import Logger from "#shared/logger";
 import { Action, Resource } from "~~/models/AutoGen";
@@ -49,7 +52,7 @@ export default defineEventHandler(async (event) => {
 
   const rs = await qry.execute();
 
-  const items = rs.map((row) => pgQueueItemSelect.parse(row));
+  const items = rs.map((row) => selectQueueItemSchema.parse(row));
 
   return {
     result: items,

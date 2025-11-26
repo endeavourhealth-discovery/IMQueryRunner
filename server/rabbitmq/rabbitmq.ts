@@ -3,10 +3,10 @@ import { QueueItemStatus } from "~~/enums";
 import hash from "object-hash";
 import { v4 as uuidv4 } from "uuid";
 import { imapi } from "~~/server/utils/imapi";
-import { postgresDb } from "~~/server/db/postgres";
+import { postgresDb } from "~~/server/db/postgres/postgres";
 import { eq } from "drizzle-orm";
-import { mysqlDb } from "~~/server/db/mysql";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { mysqlDb } from "~~/server/db/mysql/mysql";
+import { queueItem } from "~~/server/db/postgres/schemas/query_runner/schema";
 import type { QueryRequest } from "~~/models/AutoGen";
 import { executeQuery } from "../utils/executeQuery";
 
