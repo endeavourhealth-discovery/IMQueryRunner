@@ -11,7 +11,7 @@ import Aura from "@primeuix/themes/aura";
 import Lara from "@primeuix/themes/lara";
 import Nora from "@primeuix/themes/nora";
 import Material from "@primeuix/themes/material";
-import { type PaletteDesignToken } from "@primeuix/themes/types";
+import type { PaletteDesignToken } from "@primeuix/themes/types";
 
 function setupChangeThemeOptions() {
   const userSettingsStore = useUserSettingsStore();

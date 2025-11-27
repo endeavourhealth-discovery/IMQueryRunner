@@ -1,12 +1,12 @@
 {
-  "id": "00000000-0000-0000-0000-000000000000",
-  "prevId": "",
+  "id": "518205ea-f51e-44f7-8a4c-ff704b1c637a",
+  "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.QueueItem": {
+    "query_runner.QueueItem": {
       "name": "QueueItem",
-      "schema": "",
+      "schema": "query_runner",
       "columns": {
         "id": {
           "name": "id",
@@ -91,8 +91,57 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
-      "checkConstraints": {},
       "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "user.settings": {
+      "name": "settings",
+      "schema": "user",
+      "columns": {
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "currentPreset": {
+          "name": "currentPreset",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentPrimaryColor": {
+          "name": "currentPrimaryColor",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentSurfaceColor": {
+          "name": "currentSurfaceColor",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "darkMode": {
+          "name": "darkMode",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentScale": {
+          "name": "currentScale",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     }
   },
@@ -103,11 +152,8 @@
   "policies": {},
   "views": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
-  },
-  "internal": {
     "tables": {}
   }
 }

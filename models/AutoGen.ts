@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 3.2.1263 on 2025-11-17 12:20:46.
+// Generated using typescript-generator version 3.2.1263 on 2025-11-27 10:00:13.
 
 export interface ConceptContextMap {
     id?: string;
@@ -56,19 +56,6 @@ export interface Pageable<T> {
     currentPage?: number;
     pageSize?: number;
     result?: T[];
-}
-
-export interface User extends Serializable {
-    id?: string;
-    username?: string;
-    firstName?: string;
-    lastName?: string;
-    email?: string;
-    avatar?: string;
-    roles?: UserRole[];
-    groups?: string[];
-    password?: string;
-    roleNames?: string[];
 }
 
 export interface PolicyRequest {
@@ -328,12 +315,12 @@ export interface ArgumentReference {
 }
 
 export interface Assignable {
+    description?: string;
     value?: string;
     function?: FunctionClause;
     units?: TTIriRef;
-    description?: string;
-    qualifier?: TTIriRef;
     operator?: Operator;
+    qualifier?: TTIriRef;
     valueLabel?: string;
 }
 
@@ -377,8 +364,10 @@ export interface Element extends IriLD, Entailment {
     childOf?: boolean;
     parentOrSelfOf?: boolean;
     parentOf?: boolean;
+    cohort?: boolean;
     nodeRef?: string;
     invalid?: boolean;
+    isCohort?: boolean;
 }
 
 export interface Entailment {
@@ -418,13 +407,12 @@ export interface Match extends IriLD, HasPaths {
     ifFalse?: RuleAction;
     nodeRef?: string;
     typeOf?: Node;
-    instanceOf?: Node[];
+    is?: Node[];
     and?: Match[];
     or?: Match[];
     not?: Match[];
     where?: Where;
     return?: Return;
-    then?: Match;
     graph?: Element;
     optional?: boolean;
     aggregate?: FunctionClause;
@@ -439,12 +427,10 @@ export interface Match extends IriLD, HasPaths {
     rule?: Match[];
     libraryItem?: string;
     invalid?: boolean;
-    isCohort?: TTIriRef;
     groupBy?: GroupBy[];
     keepAs?: string;
     orderBy?: OrderLimit;
     asDescription?: string;
-    from?: Match;
     returx?: Return;
     isUnion?: boolean;
 }
@@ -580,10 +566,10 @@ export interface When {
 export interface Where extends Element, Assignable {
     range?: Range;
     isNull?: boolean;
+    is?: Node[];
     relativeTo?: RelativeTo;
     anyRoleGroup?: boolean;
     typeOf?: Node;
-    is?: Node[];
     not?: boolean;
     roleGroup?: boolean;
     isNotNull?: boolean;
@@ -906,14 +892,14 @@ export interface TTEntity extends TTNode, Serializable {
     context?: TTContext;
     crud?: TTIriRef;
     type?: TTArray;
+    status?: TTIriRef;
+    description?: string;
     name?: string;
     scheme?: TTIriRef;
     version?: number;
-    status?: TTIriRef;
-    description?: string;
-    prefixes?: TTPrefix[];
     code?: string;
     types?: TTIriRef[];
+    prefixes?: TTPrefix[];
 }
 
 export interface BugReport extends Task {
@@ -998,8 +984,8 @@ export interface TTArray extends Serializable {
 }
 
 export interface TTContext extends Serializable {
-    prefixes?: TTPrefix[];
     nameSpaces?: TTPrefix[];
+    prefixes?: TTPrefix[];
 }
 
 export interface Throwable extends Serializable {
@@ -1461,7 +1447,7 @@ export enum IM {
     USAGE_STATS = "http://endhealth.info/im#usageStats",
     IN_TASK = "http://endhealth.info/im#inTask",
     DEFINITION = "http://endhealth.info/im#definition",
-    INSTANCE_OF = "http://endhealth.info/im#instanceOf",
+    IS = "http://endhealth.info/im#is",
     RETURN_TYPE = "http://endhealth.info/im#returnType",
     UPDATE_PROCEDURE = "http://endhealth.info/im#updateProcedure",
     INVERSE_PATH = "http://endhealth.info/im#inversePath",
@@ -1540,6 +1526,7 @@ export enum IM {
     MAP_ADVICE = "http://endhealth.info/im#mapAdvice",
     NATIONALLY_ASSURED = "http://endhealth.info/im#NationallyAssuredUK",
     SUPPLIER_ASSURED = "http://endhealth.info/im#SupplierAssured",
+    COHORT = "http://endhealth.info/im#Cohort",
     HAS_MEMBER = "http://endhealth.info/im#hasMember",
     IS_MEMBER_OF = "http://endhealth.info/im#isMemberOf",
     AVOID_REPLACED_BY = "http://endhealth.info/im#avoidReplacedBy",

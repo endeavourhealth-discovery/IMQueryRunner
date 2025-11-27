@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
   const LOG = Logger("server/api/user/settings.post");
   await globalThis.authenticator.requireUser(event);
   const user = globalThis.authenticator.getUser(event);
+  LOG.info(await readBody(event));
   const userSettingsData = await readValidatedBody(
     event,
     userSettingsSchema.parse
@@ -24,5 +25,9 @@ export default defineEventHandler(async (event) => {
   };
   await postgresDb
     .insert(userSettings)
-    .values(insertUserSettingsSchema.parse(userSettingsInput));
+    .values(insertUserSettingsSchema.parse(userSettingsInput))
+    .onConflictDoUpdate({
+      target: userSettings.userId,
+      set: insertUserSettingsSchema.parse(userSettingsInput),
+    });
 });

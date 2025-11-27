@@ -1,27 +1,26 @@
 import { defineStore } from "pinia";
-import PrimeVueColors from "#shared/enums/PrimeVueColors.ts";
-import PrimeVuePresetThemes from "#shared/enums/PrimeVuePresetThemes.ts";
+import { PrimeVuePresetThemes, PrimeVueColors } from "@@/enums";
 
 export const useUserSettingsStore = defineStore("userSettings", () => {
-  const { isLoggedIn, user } = useUser();
+  const { isLoggedIn } = useUser();
 
-  const currentPreset = ref<PrimeVuePresetThemes>();
-  const currentPrimaryColor = ref<PrimeVueColors>();
-  const currentSurfaceColor = ref<PrimeVueColors>();
+  const currentPreset = ref<PrimeVuePresetThemes>(PrimeVuePresetThemes.AURA);
+  const currentPrimaryColor = ref<PrimeVueColors>(PrimeVueColors.EMERALD);
+  const currentSurfaceColor = ref<PrimeVueColors>(PrimeVueColors.SLATE);
   const darkMode = ref(false);
   const currentScale = ref("14px");
 
   async function updateCurrentPreset(preset: PrimeVuePresetThemes) {
     currentPreset.value = preset;
     if (isLoggedIn.value) {
-      await useFetch("/api/user/settings", {
+      await $fetch("/api/user/settings", {
         method: "post",
         body: {
           currentPreset: currentPreset.value,
           currentPrimaryColor: currentPrimaryColor.value,
-          currentSurfaceColor: currentSurfaceColor,
-          darkMode: darkMode,
-          currentScale: currentScale,
+          currentSurfaceColor: currentSurfaceColor.value,
+          darkMode: darkMode.value,
+          currentScale: currentScale.value,
         },
       });
     }
@@ -30,14 +29,14 @@ export const useUserSettingsStore = defineStore("userSettings", () => {
   async function updateCurrentPrimaryColor(color: PrimeVueColors) {
     currentPrimaryColor.value = color;
     if (isLoggedIn.value) {
-      await useFetch("/api/user/settings", {
+      await $fetch("/api/user/settings", {
         method: "post",
         body: {
           currentPreset: currentPreset.value,
           currentPrimaryColor: currentPrimaryColor.value,
-          currentSurfaceColor: currentSurfaceColor,
-          darkMode: darkMode,
-          currentScale: currentScale,
+          currentSurfaceColor: currentSurfaceColor.value,
+          darkMode: darkMode.value,
+          currentScale: currentScale.value,
         },
       });
     }
@@ -46,14 +45,14 @@ export const useUserSettingsStore = defineStore("userSettings", () => {
   async function updateCurrentSurfaceColor(color: PrimeVueColors) {
     currentSurfaceColor.value = color;
     if (isLoggedIn.value) {
-      await useFetch("/api/user/settings", {
+      await $fetch("/api/user/settings", {
         method: "post",
         body: {
           currentPreset: currentPreset.value,
           currentPrimaryColor: currentPrimaryColor.value,
-          currentSurfaceColor: currentSurfaceColor,
-          darkMode: darkMode,
-          currentScale: currentScale,
+          currentSurfaceColor: currentSurfaceColor.value,
+          darkMode: darkMode.value,
+          currentScale: currentScale.value,
         },
       });
     }
@@ -62,14 +61,14 @@ export const useUserSettingsStore = defineStore("userSettings", () => {
   async function updateDarkMode(isDarkMode: boolean) {
     darkMode.value = isDarkMode;
     if (isLoggedIn.value) {
-      await useFetch("/api/user/settings", {
+      await $fetch("/api/user/settings", {
         method: "post",
         body: {
           currentPreset: currentPreset.value,
           currentPrimaryColor: currentPrimaryColor.value,
-          currentSurfaceColor: currentSurfaceColor,
-          darkMode: darkMode,
-          currentScale: currentScale,
+          currentSurfaceColor: currentSurfaceColor.value,
+          darkMode: darkMode.value,
+          currentScale: currentScale.value,
         },
       });
     }
@@ -78,45 +77,46 @@ export const useUserSettingsStore = defineStore("userSettings", () => {
   async function updateCurrentScale(fontSize: string) {
     currentScale.value = fontSize;
     if (isLoggedIn.value) {
-      await useFetch("/api/user/settings", {
+      await $fetch("/api/user/settings", {
         method: "post",
         body: {
           currentPreset: currentPreset.value,
           currentPrimaryColor: currentPrimaryColor.value,
-          currentSurfaceColor: currentSurfaceColor,
-          darkMode: darkMode,
-          currentScale: currentScale,
+          currentSurfaceColor: currentSurfaceColor.value,
+          darkMode: darkMode.value,
+          currentScale: currentScale.value,
         },
       });
     }
   }
 
   function clearAllFromUserSettings() {
-    this.currentPreset = PrimeVuePresetThemes.AURA;
-    this.currentPrimaryColor = PrimeVueColors.EMERALD;
-    this.currentSurfaceColor = PrimeVueColors.SLATE;
-    this.darkMode = false;
-    this.currentScale = "14px";
+    currentPreset.value = PrimeVuePresetThemes.AURA;
+    currentPrimaryColor.value = PrimeVueColors.EMERALD;
+    currentSurfaceColor.value = PrimeVueColors.SLATE;
+    darkMode.value = false;
+    currentScale.value = "14px";
   }
   async function getAllUserSettings(): Promise<void> {
     const { isLoggedIn } = useUser();
     if (!isLoggedIn) {
       return;
     }
+    const headers = useRequestHeaders(["cookie"]);
     const results = await $fetch<{
-      preset: string;
-      primaryColor: PrimeVueColors;
-      surfaceColor: PrimeVueColors;
+      currentPreset: PrimeVuePresetThemes;
+      currentPrimaryColor: PrimeVueColors;
+      currentSurfaceColor: PrimeVueColors;
       darkMode: boolean;
-      scale: string;
-    }>("/api/user/settings");
-    if (results.data?.preset) this.currentPreset = results.data.preset;
-    if (results.data?.primaryColor)
-      this.currentPrimaryColor = results.data.primaryColor;
-    if (results.data?.secondaryColor)
-      this.secondaryColor = results.data.secondaryColor;
-    if (results.data.darkMode) this.darkMode = results.data.darkMode;
-    if (results.data.scale) this.currentScale = results.data.scale;
+      currentScale: string;
+    }>("/api/user/settings", { headers });
+    if (results.currentPreset) currentPreset.value = results.currentPreset;
+    if (results.currentPrimaryColor)
+      currentPrimaryColor.value = results.currentPrimaryColor;
+    if (results.currentSurfaceColor)
+      currentSurfaceColor.value = results.currentSurfaceColor;
+    if (results.darkMode) darkMode.value = results.darkMode;
+    if (results.currentScale) currentScale.value = results.currentScale;
   }
   return {
     currentPreset,

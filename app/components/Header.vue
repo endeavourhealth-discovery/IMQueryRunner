@@ -59,7 +59,11 @@
         <template #item="{ item, props }">
           <div>
             <span :class="item.icon" />
-            <span class="ml-2 cursor-pointer">{{ item.label }}</span>
+            <span
+              class="ml-2 cursor-pointer"
+              @mouseenter="toggleThemesMenu($event, item.key)"
+              >{{ item.label }}</span
+            >
           </div>
         </template>
       </TieredMenu>
@@ -334,6 +338,40 @@ function getScales(): MenuItem[] {
     },
   ];
 }
+
+function toggleThemesMenu(event: MouseEvent, key: string | undefined) {
+  if (key) {
+    switch (key) {
+      case "themes":
+        themesMenu.value.show(event);
+        break;
+      case "scale":
+        if (themesMenu.value.visible) themesMenu.value.hide();
+        break;
+    }
+  }
+}
 </script>
 
-<style scoped></style>
+<style scoped>
+#themes-menu {
+  overflow: auto;
+}
+
+.theme-container {
+  display: flex;
+  flex-flow: column nowrap;
+  width: 18rem;
+}
+
+.color-picker {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 0.25rem;
+}
+
+.round-button {
+  height: 2rem;
+  width: 2rem;
+}
+</style>

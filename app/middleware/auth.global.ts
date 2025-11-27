@@ -18,16 +18,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const userSettingsStore = useUserSettingsStore();
   LOG.info(`User is logged in = ${userStore.isLoggedIn.value}`);
 
-  if (!userStore.isLoggedIn.value) {
-    try {
-      const result = await useFetch("/api/auth/loginWithSessionId");
-      const isLoggedInApi = await useFetch("/api/auth/isLoggedIn");
-      await userSettingsStore.getAllUserSettings();
-    } catch (e) {
-      LOG.debug("Failed to login using session id");
-    }
-  }
-
   if (userStore.isLoggedIn.value) {
     if (to.path === "/QueryRunner") {
       const allowed = await uiGuard.checkPermission(
@@ -55,9 +45,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         origin: reqUrl.origin,
         redirectUrl: to.path,
       },
+      server: true,
     });
-    await userSettingsStore.getAllUserSettings();
-
     LOG.debug(`Navigating to ${loginUrl.data.value}`);
 
     return navigateTo(loginUrl.data.value, { external: true });
