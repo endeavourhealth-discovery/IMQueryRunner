@@ -1,7 +1,10 @@
 import { z } from "zod";
-import { postgresDb } from "~~/server/db/postgres";
+import { postgresDb } from "~~/server/db/postgres/postgres";
 import { eq } from "drizzle-orm";
-import { queueItem } from "~~/server/db/postgres/schema";
+import {
+  queueItem,
+  selectQueueItemSchema,
+} from "~~/server/db/postgres/schemas/query_runner/schema";
 import { Action, Resource } from "~~/models/AutoGen";
 
 const paramSchema = z.object({
@@ -20,8 +23,9 @@ export default defineEventHandler(async (event) => {
   const item = await postgresDb.query.queueItem.findFirst({
     where: eq(queueItem.id, queueId),
   });
-  if (item) {
-    await postgresDb.delete(queueItem).where(eq(queueItem.id, item.id));
+  const parsed = selectQueueItemSchema.parse(item);
+  if (parsed) {
+    await postgresDb.delete(queueItem).where(eq(queueItem.id, parsed.id));
   } else {
     createError("Query queue item not found for id: " + queueId);
   }

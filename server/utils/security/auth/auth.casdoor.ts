@@ -30,6 +30,18 @@ export default class Casdoor extends Authenticator {
     }`;
   }
 
+  getRegisterUrl(origin: string, redirectUrl: string): string {
+    const successUrl = `${origin}/callback?redirect=${redirectUrl}`;
+
+    return `${process.env.NUXT_PUBLIC_CASDOOR_URL}/signup/${
+      process.env.NUXT_PUBLIC_CASDOOR_ORGANISATION_NAME
+    }?redirect_uri=${encodeURIComponent(
+      successUrl
+    )}&response_type=code&client_id=${
+      process.env.NUXT_PUBLIC_CASDOOR_CLIENT_ID
+    }`;
+  }
+
   async getTokensFromCodeInternal(
     code: string
   ): Promise<{ accessToken: string; refreshToken?: string }> {

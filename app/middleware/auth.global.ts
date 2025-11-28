@@ -2,6 +2,7 @@ import { useUser } from "~/composables/useUser";
 import { uiGuard } from "~/utils/security/ui.guard";
 import Logger from "#shared/logger";
 import { Action, Resource } from "~~/models/AutoGen";
+import { useUserSettingsStore } from "@@/stores/usersettings.store";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const LOG = Logger("app/middleware/auth");
@@ -14,16 +15,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   if (publicRoutes.includes(to.path)) return;
 
   const userStore = useUser();
+  const userSettingsStore = useUserSettingsStore();
   LOG.info(`User is logged in = ${userStore.isLoggedIn.value}`);
-
-  if (!userStore.isLoggedIn.value) {
-    try {
-      const result = await useFetch("/api/auth/loginWithSessionId");
-      const isLoggedInApi = await useFetch("/api/auth/isLoggedIn");
-    } catch (e) {
-      LOG.debug("Failed to login using session id");
-    }
-  }
 
   if (userStore.isLoggedIn.value) {
     if (to.path === "/QueryRunner") {
@@ -52,10 +45,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         origin: reqUrl.origin,
         redirectUrl: to.path,
       },
+      server: true,
     });
-
     LOG.debug(`Navigating to ${loginUrl.data.value}`);
 
-    // return navigateTo(loginUrl.data.value, { external: true });
+    return navigateTo(loginUrl.data.value, { external: true });
   }
 });

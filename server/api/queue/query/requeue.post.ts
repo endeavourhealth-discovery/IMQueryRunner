@@ -1,6 +1,9 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
-import { pgQueueItemInsert, postgresDb } from "~~/server/db/postgres";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { postgresDb } from "~~/server/db/postgres/postgres";
+import {
+  queueItem,
+  insertQueueItemSchema,
+} from "~~/server/db/postgres/schemas/query_runner/schema";
 import { Action, Resource } from "~~/models/AutoGen";
 
 export default defineEventHandler(async (event) => {
@@ -11,7 +14,7 @@ export default defineEventHandler(async (event) => {
     Resource.QUERY,
     Action.EXECUTE
   );
-  const data = pgQueueItemInsert.parse(event);
+  const data = insertQueueItemSchema.parse(event);
   await postgresDb.insert(queueItem).values(data);
   await sendMessage(data.userId, data);
 });

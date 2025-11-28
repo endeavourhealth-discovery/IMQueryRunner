@@ -1,7 +1,10 @@
 import z from "zod";
 import { QueueItemStatus } from "~~/enums/QueueItemStatus";
-import { pgQueueItemSelect, postgresDb } from "~~/server/db/postgres";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { postgresDb } from "~~/server/db/postgres/postgres";
+import {
+  queueItem,
+  selectQueueItemSchema,
+} from "~~/server/db/postgres/schemas/query_runner/schema";
 import { desc, eq } from "drizzle-orm";
 import { Action, Resource } from "~~/models/AutoGen";
 
@@ -35,7 +38,7 @@ export default defineEventHandler(async (event) => {
     limit: size,
   });
 
-  const items = rs.map((row) => pgQueueItemSelect.parse(row));
+  const items = rs.map((row) => selectQueueItemSchema.parse(row));
   return {
     result: items,
     totalCount,

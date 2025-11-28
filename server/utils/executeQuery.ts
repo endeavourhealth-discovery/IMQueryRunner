@@ -6,9 +6,9 @@ import {
   type Query,
   type QueryRequest,
 } from "~~/models/AutoGen";
-import { mysqlDb } from "../db/mysql";
-import { postgresDb } from "../db/postgres";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { mysqlDb } from "../db/mysql/mysql";
+import { postgresDb } from "../db/postgres/postgres";
+import { queueItem } from "~~/server/db/postgres/schemas/query_runner/schema";
 import { QueueItemStatus } from "~~/enums";
 import { eq } from "drizzle-orm";
 import { imapi } from "~~/server/utils/imapi";
@@ -87,12 +87,6 @@ function hashArgument(argument: Argument): string {
   if (argument.valuePath) hashString += argument.valuePath;
   if (argument.valueNodeRef) hashString += argument.valueNodeRef;
   if (argument.dataType) hashString += argument.dataType.iri;
-  if (argument.valuePathList) {
-    const sorted = argument.valuePathList.toSorted();
-    for (const path of sorted) {
-      hashString += path.iri;
-    }
-  }
   if (argument.valueObject) hashString += argument.valueObject;
   if (argument.valueVariable) hashString += argument.valueVariable;
   return hashString;
@@ -273,7 +267,11 @@ async function populateSubqueryIrisConclusively(
   query: Query,
   subQueryIris: string[]
 ): Promise<void> {
-  if (query.isCohort) subQueryIris.push(query.isCohort.iri);
+  if (query.is?.length) {
+    for (const node of query.is) {
+      if (node.iri) subQueryIris.push(node.iri);
+    }
+  }
   if (query.and) {
     for (const and of query.and) {
       await processMatch(and, subQueryIris);
@@ -295,12 +293,17 @@ async function processMatch(
   match: Match,
   subQueryIris: string[]
 ): Promise<void> {
-  if (match.isCohort) {
-    const iri = match.isCohort.iri;
-    subQueryIris.push(iri);
-    const subQuery = await imapi.describeQuery(iri, DisplayMode.LOGICAL);
-    if (!subQuery) throw createError(`Sub query with iri: ${iri} not found`);
-    await populateSubqueryIrisConclusively(subQuery, subQueryIris);
+  if (match.is?.length) {
+    for (const node of match.is) {
+      const iri = node.iri;
+      if (iri) {
+        subQueryIris.push(iri);
+        const subQuery = await imapi.describeQuery(iri, DisplayMode.LOGICAL);
+        if (!subQuery)
+          throw createError(`Sub query with iri: ${iri} not found`);
+        await populateSubqueryIrisConclusively(subQuery, subQueryIris);
+      }
+    }
   }
   if (match.and) {
     for (const nestedAnd of match.and) {

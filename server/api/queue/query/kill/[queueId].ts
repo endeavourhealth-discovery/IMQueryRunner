@@ -1,9 +1,13 @@
 import { QueueItemStatus } from "~~/enums";
 import { z } from "zod";
-import { postgresDb } from "~~/server/db/postgres";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { postgresDb } from "~~/server/db/postgres/postgres";
+import {
+  queueItem,
+  selectQueueItemSchema,
+} from "~~/server/db/postgres/schemas/query_runner/schema";
 import { eq } from "drizzle-orm";
 import { Action, Resource } from "~~/models/AutoGen";
+import { cloneDeep } from "lodash-es";
 
 const paramSchema = z.object({
   queueId: z.string(),
@@ -21,7 +25,8 @@ export default defineEventHandler(async (event) => {
   const item = await postgresDb.query.queueItem.findFirst({
     where: eq(queueItem.id, queueId),
   });
-  if (item) {
+  const parsed = selectQueueItemSchema.parse(item);
+  if (parsed) {
     const activeQuery = postgresDb.execute(`
         SELECT *
         FROM pg_stat_activity
@@ -41,7 +46,7 @@ export default defineEventHandler(async (event) => {
         status: QueueItemStatus.CANCELLED,
         killedAt: new Date().toISOString(),
       })
-      .where(eq(queueItem.id, item.id));
+      .where(eq(queueItem.id, parsed.id));
   } else {
     createError("Query queue item not found for id: " + queueId);
   }

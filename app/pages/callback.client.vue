@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import { useUser } from "~/composables/useUser";
+import { useUserSettingsStore } from "~~/stores/usersettings.store";
+import { applyUserSettings } from "@/composables/useApplyUserSettings";
 
 const route = useRoute();
+const userSettingsStore = useUserSettingsStore();
 
 onMounted(async () => {
   const redirect = route.query.redirect as string;
@@ -14,6 +17,9 @@ onMounted(async () => {
     const isLoggedInApi = await useFetch("/api/auth/isLoggedIn");
     const { isLoggedIn } = useUser();
     if (!isLoggedIn.value) throw createError("Failed to fetch login session");
+    const userSettings = await useFetch("/api/user/settings");
+    await userSettingsStore.getAllUserSettings();
+    applyUserSettings();
     await navigateTo(redirect);
   }
 });
