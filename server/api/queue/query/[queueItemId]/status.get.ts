@@ -1,30 +1,46 @@
 import { QueueItemStatus } from "~~/enums";
 import { z } from "zod";
-import { postgresDb } from "~~/server/db/postgres";
-import { eq } from "drizzle-orm";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { postgresDb } from "~~/server/db/postgres/postgres";
+import { desc, eq } from "drizzle-orm";
+import {
+  queueItem,
+  selectQueueItemSchema,
+} from "~~/server/db/postgres/schemas/query_runner/schema";
+import { Action, Resource } from "~~/models/AutoGen";
 
 const paramSchema = z.object({
-  queueItemId: z.string(),
+  status: z.enum(QueueItemStatus),
+  page: z.coerce.number().default(1),
+  size: z.coerce.number().default(25),
 });
 
 export default defineEventHandler(async (event) => {
-  globalThis.authenticator.requireUser(event);
+  await globalThis.authenticator.requireUser(event);
   const user = globalThis.authenticator.getUser(event);
-  if (!user) {
-    throw createError("Unauthorized");
-  }
-  const { queueItemId } = await getValidatedRouterParams(
+  await globalThis.guard.requirePermission(
+    user!,
+    Resource.QUERY,
+    Action.EXECUTE
+  );
+  const { status, page, size } = await getValidatedQuery(
     event,
     paramSchema.parse
   );
-  const item = await postgresDb.query.queueItem.findFirst({
-    where: eq(queueItem.id, queueItemId),
+  const totalCount = await postgresDb.$count(
+    queueItem,
+    eq(queueItem.status, status)
+  );
+  const rs = await postgresDb.query.queueItem.findMany({
+    where: eq(queueItem.status, status),
+    orderBy: [desc(queueItem.queuedAt)],
+    offset: (+page - 1) * +size,
+    limit: size,
   });
+  const items = rs.map((row) => selectQueueItemSchema.parse(row));
 
-  if (!item) {
-    throw createError("Query queue item not found for id: " + queueItemId);
-  }
-
-  return item.status;
+  return {
+    result: items,
+    totalCount: totalCount,
+    page: page,
+  };
 });

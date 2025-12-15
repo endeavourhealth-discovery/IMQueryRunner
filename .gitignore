@@ -29,3 +29,6 @@ logs
 # prisma
 prisma/generated/
 prisma/migrations/
+
+#vscode
+.vscode/*

@@ -1,10 +1,11 @@
 import { type Enforcer, newEnforcer } from "casbin";
 import AuthorizationError from "~~/server/errors/authorization.error";
 import type Guard from "~~/server/utils/security/guard/guard.base";
-import type { User } from "~~/models/User";
 import Logger from "#shared/logger";
 import { BasicAdapter } from "casbin-basic-adapter";
 import mysql, { type ConnectionOptions } from "mysql2";
+import { Action, Resource } from "~~/models/AutoGen";
+import { type User } from "~~/models/User";
 
 export class GuardCasbin implements Guard {
   private LOG = Logger("server/utils/security/guard/casbin");
@@ -12,8 +13,8 @@ export class GuardCasbin implements Guard {
 
   async checkPermissions(
     subject: User,
-    path: string,
-    action: string
+    resource: Resource,
+    action: Action
   ): Promise<boolean> {
     try {
       if (!this.enforcer) await this.setupEnforcer();
@@ -21,7 +22,11 @@ export class GuardCasbin implements Guard {
       // return await this.enforcer.enforce(subject, path, action);
 
       // FOR DEBUG TO SEE WHICH RULE(S) PASSED
-      const permission = await this.enforcer!.enforceEx(subject, path, action);
+      const permission = await this.enforcer!.enforceEx(
+        subject,
+        resource,
+        action
+      );
       this.LOG.debug("========== PERMISSION ==========");
       this.LOG.debug(`[${permission[1]}]`);
       return permission[0].valueOf();
@@ -37,25 +42,43 @@ export class GuardCasbin implements Guard {
     }
   }
 
-  async addPolicy(username: string, dataSource: string, accessRequest: string) {
+  async requirePermission(
+    subject: User,
+    resource: Resource,
+    action: Action
+  ): Promise<void> {
+    const hasPermission = await this.checkPermissions(
+      subject,
+      resource,
+      action
+    );
+    if (!hasPermission)
+      throw new AuthorizationError({ code: 401, message: "Unauthorized" });
+  }
+
+  async addPolicy(user: User, resource: Resource, action: Action) {
     if (!this.enforcer) await this.setupEnforcer();
-    await this.enforcer!.addPolicy(username, dataSource, accessRequest);
+    await this.enforcer!.addPolicy(JSON.stringify(user), resource, action);
     await this.enforcer!.savePolicy();
   }
 
-  async removePolicy(
-    username: string,
-    dataSource: string,
-    accessRequest: string
-  ) {
+  async removePolicy(user: User, resource: Resource, action: Action) {
     if (!this.enforcer) await this.setupEnforcer();
-    await this.enforcer!.removePolicy(username, dataSource, accessRequest);
+    await this.enforcer!.removePolicy(JSON.stringify(user), resource, action);
     await this.enforcer!.savePolicy();
   }
 
   async setupEnforcer(): Promise<void> {
     const conn = mysql.createConnection(process.env.CASBIN_URL as string);
-    const adapter = await BasicAdapter.newAdapter("mysql", conn, "casbin_query_runner");
+    const adapter = await BasicAdapter.newAdapter(
+      "mysql",
+      conn,
+      "casbin_query_runner"
+    );
     this.enforcer ??= await newEnforcer("public/casbin/model.conf", adapter);
+    this.enforcer.addFunction("include", (roleNames, subRole) => {
+      if (!Array.isArray(roleNames)) return false;
+      return roleNames.includes(subRole);
+    });
   }
 }

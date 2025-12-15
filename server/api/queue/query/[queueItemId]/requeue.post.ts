@@ -1,12 +1,12 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
-import { pgQueueItemInsert, postgresDb } from "~~/server/db/postgres";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { postgresDb } from "~~/server/db/postgres/postgres";
+import {
+  queueItem,
+  insertQueueItemSchema,
+} from "~~/server/db/postgres/schemas/query_runner/schema";
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { QueryRequest } from "~~/models/AutoGen";
-import { v4 } from "uuid";
 import { QueueItemStatus } from "~~/enums";
-import { QueueItem } from "~~/models/queryItem.schema";
 
 const paramSchema = z.object({
   queueItemId: z.string(),
@@ -26,24 +26,20 @@ export default defineEventHandler(async (event) => {
   const item = await postgresDb.query.queueItem.findFirst({
     where: eq(queueItem.id, queueItemId),
   });
-
-  if (!item) {
-    throw createError("Query queue item not found for id: " + queueItemId);
-  }
-  const queryRequest: QueryRequest = item.queryRequest as QueryRequest;
-  const queueQuery: QueueItem = {
-    id: v4(),
-    queryIri: queryRequest.query.iri,
-    queryName: queryRequest.query.name,
-    queryRequest: queryRequest,
-    status: QueueItemStatus.QUEUED,
-    userId: user.id,
-    username: user.userName,
-    queryResult: [],
-    queuedAt: new Date(),
-  } as QueueItem;
-  await postgresDb
-    .insert(queueItem)
-    .values(pgQueueItemInsert.parse(queueQuery));
-  await sendMessage(user.id, queueQuery);
+  const parsed = insertQueueItemSchema.parse(item);
+  return await postgresDb
+    .transaction(async (tx) => {
+      const id = await sendMessage(user!.id, parsed);
+      parsed.id = id;
+      parsed.queuedAt = new Date().toString();
+      parsed.status = QueueItemStatus.QUEUED;
+      parsed.error = null;
+      parsed.finishedAt = null;
+      parsed.killedAt = null;
+      parsed.startedAt = null;
+      await tx.insert(queueItem).values(parsed);
+    })
+    .catch((error) => {
+      console.error("Error requeuing item", error);
+    });
 });

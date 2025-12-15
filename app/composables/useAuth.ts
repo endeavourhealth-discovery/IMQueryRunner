@@ -5,12 +5,27 @@ export const useAuth = () => {
     });
   };
 
-  const logout = () => {
-    $fetch("/api/auth/logout");
+  const logout = async () => {
+    await $fetch("/api/auth/logout");
   };
 
-  const getLoginUrl = (reqUrlOrigin: string, toPath: string) => {
+  const getLoginUrl = (
+    reqUrlOrigin: string,
+    toPath: string,
+    server: boolean = false
+  ) => {
     return useFetch("/api/auth/loginUrl", {
+      method: "get",
+      params: {
+        origin: reqUrlOrigin,
+        redirectUrl: toPath,
+      },
+      server: server,
+    });
+  };
+
+  const getRegisterUrl = (reqUrlOrigin: string, toPath: string) => {
+    return useFetch("/api/auth/registerUrl", {
       method: "get",
       params: {
         origin: reqUrlOrigin,
@@ -23,12 +38,12 @@ export const useAuth = () => {
     return useFetch("/api/auth/authenticate", { query: { code: code } });
   };
 
-  const getAccessToken = (
+  const getAccessToken = async (
     casdoorUrl: string,
     clientId: string,
     clientSecret: string
   ) => {
-    $fetch(`${casdoorUrl}/api/login/oauth/access_token`, {
+    await $fetch(`${casdoorUrl}/api/login/oauth/access_token`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -51,6 +66,10 @@ export const useAuth = () => {
     });
   };
 
+  const getIsLoggedIn = () => {
+    return useFetch("/api/auth/isLoggedIn");
+  };
+
   return {
     cancel,
     logout,
@@ -58,5 +77,7 @@ export const useAuth = () => {
     authenticate,
     getAccessToken,
     hasPermission,
+    getRegisterUrl,
+    getIsLoggedIn,
   };
 };

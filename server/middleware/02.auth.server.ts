@@ -13,6 +13,9 @@ export default defineEventHandler(async (event) => {
     "/api/auth/loginUrl",
     "/api/auth/authenticate",
     "/api/auth/logout",
+    "/api/auth/loginWithBearerToken",
+    "/api/auth/loginWithSessionId",
+    "/api/auth/isLoggedIn",
     "/api/oauth/token",
     "/api/public/auth/hasPermission",
   ];
@@ -22,16 +25,4 @@ export default defineEventHandler(async (event) => {
   }
 
   await globalThis.authenticator.requireUser(event);
-  // Authorization
-  const user = globalThis.authenticator.getUser(event);
-  const method = event.method;
-  if (user) {
-    const allowed = await globalThis.guard.checkPermissions(user, path, method);
-    if (!allowed) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: "Unauthorized",
-      });
-    }
-  }
 });

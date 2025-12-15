@@ -105,7 +105,7 @@ import type { QueueItem } from "~~/models";
 import { QueueItemStatus } from "~~/enums";
 import { computed, onMounted, ref } from "vue";
 import type { Ref } from "vue";
-import type { Argument, QueryRequest } from "~~/models/AutoGen";
+import type { Argument } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";

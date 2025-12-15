@@ -1,7 +1,4 @@
--- Current sql file was generated after introspecting the database
--- If you want to run this migration please uncomment this code before executing migrations
-/*
-CREATE TABLE "QueueItem" (
+CREATE TABLE "query_runner"."QueueItem" (
 	"id" text PRIMARY KEY NOT NULL,
 	"query_iri" varchar(255) NOT NULL,
 	"query_name" varchar(255) NOT NULL,
@@ -16,5 +13,12 @@ CREATE TABLE "QueueItem" (
 	"status" text NOT NULL,
 	"error" text
 );
-
-*/
+--> statement-breakpoint
+CREATE TABLE "user"."settings" (
+	"userId" text PRIMARY KEY NOT NULL,
+	"currentPreset" text,
+	"currentPrimaryColor" text,
+	"currentSurfaceColor" text,
+	"darkMode" boolean,
+	"currentScale" text
+);

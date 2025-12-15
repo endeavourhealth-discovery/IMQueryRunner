@@ -1,12 +1,11 @@
 import hash from "object-hash";
 import { type Argument, type QueryRequest } from "~~/models/AutoGen";
-import { mysqlDb } from "../db/mysql";
-import { postgresDb } from "../db/postgres";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { mysqlDb } from "../db/mysql/mysql";
+import { postgresDb } from "../db/postgres/postgres";
+import { queueItem } from "~~/server/db/postgres/schemas/query_runner/schema";
 import { QueueItemStatus } from "~~/enums";
 import { eq } from "drizzle-orm";
 import { imapi } from "~~/server/utils/imapi";
-import { cloneDeep } from "lodash-es";
 import { type MySqlQueryResult } from "drizzle-orm/mysql2";
 import Logger from "~~/shared/logger";
 const LOG = Logger("api/queue/user");
@@ -83,12 +82,6 @@ function hashArgument(argument: Argument): string {
   if (argument.valuePath) hashString += argument.valuePath;
   if (argument.valueNodeRef) hashString += argument.valueNodeRef;
   if (argument.dataType) hashString += argument.dataType.iri;
-  if (argument.valuePathList) {
-    const sorted = argument.valuePathList.toSorted();
-    for (const path of sorted) {
-      hashString += path.iri;
-    }
-  }
   if (argument.valueObject) hashString += argument.valueObject;
   if (argument.valueVariable) hashString += argument.valueVariable;
   return hashString;
