@@ -129,11 +129,10 @@
 <script setup lang="ts">
 import type { MenuItem } from "primevue/menuitem";
 import { useUser } from "~/composables/useUser";
-import { useAuth } from "~/composables/useAuth";
+import { AuthService } from "~/services";
 import useChangeScale from "@/composables/useChangeScale";
 import { PrimeVueColors, PrimeVuePresetThemes } from "~~/enums";
 
-const { logout, getLoginUrl, getRegisterUrl } = useAuth();
 const { user, isLoggedIn } = useUser();
 const router = useRouter();
 const route = useRoute();
@@ -262,14 +261,17 @@ function setUserMenuItems(): void {
 async function toLogin() {
   const reqUrl = useRequestURL();
   userStore.clearUserCookie();
-  const loginUrl = await getLoginUrl(reqUrl.origin, route.path);
+  const loginUrl = await AuthService.getLoginUrl(reqUrl.origin, route.path);
   await navigateTo(loginUrl.data.value, { external: true });
 }
 
 async function toRegister() {
   const reqUrl = useRequestURL();
   userStore.clearUserCookie();
-  const registerUrl = await getRegisterUrl(reqUrl.origin, route.path);
+  const registerUrl = await AuthService.getRegisterUrl(
+    reqUrl.origin,
+    route.path
+  );
   await navigateTo(registerUrl.data.value, { external: true });
 }
 
@@ -287,7 +289,7 @@ async function confirmLogout() {
       outlined: true,
     },
     accept: async () => {
-      await logout();
+      await AuthService.logout();
       location.reload();
     },
   });

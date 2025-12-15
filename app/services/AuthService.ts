@@ -1,19 +1,19 @@
-export const useAuth = () => {
-  const cancel = (queueItemId: string) => {
+const AuthService = {
+  async cancel(queueItemId: string) {
     return useFetch(`/api/queue/query/${queueItemId}/cancel`, {
       method: "post",
     });
-  };
+  },
 
-  const logout = async () => {
+  async logout() {
     await $fetch("/api/auth/logout");
-  };
+  },
 
-  const getLoginUrl = (
+  async getLoginUrl(
     reqUrlOrigin: string,
     toPath: string,
     server: boolean = false
-  ) => {
+  ) {
     return useFetch("/api/auth/loginUrl", {
       method: "get",
       params: {
@@ -22,9 +22,9 @@ export const useAuth = () => {
       },
       server: server,
     });
-  };
+  },
 
-  const getRegisterUrl = (reqUrlOrigin: string, toPath: string) => {
+  async getRegisterUrl(reqUrlOrigin: string, toPath: string) {
     return useFetch("/api/auth/registerUrl", {
       method: "get",
       params: {
@@ -32,17 +32,17 @@ export const useAuth = () => {
         redirectUrl: toPath,
       },
     });
-  };
+  },
 
-  const authenticate = (code: string) => {
+  async authenticate(code: string) {
     return useFetch("/api/auth/authenticate", { query: { code: code } });
-  };
+  },
 
-  const getAccessToken = async (
+  async getAccessToken(
     casdoorUrl: string,
     clientId: string,
     clientSecret: string
-  ) => {
+  ) {
     await $fetch(`${casdoorUrl}/api/login/oauth/access_token`, {
       method: "POST",
       headers: {
@@ -54,9 +54,9 @@ export const useAuth = () => {
         client_secret: clientSecret,
       }),
     });
-  };
+  },
 
-  const hasPermission = (object: string, action: string) => {
+  async hasPermission(object: string, action: string) {
     return useFetch("/api/public/auth/hasPermission", {
       method: "POST",
       body: {
@@ -64,20 +64,10 @@ export const useAuth = () => {
         action: action,
       },
     });
-  };
+  },
 
-  const getIsLoggedIn = () => {
+  async getIsLoggedIn() {
     return useFetch("/api/auth/isLoggedIn");
-  };
-
-  return {
-    cancel,
-    logout,
-    getLoginUrl,
-    authenticate,
-    getAccessToken,
-    hasPermission,
-    getRegisterUrl,
-    getIsLoggedIn,
-  };
+  },
 };
+export default Object.freeze(AuthService);

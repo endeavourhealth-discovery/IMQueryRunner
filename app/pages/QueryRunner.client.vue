@@ -110,10 +110,9 @@ import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
 import { useUser } from "~/composables/useUser";
-import { useQueue } from "~/composables/useQueue";
+import { QueueService } from "~/services";
 const { user } = useUser();
 const confirm = useConfirm();
-const { cancel } = useQueue();
 
 const socket = io({
   extraHeaders: {
@@ -217,7 +216,7 @@ function getStatusSeverity(
 }
 
 async function cancelQuery(queryId: string) {
-  await cancel(queryId);
+  await QueueService.cancel(queryId);
   await initSearch();
 }
 
@@ -255,7 +254,7 @@ async function viewArgumentDisplay(args: Argument[]) {
 }
 
 async function deleteQuery(queryId: string) {
-  await cancel(queryId);
+  await QueueService.cancel(queryId);
   await initSearch();
 }
 

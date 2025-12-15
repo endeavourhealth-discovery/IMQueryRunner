@@ -1,13 +1,11 @@
 import { useUser } from "~/composables/useUser";
 import { uiGuard } from "~/utils/security/ui.guard";
 import Logger from "#shared/logger";
-import { useAuth } from "~/composables/useAuth";
+import { AuthService } from "~/services";
 import { Action, Resource } from "~~/models/AutoGen";
 import { useUserSettingsStore } from "@@/stores/usersettings.store";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const { getLoginUrl } = useAuth();
-
   const LOG = Logger("app/middleware/auth");
   if (to.path.startsWith("/api")) {
     LOG.debug("API route, skipping auth");
@@ -42,7 +40,11 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
     userStore.clearUserCookie();
 
-    const loginUrl = await getLoginUrl(reqUrl.origin, to.path, true);
+    const loginUrl = await AuthService.getLoginUrl(
+      reqUrl.origin,
+      to.path,
+      true
+    );
     LOG.debug(`Navigating to ${loginUrl.data.value}`);
 
     return navigateTo(loginUrl.data.value, { external: true });
