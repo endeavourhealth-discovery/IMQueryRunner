@@ -1,12 +1,7 @@
+import { AuthService } from "~/services";
 class UIGuard {
   public async checkPermission(object: string, action: string) {
-    return await useFetch("/api/public/auth/hasPermission", {
-      method: "POST",
-      body: {
-        object: object,
-        action: action,
-      },
-    });
+    return await AuthService.hasPermission(object, action);
   }
 }
 

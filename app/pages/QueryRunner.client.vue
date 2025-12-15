@@ -92,7 +92,7 @@
       :queryItem="selectedQuery"
       v-model:showDialog="showQueryResults"
     />
-    <ArgumentDisplayDialog
+    <QueryRunnerArgumentDisplayDialog
       :arguments="currentArguments"
       :show-footer-buttons="false"
       v-model:showDialog="showArgumentDisplay"
@@ -105,13 +105,12 @@ import type { QueueItem } from "~~/models";
 import { QueueItemStatus } from "~~/enums";
 import { computed, onMounted, ref } from "vue";
 import type { Ref } from "vue";
-import type { Argument, QueryRequest } from "~~/models/AutoGen";
+import type { Argument } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
-import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
 import { io } from "socket.io-client";
 import { useUser } from "~/composables/useUser";
-
+import { QueueService } from "~/services";
 const { user } = useUser();
 const confirm = useConfirm();
 
@@ -217,9 +216,7 @@ function getStatusSeverity(
 }
 
 async function cancelQuery(queryId: string) {
-  const result = await useFetch("/api/queue/query/cancel", {
-    params: { queueId: queryId },
-  });
+  await QueueService.cancel(queryId);
   await initSearch();
 }
 
@@ -257,25 +254,13 @@ async function viewArgumentDisplay(args: Argument[]) {
 }
 
 async function deleteQuery(queryId: string) {
-  const result = await useFetch("/api/queue/query/delete", {
-    params: { queueId: queryId },
-  });
+  await QueueService.cancel(queryId);
   await initSearch();
 }
 
 async function requeueQuery(queryId: string) {
-  const found = getById(queryId);
-  if (found) {
-    const result = await useFetch("/api/queue/query/requeue", {
-      method: "post",
-      body: found,
-    });
-  }
+  await requeueQuery(queryId);
   await initSearch();
-}
-
-function getById(queryId: string): QueueItem | undefined {
-  return queryQueueItems.value.find((item) => item.id === queryId);
 }
 
 async function onPage(event: any) {

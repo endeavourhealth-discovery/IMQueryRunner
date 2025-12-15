@@ -9,7 +9,7 @@ import {
 import { Action, Resource } from "~~/models/AutoGen";
 
 const paramSchema = z.object({
-  queueId: z.string(),
+  queueItemId: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -18,14 +18,39 @@ export default defineEventHandler(async (event) => {
   await globalThis.guard.requirePermission(
     user!,
     Resource.QUERY,
-    Action.EXECUTE
+    Action.DELETE
   );
-  const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
+  const { queueItemId } = await getValidatedRouterParams(
+    event,
+    paramSchema.parse
+  );
   const item = await postgresDb.query.queueItem.findFirst({
-    where: eq(queueItem.id, queueId),
+    where: eq(queueItem.id, queueItemId),
   });
   const parsed = selectQueueItemSchema.parse(item);
-  if (parsed) {
+
+  if (parsed.status === QueueItemStatus.QUEUED) {
+    await postgresDb
+      .update(queueItem)
+      .set({
+        status: QueueItemStatus.CANCELLED,
+        killedAt: new Date().toISOString(),
+      })
+      .where(eq(queueItem.id, parsed.id));
+  } else if (parsed.status === QueueItemStatus.RUNNING) {
+    const activeQuery = postgresDb.execute(`
+        SELECT *
+        FROM pg_stat_activity
+        WHERE state = 'active' LIMIT 1
+    `);
+    const result = postgresDb.execute(`
+    SELECT pg_cancel_backend(${activeQuery})
+    `);
+    if (!result) {
+      postgresDb.execute(`
+      SELECT pg_terminate_backend(${activeQuery})
+      `);
+    }
     await postgresDb
       .update(queueItem)
       .set({
@@ -34,6 +59,6 @@ export default defineEventHandler(async (event) => {
       })
       .where(eq(queueItem.id, parsed.id));
   } else {
-    createError("Query queue item not found for id: " + queueId);
+    createError("Query queue item status is: " + parsed.status);
   }
 });

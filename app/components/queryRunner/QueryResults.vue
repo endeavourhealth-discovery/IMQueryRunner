@@ -67,6 +67,7 @@ import type { QueueItem } from "@@/models";
 import { cloneDeep, isArray } from "lodash-es";
 import { onMounted, ref, watch } from "vue";
 import type { Ref } from "vue";
+import { QueueService } from "~/services";
 
 interface Props {
   queryItem: QueueItem | undefined;
@@ -90,15 +91,14 @@ function closeDialog() {
 
 async function downloadQueryResults() {
   if (props.queryItem?.queryRequest) {
-    const request = cloneDeep(props.queryItem.queryRequest);
-    // request.page = { pageNumber: pageNumber.value, pageSize: size.value }; //TODO: fix paging mechanism
-    const results = await useFetch("/api/query/results", {
-      method: "get",
-      body: request,
-    });
-    if (results.data.value && isArray(results.data.value)) {
-      totalCount.value = results.data.value.length; //TODO: replace with actual count
-      queryResults.value = results.data.value.map((id) => ({ id }));
+    const results = await QueueService.getResults(
+      props.queryItem.id,
+      pageNumber.value,
+      size.value
+    );
+    if (results && isArray(results.results)) {
+      totalCount.value = results.totalCount; //TODO: replace with actual count
+      queryResults.value = results.results;
     }
   }
 }

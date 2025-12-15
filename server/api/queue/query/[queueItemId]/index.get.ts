@@ -8,25 +8,24 @@ import {
 import { Action, Resource } from "~~/models/AutoGen";
 
 const paramSchema = z.object({
-  queueId: z.string(),
+  queueItemId: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
-  await globalThis.authenticator.requireUser(event);
+  globalThis.authenticator.requireUser(event);
   const user = globalThis.authenticator.getUser(event);
   await globalThis.guard.requirePermission(
     user!,
     Resource.QUERY,
     Action.EXECUTE
   );
-  const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
+  const { queueItemId } = await getValidatedRouterParams(
+    event,
+    paramSchema.parse
+  );
   const item = await postgresDb.query.queueItem.findFirst({
-    where: eq(queueItem.id, queueId),
+    where: eq(queueItem.id, queueItemId),
   });
   const parsed = selectQueueItemSchema.parse(item);
-  if (parsed) {
-    await postgresDb.delete(queueItem).where(eq(queueItem.id, parsed.id));
-  } else {
-    createError("Query queue item not found for id: " + queueId);
-  }
+  return parsed;
 });

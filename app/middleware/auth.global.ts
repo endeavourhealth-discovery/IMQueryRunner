@@ -1,6 +1,7 @@
 import { useUser } from "~/composables/useUser";
 import { uiGuard } from "~/utils/security/ui.guard";
 import Logger from "#shared/logger";
+import { AuthService } from "~/services";
 import { Action, Resource } from "~~/models/AutoGen";
 import { useUserSettingsStore } from "@@/stores/usersettings.store";
 
@@ -39,14 +40,11 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
     userStore.clearUserCookie();
 
-    const loginUrl = await useFetch("/api/auth/loginUrl", {
-      method: "get",
-      params: {
-        origin: reqUrl.origin,
-        redirectUrl: to.path,
-      },
-      server: true,
-    });
+    const loginUrl = await AuthService.getLoginUrl(
+      reqUrl.origin,
+      to.path,
+      true
+    );
     LOG.debug(`Navigating to ${loginUrl.data.value}`);
 
     return navigateTo(loginUrl.data.value, { external: true });

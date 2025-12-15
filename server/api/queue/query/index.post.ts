@@ -11,8 +11,6 @@ import {
   Action,
 } from "~~/models/AutoGen";
 import { QueueItemStatus } from "~~/enums";
-import type { QueueItem } from "~~/models/queryItem.schema";
-import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
   await globalThis.authenticator.requireUser(event);
@@ -30,19 +28,24 @@ export default defineEventHandler(async (event) => {
   } catch (e: unknown) {
     throw createError("Unable to convert query to SQL");
   }
-  const queueQuery: QueueItem = {
-    id: v4(),
-    queryIri: queryRequest.query.iri,
-    queryName: queryRequest.query.name,
-    queryRequest: queryRequest,
-    status: QueueItemStatus.QUEUED,
-    userId: user!.id,
-    username: user!.userName,
-    queryResult: [],
-    queuedAt: new Date(),
-  } as QueueItem;
-  await postgresDb
-    .insert(queueItem)
-    .values(insertQueueItemSchema.parse(queueQuery));
-  await sendMessage(user!.id, queueQuery);
+  return await postgresDb
+    .transaction(async (tx) => {
+      const id = await sendMessage(user!.id, queryRequest);
+      const qi = insertQueueItemSchema.parse({
+        id: id,
+        queryIri: queryRequest.query.iri,
+        queryName: queryRequest.query.name,
+        queryRequest: queryRequest,
+        userId: user!.id,
+        userName: user!.userName,
+        queuedAt: new Date(),
+        status: QueueItemStatus.QUEUED,
+      });
+      await tx.insert(queueItem).values(qi);
+
+      return { queueId: id };
+    })
+    .catch((error) => {
+      console.error("Error creating queue item", error);
+    });
 });
