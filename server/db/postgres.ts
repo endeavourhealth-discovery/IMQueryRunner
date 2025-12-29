@@ -3,6 +3,10 @@ import * as schema from "./postgres/schema"
 import {createInsertSchema, createSelectSchema} from "drizzle-zod";
 import {queueItem} from "./postgres/schema";
 
+if (!process.env.POSTGRES_URL) {
+  throw new Error("Missing POSTGRES_URL environment variable");
+}
+
 export const postgresDb = drizzle(process.env.POSTGRES_URL!, { schema });
 export const pgQueueItemInsert = createInsertSchema(queueItem);
 export const pgQueueItemSelect = createSelectSchema(queueItem);
