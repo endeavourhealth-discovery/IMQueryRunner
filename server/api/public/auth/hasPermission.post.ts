@@ -10,5 +10,5 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  return await globalThis.guard.hasPermission(accessToken, body.object, body.action);
+  return await globalThis.security.hasPermission(accessToken, body.object, body.action);
 });

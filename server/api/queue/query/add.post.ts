@@ -7,8 +7,8 @@ import type { QueueItem } from "~~/models/queryItem.schema";
 import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
-  globalThis.authenticator.requireUser(event);
-  const user = await globalThis.authenticator.getUser(event);
+  globalThis.security.requireUser(event);
+  const user = await globalThis.security.getUser(event);
   const queryRequest: QueryRequest = await readBody(event);
 
   if (!queryRequest.language) queryRequest.language = DatabaseOption.MYSQL;

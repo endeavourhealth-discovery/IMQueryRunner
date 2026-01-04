@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     LOG.debug("=================== TOKENS FROM CODE ===================")
     LOG.debug("Code: " + code)
     LOG.debug("Redirect URI: " + redirectUri)
-    await globalThis.authenticator.getTokensFromCode(event, code, redirectUri);
+    await globalThis.security.getTokensFromCode(event, code, redirectUri);
   } catch (ex) {
     LOG.debug("Error exchanging code for token");
     LOG.debug(ex);

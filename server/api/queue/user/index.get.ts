@@ -13,7 +13,7 @@ const querySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const LOG = Logger("api/queue/user");
-  const user = globalThis.authenticator.getUser(event);
+  const user = globalThis.security.getUser(event);
 
   const { page, size, userId, date } = await getValidatedQuery(
     event,

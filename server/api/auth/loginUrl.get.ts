@@ -7,5 +7,5 @@ const paramSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { redirectUri, state } = await getValidatedQuery(event, paramSchema.parse);
-  return globalThis.authenticator.getLoginUrl(redirectUri, state);
+  return globalThis.security.getLoginUrl(redirectUri, state);
 });

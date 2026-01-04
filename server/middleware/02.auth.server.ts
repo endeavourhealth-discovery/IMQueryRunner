@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const method = event.method;
-  const allowed = await globalThis.guard.hasPermission(accessToken, path, method);
+  const allowed = await globalThis.security.hasPermission(accessToken, path, method);
     if (!allowed) {
       throw createError({
         statusCode: 401,
