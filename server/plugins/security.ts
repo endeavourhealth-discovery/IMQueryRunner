@@ -1,7 +1,8 @@
 import type { NitroApp } from "nitropack";
-import Casdoor from "~~/server/utils/security/auth/auth.casdoor";
+import EndeavourSecurity from "~~/server/utils/security/endeavourSecurity";
 
 export default defineNitroPlugin((nitroApp: NitroApp) => {
-  globalThis.authenticator = new Casdoor();
-  globalThis.guard = new GuardCasbin();
+  const security = new EndeavourSecurity(process.env.APPLICATION_NAME as string)
+  globalThis.authenticator = security;
+  globalThis.guard = security;
 });

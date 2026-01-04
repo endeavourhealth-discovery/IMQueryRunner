@@ -22,7 +22,7 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event) => {
   const queryRequest: QueryRequest = await readBody(event);
-  const cachedResults = getCachedQueryResults(queryRequest);
+  const cachedResults = await getCachedQueryResults(queryRequest);
   if (cachedResults) return cachedResults;
   else throw createError("Query results not found. Please run the query.");
 });

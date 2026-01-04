@@ -1,4 +1,3 @@
-import type { Token } from "casdoor-nodejs-sdk/lib/cjs/token";
 import z from "zod";
 
 defineRouteMeta({
@@ -44,5 +43,5 @@ const tokenSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { token } = await readValidatedBody(event, tokenSchema.parse);
-  await globalThis.authenticator.revokeTokens(event, token);
+  await globalThis.authenticator.revokeTokens(token);
 });

@@ -3,15 +3,18 @@ import Logger from "#shared/logger";
 
 const paramSchema = z.object({
   code: z.string(),
+  redirectUri: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
   const LOG = Logger("server/api/auth/authenticate")
-  const { code } = await getValidatedQuery(event, paramSchema.parse);
+  const { code, redirectUri } = await getValidatedQuery(event, paramSchema.parse);
 
   try {
     LOG.debug("=================== TOKENS FROM CODE ===================")
-    await globalThis.authenticator.getTokensFromCode(event, code);
+    LOG.debug("Code: " + code)
+    LOG.debug("Redirect URI: " + redirectUri)
+    await globalThis.authenticator.getTokensFromCode(event, code, redirectUri);
   } catch (ex) {
     LOG.debug("Error exchanging code for token");
     LOG.debug(ex);

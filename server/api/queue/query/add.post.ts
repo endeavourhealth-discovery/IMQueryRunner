@@ -8,7 +8,7 @@ import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
   globalThis.authenticator.requireUser(event);
-  const user = globalThis.authenticator.getUser(event);
+  const user = await globalThis.authenticator.getUser(event);
   const queryRequest: QueryRequest = await readBody(event);
 
   if (!queryRequest.language) queryRequest.language = DatabaseOption.MYSQL;

@@ -7,14 +7,14 @@ export default abstract class Authenticator {
   protected readonly USER_SESSION = "user_session";
   protected readonly REFRESH_TOKEN = "refresh_token";
 
-  abstract getLoginUrl(origin: string, redirectUrl: string): string;
-  abstract getTokensFromCodeInternal(code: string): Promise<{ accessToken: string, refreshToken?: string}>;
-  abstract getUserInternal(accessToken: string): User;
-  abstract revokeTokens(event: H3Event<EventHandlerRequest>, accessToken?: string, refreshToken?: string): Promise<void>;
-  abstract requireUserInternal(event: H3Event<EventHandlerRequest>, accessToken?: string, refreshToken?: string): Promise<void>;
+  abstract getLoginUrl(redirectUri: string, state: string): Promise<string>;
+  abstract getTokensFromCodeInternal(code: string, redirectUri: string): Promise<{ accessToken: string, refreshToken?: string}>;
+  abstract getUserInternal(accessToken: string): Promise<User>;
+  abstract revokeTokens(accessToken?: string, refreshToken?: string): Promise<void>;
+  abstract introspect(accessToken?: string, refreshToken?: string): Promise<void>;
 
-  public async getTokensFromCode(event: H3Event<EventHandlerRequest>,code: string) {
-    const { accessToken, refreshToken } = await this.getTokensFromCodeInternal(code);
+  public async getTokensFromCode(event: H3Event<EventHandlerRequest>, code: string, redirectUri: string) {
+    const { accessToken, refreshToken } = await this.getTokensFromCodeInternal(code, redirectUri);
     this.setCookies(event, accessToken, refreshToken)
   }
 
@@ -29,19 +29,19 @@ export default abstract class Authenticator {
     }
   }
 
-  public getUser(event: H3Event<EventHandlerRequest>) : User | undefined {
+  public async getUser(event: H3Event<EventHandlerRequest>) : Promise<User | undefined> {
     const accessToken = getCookie(event, this.ACCESS_TOKEN);
     if (!accessToken)
       return undefined;
 
-    return this.getUserInternal(accessToken);
+    return await this.getUserInternal(accessToken);
   }
 
   public async logout(event: H3Event<EventHandlerRequest>) {
     const accessToken = getCookie(event, this.ACCESS_TOKEN);
     const refreshToken = getCookie(event, this.REFRESH_TOKEN);
 
-    await this.revokeTokens(event, accessToken, refreshToken);
+    await this.revokeTokens(accessToken, refreshToken);
 
     deleteCookie(event, this.ACCESS_TOKEN);
     deleteCookie(event, this.REFRESH_TOKEN);
@@ -51,6 +51,6 @@ export default abstract class Authenticator {
   public async requireUser(event: H3Event<EventHandlerRequest>) {
     const accessToken = getCookie(event, this.ACCESS_TOKEN);
     const refreshToken = getCookie(event, this.REFRESH_TOKEN);
-    await this.requireUserInternal(event, accessToken, refreshToken);
+    await this.introspect(accessToken, refreshToken);
   }
 }

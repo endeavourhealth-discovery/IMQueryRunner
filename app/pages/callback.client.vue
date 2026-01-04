@@ -5,13 +5,17 @@ import { useUser } from "~/composables/useUser";
 const route = useRoute();
 
 onMounted(async () => {
-  const redirect = route.query.redirect as string;
+  console.log("======================= EXCHANGING CODE ==================================")
+  const state = route.query.state as string;
   const code = route.query.code as string;
+
+  const reqUrl = useRequestURL();
+
   if (code) {
-    await useFetch("/api/auth/authenticate", { query: { code: code } });
+    await useFetch("/api/auth/authenticate", { query: { code: code, redirectUri: reqUrl.origin + "/callback" } });
     const { isLoggedIn } = useUser();
     if (!isLoggedIn.value) throw createError("Failed to fetch login session");
-    await navigateTo(redirect);
+    await navigateTo(state);
   }
 });
 </script>

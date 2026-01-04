@@ -9,6 +9,16 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return;
   }
 
+  if (to.path.startsWith("/callback")) {
+    LOG.debug("Callback route, skipping auth")
+    return;
+  }
+
+  if (to.path.startsWith("/unauthorized")) {
+    LOG.debug("Unauthorized route, skipping auth")
+    return;
+  }
+
   const userStore = useUser();
   LOG.debug(`User is logged in = ${userStore.isLoggedIn.value}`)
 
@@ -31,8 +41,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       const loginUrl = await useFetch("/api/auth/loginUrl", {
         method: "get",
         params: {
-          origin: reqUrl.origin,
-          redirectUrl: to.path
+          redirectUri: reqUrl.origin + "/callback",
+          state: to.path
         }
       });
 

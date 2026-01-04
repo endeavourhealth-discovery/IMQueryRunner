@@ -1,8 +1,6 @@
-import type {User} from "~~/models/User";
-
 export default interface Guard {
-  checkPermissions(
-    subject: User | undefined,
+  hasPermission(
+    accessToken: string,
     object: string,
     action: string
   ): Promise<boolean>;

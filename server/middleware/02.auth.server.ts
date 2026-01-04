@@ -2,9 +2,10 @@ import Logger from "~~/shared/logger";
 
 export default defineEventHandler(async (event) => {
   const LOG = Logger("server/middleware/auth");
-  LOG.info("auth middleware");
   const path = getRequestURL(event).pathname;
+  LOG.info("auth middleware [" + path + "]");
   if (!path.startsWith("/api")) {
+    LOG.debug("Not an API route. Skipping");
     return;
   }
 
@@ -17,21 +18,25 @@ export default defineEventHandler(async (event) => {
     "/api/public/auth/hasPermission",
   ];
 
-  if (publicRoutes.includes(path)) {
+  if (publicRoutes.includes(path) || path.startsWith(process.env.AUTH_URL as string)) {
     return;
   }
 
-  await globalThis.authenticator.requireUser(event);
   // Authorization
-  const user = globalThis.authenticator.getUser(event);
+  const accessToken = getCookie(event, "access_token");
+  if (!accessToken) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Unauthorized",
+    })
+  }
+
   const method = event.method;
-  if (user) {
-    const allowed = await globalThis.guard.checkPermissions(user, path, method);
+  const allowed = await globalThis.guard.hasPermission(accessToken, path, method);
     if (!allowed) {
       throw createError({
         statusCode: 401,
         statusMessage: "Unauthorized",
       });
     }
-  }
 });

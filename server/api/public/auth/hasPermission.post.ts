@@ -2,7 +2,13 @@
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
-  const user = globalThis.authenticator.getUser(event);
+  const accessToken = getCookie(event, "access_token");
+  if (!accessToken) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: "Access token not found in cookies"
+    });
+  }
 
-  return await globalThis.guard.checkPermissions(user, body.object, body.action);
+  return await globalThis.guard.hasPermission(accessToken, body.object, body.action);
 });
