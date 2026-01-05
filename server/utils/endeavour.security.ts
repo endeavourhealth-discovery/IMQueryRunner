@@ -12,18 +12,16 @@ export class EndeavourSecurity {
     this.application = application;
   }
   async getLoginUrl(redirectUri: string, state: string): Promise<string> {
-    return await $fetch(`${process.env.AUTH_URL}/api/authn/getLoginUrl`, {
+    return await $fetch(`${process.env.AUTH_URL}/api/${this.application}/authn/getLoginUrl`, {
       query: {
-        application: this.application,
         redirectUri: redirectUri,
         state: state
       }
     }) as any
   }
   async getTokensFromCodeInternal(code: string, redirectUri: string): Promise<{ accessToken: string; refreshToken?: string }> {
-    return await $fetch(`${process.env.AUTH_URL}/api/authn/getTokensFromCode`, {
+    return await $fetch(`${process.env.AUTH_URL}/api/${this.application}/authn/getTokensFromCode`, {
       query: {
-        application: this.application,
         code: code,
         redirectUri: redirectUri
       }
@@ -31,20 +29,16 @@ export class EndeavourSecurity {
   }
 
   async getUserInternal(accessToken: string): Promise<User> {
-    return await $fetch(`${process.env.AUTH_URL}/api/authn/getUser`,{
+    return await $fetch(`${process.env.AUTH_URL}/api/${this.application}/authn/getUser`,{
       headers: {
         "Authorization": `Bearer ${accessToken}`
       },
-      query: {
-        application: this.application
-      }
     }) as any
   }
 
   async revokeTokens(accessToken?: string, refreshToken?: string): Promise<void> {
-    return await $fetch(`${process.env.AUTH_URL}/api/authn/revokeTokens`, {
+    return await $fetch(`${process.env.AUTH_URL}/api/${this.application}/authn/revokeTokens`, {
       query: {
-        application: this.application,
         accessToken: accessToken,
         refreshToken: refreshToken
       }
@@ -52,9 +46,8 @@ export class EndeavourSecurity {
   }
 
   async introspect(accessToken?: string, refreshToken?: string): Promise<void> {
-    return await $fetch(`${process.env.AUTH_URL}/api/authn/introspect`, {
+    return await $fetch(`${process.env.AUTH_URL}/api/${this.application}/authn/introspect`, {
       query: {
-        application: this.application,
         accessToken: accessToken,
         refreshToken: refreshToken
       }
@@ -102,12 +95,11 @@ export class EndeavourSecurity {
   }
 
   async hasPermission(accessToken: string, object: string, action: string): Promise<boolean> {
-    return await $fetch(`${process.env.AUTH_URL}/api/authz/hasPermission`, {
+    return await $fetch(`${process.env.AUTH_URL}/api/${this.application}/authz/hasPermission`, {
       headers: {
         "Authorization": `Bearer ${accessToken}`
       },
       query: {
-        application: this.application,
         object: object,
         action: action
       }
