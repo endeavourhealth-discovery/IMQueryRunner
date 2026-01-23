@@ -1,8 +1,8 @@
 import z from "zod";
 import { QueueItemStatus } from "~~/enums/QueueItemStatus";
-import {pgQueueItemSelect, postgresDb} from "~~/server/db/postgres";
-import {queueItem} from "~~/server/db/postgres/schema";
-import {desc, eq} from "drizzle-orm";
+import { pgQueueItemSelect, postgresDb } from "~~/server/db/postgres";
+import { queryQueue } from "~~/server/db/postgres/schema";
+import { desc, eq } from "drizzle-orm";
 
 const querySchema = z.object({
   status: z.enum(QueueItemStatus),
@@ -13,14 +13,16 @@ const querySchema = z.object({
 export default defineEventHandler(async (event) => {
   const { status, page, size } = await getValidatedQuery(
     event,
-    querySchema.parse
+    querySchema.parse,
   );
-  const totalCount = await postgresDb
-    .$count(queueItem, eq(queueItem.status, status));
+  const totalCount = await postgresDb.$count(
+    queryQueue,
+    eq(queryQueue.status, status),
+  );
 
-  const rs = await postgresDb.query.queueItem.findMany({
-    where: eq(queueItem.status, status),
-    orderBy: [desc(queueItem.queuedAt)],
+  const rs = await postgresDb.query.queryQueue.findMany({
+    where: eq(queryQueue.status, status),
+    orderBy: [desc(queryQueue.queuedAt)],
     offset: (+page - 1) * +size,
     limit: size,
   });

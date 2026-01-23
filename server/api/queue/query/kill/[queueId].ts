@@ -1,8 +1,8 @@
 import { QueueItemStatus } from "~~/enums";
 import { z } from "zod";
-import {postgresDb} from "~~/server/db/postgres";
-import {queueItem} from "~~/server/db/postgres/schema";
-import {eq} from "drizzle-orm";
+import { postgresDb } from "~~/server/db/postgres";
+import { queryQueue } from "~~/server/db/postgres/schema";
+import { eq } from "drizzle-orm";
 
 const paramSchema = z.object({
   queueId: z.string(),
@@ -10,8 +10,8 @@ const paramSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
-  const item = await postgresDb.query.queueItem.findFirst({
-    where: eq(queueItem.id, queueId ),
+  const item = await postgresDb.query.queryQueue.findFirst({
+    where: eq(queryQueue.id, queueId),
   });
   if (item) {
     const activeQuery = postgresDb.execute(`
@@ -28,9 +28,12 @@ export default defineEventHandler(async (event) => {
       `);
     }
     await postgresDb
-      .update(queueItem)
-      .set({status: QueueItemStatus.CANCELLED, killedAt: new Date().toISOString()})
-      .where(eq(queueItem.id, item.id));
+      .update(queryQueue)
+      .set({
+        status: QueueItemStatus.CANCELLED,
+        killedAt: new Date().toISOString(),
+      })
+      .where(eq(queryQueue.id, item.id));
   } else {
     createError("Query queue item not found for id: " + queueId);
   }

@@ -3,7 +3,7 @@ import { $fetch } from "ofetch";
 
 export class IMAPI {
   public async getQuerySql(queryRequest: QueryRequest): Promise<string> {
-    return await $fetch(process.env.IMAPI_URL! + "query/public/sql", {
+    return await $fetch(process.env.IMAPI_URL! + "query/private/sql", {
       body: queryRequest,
       method: "post",
     });
@@ -20,7 +20,7 @@ export class IMAPI {
   }
 
   public async describeQuery(queryIri: string, displayMode: DisplayMode) {
-    return await $fetch(process.env.IMAPI_URL! + "query/public/queryDisplay", {
+    return await $fetch(process.env.IMAPI_URL! + "query/private/queryDisplay", {
       params: {
         queryIri: queryIri,
         displayMode: displayMode,

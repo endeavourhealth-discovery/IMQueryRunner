@@ -4,10 +4,10 @@ import { QueueItemStatus } from "~~/enums";
 export const queueItemSchema = z.object({
   id: z.uuid(),
   queryIri: z.url(),
-  queryName: z.string(),
+  queryName: z.string().optional(),
   queryRequest: z.any(),
   userId: z.uuid(),
-  username: z.string(),
+  userName: z.string(),
   queuedAt: z.date().optional(),
   startedAt: z.date().optional(),
   pid: z.number().optional(),

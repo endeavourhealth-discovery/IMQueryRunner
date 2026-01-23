@@ -1,7 +1,7 @@
 import { z } from "zod";
-import {postgresDb} from "~~/server/db/postgres";
-import {eq} from "drizzle-orm";
-import {queueItem} from "~~/server/db/postgres/schema";
+import { postgresDb } from "~~/server/db/postgres";
+import { eq } from "drizzle-orm";
+import { queryQueue } from "~~/server/db/postgres/schema";
 
 const paramSchema = z.object({
   queueId: z.string(),
@@ -9,13 +9,11 @@ const paramSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
-  const item = await postgresDb.query.queueItem.findFirst({
-    where: eq(queueItem.id, queueId ),
+  const item = await postgresDb.query.queryQueue.findFirst({
+    where: eq(queryQueue.id, queueId),
   });
   if (item) {
-    await postgresDb
-      .delete(queueItem)
-      .where(eq(queueItem.id, item.id))
+    await postgresDb.delete(queryQueue).where(eq(queryQueue.id, item.id));
   } else {
     createError("Query queue item not found for id: " + queueId);
   }
