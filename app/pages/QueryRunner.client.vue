@@ -29,7 +29,7 @@
           <Column field="queryIri" header="Iri"></Column>
           <Column field="queryName" header="Query name"></Column>
           <Column>
-            <template #body="{ data }: { data: QueueItem }">
+            <template #body="{ data }: { data: Job }">
               <Button
                 label="View arguments"
                 @click="viewArgumentDisplay(data.queryRequest.argument)"
@@ -38,35 +38,28 @@
           </Column>
           <Column field="userName" header="User"></Column>
           <Column field="queuedAt" header="Queued at">
-            <template #body="{ data }: { data: QueueItem }">
+            <template #body="{ data }: { data: Job }">
               <span>{{
                 data.queuedAt ? getDisplayDateTime(data.queuedAt) : "-"
               }}</span>
             </template>
           </Column>
           <Column field="startedAt" header="Started at">
-            <template #body="{ data }: { data: QueueItem }">
+            <template #body="{ data }: { data: Job }">
               <span>{{
                 data.startedAt ? getDisplayDateTime(data.startedAt) : "-"
               }}</span>
             </template>
           </Column>
-          <Column field="finishedAt" header="Finished at">
-            <template #body="{ data }: { data: QueueItem }">
+          <Column field="stoppedAt" header="Stopped at">
+            <template #body="{ data }: { data: Job }">
               <span>{{
-                data.finishedAt ? getDisplayDateTime(data.finishedAt) : "-"
-              }}</span>
-            </template>
-          </Column>
-          <Column field="killedAt" header="Killed at">
-            <template #body="{ data }: { data: QueueItem }">
-              <span>{{
-                data.killedAt ? getDisplayDateTime(data.killedAt) : "-"
+                data.stoppedAt ? getDisplayDateTime(data.stoppedAt) : "-"
               }}</span>
             </template>
           </Column>
           <Column field="status" header="Status">
-            <template #body="{ data }: { data: QueueItem }">
+            <template #body="{ data }: { data: Job }">
               <Tag
                 :severity="data.status ? getStatusSeverity(data.status) : '-'"
                 :value="data.status"
@@ -101,8 +94,8 @@
 </template>
 
 <script setup lang="ts">
-import type { QueueItem } from "~~/models";
-import { QueueItemStatus } from "~~/enums";
+import type { Job } from "~~/models";
+import { JobStatus } from "~~/enums";
 import { computed, onMounted, ref } from "vue";
 import type { Ref } from "vue";
 import type { Argument, QueryRequest } from "~~/models/AutoGen";
@@ -120,14 +113,14 @@ const socket = io({
   },
 });
 
-const queryQueueItems: Ref<QueueItem[]> = ref([]);
+const queryQueueItems: Ref<Job[]> = ref([]);
 const loading = ref(true);
 const searchLoading = ref(false);
 const totalCount = ref(0);
 const page = ref(1);
 const rows = ref(25);
 const rowsOriginal = ref(25);
-const selectedQuery: Ref<QueueItem | undefined> = ref();
+const selectedQuery: Ref<Job | undefined> = ref();
 const showQueryResults = ref(false);
 const websocketIsConnected = ref(false);
 const transport = ref("N/A");
@@ -148,7 +141,7 @@ async function initSearch() {
   searchLoading.value = true;
   const results = await useFetch<{
     totalCount: number;
-    result: QueueItem[];
+    result: Job[];
   }>("/api/queue/user/", {
     query: {
       userId: user.value?.id,
@@ -172,7 +165,7 @@ async function initSearch() {
 
 async function refresh() {
   searchLoading.value = true;
-  const results = await $fetch<{ totalCount: number; result: QueueItem[] }>(
+  const results = await $fetch<{ totalCount: number; result: Job[] }>(
     "/api/queue/user/",
     {
       query: {
@@ -180,7 +173,7 @@ async function refresh() {
         page: page.value,
         size: rows.value,
       },
-    }
+    },
   );
   if (results) {
     totalCount.value = results.totalCount;
@@ -197,18 +190,18 @@ async function refresh() {
 }
 
 function getStatusSeverity(
-  status: QueueItemStatus
+  status: JobStatus,
 ): "secondary" | "success" | "info" | "warn" | "danger" | "contrast" {
   switch (status) {
-    case QueueItemStatus.QUEUED:
+    case JobStatus.QUEUED:
       return "warn";
-    case QueueItemStatus.RUNNING:
+    case JobStatus.RUNNING:
       return "info";
-    case QueueItemStatus.COMPLETED:
+    case JobStatus.COMPLETED:
       return "success";
-    case QueueItemStatus.ERRORED:
+    case JobStatus.ERRORED:
       return "danger";
-    case QueueItemStatus.CANCELLED:
+    case JobStatus.CANCELLED:
       return "contrast";
     default:
       return "info";
@@ -238,14 +231,14 @@ async function goToQuery(queryIri: string) {
       const config = useRuntimeConfig();
       await navigateTo(
         `${config.public.imDirectoryUrl!}"directory/folder/"${encodeURI(
-          queryIri
-        )}`
+          queryIri,
+        )}`,
       );
     },
   });
 }
 
-async function viewQueryResults(queryItem: QueueItem) {
+async function viewQueryResults(queryItem: Job) {
   selectedQuery.value = queryItem;
   showQueryResults.value = true;
 }
@@ -272,7 +265,7 @@ async function requeueQuery(queryId: string) {
   await initSearch();
 }
 
-function getById(queryId: string): QueueItem | undefined {
+function getById(queryId: string): Job | undefined {
   return queryQueueItems.value.find((item) => item.id === queryId);
 }
 
@@ -285,7 +278,7 @@ async function onPage(event: any) {
 
 function scrollToTop() {
   const scrollArea = document.getElementsByClassName(
-    "p-datatable-scrollable-table"
+    "p-datatable-scrollable-table",
   )[0] as HTMLElement;
   scrollArea?.scrollIntoView({ block: "start", behavior: "smooth" });
 }

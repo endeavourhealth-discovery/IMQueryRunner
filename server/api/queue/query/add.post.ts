@@ -1,9 +1,9 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
 import { pgQueueItemInsert, postgresDb } from "~~/server/db/postgres";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { queryQueue } from "~~/server/db/postgres/schema";
 import { type QueryRequest, DatabaseOption } from "~~/models/AutoGen";
-import { QueueItemStatus } from "~~/enums";
-import type { QueueItem } from "~~/models/queryItem.schema";
+import { JobStatus } from "~~/enums";
+import type { Job } from "~~/models/job.schema";
 import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
@@ -17,19 +17,19 @@ export default defineEventHandler(async (event) => {
   } catch (e: unknown) {
     throw createError("Unable to convert query to SQL");
   }
-  const queueQuery: QueueItem = {
+  const queryTask: Job = {
     id: v4(),
+    jobName: queryRequest.query.name || "Unnamed Query",
     queryIri: queryRequest.query.iri,
-    queryName: queryRequest.query.name,
     queryRequest: queryRequest,
-    status: QueueItemStatus.QUEUED,
+    status: JobStatus.QUEUED,
     userId: user!.id,
-    username: user!.userName,
+    userName: user!.userName,
     queryResult: [],
-    queuedAt: new Date(),
-  } as QueueItem;
+    queuedAt: new Date().toDateString() as any,
+  } as Job;
   await postgresDb
-    .insert(queueItem)
-    .values(pgQueueItemInsert.parse(queueQuery));
-  await sendMessage(user!.id, queueQuery);
+    .insert(queryQueue)
+    .values(pgQueueItemInsert.parse(queryTask));
+  await sendMessage(user!.id, queryTask);
 });

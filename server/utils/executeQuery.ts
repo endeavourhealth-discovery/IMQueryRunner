@@ -8,8 +8,8 @@ import {
 } from "~~/models/AutoGen";
 import { mysqlDb } from "../db/mysql";
 import { postgresDb } from "../db/postgres";
-import { queueItem } from "~~/server/db/postgres/schema";
-import { QueueItemStatus } from "~~/enums";
+import { queryQueue } from "~~/server/db/postgres/schema";
+import { JobStatus } from "~~/enums";
 import { eq } from "drizzle-orm";
 import { imapi } from "~~/server/utils/imapi";
 import { cloneDeep } from "lodash-es";
@@ -26,26 +26,26 @@ type PatientRow = {
 export async function executeQuery(
   sql: string,
   queryRequest: QueryRequest,
-  id: string
+  id: string,
 ) {
   const cachedResults = await getCachedQueryResults(queryRequest);
   if (cachedResults) return cachedResults;
   const queryIrisToHashCodes = await runSubQueries(queryRequest);
   const resolvedSql = await getResolvedSql(queryRequest, queryIrisToHashCodes);
   const [result] = (await mysqlDb.execute<PatientRow>(
-    resolvedSql
+    resolvedSql,
   )) as unknown as QueryResult<PatientRow>;
   storeQueryResultsAndCache(
     queryRequest,
-    result.map((r) => r.id)
+    result.map((r) => r.id),
   );
   await postgresDb
-    .update(queueItem)
+    .update(queryQueue)
     .set({
-      status: QueueItemStatus.COMPLETED,
-      finishedAt: new Date().toISOString(),
+      status: JobStatus.COMPLETED,
+      stoppedAt: new Date().toISOString(),
     })
-    .where(eq(queueItem.id, id));
+    .where(eq(queryQueue.id, id));
   return result.map((r) => r.id);
 }
 
@@ -99,7 +99,7 @@ function hashArgument(argument: Argument): string {
 }
 
 export async function getCachedQueryResults(
-  queryRequest: QueryRequest
+  queryRequest: QueryRequest,
 ): Promise<string[] | undefined> {
   const queryHash = hashQueryRequest(queryRequest);
   const cachedResult = queryResultsMap.get(queryHash);
@@ -121,7 +121,7 @@ FROM imqcache.${queryHash}
     };`;
   else cacheSql += ";";
   const [result] = (await mysqlDb.execute<PatientRow>(
-    cacheSql
+    cacheSql,
   )) as unknown as QueryResult<PatientRow>;
   return result.map((r) => r.id);
 }
@@ -142,13 +142,13 @@ async function runSubQueries(queryRequest: QueryRequest) {
   const subQueries = await getSubqueryIris(queryRequest.query);
   const queryIrisToHashCodes = await getQueryIrisToHashCodes(
     subQueries,
-    queryRequest.argument ? queryRequest.argument : []
+    queryRequest.argument ? queryRequest.argument : [],
   );
   if (subQueries?.length) {
     for (const subQueryIri of subQueries) {
       const subQuery = await imapi.describeQuery(
         subQueryIri,
-        DisplayMode.LOGICAL
+        DisplayMode.LOGICAL,
       );
       const subQueryRequest = {
         query: subQuery,
@@ -158,15 +158,15 @@ async function runSubQueries(queryRequest: QueryRequest) {
       if (!queryResultsMap.has(hashCode) && !(await tableExists(hashCode))) {
         const resolvedSql = await getResolvedSql(
           subQueryRequest,
-          queryIrisToHashCodes
+          queryIrisToHashCodes,
         );
         // awaiting drizzle pr #1523 for typings to work correctly. This is a fix as described in drizzle issue #661
         const [result] = (await mysqlDb.execute<PatientRow>(
-          resolvedSql
+          resolvedSql,
         )) as unknown as QueryResult<PatientRow>;
         await storeQueryResultsAndCache(
           subQueryRequest,
-          result.map((r) => r.id)
+          result.map((r) => r.id),
         );
       }
     }
@@ -176,7 +176,7 @@ async function runSubQueries(queryRequest: QueryRequest) {
 
 async function getResolvedSql(
   queryRequest: QueryRequest,
-  queryIrisToHashCodes: Map<string, string>
+  queryIrisToHashCodes: Map<string, string>,
 ) {
   let sql = await imapi.getQuerySql(queryRequest);
   if (queryRequest.argument) {
@@ -188,7 +188,7 @@ async function getResolvedSql(
       else if (arg.valueIriList && arg.parameter) {
         sql = sql.replace(
           arg.parameter,
-          getIriLine(arg.valueIriList.map((v) => v.iri))
+          getIriLine(arg.valueIriList.map((v) => v.iri)),
         );
       }
     }
@@ -197,7 +197,7 @@ async function getResolvedSql(
     for (const iri of queryIrisToHashCodes.keys()) {
       sql = sql.replace(
         "q_" + iri,
-        JSON.stringify(queryIrisToHashCodes.get(iri))
+        JSON.stringify(queryIrisToHashCodes.get(iri)),
       );
     }
   }
@@ -213,13 +213,13 @@ function getIriLine(stringIris: string[]): string {
 
 async function getQueryIrisToHashCodes(
   subQueries: string[],
-  argument: Argument[]
+  argument: Argument[],
 ) {
   const queryIrisToHashCodes = new Map<string, string>();
   for (const subQueryIri of subQueries) {
     const subQuery = await imapi.describeQuery(
       subQueryIri,
-      DisplayMode.LOGICAL
+      DisplayMode.LOGICAL,
     );
     const subQueryRequest = {
       query: subQuery,
@@ -233,21 +233,21 @@ async function getQueryIrisToHashCodes(
 
 async function storeQueryResultsAndCache(
   queryRequest: QueryRequest,
-  results: string[]
+  results: string[],
 ) {
   const queryHash = hashQueryRequest(queryRequest);
   queryResultsMap.set(queryHash, new Set(results));
   await createTable(queryHash);
   if (results.length) {
     await mysqlDb.execute(
-      `INSERT INTO ${queryHash} (id) VALUES (${results.join("), \n(") + ")"}`
+      `INSERT INTO ${queryHash} (id) VALUES (${results.join("), \n(") + ")"}`,
     );
   }
 }
 
 async function createTable(hashCode: string) {
   await mysqlDb.execute(
-    `CREATE TABLE IF NOT EXISTS ${hashCode} (id BIGINT NOT NULL,PRIMARY KEY(id))`
+    `CREATE TABLE IF NOT EXISTS ${hashCode} (id BIGINT NOT NULL,PRIMARY KEY(id))`,
   );
 }
 
@@ -271,7 +271,7 @@ function deduplicateKeepLast(subQueryIris: string[]): string[] {
 
 async function populateSubqueryIrisConclusively(
   query: Query,
-  subQueryIris: string[]
+  subQueryIris: string[],
 ): Promise<void> {
   if (query.isCohort) subQueryIris.push(query.isCohort.iri);
   if (query.and) {
@@ -293,7 +293,7 @@ async function populateSubqueryIrisConclusively(
 
 async function processMatch(
   match: Match,
-  subQueryIris: string[]
+  subQueryIris: string[],
 ): Promise<void> {
   if (match.isCohort) {
     const iri = match.isCohort.iri;

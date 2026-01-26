@@ -1,12 +1,12 @@
 import { Connection } from "rabbitmq-client";
-import { QueueItemStatus } from "~~/enums";
+import { JobStatus } from "~~/enums";
 import hash from "object-hash";
 import { v4 as uuidv4 } from "uuid";
 import { imapi } from "~~/server/utils/imapi";
 import { postgresDb } from "~~/server/db/postgres";
 import { eq } from "drizzle-orm";
 import { mysqlDb } from "~~/server/db/mysql";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { queryQueue } from "~~/server/db/postgres/schema";
 import type { QueryRequest } from "~~/models/AutoGen";
 import { executeQuery } from "../utils/executeQuery";
 
@@ -30,10 +30,10 @@ const sub = rabbit.createConsumer(
   },
   async (msg) => {
     const id = msg.messageId!;
-    const entry = await postgresDb.query.queueItem.findFirst({
-      where: eq(queueItem.id, id),
+    const entry = await postgresDb.query.queryQueue.findFirst({
+      where: eq(queryQueue.id, id),
     });
-    if (entry && QueueItemStatus.CANCELLED === entry.status) {
+    if (entry && JobStatus.CANCELLED === entry.status) {
       throw new Error("Item is cancelled. Query rejected.");
     }
     if (!entry) {
@@ -41,12 +41,12 @@ const sub = rabbit.createConsumer(
     }
 
     await postgresDb
-      .update(queueItem)
+      .update(queryQueue)
       .set({
-        status: QueueItemStatus.RUNNING,
+        status: JobStatus.RUNNING,
         startedAt: new Date().toISOString(),
       })
-      .where(eq(queueItem.id, id));
+      .where(eq(queryQueue.id, id));
 
     const queryRequest: QueryRequest = JSON.parse(msg.body);
 
@@ -55,20 +55,20 @@ const sub = rabbit.createConsumer(
       .catch(async (err) => {
         console.error(err);
         await postgresDb
-          .update(queueItem)
+          .update(queryQueue)
           .set({
-            status: QueueItemStatus.ERRORED,
+            status: JobStatus.ERRORED,
             error: JSON.stringify(err),
-            killedAt: new Date().toISOString(),
+            stoppedAt: new Date().toISOString(),
           })
-          .where(eq(queueItem.id, id));
+          .where(eq(queryQueue.id, id));
         return undefined;
       });
 
     if (sql) {
       await executeQuery(sql, queryRequest, id);
     }
-  }
+  },
 );
 
 sub.on("error", (err) => {});
@@ -91,7 +91,7 @@ export async function sendMessage(userId: string, message: any) {
       routingKey: "query.execute." + userId,
       durable: true,
     },
-    message
+    message,
   );
 
   return id;
