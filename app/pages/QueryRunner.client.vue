@@ -96,20 +96,26 @@
 <script setup lang="ts">
 import type { Job } from "~~/models";
 import { JobStatus } from "~~/enums";
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
-import type { Argument, QueryRequest } from "~~/models/AutoGen";
+import type { Argument } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
-import { useUser } from "~/composables/useUser";
+import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
+import { useUserStore } from "~/plugins/end-sec-ui";
 
-const { user } = useUser();
+definePageMeta({
+  requiresAuth: true,
+  requiresRole: ["EXECUTOR", "ADMIN"],
+})
+
+const { user } = useUserStore();
 const confirm = useConfirm();
 
 const socket = io({
   extraHeaders: {
-    authorization: `bearer ${user.value?.id}`,
+    authorization: `bearer ${user?.id}`,
   },
 });
 
@@ -130,7 +136,7 @@ const currentArguments: Ref<Argument[]> = ref([]);
 onMounted(async () => {
   loading.value = true;
   loading.value = false;
-  socket.emit("joinRoom", "test-room", user.value?.userName);
+  socket.emit("joinRoom", "test-room", user?.userName);
   socket.on("message", function (data) {
     alert(data);
   });
@@ -144,7 +150,7 @@ async function initSearch() {
     result: Job[];
   }>("/api/queue/user/", {
     query: {
-      userId: user.value?.id,
+      userId: user?.id,
       page: page.value,
       size: rows.value,
     },
@@ -169,7 +175,7 @@ async function refresh() {
     "/api/queue/user/",
     {
       query: {
-        userId: user.value?.id,
+        userId: user?.id,
         page: page.value,
         size: rows.value,
       },

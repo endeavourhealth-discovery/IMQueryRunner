@@ -3,35 +3,14 @@ import Logger from "~~/shared/logger";
 export default defineEventHandler(async (event) => {
   const LOG = Logger("server/middleware/auth");
   LOG.info("auth middleware");
+
+  // Ignore ui routes, public api's and auth api's
   const path = getRequestURL(event).pathname;
-  if (!path.startsWith("/api")) {
+  if (!path.startsWith("/api")
+    || path.startsWith("/api/public")
+    || path.startsWith("/api/auth")) {
     return;
   }
 
-  // Authentication
-  const publicRoutes = [
-    "/api/auth/loginUrl",
-    "/api/auth/authenticate",
-    "/api/auth/logout",
-    "/api/oauth/token",
-    "/api/public/auth/hasPermission",
-  ];
-
-  if (publicRoutes.includes(path)) {
-    return;
-  }
-
-  await globalThis.authenticator.requireUser(event);
-  // Authorization
-  const user = globalThis.authenticator.getUser(event);
-  const method = event.method;
-  if (user) {
-    const allowed = await globalThis.guard.checkPermissions(user, path, method);
-    if (!allowed) {
-      throw createError({
-        statusCode: 401,
-        statusMessage: "Unauthorized",
-      });
-    }
-  }
+  await globalThis.apiGuard.checkPermissions(event);
 });

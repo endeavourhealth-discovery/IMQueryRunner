@@ -56,7 +56,7 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event) => {
-  const currentUser = globalThis.authenticator.getUser(event);
+  const currentUser = await globalThis.apiGuard.getUser();
 
   const userId = currentUser!.id;
   const userName = currentUser!.userName;

@@ -1,3 +1,4 @@
+
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
 import { pgJobInsert, postgresDb } from "~~/server/db/postgres";
 import { jobTable } from "~~/server/db/postgres/schema";
@@ -7,8 +8,7 @@ import type { Job } from "~~/models/job.schema";
 import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
-  globalThis.authenticator.requireUser(event);
-  const user = globalThis.authenticator.getUser(event);
+  const user = await globalThis.apiGuard.getUser();
   const queryRequest: QueryRequest = await readBody(event);
 
   if (!queryRequest.language) queryRequest.language = DatabaseOption.MYSQL;

@@ -23,6 +23,7 @@
       id="header-end"
       class="h-full flex-grow-0 flex-shrink-1 flex-auto flex flex-row items-center justify-self-end justify-end gap-[0.25rem]"
     >
+      {{user?.userName}}
       <Button
         v-tooltip.left="'Account'"
         v-if="!isLoggedIn"
@@ -44,16 +45,16 @@
         data-testid="account-menu-logged-in"
       >
         <img
-          class="avatar-icon"
+          class="avatar-i con"
           alt="avatar icon"
-          :src="user.avatar"
+          :src="user?.avatar"
           style="min-width: 1.75rem"
         />
       </Button>
       <TieredMenu
         ref="userMenu"
         id="account-menu"
-        :model="accountItems"
+        :model="getItems()"
         :popup="true"
       >
         <template #item="{ item, props }">
@@ -69,15 +70,15 @@
 
 <script setup lang="ts">
 import type { MenuItem } from "primevue/menuitem";
-import { useUser } from "~/composables/useUser";
+import { useUserStore } from "~/plugins/end-sec-ui";
+import {useRouter} from "#app";
 
-const { user, isLoggedIn } = useUser();
-const router = useRouter();
-const confirm = useConfirm();
-const toast = useToast();
+const userStore = useUserStore();
 
 const loginItems: Ref<MenuItem[]> = ref([]);
 const accountItems: Ref<MenuItem[]> = ref([]);
+const user = computed(() => userStore.user)
+const isLoggedIn = computed(() => userStore.isLoggedIn)
 const userMenu = ref();
 
 onMounted(() => {
@@ -85,7 +86,7 @@ onMounted(() => {
 });
 
 async function toLandingPage() {
-  return await navigateTo("/");
+  return navigateTo("/");
 }
 
 function getItems(): MenuItem[] {
@@ -102,43 +103,22 @@ function setUserMenuItems(): void {
     {
       label: "Login",
       icon: "fa-solid fa-fw fa-user",
-      command: async () => await confirmLogin(),
+      command: async () => {
+        await navigateTo( await globalThis.uiGuard.getLoginUrl(), { external: true } )
+      }
     },
   ];
   accountItems.value = [
     {
       label: "Logout",
       icon: "fa-solid fa-fw fa-arrow-right-from-bracket",
-      command: async () => await confirmLogout(),
+      command: async () => {
+        await globalThis.uiGuard.logout()
+      }
     },
   ];
 }
 
-async function confirmLogin() {
-  const route = useRoute();
-  await navigateTo(route.fullPath);
-}
-
-async function confirmLogout() {
-  toast.add({ severity: "success", summary: "Success" });
-  confirm.require({
-    message: "Are you sure you want to logout?",
-    header: "Logout",
-    acceptProps: {
-      label: "Logout",
-    },
-    rejectProps: {
-      label: "Cancel",
-      severity: "secondary",
-      outlined: true,
-    },
-    accept: async () => {
-      const reqUrl = useRequestURL();
-      await $fetch("/api/auth/logout");
-      location.reload();
-    },
-  });
-}
 </script>
 
 <style scoped></style>
