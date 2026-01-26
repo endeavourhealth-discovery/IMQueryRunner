@@ -1,11 +1,11 @@
 import z from "zod";
-import { QueueItemStatus } from "~~/enums";
+import { JobStatus } from "~~/enums";
 import { pgQueueItemSelect, postgresDb } from "~~/server/db/postgres";
 import { and, desc, eq } from "drizzle-orm";
 import { queryQueue } from "~~/server/db/postgres/schema";
 
 const querySchema = z.object({
-  status: z.enum(QueueItemStatus),
+  status: z.enum(JobStatus),
   page: z.coerce.number().default(1),
   size: z.coerce.number().default(25),
   userId: z.string(),

@@ -1,4 +1,4 @@
-import { QueueItemStatus } from "~~/enums";
+import { JobStatus } from "~~/enums";
 import { z } from "zod";
 import { postgresDb } from "~~/server/db/postgres";
 import { queryQueue } from "~~/server/db/postgres/schema";
@@ -30,8 +30,8 @@ export default defineEventHandler(async (event) => {
     await postgresDb
       .update(queryQueue)
       .set({
-        status: QueueItemStatus.CANCELLED,
-        killedAt: new Date().toISOString(),
+        status: JobStatus.CANCELLED,
+        stoppedAt: new Date().toISOString(),
       })
       .where(eq(queryQueue.id, item.id));
   } else {

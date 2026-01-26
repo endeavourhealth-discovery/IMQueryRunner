@@ -10,9 +10,7 @@
     <Button
       v-if="
         queryQueueItem.status &&
-        [QueueItemStatus.QUEUED, QueueItemStatus.RUNNING].includes(
-          queryQueueItem.status
-        )
+        [JobStatus.QUEUED, JobStatus.RUNNING].includes(queryQueueItem.status)
       "
       icon="fa-duotone fa-solid fa-ban"
       severity="danger"
@@ -24,11 +22,9 @@
     <Button
       v-if="
         queryQueueItem.status &&
-        [
-          QueueItemStatus.COMPLETED,
-          QueueItemStatus.CANCELLED,
-          QueueItemStatus.ERRORED,
-        ].includes(queryQueueItem.status)
+        [JobStatus.COMPLETED, JobStatus.CANCELLED, JobStatus.ERRORED].includes(
+          queryQueueItem.status,
+        )
       "
       icon="fa-duotone fa-solid fa-repeat"
       severity="warn"
@@ -40,7 +36,7 @@
     <Button
       v-if="
         queryQueueItem.status &&
-        [QueueItemStatus.ERRORED].includes(queryQueueItem.status)
+        [JobStatus.ERRORED].includes(queryQueueItem.status)
       "
       icon="fa-duotone fa-solid fa-triangle-exclamation"
       class="p-button-rounded p-button-text activity-row-button"
@@ -49,7 +45,7 @@
       data-testid="show-error-button"
     />
     <Button
-      v-if="queryQueueItem.status === QueueItemStatus.COMPLETED"
+      v-if="queryQueueItem.status === JobStatus.COMPLETED"
       icon="fa-duotone fa-solid fa-list"
       class="p-button-rounded p-button-text p-button-plain activity-row-button"
       @click="viewQueryResults"
@@ -83,13 +79,13 @@
 </template>
 
 <script setup lang="ts">
-import { QueueItemStatus } from "@@/enums";
-import type { QueueItem } from "~~/models";
+import { JobStatus } from "@@/enums";
+import type { Job } from "~~/models";
 import { useConfirm } from "primevue/useconfirm";
 import { ref } from "vue";
 
 interface Props {
-  queryQueueItem: QueueItem;
+  queryQueueItem: Job;
 }
 
 const props = defineProps<Props>();
@@ -114,7 +110,7 @@ function cancelQuery() {
   confirm.require({
     message:
       "Are you sure you want to cancel query '" +
-      props.queryQueueItem.queryName +
+      props.queryQueueItem.jobName +
       "'?",
     header: "Confirm cancellation",
     icon: "pi pi-exclamation-triangle",
@@ -135,7 +131,7 @@ function deleteQuery() {
   confirm.require({
     message:
       "Are you sure you want to delete query '" +
-      props.queryQueueItem.queryName +
+      props.queryQueueItem.jobName +
       "' from the queue?",
     header: "Confirm cancellation",
     icon: "pi pi-exclamation-triangle",

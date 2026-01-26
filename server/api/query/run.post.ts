@@ -1,10 +1,10 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
-import { QueueItemStatus } from "~~/enums";
 import { imapi } from "~~/server/utils/imapi";
 import { pgQueueItemInsert, postgresDb } from "~~/server/db/postgres";
 import { queryQueue } from "~~/server/db/postgres/schema";
 import { IM, RDFS } from "~~/models/AutoGen";
 import z from "zod";
+import { JobStatus } from "~~/enums";
 
 export const queryRunRequestSchema = z.object({
   query_id: z.string(),
@@ -86,7 +86,7 @@ export default defineEventHandler(async (event) => {
         userId: userId,
         userName: userName,
         queuedAt: data.reference_date,
-        status: QueueItemStatus.QUEUED,
+        status: JobStatus.QUEUED,
       });
       await tx.insert(queryQueue).values(qi);
 

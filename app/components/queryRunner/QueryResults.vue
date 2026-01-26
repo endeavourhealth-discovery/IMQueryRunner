@@ -63,13 +63,13 @@
 </template>
 
 <script setup lang="ts">
-import type { QueueItem } from "@@/models";
+import type { Job } from "@@/models";
 import { cloneDeep, isArray } from "lodash-es";
 import { onMounted, ref, watch } from "vue";
 import type { Ref } from "vue";
 
 interface Props {
-  queryItem: QueueItem | undefined;
+  queryItem: Job | undefined;
 }
 
 const props = defineProps<Props>();

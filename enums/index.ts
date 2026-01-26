@@ -1,3 +1,3 @@
-import { QueueItemStatus } from "./QueueItemStatus";
+import { JobStatus } from "./JobStatus";
 
-export { QueueItemStatus };
+export { JobStatus };

@@ -1,5 +1,5 @@
 import { Connection } from "rabbitmq-client";
-import { QueueItemStatus } from "~~/enums";
+import { JobStatus } from "~~/enums";
 import hash from "object-hash";
 import { v4 as uuidv4 } from "uuid";
 import { imapi } from "~~/server/utils/imapi";
@@ -33,7 +33,7 @@ const sub = rabbit.createConsumer(
     const entry = await postgresDb.query.queryQueue.findFirst({
       where: eq(queryQueue.id, id),
     });
-    if (entry && QueueItemStatus.CANCELLED === entry.status) {
+    if (entry && JobStatus.CANCELLED === entry.status) {
       throw new Error("Item is cancelled. Query rejected.");
     }
     if (!entry) {
@@ -43,7 +43,7 @@ const sub = rabbit.createConsumer(
     await postgresDb
       .update(queryQueue)
       .set({
-        status: QueueItemStatus.RUNNING,
+        status: JobStatus.RUNNING,
         startedAt: new Date().toISOString(),
       })
       .where(eq(queryQueue.id, id));
@@ -57,9 +57,9 @@ const sub = rabbit.createConsumer(
         await postgresDb
           .update(queryQueue)
           .set({
-            status: QueueItemStatus.ERRORED,
+            status: JobStatus.ERRORED,
             error: JSON.stringify(err),
-            killedAt: new Date().toISOString(),
+            stoppedAt: new Date().toISOString(),
           })
           .where(eq(queryQueue.id, id));
         return undefined;
@@ -68,7 +68,7 @@ const sub = rabbit.createConsumer(
     if (sql) {
       await executeQuery(sql, queryRequest, id);
     }
-  }
+  },
 );
 
 sub.on("error", (err) => {});
@@ -91,7 +91,7 @@ export async function sendMessage(userId: string, message: any) {
       routingKey: "query.execute." + userId,
       durable: true,
     },
-    message
+    message,
   );
 
   return id;

@@ -1,21 +1,20 @@
 import { z } from "zod";
-import { QueueItemStatus } from "~~/enums";
+import { JobStatus } from "~~/enums";
 
-export const queueItemSchema = z.object({
+export const jobSchema = z.object({
   id: z.uuid(),
+  jobName: z.string(),
   queryIri: z.url(),
-  queryName: z.string().optional(),
   queryRequest: z.any(),
   userId: z.uuid(),
   userName: z.string(),
   queuedAt: z.date().optional(),
   startedAt: z.date().optional(),
   pid: z.number().optional(),
-  finishedAt: z.date().optional(),
-  killedAt: z.date().optional(),
-  status: z.enum(QueueItemStatus),
+  stoppedAt: z.date().optional(),
+  status: z.enum(JobStatus),
   queryResult: z.array(z.string()).optional(),
   error: z.any().optional(),
 });
 
-export type QueueItem = z.infer<typeof queueItemSchema>;
+export type Job = z.infer<typeof jobSchema>;
