@@ -53,7 +53,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     if (error instanceof FetchError) {
       const path = (error.request instanceof Request) ? error.request.url : error.request;
 
-      if (!path?.startsWith("/api/auth")) return;
+      if (!path) return;
 
       switch (error.status) {
         case 401: {

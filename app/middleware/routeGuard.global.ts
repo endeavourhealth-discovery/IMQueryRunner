@@ -1,8 +1,6 @@
 import { useUserStore } from "~/plugins/end-sec-ui"
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  console.log("Route Guard")
-
   const { requiresAuth, requiresRole } = to.meta;
   const userStore = useUserStore();
 

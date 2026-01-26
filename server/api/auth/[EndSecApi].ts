@@ -33,15 +33,10 @@ export default defineEventHandler(async (event): Promise<any> => {
   const method = event.method;
   const name = getRouterParam(event, "EndSecApi")
 
-  console.log(`Name: ${name}`)
-
   if (method == "POST") {
     switch (name) {
       case "hasPermission": {
-        console.log("Checking permissions for " + sessionId)
         const permissionParams = await getQueryParams(event, permissionSchema.parse)
-        console.log("Params")
-        console.log(permissionParams);
           const allowed = await $fetch<string>(`${EndSecHost}/api/${EndSecApp}/authz/hasPermission`, {
             query: {
               sessionId: sessionId,
@@ -49,7 +44,6 @@ export default defineEventHandler(async (event): Promise<any> => {
               action: permissionParams.action
             }
           })
-        console.log("Allowed: " + allowed)
         return allowed;
       }
     }
@@ -78,7 +72,6 @@ export default defineEventHandler(async (event): Promise<any> => {
         return user;
       }
       case "logout": {
-        console.log("Logging out " + sessionId)
         await $fetch<string>(`${EndSecHost}/api/${EndSecApp}/authn/logout`, {
           query:
             {
@@ -89,7 +82,6 @@ export default defineEventHandler(async (event): Promise<any> => {
         return;
       }
       case "getUser": {
-        console.log("Getting user for " + sessionId)
         return await $fetch<string>(`${EndSecHost}/api/${EndSecApp}/authn/getUser`, {
           query:
             {

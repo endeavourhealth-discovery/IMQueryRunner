@@ -9,16 +9,10 @@ onMounted(async () => {
   const state = route.query.state as string;
   const code = route.query.code as string;
   if (code) {
-    console.log("Callback received code: ", code, " state: ", state);
     await globalThis.uiGuard.callback(code, state);
-    console.log("Callback completed");
-
     if (!userStore.isLoggedIn){
       throw createError("Failed to fetch login session");
     }
-
-    console.log("User logged in", userStore.user);
-
     await navigateTo(state);
   }
 });
