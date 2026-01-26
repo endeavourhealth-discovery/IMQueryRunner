@@ -1,6 +1,6 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
-import { pgQueueItemInsert, postgresDb } from "~~/server/db/postgres";
-import { queryQueue } from "~~/server/db/postgres/schema";
+import { pgJobInsert, postgresDb } from "~~/server/db/postgres";
+import { jobTable } from "~~/server/db/postgres/schema";
 import { type QueryRequest, DatabaseOption } from "~~/models/AutoGen";
 import { JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
@@ -28,8 +28,6 @@ export default defineEventHandler(async (event) => {
     queryResult: [],
     queuedAt: new Date().toDateString() as any,
   } as Job;
-  await postgresDb
-    .insert(queryQueue)
-    .values(pgQueueItemInsert.parse(queryTask));
+  await postgresDb.insert(jobTable).values(pgJobInsert.parse(queryTask));
   await sendMessage(user!.id, queryTask);
 });

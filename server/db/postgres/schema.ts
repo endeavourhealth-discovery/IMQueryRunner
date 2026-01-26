@@ -10,7 +10,7 @@ import {
 
 const queryRunner = pgSchema("query_runner");
 
-export const queryQueue = queryRunner.table("job", {
+export const jobTable = queryRunner.table("job", {
   id: uuid("id").primaryKey().notNull(),
   jobName: varchar("job_name", { length: 255 }).notNull(), //defaults to query name
   queryIri: varchar("query_iri", { length: 255 }).notNull(),

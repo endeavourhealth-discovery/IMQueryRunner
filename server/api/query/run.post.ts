@@ -1,7 +1,7 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
 import { imapi } from "~~/server/utils/imapi";
-import { pgQueueItemInsert, postgresDb } from "~~/server/db/postgres";
-import { queryQueue } from "~~/server/db/postgres/schema";
+import { pgJobInsert, postgresDb } from "~~/server/db/postgres";
+import { jobTable } from "~~/server/db/postgres/schema";
 import { IM, RDFS } from "~~/models/AutoGen";
 import z from "zod";
 import { JobStatus } from "~~/enums";
@@ -78,7 +78,7 @@ export default defineEventHandler(async (event) => {
     .transaction(async (tx) => {
       const id = await sendMessage(userId, queryRequest);
 
-      const qi = pgQueueItemInsert.parse({
+      const qi = pgJobInsert.parse({
         id: id,
         queryIri: data.query_id,
         queryName: entity[RDFS.LABEL],
@@ -88,7 +88,7 @@ export default defineEventHandler(async (event) => {
         queuedAt: data.reference_date,
         status: JobStatus.QUEUED,
       });
-      await tx.insert(queryQueue).values(qi);
+      await tx.insert(jobTable).values(qi);
 
       return { queueId: id };
     })

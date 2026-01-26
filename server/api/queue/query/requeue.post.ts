@@ -1,9 +1,9 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
-import { pgQueueItemInsert, postgresDb } from "~~/server/db/postgres";
-import { queryQueue } from "~~/server/db/postgres/schema";
+import { pgJobInsert, postgresDb } from "~~/server/db/postgres";
+import { jobTable } from "~~/server/db/postgres/schema";
 
 export default defineEventHandler(async (event) => {
-  const data = pgQueueItemInsert.parse(event);
-  await postgresDb.insert(queryQueue).values(data);
+  const data = pgJobInsert.parse(event);
+  await postgresDb.insert(jobTable).values(data);
   await sendMessage(data.userId, data);
 });

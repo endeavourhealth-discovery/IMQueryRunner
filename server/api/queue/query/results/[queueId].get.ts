@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { postgresDb } from "~~/server/db/postgres";
 import { eq, sql } from "drizzle-orm";
-import { queryQueue } from "~~/server/db/postgres/schema";
+import { jobTable } from "~~/server/db/postgres/schema";
 import hash from "object-hash";
 import { mysqlDb } from "~~/server/db/mysql";
 
@@ -11,8 +11,8 @@ const paramSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
-  const item = await postgresDb.query.queryQueue.findFirst({
-    where: eq(queryQueue.id, queueId),
+  const item = await postgresDb.query.jobTable.findFirst({
+    where: eq(jobTable.id, queueId),
   });
 
   if (item?.queryRequest) {
