@@ -1,7 +1,7 @@
 import z from "zod";
 import { JobStatus } from "~~/enums/JobStatus";
-import { pgQueueItemSelect, postgresDb } from "~~/server/db/postgres";
-import { queryQueue } from "~~/server/db/postgres/schema";
+import { pgJobSelect, postgresDb } from "~~/server/db/postgres";
+import { jobTable } from "~~/server/db/postgres/schema";
 import { desc, eq } from "drizzle-orm";
 
 const querySchema = z.object({
@@ -16,18 +16,18 @@ export default defineEventHandler(async (event) => {
     querySchema.parse,
   );
   const totalCount = await postgresDb.$count(
-    queryQueue,
-    eq(queryQueue.status, status),
+    jobTable,
+    eq(jobTable.status, status),
   );
 
-  const rs = await postgresDb.query.queryQueue.findMany({
-    where: eq(queryQueue.status, status),
-    orderBy: [desc(queryQueue.queuedAt)],
+  const rs = await postgresDb.query.jobTable.findMany({
+    where: eq(jobTable.status, status),
+    orderBy: [desc(jobTable.queuedAt)],
     offset: (+page - 1) * +size,
     limit: size,
   });
 
-  const items = rs.map((row) => pgQueueItemSelect.parse(row));
+  const items = rs.map((row) => pgJobSelect.parse(row));
   return {
     result: items,
     totalCount,

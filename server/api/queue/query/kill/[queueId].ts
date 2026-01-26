@@ -1,7 +1,7 @@
 import { JobStatus } from "~~/enums";
 import { z } from "zod";
 import { postgresDb } from "~~/server/db/postgres";
-import { queryQueue } from "~~/server/db/postgres/schema";
+import { jobTable } from "~~/server/db/postgres/schema";
 import { eq } from "drizzle-orm";
 
 const paramSchema = z.object({
@@ -10,8 +10,8 @@ const paramSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
-  const item = await postgresDb.query.queryQueue.findFirst({
-    where: eq(queryQueue.id, queueId),
+  const item = await postgresDb.query.jobTable.findFirst({
+    where: eq(jobTable.id, queueId),
   });
   if (item) {
     const activeQuery = postgresDb.execute(`
@@ -28,12 +28,12 @@ export default defineEventHandler(async (event) => {
       `);
     }
     await postgresDb
-      .update(queryQueue)
+      .update(jobTable)
       .set({
         status: JobStatus.CANCELLED,
         stoppedAt: new Date().toISOString(),
       })
-      .where(eq(queryQueue.id, item.id));
+      .where(eq(jobTable.id, item.id));
   } else {
     createError("Query queue item not found for id: " + queueId);
   }

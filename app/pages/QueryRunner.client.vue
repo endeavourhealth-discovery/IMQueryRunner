@@ -6,7 +6,7 @@
       >
         <div><Button label="Refresh" @click="refresh" /></div>
         <DataTable
-          :value="queryQueueItems"
+          :value="jobs"
           :paginator="true"
           :rows="rows"
           :scrollable="true"
@@ -69,7 +69,7 @@
           <Column>
             <template #body="slotProps">
               <ActionButtons
-                :queryQueueItem="slotProps.data"
+                :job="slotProps.data"
                 @cancel-query="cancelQuery"
                 @go-to-query="goToQuery"
                 @view-query-results="viewQueryResults"
@@ -113,7 +113,7 @@ const socket = io({
   },
 });
 
-const queryQueueItems: Ref<Job[]> = ref([]);
+const jobs: Ref<Job[]> = ref([]);
 const loading = ref(true);
 const searchLoading = ref(false);
 const totalCount = ref(0);
@@ -151,14 +151,14 @@ async function initSearch() {
   });
   if (results.data.value) {
     totalCount.value = results.data.value.totalCount;
-    queryQueueItems.value = results.data.value.result.sort((a, b) => {
+    jobs.value = results.data.value.result.sort((a, b) => {
       if (!a.queuedAt) return 1;
       if (!b.queuedAt) return -1;
       return new Date(b.queuedAt).getTime() - new Date(a.queuedAt).getTime();
     });
   } else {
     totalCount.value = 0;
-    queryQueueItems.value = [];
+    jobs.value = [];
   }
   searchLoading.value = false;
 }
@@ -177,14 +177,14 @@ async function refresh() {
   );
   if (results) {
     totalCount.value = results.totalCount;
-    queryQueueItems.value = results.result.sort((a, b) => {
+    jobs.value = results.result.sort((a, b) => {
       if (!a.queuedAt) return 1;
       if (!b.queuedAt) return -1;
       return new Date(b.queuedAt).getTime() - new Date(a.queuedAt).getTime();
     });
   } else {
     totalCount.value = 0;
-    queryQueueItems.value = [];
+    jobs.value = [];
   }
   searchLoading.value = false;
 }
@@ -266,7 +266,7 @@ async function requeueQuery(queryId: string) {
 }
 
 function getById(queryId: string): Job | undefined {
-  return queryQueueItems.value.find((item) => item.id === queryId);
+  return jobs.value.find((item) => item.id === queryId);
 }
 
 async function onPage(event: any) {
@@ -317,7 +317,7 @@ onBeforeUnmount(() => {
 });
 
 socket.on("queueUpdate", (value) => {
-  queryQueueItems.value = value;
+  jobs.value = value;
 });
 </script>
 

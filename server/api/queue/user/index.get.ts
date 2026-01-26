@@ -1,6 +1,6 @@
 import z from "zod";
-import { pgQueueItemSelect, postgresDb } from "~~/server/db/postgres";
-import { queryQueue } from "~~/server/db/postgres/schema";
+import { pgJobSelect, postgresDb } from "~~/server/db/postgres";
+import { jobTable } from "~~/server/db/postgres/schema";
 import { and, desc, eq, lte, SQL } from "drizzle-orm";
 import Logger from "#shared/logger";
 
@@ -21,20 +21,20 @@ export default defineEventHandler(async (event) => {
   );
 
   const totalCount = await postgresDb.$count(
-    queryQueue,
-    eq(queryQueue.userId, userId),
+    jobTable,
+    eq(jobTable.userId, userId),
   );
 
   const filters: SQL[] = [];
   // if (!user?.groups.includes("Endeavour/Admin"))
-  filters.push(eq(queryQueue.userId, userId));
-  if (date) filters.push(lte(queryQueue.queuedAt, date));
+  filters.push(eq(jobTable.userId, userId));
+  if (date) filters.push(lte(jobTable.queuedAt, date));
 
   let qry = postgresDb
     .select()
-    .from(queryQueue)
+    .from(jobTable)
     .where(and(...filters))
-    .orderBy(desc(queryQueue.queuedAt))
+    .orderBy(desc(jobTable.queuedAt))
     .offset((+page - 1) * +size)
     .limit(size);
 
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
 
   const rs = await qry.execute();
 
-  const items = rs.map((row) => pgQueueItemSelect.parse(row));
+  const items = rs.map((row) => pgJobSelect.parse(row));
 
   return {
     result: items,

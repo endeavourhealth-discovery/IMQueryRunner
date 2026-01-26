@@ -6,7 +6,7 @@ import { imapi } from "~~/server/utils/imapi";
 import { postgresDb } from "~~/server/db/postgres";
 import { eq } from "drizzle-orm";
 import { mysqlDb } from "~~/server/db/mysql";
-import { queryQueue } from "~~/server/db/postgres/schema";
+import { jobTable } from "~~/server/db/postgres/schema";
 import type { QueryRequest } from "~~/models/AutoGen";
 import { executeQuery } from "../utils/executeQuery";
 
@@ -30,8 +30,8 @@ const sub = rabbit.createConsumer(
   },
   async (msg) => {
     const id = msg.messageId!;
-    const entry = await postgresDb.query.queryQueue.findFirst({
-      where: eq(queryQueue.id, id),
+    const entry = await postgresDb.query.jobTable.findFirst({
+      where: eq(jobTable.id, id),
     });
     if (entry && JobStatus.CANCELLED === entry.status) {
       throw new Error("Item is cancelled. Query rejected.");
@@ -41,12 +41,12 @@ const sub = rabbit.createConsumer(
     }
 
     await postgresDb
-      .update(queryQueue)
+      .update(jobTable)
       .set({
         status: JobStatus.RUNNING,
         startedAt: new Date().toISOString(),
       })
-      .where(eq(queryQueue.id, id));
+      .where(eq(jobTable.id, id));
 
     const queryRequest: QueryRequest = JSON.parse(msg.body);
 
@@ -55,13 +55,13 @@ const sub = rabbit.createConsumer(
       .catch(async (err) => {
         console.error(err);
         await postgresDb
-          .update(queryQueue)
+          .update(jobTable)
           .set({
             status: JobStatus.ERRORED,
             error: JSON.stringify(err),
             stoppedAt: new Date().toISOString(),
           })
-          .where(eq(queryQueue.id, id));
+          .where(eq(jobTable.id, id));
         return undefined;
       });
 

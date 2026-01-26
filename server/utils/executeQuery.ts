@@ -8,7 +8,7 @@ import {
 } from "~~/models/AutoGen";
 import { mysqlDb } from "../db/mysql";
 import { postgresDb } from "../db/postgres";
-import { queryQueue } from "~~/server/db/postgres/schema";
+import { jobTable } from "~~/server/db/postgres/schema";
 import { JobStatus } from "~~/enums";
 import { eq } from "drizzle-orm";
 import { imapi } from "~~/server/utils/imapi";
@@ -40,12 +40,12 @@ export async function executeQuery(
     result.map((r) => r.id),
   );
   await postgresDb
-    .update(queryQueue)
+    .update(jobTable)
     .set({
       status: JobStatus.COMPLETED,
       stoppedAt: new Date().toISOString(),
     })
-    .where(eq(queryQueue.id, id));
+    .where(eq(jobTable.id, id));
   return result.map((r) => r.id);
 }
 
