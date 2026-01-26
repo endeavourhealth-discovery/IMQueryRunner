@@ -1,6 +1,6 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
 import { pgQueueItemInsert, postgresDb } from "~~/server/db/postgres";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { queryQueue } from "~~/server/db/postgres/schema";
 import { type QueryRequest, DatabaseOption } from "~~/models/AutoGen";
 import { QueueItemStatus } from "~~/enums";
 import type { QueueItem } from "~~/models/queryItem.schema";
@@ -17,19 +17,19 @@ export default defineEventHandler(async (event) => {
   } catch (e: unknown) {
     throw createError("Unable to convert query to SQL");
   }
-  const queueQuery: QueueItem = {
+  const queryTask: QueueItem = {
     id: v4(),
     queryIri: queryRequest.query.iri,
-    queryName: queryRequest.query.name,
+    queryName: queryRequest.query.name ?? "",
     queryRequest: queryRequest,
     status: QueueItemStatus.QUEUED,
     userId: user!.id,
-    username: user!.userName,
+    userName: user!.userName,
     queryResult: [],
-    queuedAt: new Date(),
+    queuedAt: new Date().toDateString() as any,
   } as QueueItem;
   await postgresDb
-    .insert(queueItem)
-    .values(pgQueueItemInsert.parse(queueQuery));
-  await sendMessage(user!.id, queueQuery);
+    .insert(queryQueue)
+    .values(pgQueueItemInsert.parse(queryTask));
+  await sendMessage(user!.id, queryTask);
 });
