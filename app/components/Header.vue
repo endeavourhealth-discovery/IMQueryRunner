@@ -104,11 +104,18 @@ function setUserMenuItems(): void {
       label: "Login",
       icon: "fa-solid fa-fw fa-user",
       command: async () => {
-        await navigateTo( await globalThis.uiGuard.getLoginUrl(), { external: true } )
+        await globalThis.uiGuard.login()
       }
     },
   ];
   accountItems.value = [
+    {
+      label: "My Account",
+      icon: "fa-solid fa-fw fa-cog",
+      command: async () => {
+        await globalThis.uiGuard.profile()
+      }
+    },
     {
       label: "Logout",
       icon: "fa-solid fa-fw fa-arrow-right-from-bracket",

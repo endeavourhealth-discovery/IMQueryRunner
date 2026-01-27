@@ -6,7 +6,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
   if (requiresAuth || requiresRole) {
     if (!userStore.isLoggedIn) {
-      return navigateTo(await globalThis.uiGuard.getLoginUrl(), { external: true })
+      return globalThis.uiGuard.login()
     }
 
     if (!userStore.hasRole(requiresRole as string[]))

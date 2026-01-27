@@ -21,21 +21,24 @@ export const useUserStore = defineStore("user", () => {
 })
 
 interface EndSecUI {
-  getLoginUrl(): Promise<string>
+  login(): Promise<void>
   callback(code: string, state: string): Promise<void>
+
+  profile(): Promise<void>
   logout(): Promise<void>
 }
 
 export default defineNuxtPlugin((nuxtApp) => {
   globalThis.uiGuard = {
-    getLoginUrl: async (): Promise<string> => {
+    login: async (): Promise<void> => {
       const reqUrl = useRequestURL()
-      return await $fetch("/api/auth/getLoginUrl", {
+      const loginUrl = await $fetch("/api/auth/getLoginUrl", {
         query: {
           redirectUri: reqUrl.origin + "/callback",
           state: reqUrl.pathname + reqUrl.search
         }
       })
+      await nuxtApp.runWithContext(() => navigateTo(loginUrl, { external: true }))
     },
 
     callback: async (code: string, state: string): Promise<void> => {
@@ -43,9 +46,15 @@ export default defineNuxtPlugin((nuxtApp) => {
       useUserStore().setUser(response as User)
     },
 
+    profile: async(): Promise<void> => {
+      const profileUrl = await $fetch("/api/auth/getProfileUrl")
+      await nuxtApp.runWithContext(() => navigateTo(profileUrl, { external: true }))
+    },
+
     logout: async (): Promise<void> => {
       await $fetch("/api/auth/logout")
       useUserStore().setUser(null);
+      reloadNuxtApp()
     },
   } as EndSecUI
 
@@ -58,7 +67,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       switch (error.status) {
         case 401: {
           await clearError()
-          await navigateTo(await globalThis.uiGuard.getLoginUrl(), { external: true })
+          await globalThis.uiGuard.login()
           break;
         }
         case 403:
