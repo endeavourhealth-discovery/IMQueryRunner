@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev | pino-pretty",
+    "test:unit": "vitest",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -50,6 +51,7 @@
     "drizzle-kit": "^0.31.5",
     "pino-pretty": "^13.1.1",
     "typescript": "^5.9.2",
+    "vitest": "^4.0.16",
     "vue-tsc": "^3.1.0"
   }
 }
