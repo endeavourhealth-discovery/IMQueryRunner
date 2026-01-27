@@ -4,6 +4,10 @@ import path from "path";
 export default defineConfig({
   test: {
     environment: "node",
+    env: {
+      COMPASS_URL: "mysql://test:test@localhost:3306/test",
+      POSTGRES_URL: "postgresql://test:test@localhost:5432/test"
+    }
   },
   resolve: {
     alias: {

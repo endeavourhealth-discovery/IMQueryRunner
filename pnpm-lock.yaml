@@ -53,6 +53,9 @@ importers:
       object-hash:
         specifier: ^3.0.0
         version: 3.0.0
+      ofetch:
+        specifier: ^1.4.1
+        version: 1.4.1
       perfect-debounce:
         specifier: ^2.0.0
         version: 2.0.0

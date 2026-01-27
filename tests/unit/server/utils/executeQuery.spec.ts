@@ -1,20 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { executeQuery } from "./executeQuery";
-import { mysqlDb } from "../db/mysql";
-import { postgresDb } from "../db/postgres";
-import { imapi } from "./imapi";
-import hash from "object-hash";
-import { JobStatus } from "~~/enums";
+import { executeQuery } from "../../../../server/utils/executeQuery";
+import { mysqlDb } from "../../../../server/db/mysql";
+import { postgresDb } from "../../../../server/db/postgres";
+import { imapi } from "../../../../server/utils/imapi";
 
 (global as any).createError = vi.fn((msg) => new Error(msg));
 
-vi.mock("../db/mysql", () => ({
+const mockResultSetHeader = {
+  affectedRows: 0,
+  fieldCount: 0,
+  info: "",
+  insertId: 0,
+  serverStatus: 0,
+  warningStatus: 0,
+  changedRows: 0,
+};
+
+vi.mock("../../../../server/db/mysql", () => ({
   mysqlDb: {
     execute: vi.fn(),
   },
 }));
 
-vi.mock("../db/postgres", () => ({
+vi.mock("../../../../server/db/postgres", () => ({
   postgresDb: {
     update: vi.fn().mockReturnThis(),
     set: vi.fn().mockReturnThis(),
@@ -22,7 +30,7 @@ vi.mock("../db/postgres", () => ({
   },
 }));
 
-vi.mock("./imapi", () => ({
+vi.mock("../../../../server/utils/imapi", () => ({
   imapi: {
     getQuerySql: vi.fn(),
     describeQuery: vi.fn(),
@@ -41,14 +49,14 @@ describe.sequential("executeQuery", () => {
     } as any;
     
     const id = "job-id";
-    
+
     // First call to populate cache
     vi.mocked(imapi.getQuerySql).mockResolvedValue("SELECT * FROM table");
     vi.mocked(mysqlDb.execute)
-      .mockResolvedValueOnce([[]]) // getCachedQueryResults -> tableExists
-      .mockResolvedValueOnce([[{ id: "patient-1" }]]) // main query
-      .mockResolvedValueOnce([[]]) // storeQueryResultsAndCache -> createTable
-      .mockResolvedValueOnce([[]]); // storeQueryResultsAndCache -> insert
+      .mockResolvedValueOnce([[], []] as any) // getCachedQueryResults -> tableExists
+      .mockResolvedValueOnce([[{ id: "patient-1" }], []] as any) // main query
+      .mockResolvedValueOnce([mockResultSetHeader, []] as any) // storeQueryResultsAndCache -> createTable
+      .mockResolvedValueOnce([mockResultSetHeader, []] as any); // storeQueryResultsAndCache -> insert
 
     await executeQuery("SELECT * FROM table", queryRequest, id);
     
@@ -70,8 +78,8 @@ describe.sequential("executeQuery", () => {
     
     // Mock tableExists to return true
     vi.mocked(mysqlDb.execute)
-      .mockResolvedValueOnce([[{ TABLE_NAME: "some-hash" }]]) // tableExists
-      .mockResolvedValueOnce([[{ id: "patient-cache-1" }]]); // cache query
+      .mockResolvedValueOnce([[{ TABLE_NAME: "some-hash" }], []] as any) // tableExists
+      .mockResolvedValueOnce([[{ id: "patient-cache-1" }], []] as any); // cache query
       
     const result = await executeQuery("SELECT * FROM table", queryRequest, id);
     
@@ -90,10 +98,10 @@ describe.sequential("executeQuery", () => {
     vi.mocked(imapi.getQuerySql).mockResolvedValue("SELECT * FROM table");
     
     vi.mocked(mysqlDb.execute)
-      .mockResolvedValueOnce([[]]) // getCachedQueryResults -> tableExists
-      .mockResolvedValueOnce([[{ id: "patient-new" }]]) // main query
-      .mockResolvedValueOnce([[]]) // storeQueryResultsAndCache -> createTable
-      .mockResolvedValueOnce([[]]); // storeQueryResultsAndCache -> insert
+      .mockResolvedValueOnce([[], []] as any) // getCachedQueryResults -> tableExists
+      .mockResolvedValueOnce([[{ id: "patient-new" }], []] as any) // main query
+      .mockResolvedValueOnce([mockResultSetHeader, []] as any) // storeQueryResultsAndCache -> createTable
+      .mockResolvedValueOnce([mockResultSetHeader, []] as any); // storeQueryResultsAndCache -> insert
       
     const result = await executeQuery("SELECT * FROM table", queryRequest, id);
     
@@ -114,10 +122,10 @@ describe.sequential("executeQuery", () => {
     
     vi.mocked(imapi.getQuerySql).mockResolvedValue("SELECT * FROM table WHERE col1 = $param1 AND col2 = $param2");
     vi.mocked(mysqlDb.execute)
-      .mockResolvedValueOnce([[]]) // getCachedQueryResults -> tableExists
-      .mockResolvedValueOnce([[{ id: "patient-1" }]]) // main query
-      .mockResolvedValueOnce([[]]) // createTable
-      .mockResolvedValueOnce([[]]); // insert cache
+      .mockResolvedValueOnce([[], []] as any) // getCachedQueryResults -> tableExists
+      .mockResolvedValueOnce([[{ id: "patient-1" }], []] as any) // main query
+      .mockResolvedValueOnce([mockResultSetHeader, []] as any) // createTable
+      .mockResolvedValueOnce([mockResultSetHeader, []] as any); // insert cache
       
     await executeQuery("SELECT * FROM table", queryRequest, id);
     
@@ -147,14 +155,14 @@ describe.sequential("executeQuery", () => {
     });
 
     vi.mocked(mysqlDb.execute)
-      .mockResolvedValueOnce([[]]) // getCachedQueryResults(main) -> tableExists
-      .mockResolvedValueOnce([[]]) // runSubQueries(main) -> tableExists(sub-query-1)
-      .mockResolvedValueOnce([[{ id: "sub-p1" }]]) // runSubQueries(main) -> mysqlDb.execute(sub-query sql)
-      .mockResolvedValueOnce([[]]) // storeQueryResultsAndCache(sub) -> createTable
-      .mockResolvedValueOnce([[]]) // storeQueryResultsAndCache(sub) -> insert cache
-      .mockResolvedValueOnce([[{ id: "main-p1" }]]) // mysqlDb.execute(resolved main sql)
-      .mockResolvedValueOnce([[]]) // storeQueryResultsAndCache(main) -> createTable
-      .mockResolvedValueOnce([[]]); // storeQueryResultsAndCache(main) -> insert cache
+      .mockResolvedValueOnce([[], []] as any) // getCachedQueryResults(main) -> tableExists
+      .mockResolvedValueOnce([[], []] as any) // runSubQueries(main) -> tableExists(sub-query-1)
+      .mockResolvedValueOnce([[{ id: "sub-p1" }], []] as any) // runSubQueries(main) -> mysqlDb.execute(sub-query sql)
+      .mockResolvedValueOnce([mockResultSetHeader, []] as any) // storeQueryResultsAndCache(sub) -> createTable
+      .mockResolvedValueOnce([mockResultSetHeader, []] as any) // storeQueryResultsAndCache(sub) -> insert cache
+      .mockResolvedValueOnce([[{ id: "main-p1" }], []] as any) // mysqlDb.execute(resolved main sql)
+      .mockResolvedValueOnce([mockResultSetHeader, []] as any) // storeQueryResultsAndCache(main) -> createTable
+      .mockResolvedValueOnce([mockResultSetHeader, []] as any); // storeQueryResultsAndCache(main) -> insert cache
 
     const result = await executeQuery("main-sql", queryRequest, id);
     
@@ -173,7 +181,7 @@ describe.sequential("executeQuery", () => {
     } as any;
     
     vi.mocked(imapi.getQuerySql).mockResolvedValue("SELECT * FROM table WHERE col = $param1");
-    vi.mocked(mysqlDb.execute).mockResolvedValue([[]]); // tableExists
+    vi.mocked(mysqlDb.execute).mockResolvedValue([[], []] as any); // tableExists
 
     await expect(executeQuery("sql", queryRequest, "id")).rejects.toThrow("Invalid iri");
   });
@@ -185,8 +193,8 @@ describe.sequential("executeQuery", () => {
     } as any;
     
     vi.mocked(mysqlDb.execute)
-      .mockResolvedValueOnce([[{ TABLE_NAME: "some-hash" }]]) // tableExists
-      .mockResolvedValueOnce([[{ id: "p1" }]]); // cache query
+      .mockResolvedValueOnce([[{ TABLE_NAME: "some-hash" }], []] as any) // tableExists
+      .mockResolvedValueOnce([[{ id: "p1" }], []] as any); // cache query
       
     await executeQuery("sql", queryRequest, "id");
     
