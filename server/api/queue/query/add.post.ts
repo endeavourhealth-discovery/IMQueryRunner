@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
     userId: user!.id,
     userName: user!.userName,
     queryResult: [],
-    queuedAt: new Date().toDateString() as any,
+    queuedAt: new Date().toISOString(),
   } as Job;
   await postgresDb.insert(jobTable).values(pgJobInsert.parse(queryTask));
   await sendMessage(user!.id, queryTask);
