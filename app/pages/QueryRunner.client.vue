@@ -27,7 +27,7 @@
           <template #empty>None</template>
           <Column field="id" header="ID"></Column>
           <Column field="queryIri" header="Iri"></Column>
-          <Column field="queryName" header="Query name"></Column>
+          <Column field="jobName" header="Job name"></Column>
           <Column>
             <template #body="{ data }: { data: Job }">
               <Button
@@ -103,6 +103,7 @@ import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
 import { useUser } from "~/composables/useUser";
+import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
 
 const { user } = useUser();
 const confirm = useConfirm();
@@ -135,6 +136,7 @@ onMounted(async () => {
     alert(data);
   });
   socket.emit("hello");
+  await initSearch()
 });
 
 async function initSearch() {
@@ -283,19 +285,20 @@ function scrollToTop() {
   scrollArea?.scrollIntoView({ block: "start", behavior: "smooth" });
 }
 
-function getDisplayDateTime(date: Date) {
+function getDisplayDateTime(date: string) {
+  const d = new Date(date);
   return (
-    date.getUTCDate() +
+    d.getUTCDate() +
     "/" +
-    (date.getUTCMonth() + 1) +
+    (d.getUTCMonth() + 1) +
     "/" +
-    date.getUTCFullYear() +
+    d.getUTCFullYear() +
     " " +
-    date.getUTCHours() +
+    d.getUTCHours() +
     ":" +
-    date.getUTCMinutes() +
+    d.getUTCMinutes() +
     ":" +
-    date.getUTCMilliseconds()
+    d.getUTCMilliseconds()
   );
 }
 

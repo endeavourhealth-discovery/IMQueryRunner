@@ -9,6 +9,7 @@ import { mysqlDb } from "~~/server/db/mysql";
 import { jobTable } from "~~/server/db/postgres/schema";
 import type { QueryRequest } from "~~/models/AutoGen";
 import { executeQuery } from "../utils/executeQuery";
+import type { Job } from "~~/models/job.schema";
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
 rabbit.on("error", (err) => {});
@@ -79,22 +80,18 @@ const pub = rabbit.createPublisher({
   exchanges: [{ exchange: "query_runner", type: "topic", durable: true }],
 });
 
-export async function sendMessage(userId: string, message: any) {
-  const id = uuidv4();
-
-  if (message instanceof Object) message = JSON.stringify(message);
-
+export async function sendMessage(userId: string, message: Job) {
   await pub.send(
     {
-      messageId: id,
+      messageId: message.id,
       exchange: "query_runner",
       routingKey: "query.execute." + userId,
       durable: true,
     },
-    message,
+    JSON.stringify(message),
   );
 
-  return id;
+  return message.id;
 }
 
 async function onShutdown() {
