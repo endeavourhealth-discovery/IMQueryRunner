@@ -8,17 +8,18 @@ const querySchema = z.object({
   page: z.coerce.number().default(1),
   size: z.coerce.number().default(25),
   date: z.iso.date().optional(),
-  userId: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
   const LOG = Logger("api/queue/user");
-  const user = globalThis.authenticator.getUser(event);
+  const user = await globalThis.apiGuard.getUser(event);
 
-  const { page, size, userId, date } = await getValidatedQuery(
+  const { page, size, date } = await getValidatedQuery(
     event,
     querySchema.parse,
   );
+
+  const userId = user!.id;
 
   const totalCount = await postgresDb.$count(
     jobTable,

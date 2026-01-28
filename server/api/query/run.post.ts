@@ -5,6 +5,7 @@ import { jobTable } from "~~/server/db/postgres/schema";
 import { IM, RDFS } from "~~/models/AutoGen";
 import z from "zod";
 import { JobStatus } from "~~/enums";
+import type {Job} from "~~/models";
 
 export const queryRunRequestSchema = z.object({
   query_id: z.string(),
@@ -55,44 +56,46 @@ defineRouteMeta({
   },
 });
 
-// export default defineEventHandler(async (event) => {
-//   const currentUser = globalThis.authenticator.getUser(event);
+export default defineEventHandler(async (event) => {
+  const currentUser = await globalThis.apiGuard.getUser();
 
-//   const userId = currentUser!.id;
-//   const userName = currentUser!.userName;
+  const userId = currentUser!.id;
+  const userName = currentUser!.userName;
 
-//   const data = await readValidatedBody(event, queryRunRequestSchema.parse);
+  const data = await readValidatedBody(event, queryRunRequestSchema.parse);
 
-//   const entity = await imapi.getPartialEntity(data.query_id, [
-//     RDFS.LABEL,
-//     IM.DEFINITION,
-//   ]);
-//   const query = JSON.parse(entity[IM.DEFINITION]);
+  const entity = await imapi.getPartialEntity(data.query_id, [
+    RDFS.LABEL,
+    IM.DEFINITION,
+  ]);
+  const query = JSON.parse(entity[IM.DEFINITION]);
 
-//   const queryRequest = {
-//     query: query,
-//     referenceDate: data.reference_date,
-//   };
+  const job = {
+    queryRequest: {
+      query: query,
+      referenceDate: data.reference_date,
+    }
+  } as Job
 
-//   return await postgresDb
-//     .transaction(async (tx) => {
-//       const id = await sendMessage(userId, queryRequest);
+  return await postgresDb
+    .transaction(async (tx) => {
+      const id = await sendMessage(userId, job);
 
-//       const qi = pgJobInsert.parse({
-//         id: id,
-//         queryIri: data.query_id,
-//         queryName: entity[RDFS.LABEL],
-//         queryRequest: queryRequest,
-//         userId: userId,
-//         userName: userName,
-//         queuedAt: data.reference_date,
-//         status: JobStatus.QUEUED,
-//       });
-//       await tx.insert(jobTable).values(qi);
+      const qi = pgJobInsert.parse({
+        id: id,
+        queryIri: data.query_id,
+        queryName: entity[RDFS.LABEL],
+        queryRequest: job.queryRequest,
+        userId: userId,
+        userName: userName,
+        queuedAt: data.reference_date,
+        status: JobStatus.QUEUED,
+      });
+      await tx.insert(jobTable).values(qi);
 
-//       return { queueId: id };
-//     })
-//     .catch((error) => {
-//       console.error("Error creating queue item", error);
-//     });
-// });
+      return { queueId: id };
+    })
+    .catch((error) => {
+      console.error("Error creating queue item", error);
+    });
+});
