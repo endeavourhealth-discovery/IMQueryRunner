@@ -5,6 +5,7 @@ import { jobTable } from "~~/server/db/postgres/schema";
 import { IM, RDFS } from "~~/models/AutoGen";
 import z from "zod";
 import { JobStatus } from "~~/enums";
+import type {Job} from "~~/models";
 
 export const queryRunRequestSchema = z.object({
   query_id: z.string(),
@@ -69,20 +70,22 @@ export default defineEventHandler(async (event) => {
   ]);
   const query = JSON.parse(entity[IM.DEFINITION]);
 
-  const queryRequest = {
-    query: query,
-    referenceDate: data.reference_date,
-  };
+  const job = {
+    queryRequest: {
+      query: query,
+      referenceDate: data.reference_date,
+    }
+  } as Job
 
   return await postgresDb
     .transaction(async (tx) => {
-      const id = await sendMessage(userId, queryRequest);
+      const id = await sendMessage(userId, job);
 
       const qi = pgJobInsert.parse({
         id: id,
         queryIri: data.query_id,
         queryName: entity[RDFS.LABEL],
-        queryRequest: queryRequest,
+        queryRequest: job.queryRequest,
         userId: userId,
         userName: userName,
         queuedAt: data.reference_date,

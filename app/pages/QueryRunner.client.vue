@@ -104,7 +104,6 @@ import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
 import { useUserStore } from "~/plugins/end-sec-ui";
-import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
 
 definePageMeta({
   requiresAuth: true,

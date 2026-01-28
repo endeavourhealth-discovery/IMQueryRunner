@@ -1,6 +1,5 @@
 import {object, string} from "zod/v4/mini";
 import {createError, getValidatedQuery, H3Event, type InferEventInput, type ValidateFunction} from "h3";
-import { clearError } from "nuxt/app";
 
 const loginUrlSchema = object({
   redirectUri: string(),
@@ -32,19 +31,22 @@ export default defineEventHandler(async (event): Promise<any> => {
   const EndSecApp = process.env.ENDEAVOUR_SECURITY_APPLICATION;
   const method = event.method;
   const name = getRouterParam(event, "EndSecApi")
+  const req = event?.node?.req
+  const clientIp = req?.headers['x-real-ip']?.[0] || req?.headers['x-forwarded-for']?.[0] || req?.socket?.remoteAddress || "UNKNOWN"
+
 
   if (method == "POST") {
     switch (name) {
       case "hasPermission": {
         const permissionParams = await getQueryParams(event, permissionSchema.parse)
-          const allowed = await $fetch<string>(`${EndSecHost}/api/${EndSecApp}/authz/hasPermission`, {
-            query: {
-              sessionId: sessionId,
-              object: permissionParams.object,
-              action: permissionParams.action
-            }
-          })
-        return allowed;
+        return await $fetch<string>(`${EndSecHost}/api/${EndSecApp}/authz/hasPermission`, {
+          headers: {"x-client-ip": clientIp},
+          query: {
+            sessionId: sessionId,
+            object: permissionParams.object,
+            action: permissionParams.action
+          }
+        });
       }
     }
   } else if (method == "GET") {
@@ -62,6 +64,7 @@ export default defineEventHandler(async (event): Promise<any> => {
       case "login": {
         const loginParams = await getQueryParams(event, loginSchema.parse)
         const { sessionId, user } = await $fetch<string>(`${EndSecHost}/api/${EndSecApp}/authn/login`, {
+          headers: {"x-client-ip": clientIp },
           query:
             {
               code: loginParams.code,
@@ -83,6 +86,7 @@ export default defineEventHandler(async (event): Promise<any> => {
       }
       case "getUser": {
         return await $fetch<string>(`${EndSecHost}/api/${EndSecApp}/authn/getUser`, {
+          headers: {"x-client-ip": clientIp },
           query:
             {
               sessionId: sessionId,

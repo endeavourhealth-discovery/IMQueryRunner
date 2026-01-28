@@ -23,7 +23,6 @@ export const useUserStore = defineStore("user", () => {
 interface EndSecUI {
   login(): Promise<void>
   callback(code: string, state: string): Promise<void>
-
   profile(): Promise<void>
   logout(): Promise<void>
 }
@@ -31,8 +30,11 @@ interface EndSecUI {
 export default defineNuxtPlugin((nuxtApp) => {
   globalThis.uiGuard = {
     login: async (): Promise<void> => {
+      const req = useRequestEvent()?.node?.req
+      const ip = req?.headers['x-real-ip']?.[0] || req?.headers['x-forwarded-for']?.[0] || req?.socket?.remoteAddress || "0.0.0.0"
       const reqUrl = useRequestURL()
       const loginUrl = await $fetch("/api/auth/getLoginUrl", {
+        headers: {"x-client-ip": ip},
         query: {
           redirectUri: reqUrl.origin + "/callback",
           state: reqUrl.pathname + reqUrl.search
@@ -42,7 +44,12 @@ export default defineNuxtPlugin((nuxtApp) => {
     },
 
     callback: async (code: string, state: string): Promise<void> => {
-      const response = await $fetch("/api/auth/login", {query: {code: code, state: state}})
+      const req = useRequestEvent()?.node?.req
+      const ip = req?.headers['x-real-ip']?.[0] || req?.headers['x-forwarded-for']?.[0] || req?.socket?.remoteAddress || "0.0.0.0"
+      const response = await $fetch("/api/auth/login", {
+        headers: {"x-client-ip": ip},
+        query: {code: code, state: state}
+      })
       useUserStore().setUser(response as User)
     },
 
