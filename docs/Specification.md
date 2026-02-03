@@ -7,9 +7,11 @@ Currently, the only way to add a query to the queue is via a direct request to t
 ### TODO
 
 - Add queries to the queue through the UI:
+  - Add a new page /search
   - Search for a query using a search bar
-  - View the query definition and generated SQL
-  - Add the selected query to the queue
+  - View the query definition (logical view)
+  - Click on Run button to add the selected query to the queue
+  - Navigate to the queue
 
 ## Run a Job (Query)
 
