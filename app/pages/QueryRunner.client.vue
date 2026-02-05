@@ -4,7 +4,7 @@
       <div
         class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
       >
-        <div><Button label="Refresh" @click="refresh" /></div>
+        <div class="m-2"><Button icon="fa-solid fa-arrows-rotate" label="Refresh" @click="refresh" /></div>
         <DataTable
           :value="jobs"
           :paginator="true"
@@ -31,8 +31,10 @@
           <Column>
             <template #body="{ data }: { data: Job }">
               <Button
+                :disabled="!data.queryRequest.argument"
                 label="View arguments"
                 @click="viewArgumentDisplay(data.queryRequest.argument)"
+                v-tooltip.top="'No arguments available'"
               />
             </template>
           </Column>
@@ -81,10 +83,6 @@
         </DataTable>
       </div>
     </div>
-    <QueryResults
-      :queryItem="selectedQuery"
-      v-model:showDialog="showQueryResults"
-    />
     <ArgumentDisplayDialog
       :arguments="currentArguments"
       :show-footer-buttons="false"
@@ -100,7 +98,6 @@ import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
 import type { Argument } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
-import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
 import { useUserStore } from "~/plugins/end-sec-ui";

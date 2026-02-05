@@ -8,7 +8,7 @@ import type { Job } from "~~/models/job.schema";
 import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
-  const user = await globalThis.apiGuard.getUser();
+  const user = await globalThis.apiGuard.getUser(event);
   const queryRequest: QueryRequest = await readBody(event);
 
   if (!queryRequest.language) queryRequest.language = DatabaseOption.MYSQL;

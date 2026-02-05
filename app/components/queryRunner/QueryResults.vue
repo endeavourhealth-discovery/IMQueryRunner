@@ -1,25 +1,17 @@
 <template>
-  <Dialog
-    v-model:visible="showDialog"
-    modal
-    maximizable
-    header="Query Results"
-    :style="{
-      width: '90vw',
-      height: '90vh',
-      minWidth: '90vw',
-      minHeight: '90vh',
-    }"
-    class="query-results-dialog"
-  >
-    <div class="query-results-dialog-content">
+  <div class="flex-auto overflow-auto">
+    <div class="h-[calc(100% - 3.5rem)] overflow-auto">
+      <div
+          class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
+      >
+        <div class="m-2"><Button icon="fa-solid fa-arrow-left" label="Back to queue" @click="backToQueue" /></div>
       <DataTable
         :size="'small'"
         :value="queryResults"
         :paginator="true"
         :rows="size"
         :scrollable="true"
-        scroll-height="flex"
+        scroll-height="600px"
         :autoLayout="true"
         @page="onPage($event)"
         :lazy="true"
@@ -41,15 +33,14 @@
           </div>
         </template>
         <template #empty>None</template>
-        <Column field="id" header="Patient ID"></Column>
+        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
       </DataTable>
     </div>
-    <template #footer>
       <div class="im-dialog-footer">
         <div class="button-footer">
-          <Button label="Close" @click="closeDialog" text />
           <Button
-            :disabled="!queryItem"
+              class="m-2"
+            :disabled="!queryResults.length"
             data-testid="query-results-download"
             label="Download"
             :loading="downloadLoading"
@@ -58,23 +49,20 @@
           />
         </div>
       </div>
-    </template>
-  </Dialog>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import type { Job } from "@@/models";
-import { cloneDeep, isArray } from "lodash-es";
-import { onMounted, ref, watch } from "vue";
+import { isArray } from "lodash-es";
+import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
 
 interface Props {
-  queryItem: Job | undefined;
+  queryId: string | string[] | undefined;
 }
 
 const props = defineProps<Props>();
-
-const showDialog = defineModel<boolean>("showDialog");
 
 const loading = ref(false);
 const downloadLoading = ref(false);
@@ -83,39 +71,43 @@ const pageNumber = ref(1);
 const size = ref(25);
 const originalSize = ref(25);
 const totalCount = ref();
+const columns: Ref<any[]> = ref( []);
 
-function closeDialog() {
-  showDialog.value = false;
-}
+onMounted(async () => {
+  await getQueryResults();
+  formatResultsForTable();
+});
 
-async function downloadQueryResults() {
-  if (props.queryItem?.queryRequest) {
-    const request = cloneDeep(props.queryItem.queryRequest);
+async function getQueryResults() {
+  if (props.queryId) {
     // request.page = { pageNumber: pageNumber.value, pageSize: size.value }; //TODO: fix paging mechanism
-    const results = useFetch("/api/query/results", {
-      method: "get",
-      body: request,
-    });
+    const results = await useFetch(`/api/queue/query/results/hashcode/${props.queryId}`);
     if (results.data.value && isArray(results.data.value)) {
       totalCount.value = results.data.value.length; //TODO: replace with actual count
-      queryResults.value = results.data.value.map((id) => ({ id }));
+      queryResults.value = results.data.value;
     }
   }
+}
+
+function formatResultsForTable() {
+    for (const key of Object.keys(queryResults.value[0])) {
+      if (key !== "hashcode") columns.value.push({field: key, header: key.replace("_", " ")})
+    }
+}
+
+function downloadQueryResults() {
+
 }
 
 async function onPage(event: any) {
   pageNumber.value = event.page;
   size.value = event.rows;
-  await downloadQueryResults();
+  await getQueryResults();
 }
 
-watch(showDialog, async (newValue, oldValue) => {
-  if (newValue && totalCount.value === undefined) await downloadQueryResults();
-});
-
-onMounted(async () => {
-  await downloadQueryResults();
-});
+function backToQueue() {
+  navigateTo("/");
+}
 </script>
 
 <style scoped></style>
