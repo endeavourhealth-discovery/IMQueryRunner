@@ -1,4 +1,4 @@
--- CREATE SCHEMA query_runner; uncomment if schema does not exist
+-- CREATE SCHEMA query_runner; -- uncomment if schema does not exist
 
 CREATE TABLE
   query_runner.job (

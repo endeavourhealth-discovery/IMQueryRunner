@@ -31,14 +31,14 @@ const sub = rabbit.createConsumer(
   },
   async (msg) => {
     const id = msg.messageId!;
-    const entry = await postgresDb.query.jobTable.findFirst({
+    const job = await postgresDb.query.jobTable.findFirst({
       where: eq(jobTable.id, id),
     });
-    if (entry && JobStatus.CANCELLED === entry.status) {
+    if (job && JobStatus.CANCELLED === job.status) {
       throw new Error("Item is cancelled. Query rejected.");
     }
-    if (!entry) {
-      throw new Error("Could not find entry with id: " + id);
+    if (!job) {
+      throw new Error("Could not find job with id: " + id);
     }
 
     await postgresDb
@@ -48,9 +48,8 @@ const sub = rabbit.createConsumer(
         startedAt: new Date().toISOString(),
       })
       .where(eq(jobTable.id, id));
-
-    const queryRequest: QueryRequest = JSON.parse(msg.body);
-
+    const parsedJob = JSON.parse(msg.body);
+    const queryRequest: QueryRequest = parsedJob.queryRequest;
     let sql: string | undefined = await imapi
       .getQuerySql(queryRequest)
       .catch(async (err) => {
@@ -65,10 +64,18 @@ const sub = rabbit.createConsumer(
           .where(eq(jobTable.id, id));
         return undefined;
       });
-
-    if (sql) {
-      await executeQuery(sql, queryRequest, id);
+    if (!sql) {
+      throw new Error("Could generate SQL for job with id: " + id);
     }
+    const pid = await executeQuery(sql, queryRequest);
+    await postgresDb
+      .update(jobTable)
+      .set({
+        pid: pid ?? 1, // temp default to 1 TODO
+        status: JobStatus.COMPLETED,
+        stoppedAt: new Date().toISOString(),
+      })
+      .where(eq(jobTable.id, id));
   },
 );
 
@@ -90,7 +97,6 @@ export async function sendMessage(userId: string, message: Job) {
     },
     JSON.stringify(message),
   );
-
   return message.id;
 }
 

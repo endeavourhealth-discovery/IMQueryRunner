@@ -1,4 +1,3 @@
-
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
 import { pgJobInsert, postgresDb } from "~~/server/db/postgres";
 import { jobTable } from "~~/server/db/postgres/schema";
@@ -8,9 +7,8 @@ import type { Job } from "~~/models/job.schema";
 import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
-  const user = await globalThis.apiGuard.getUser();
+  const user = await globalThis.apiGuard.getUser(event);
   const queryRequest: QueryRequest = await readBody(event);
-
   if (!queryRequest.language) queryRequest.language = DatabaseOption.MYSQL;
   try {
     await imapi.getQuerySql(queryRequest);
@@ -24,8 +22,7 @@ export default defineEventHandler(async (event) => {
     queryRequest: queryRequest,
     status: JobStatus.QUEUED,
     userId: user!.id,
-    userName: user!.userName,
-    queryResult: [],
+    userName: user!.username,
     queuedAt: new Date().toISOString(),
   } as Job;
   await postgresDb.insert(jobTable).values(pgJobInsert.parse(queryTask));
