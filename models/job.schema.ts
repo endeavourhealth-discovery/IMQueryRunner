@@ -13,7 +13,6 @@ export const jobSchema = z.object({
   pid: z.number().optional(),
   stoppedAt: z.string().optional(),
   status: z.enum(JobStatus),
-  queryResult: z.array(z.string()).optional(),
   error: z.any().optional(),
 });
 
