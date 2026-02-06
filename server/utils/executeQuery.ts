@@ -1,4 +1,5 @@
-import hash from "object-hash";
+import murmurhash from "murmurhash";
+import { type ResultSetHeader } from "mysql2";
 import { type Argument, type QueryRequest } from "~~/models/AutoGen";
 import { mysqlDb } from "../db/mysql";
 import { imapi } from "~~/server/utils/imapi";
@@ -8,19 +9,19 @@ export async function executeQuery(sql: string, queryRequest: QueryRequest) {
   const queryRequestForSQL = await imapi.getQueryRequestForSQL(queryRequest);
   if (!queryRequestForSQL.query.iri)
     throw new Error("Query IRI is required for execution");
-  const queryIrisToHashCodes = {} as { [key: string]: string };
+  const queryIrisToHashCodes = {} as { [key: string]: number };
   queryIrisToHashCodes["$hashcode"] = hashQueryRequest(queryRequestForSQL);
   // TODO: check if hashcode exists in db and is relevant, if so return cached results
   const subQueries = await imapi.getSubqueryIris(queryRequestForSQL.query.iri!);
-  if (subQueries.length) {
+  if (subQueries.length)
     await runSubQueries(subQueries, queryRequestForSQL, queryIrisToHashCodes);
-  }
   const resolvedSql = await getResolvedSql(
     sql,
     queryRequestForSQL,
     queryIrisToHashCodes,
   );
-  await mysqlDb.execute(resolvedSql);
+  const [result] = await mysqlDb.execute<ResultSetHeader>(resolvedSql);
+  return result.insertId;
 }
 
 function hashQueryRequest(queryRequest: QueryRequest) {
@@ -30,7 +31,7 @@ function hashQueryRequest(queryRequest: QueryRequest) {
     argHash += hashArgument(arg);
   }
   if (queryRequest.query.iri) argHash += queryRequest.query.iri;
-  return hash(argHash);
+  return murmurhash.v3(argHash);
 }
 
 function resolveArgs(queryRequest: QueryRequest) {
@@ -41,7 +42,7 @@ function resolveArgs(queryRequest: QueryRequest) {
     if (!hasDate)
       queryRequest.argument.push({
         parameter: date,
-        valueData: new Date().toString(),
+        valueData: new Date().toISOString().split("T")[0],
       } as Argument);
   }
 }
@@ -81,7 +82,7 @@ export async function getCachedQueryResults(
   // return result.map((r) => r.id);
 }
 
-export async function isCachedAndRelevant(hashCode: string): Promise<boolean> {
+export async function isCachedAndRelevant(hashCode: number): Promise<boolean> {
   // check if query has been run
   // check if the results are still relevant (by date)
   return false;
@@ -90,7 +91,7 @@ export async function isCachedAndRelevant(hashCode: string): Promise<boolean> {
 async function runSubQueries(
   subQueries: SubQueryDependency[],
   queryRequest: QueryRequest,
-  queryIrisToHashCodes: { [key: string]: string },
+  queryIrisToHashCodes: { [key: string]: number },
 ) {
   await getQueryIrisToHashCodes(
     subQueries,
@@ -122,7 +123,7 @@ async function runSubQueries(
 async function getResolvedSql(
   sql: string,
   queryRequest: QueryRequest,
-  queryIrisToHashCodes: { [key: string]: string },
+  queryIrisToHashCodes: { [key: string]: number },
 ) {
   if (queryRequest.argument) {
     for (const arg of queryRequest.argument) {
@@ -156,7 +157,7 @@ function getIriLine(stringIris: string[]): string {
 async function getQueryIrisToHashCodes(
   subQueries: SubQueryDependency[],
   argument: Argument[],
-  queryIrisToHashCodes: { [key: string]: string },
+  queryIrisToHashCodes: { [key: string]: number },
 ) {
   for (const subQueryDep of subQueries) {
     const subQueryIri = subQueryDep.iri;

@@ -1,11 +1,8 @@
 import { Connection } from "rabbitmq-client";
 import { JobStatus } from "~~/enums";
-import hash from "object-hash";
-import { v4 as uuidv4 } from "uuid";
 import { imapi } from "~~/server/utils/imapi";
 import { postgresDb } from "~~/server/db/postgres";
 import { eq } from "drizzle-orm";
-import { mysqlDb } from "~~/server/db/mysql";
 import { jobTable } from "~~/server/db/postgres/schema";
 import type { QueryRequest } from "~~/models/AutoGen";
 import { executeQuery } from "../utils/executeQuery";
@@ -71,7 +68,7 @@ const sub = rabbit.createConsumer(
     await postgresDb
       .update(jobTable)
       .set({
-        pid: pid ?? 1, // temp default to 1 TODO
+        pid: pid,
         status: JobStatus.COMPLETED,
         stoppedAt: new Date().toISOString(),
       })
