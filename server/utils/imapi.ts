@@ -1,4 +1,5 @@
 import type { DisplayMode, QueryRequest } from "~~/models/AutoGen";
+import type { SubQueryDependency } from "~~/models/SubQueryDependency";
 import { $fetch } from "ofetch";
 
 export class IMAPI {
@@ -6,6 +7,17 @@ export class IMAPI {
     return await $fetch(process.env.IMAPI_URL! + "query/private/sql", {
       body: queryRequest,
       method: "post",
+    });
+  }
+
+  public async getSubqueryIris(
+    queryIri: String,
+  ): Promise<SubQueryDependency[]> {
+    return await $fetch(process.env.IMAPI_URL! + "query/private/subQueries", {
+      params: {
+        queryIri: queryIri,
+      },
+      method: "get",
     });
   }
 
@@ -19,14 +31,16 @@ export class IMAPI {
     });
   }
 
-  public async describeQuery(queryIri: string, displayMode: DisplayMode) {
-    return await $fetch(process.env.IMAPI_URL! + "query/private/queryDisplay", {
-      params: {
-        queryIri: queryIri,
-        displayMode: displayMode,
+  public async getQueryRequestForSQL(
+    queryRequest: QueryRequest,
+  ): Promise<QueryRequest> {
+    return await $fetch(
+      process.env.IMAPI_URL! + "query/private/queryRequestForSQL",
+      {
+        body: queryRequest,
+        method: "post",
       },
-      method: "get",
-    });
+    );
   }
 }
 
