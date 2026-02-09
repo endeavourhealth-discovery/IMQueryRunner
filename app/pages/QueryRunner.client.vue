@@ -27,8 +27,8 @@
           :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
         >
           <template #empty>None</template>
-          <Column field="id" header="ID"></Column>
-          <Column field="queryIri" header="Iri"></Column>
+          <Column field="dbid" header="ID"></Column>
+          <Column field="queryRequest.query.iri" header="Iri"></Column>
           <Column field="jobName" header="Job name"></Column>
           <Column>
             <template #body="{ data }: { data: Job }">
