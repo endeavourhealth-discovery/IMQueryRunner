@@ -29,7 +29,7 @@ const sub = rabbit.createConsumer(
   async (msg) => {
     const id = msg.messageId!;
     const job = await postgresDb.query.jobTable.findFirst({
-      where: eq(jobTable.id, id),
+      where: eq(jobTable.dbid, id),
     });
     if (job && JobStatus.CANCELLED === job.status) {
       throw new Error("Item is cancelled. Query rejected.");
@@ -42,9 +42,9 @@ const sub = rabbit.createConsumer(
       .update(jobTable)
       .set({
         status: JobStatus.RUNNING,
-        startedAt: new Date().toISOString(),
+        runDate: new Date().toISOString(),
       })
-      .where(eq(jobTable.id, id));
+      .where(eq(jobTable.dbid, id));
     const parsedJob = JSON.parse(msg.body);
     const queryRequest: QueryRequest = parsedJob.queryRequest;
     let sql: string | undefined = await imapi
@@ -56,9 +56,9 @@ const sub = rabbit.createConsumer(
           .set({
             status: JobStatus.ERRORED,
             error: JSON.stringify(err),
-            stoppedAt: new Date().toISOString(),
+            finishDate: new Date().toISOString(),
           })
-          .where(eq(jobTable.id, id));
+          .where(eq(jobTable.dbid, id));
         return undefined;
       });
     if (!sql) {
@@ -70,9 +70,9 @@ const sub = rabbit.createConsumer(
       .set({
         pid: pid,
         status: JobStatus.COMPLETED,
-        stoppedAt: new Date().toISOString(),
+        finishDate: new Date().toISOString(),
       })
-      .where(eq(jobTable.id, id));
+      .where(eq(jobTable.dbid, id));
   },
 );
 
@@ -87,14 +87,14 @@ const pub = rabbit.createPublisher({
 export async function sendMessage(userId: string, message: Job) {
   await pub.send(
     {
-      messageId: message.id,
+      messageId: message.dbid,
       exchange: "query_runner",
       routingKey: "query.execute." + userId,
       durable: true,
     },
     JSON.stringify(message),
   );
-  return message.id;
+  return message.dbid;
 }
 
 async function onShutdown() {
