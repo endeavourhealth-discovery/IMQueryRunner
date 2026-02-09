@@ -5,7 +5,7 @@
           class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
       >
         <div class="m-2"><Button icon="fa-solid fa-arrow-left" label="Back to queue" @click="backToQueue" /></div>
-      <DataTable
+        <DataTable
         :size="'small'"
         :value="queryResults"
         :paginator="true"
@@ -81,7 +81,8 @@ onMounted(async () => {
 async function getQueryResults() {
   if (props.queryId) {
     // request.page = { pageNumber: pageNumber.value, pageSize: size.value }; //TODO: fix paging mechanism
-    const results = await useFetch(`/api/queue/query/results/hashcode/${props.queryId}`);
+    //const results = await useFetch(`/api/queue/query/results/hashcode/1); //TODO: for testing, remove later
+    const results = await useFetch(`/api/queue/query/results/${props.queryId}`);
     if (results.data.value && isArray(results.data.value)) {
       totalCount.value = results.data.value.length; //TODO: replace with actual count
       queryResults.value = results.data.value;

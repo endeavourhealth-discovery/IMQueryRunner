@@ -4,7 +4,9 @@
       <div
         class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
       >
-        <div class="m-2"><Button icon="fa-solid fa-arrows-rotate" label="Refresh" @click="refresh" /></div>
+        <div class="flex gap-2 m-2">
+          <Button class="flex" severity="secondary" icon="fa-solid fa-arrows-rotate" label="Refresh" @click="refresh" />
+        </div>
         <DataTable
           :value="jobs"
           :paginator="true"
@@ -213,9 +215,7 @@ function getStatusSeverity(
 }
 
 async function cancelQuery(queryId: string) {
-  await useFetch("/api/queue/query/cancel", {
-    params: { queueId: queryId },
-  });
+  await useFetch(`/api/queue/query/cancel/${queryId}`);
   await initSearch();
 }
 
@@ -253,9 +253,7 @@ async function viewArgumentDisplay(args: Argument[]) {
 }
 
 async function deleteQuery(queryId: string) {
-  await useFetch("/api/queue/query/delete", {
-    params: { queueId: queryId },
-  });
+  await useFetch(`/api/queue/query/delete/${queryId}`);
   await initSearch();
 }
 
