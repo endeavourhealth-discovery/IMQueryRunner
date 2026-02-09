@@ -16,14 +16,12 @@ export default defineEventHandler(async (event) => {
     throw createError("Unable to convert query to SQL");
   }
   const queryTask: Job = {
-    id: v4(),
+    dbid: v4(),
     jobName: queryRequest.query.name || "Unnamed Query",
-    queryIri: queryRequest.query.iri,
     queryRequest: queryRequest,
     status: JobStatus.QUEUED,
     userId: user!.id,
-    userName: user!.username,
-    queuedAt: new Date().toISOString(),
+    queueDate: new Date().toISOString(),
   } as Job;
   await postgresDb.insert(jobTable).values(pgJobInsert.parse(queryTask));
   await sendMessage(user!.id, queryTask);
