@@ -29,13 +29,13 @@ export default defineEventHandler(async (event) => {
   const filters: SQL[] = [];
   // if (!user?.groups.includes("Endeavour/Admin"))
   filters.push(eq(jobTable.userId, userId));
-  if (date) filters.push(lte(jobTable.queuedAt, date));
+  if (date) filters.push(lte(jobTable.queueDate, date));
 
   let qry = postgresDb
     .select()
     .from(jobTable)
     .where(and(...filters))
-    .orderBy(desc(jobTable.queuedAt))
+    .orderBy(desc(jobTable.queueDate))
     .offset((+page - 1) * +size)
     .limit(size);
 

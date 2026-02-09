@@ -42,7 +42,7 @@ export default defineNuxtConfig({
       casdoorClientId: process.env.CASDOOR_CLIENT_ID,
       casdoorClientSecret: process.env.CASDOOR_CLIENT_SECRET,
       imapiUrl: process.env.imapiUrl,
-      imDirectoryUrl: process.env.imDIrectoryUrl,
+      imDirectoryUrl: process.env.IM_DIRECTORY_URL,
       // cognitoIdentityPoolId: process.env.COGNITO_IDENTITY_POOL,
       // cognitoRegion: process.env.COGNITO_REGION,
       // cognitoUserPool: process.env.COGNITO_USER_POOL,

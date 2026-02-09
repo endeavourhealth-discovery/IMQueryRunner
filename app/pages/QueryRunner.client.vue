@@ -44,21 +44,21 @@
           <Column field="queuedAt" header="Queued at">
             <template #body="{ data }: { data: Job }">
               <span>{{
-                data.queuedAt ? getDisplayDateTime(data.queuedAt) : "-"
+                data.queueDate ? getDisplayDateTime(data.queueDate) : "-"
               }}</span>
             </template>
           </Column>
           <Column field="startedAt" header="Started at">
             <template #body="{ data }: { data: Job }">
               <span>{{
-                data.startedAt ? getDisplayDateTime(data.startedAt) : "-"
+                data.runDate ? getDisplayDateTime(data.runDate) : "-"
               }}</span>
             </template>
           </Column>
-          <Column field="stoppedAt" header="Stopped at">
+          <Column field="finishDate" header="Stopped at">
             <template #body="{ data }: { data: Job }">
               <span>{{
-                data.stoppedAt ? getDisplayDateTime(data.stoppedAt) : "-"
+                data.finishDate ? getDisplayDateTime(data.finishDate) : "-"
               }}</span>
             </template>
           </Column>
@@ -158,9 +158,9 @@ async function initSearch() {
   if (results.data.value) {
     totalCount.value = results.data.value.totalCount;
     jobs.value = results.data.value.result.sort((a, b) => {
-      if (!a.queuedAt) return 1;
-      if (!b.queuedAt) return -1;
-      return new Date(b.queuedAt).getTime() - new Date(a.queuedAt).getTime();
+      if (!a.queueDate) return 1;
+      if (!b.queueDate) return -1;
+      return new Date(b.queueDate).getTime() - new Date(a.queueDate).getTime();
     });
   } else {
     totalCount.value = 0;
@@ -184,9 +184,9 @@ async function refresh() {
   if (results) {
     totalCount.value = results.totalCount;
     jobs.value = results.result.sort((a, b) => {
-      if (!a.queuedAt) return 1;
-      if (!b.queuedAt) return -1;
-      return new Date(b.queuedAt).getTime() - new Date(a.queuedAt).getTime();
+      if (!a.queueDate) return 1;
+      if (!b.queueDate) return -1;
+      return new Date(b.queueDate).getTime() - new Date(a.queueDate).getTime();
     });
   } else {
     totalCount.value = 0;
@@ -233,10 +233,11 @@ async function goToQuery(queryIri: string) {
     },
     accept: async () => {
       const config = useRuntimeConfig();
+      console.log(config.public.imDirectoryUrl)
       await navigateTo(
-        `${config.public.imDirectoryUrl!}"directory/folder/"${encodeURI(
+        `${config.public.imDirectoryUrl!}directory/folder/${encodeURI(
           queryIri,
-        )}`,
+        )}`, {external: true},
       );
     },
   });
@@ -268,7 +269,7 @@ async function requeueQuery(queryId: string) {
 }
 
 function getById(queryId: string): Job | undefined {
-  return jobs.value.find((item) => item.id === queryId);
+  return jobs.value.find((item) => item.dbid === queryId);
 }
 
 async function onPage(event: any) {
