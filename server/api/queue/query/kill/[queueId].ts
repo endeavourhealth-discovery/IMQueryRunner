@@ -11,7 +11,7 @@ const paramSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
   const item = await postgresDb.query.jobTable.findFirst({
-    where: eq(jobTable.id, queueId),
+    where: eq(jobTable.dbid, queueId),
   });
   if (item) {
     const activeQuery = postgresDb.execute(`
@@ -31,9 +31,9 @@ export default defineEventHandler(async (event) => {
       .update(jobTable)
       .set({
         status: JobStatus.CANCELLED,
-        stoppedAt: new Date().toISOString(),
+        finishDate: new Date().toISOString(),
       })
-      .where(eq(jobTable.id, item.id));
+      .where(eq(jobTable.dbid, item.dbid));
   } else {
     createError("Query queue item not found for id: " + queueId);
   }
