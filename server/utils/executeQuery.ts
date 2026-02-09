@@ -24,7 +24,7 @@ export async function executeQuery(sql: string, queryRequest: QueryRequest) {
   return result.insertId;
 }
 
-function hashQueryRequest(queryRequest: QueryRequest) {
+export function hashQueryRequest(queryRequest: QueryRequest) {
   resolveArgs(queryRequest);
   let argHash = "";
   for (const arg of queryRequest.argument!) {

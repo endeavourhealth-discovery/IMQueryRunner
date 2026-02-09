@@ -142,8 +142,8 @@ function deleteQuery() {
   });
 }
 
-function viewQueryResults() {
-  emit("viewQueryResults", props.job);
+async function viewQueryResults() {
+  await navigateTo({ path: `/results/${props.job.dbid}` })
 }
 
 function requeueQuery() {

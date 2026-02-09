@@ -4,7 +4,9 @@
       <div
         class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
       >
-        <div><Button label="Refresh" @click="refresh" /></div>
+        <div class="flex gap-2 m-2">
+          <Button class="flex" severity="secondary" icon="fa-solid fa-arrows-rotate" label="Refresh" @click="refresh" />
+        </div>
         <DataTable
           :value="jobs"
           :paginator="true"
@@ -25,14 +27,16 @@
           :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
         >
           <template #empty>None</template>
-          <Column field="id" header="ID"></Column>
-          <Column field="queryIri" header="Iri"></Column>
+          <Column field="dbid" header="ID"></Column>
+          <Column field="queryRequest.query.iri" header="Iri"></Column>
           <Column field="jobName" header="Job name"></Column>
           <Column>
             <template #body="{ data }: { data: Job }">
               <Button
+                :disabled="!data.queryRequest.argument"
                 label="View arguments"
                 @click="viewArgumentDisplay(data.queryRequest.argument)"
+                v-tooltip.top="'No arguments available'"
               />
             </template>
           </Column>
@@ -74,10 +78,6 @@
         </DataTable>
       </div>
     </div>
-    <QueryResults
-      :queryItem="selectedQuery"
-      v-model:showDialog="showQueryResults"
-    />
     <ArgumentDisplayDialog
       :arguments="currentArguments"
       :show-footer-buttons="false"
@@ -93,7 +93,6 @@ import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
 import type { Argument } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
-import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
 import { useUserStore } from "~/plugins/end-sec-ui";
@@ -209,9 +208,7 @@ function getStatusSeverity(
 }
 
 async function cancelQuery(queryId: string) {
-  await useFetch("/api/queue/query/cancel", {
-    params: { queueId: queryId },
-  });
+  await useFetch(`/api/queue/query/cancel/${queryId}`);
   await initSearch();
 }
 
@@ -230,9 +227,9 @@ async function goToQuery(queryIri: string) {
     accept: async () => {
       const config = useRuntimeConfig();
       await navigateTo(
-        `${config.public.imDirectoryUrl!}"directory/folder/"${encodeURI(
+        `${config.public.imDirectoryUrl!}directory/folder/${encodeURI(
           queryIri,
-        )}`,
+        )}`, {external: true},
       );
     },
   });
@@ -249,9 +246,7 @@ async function viewArgumentDisplay(args: Argument[]) {
 }
 
 async function deleteQuery(queryId: string) {
-  await useFetch("/api/queue/query/delete", {
-    params: { queueId: queryId },
-  });
+  await useFetch(`/api/queue/query/delete/${queryId}`);
   await initSearch();
 }
 

@@ -1,5 +1,8 @@
-import {object, string} from "zod/v4/mini";
+import {object, string, enum as zenum, array, boolean } from "zod/v4";
 import {createError, getValidatedQuery, H3Event, type InferEventInput, type ValidateFunction} from "h3";
+import {Namespace, UserRole} from "~~/models/AutoGen";
+import Resource from "~~/enums/Resource";
+import type {output} from "zod/v4/mini";
 
 const loginUrlSchema = object({
   redirectUri: string(),
@@ -11,9 +14,16 @@ const loginSchema = object({
   state: string()
 });
 
-const permissionSchema = object({
-  object: string(),
-  action: string()
+const NamespacePermissionSchema = object({
+    iri: zenum(Namespace),
+    read: boolean(),
+    write: boolean(),
+});
+
+const PermissionSchema = object({
+    resource: zenum(Resource),
+    allowableRoles: array(zenum(UserRole)).prefault([]),
+    allowableNamespaces: array(NamespacePermissionSchema).prefault([]),
 });
 
 async function getQueryParams<T, Event extends H3Event = H3Event, _T = InferEventInput<"query", Event, T>>(event: Event, validate: ValidateFunction<_T>): Promise<_T> {
@@ -38,15 +48,15 @@ export default defineEventHandler(async (event): Promise<any> => {
   if (method == "POST") {
     switch (name) {
       case "hasPermission": {
-        const permissionParams = await getQueryParams(event, permissionSchema.parse)
-        return await $fetch<string>(`${EndSecHost}/api/${EndSecApp}/authz/hasPermission`, {
-          headers: {"x-client-ip": clientIp},
-          query: {
-            sessionId: sessionId,
-            object: permissionParams.object,
-            action: permissionParams.action
-          }
-        });
+          const permissionParams = await readValidatedBody(event, PermissionSchema.parse)
+          return await $fetch<string>(`${EndSecHost}/api/${EndSecApp}/authz/hasPermission`, {
+              method: "POST",
+              headers: {"x-client-ip": clientIp},
+              body: {
+                  permission: permissionParams,
+                  sessionId: sessionId
+              }
+          });
       }
     }
   } else if (method == "GET") {

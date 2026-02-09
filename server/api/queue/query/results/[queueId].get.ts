@@ -1,9 +1,11 @@
 import { z } from "zod";
 import { postgresDb } from "~~/server/db/postgres";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { jobTable } from "~~/server/db/postgres/schema";
-import hash from "object-hash";
-import { mysqlDb } from "~~/server/db/mysql";
+import {imapi} from "~~/server/utils/imapi";
+import { hashQueryRequest } from "~~/server/utils/executeQuery";
+import type {QueryRequest} from "~~/models/AutoGen";
+
 
 const paramSchema = z.object({
   queueId: z.string(),
@@ -16,12 +18,12 @@ export default defineEventHandler(async (event) => {
   });
 
   if (item?.queryRequest) {
-    const requestHash = hash(item.queryRequest);
+      const queryRequestForSQL = await imapi.getQueryRequestForSQL(item.queryRequest as QueryRequest);
+      if (!queryRequestForSQL.query.iri)
+          throw new Error("Query IRI is required for execution");
+      const requestHash = hashQueryRequest(queryRequestForSQL);
+      const results = await $fetch(`/api/queue/query/results/hashcode/${requestHash}`) as any;
 
-    const results = await mysqlDb.execute(
-      sql.raw(`SELECT * FROM imqcache.${requestHash}`),
-    );
-
-    return results[0];
+      return results[0];
   }
 });
