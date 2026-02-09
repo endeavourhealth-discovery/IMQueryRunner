@@ -1,11 +1,11 @@
 import z from "zod";
-import { QueueItemStatus } from "~~/enums";
-import {pgQueueItemSelect, postgresDb} from "~~/server/db/postgres";
-import {and, desc, eq} from "drizzle-orm";
-import {queueItem} from "~~/server/db/postgres/schema";
+import { JobStatus } from "~~/enums";
+import { pgJobSelect, postgresDb } from "~~/server/db/postgres";
+import { and, desc, eq } from "drizzle-orm";
+import { jobTable } from "~~/server/db/postgres/schema";
 
 const querySchema = z.object({
-  status: z.enum(QueueItemStatus),
+  status: z.enum(JobStatus),
   page: z.coerce.number().default(1),
   size: z.coerce.number().default(25),
   userId: z.string(),
@@ -14,26 +14,21 @@ const querySchema = z.object({
 export default defineEventHandler(async (event) => {
   const { status, page, size, userId } = await getValidatedQuery(
     event,
-    querySchema.parse
+    querySchema.parse,
   );
 
-  const totalCount = await postgresDb.$count(queueItem,
-    and(
-      eq(queueItem.userId, userId),
-      eq(queueItem.status, status)
-    )
+  const totalCount = await postgresDb.$count(
+    jobTable,
+    and(eq(jobTable.userId, userId), eq(jobTable.status, status)),
   );
 
-  const rs = await postgresDb.query.queueItem.findMany({
-    where: and(
-      eq(queueItem.userId, userId),
-      eq(queueItem.status, status)
-    ),
-    orderBy: [desc(queueItem.queuedAt)],
+  const rs = await postgresDb.query.jobTable.findMany({
+    where: and(eq(jobTable.userId, userId), eq(jobTable.status, status)),
+    orderBy: [desc(jobTable.queuedAt)],
     offset: (+page - 1) * +size,
-    limit: size
+    limit: size,
   });
-  const items = rs.map((row) => pgQueueItemSelect.parse(row));
+  const items = rs.map((row) => pgJobSelect.parse(row));
   return {
     result: items,
     totalCount,

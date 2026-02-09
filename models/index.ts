@@ -1,3 +1,3 @@
-import type { QueueItem } from "./queryItem.schema";
+import type { Job } from "./job.schema";
 
-export type { QueueItem };
+export type { Job };

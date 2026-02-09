@@ -6,7 +6,7 @@
       >
         <div><Button label="Refresh" @click="refresh" /></div>
         <DataTable
-          :value="queryQueueItems"
+          :value="jobs"
           :paginator="true"
           :rows="rows"
           :scrollable="true"
@@ -27,9 +27,9 @@
           <template #empty>None</template>
           <Column field="id" header="ID"></Column>
           <Column field="queryIri" header="Iri"></Column>
-          <Column field="queryName" header="Query name"></Column>
+          <Column field="jobName" header="Job name"></Column>
           <Column>
-            <template #body="{ data }: { data: QueueItem }">
+            <template #body="{ data }: { data: Job }">
               <Button
                 label="View arguments"
                 @click="viewArgumentDisplay(data.queryRequest.argument)"
@@ -38,35 +38,28 @@
           </Column>
           <Column field="userName" header="User"></Column>
           <Column field="queuedAt" header="Queued at">
-            <template #body="{ data }: { data: QueueItem }">
+            <template #body="{ data }: { data: Job }">
               <span>{{
                 data.queuedAt ? getDisplayDateTime(data.queuedAt) : "-"
               }}</span>
             </template>
           </Column>
           <Column field="startedAt" header="Started at">
-            <template #body="{ data }: { data: QueueItem }">
+            <template #body="{ data }: { data: Job }">
               <span>{{
                 data.startedAt ? getDisplayDateTime(data.startedAt) : "-"
               }}</span>
             </template>
           </Column>
-          <Column field="finishedAt" header="Finished at">
-            <template #body="{ data }: { data: QueueItem }">
+          <Column field="stoppedAt" header="Stopped at">
+            <template #body="{ data }: { data: Job }">
               <span>{{
-                data.finishedAt ? getDisplayDateTime(data.finishedAt) : "-"
-              }}</span>
-            </template>
-          </Column>
-          <Column field="killedAt" header="Killed at">
-            <template #body="{ data }: { data: QueueItem }">
-              <span>{{
-                data.killedAt ? getDisplayDateTime(data.killedAt) : "-"
+                data.stoppedAt ? getDisplayDateTime(data.stoppedAt) : "-"
               }}</span>
             </template>
           </Column>
           <Column field="status" header="Status">
-            <template #body="{ data }: { data: QueueItem }">
+            <template #body="{ data }: { data: Job }">
               <Tag
                 :severity="data.status ? getStatusSeverity(data.status) : '-'"
                 :value="data.status"
@@ -76,7 +69,7 @@
           <Column>
             <template #body="slotProps">
               <ActionButtons
-                :queryQueueItem="slotProps.data"
+                :job="slotProps.data"
                 @cancel-query="cancelQuery"
                 @go-to-query="goToQuery"
                 @view-query-results="viewQueryResults"
@@ -101,33 +94,39 @@
 </template>
 
 <script setup lang="ts">
-import type { QueueItem } from "~~/models";
-import { QueueItemStatus } from "~~/enums";
-import { computed, onMounted, ref } from "vue";
+import type { Job } from "~~/models";
+import { JobStatus } from "~~/enums";
+import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
-import type { Argument, QueryRequest } from "~~/models/AutoGen";
+import type { Argument } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import QueryResults from "~/components/queryRunner/QueryResults.vue";
 import { io } from "socket.io-client";
-import { useUser } from "~/composables/useUser";
+import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
+import { useUserStore } from "~/plugins/end-sec-ui";
 
-const { user } = useUser();
+definePageMeta({
+  requiresAuth: true,
+  requiresRole: ["EXECUTOR", "ADMIN"],
+})
+
+const { user } = useUserStore();
 const confirm = useConfirm();
 
 const socket = io({
   extraHeaders: {
-    authorization: `bearer ${user.value?.id}`,
+    authorization: `bearer ${user?.id}`,
   },
 });
 
-const queryQueueItems: Ref<QueueItem[]> = ref([]);
+const jobs: Ref<Job[]> = ref([]);
 const loading = ref(true);
 const searchLoading = ref(false);
 const totalCount = ref(0);
 const page = ref(1);
 const rows = ref(25);
 const rowsOriginal = ref(25);
-const selectedQuery: Ref<QueueItem | undefined> = ref();
+const selectedQuery: Ref<Job | undefined> = ref();
 const showQueryResults = ref(false);
 const websocketIsConnected = ref(false);
 const transport = ref("N/A");
@@ -137,78 +136,79 @@ const currentArguments: Ref<Argument[]> = ref([]);
 onMounted(async () => {
   loading.value = true;
   loading.value = false;
-  socket.emit("joinRoom", "test-room", user.value?.userName);
+  socket.emit("joinRoom", "test-room", user?.userName);
   socket.on("message", function (data) {
     alert(data);
   });
   socket.emit("hello");
+  await initSearch()
 });
 
 async function initSearch() {
   searchLoading.value = true;
   const results = await useFetch<{
     totalCount: number;
-    result: QueueItem[];
+    result: Job[];
   }>("/api/queue/user/", {
     query: {
-      userId: user.value?.id,
+      userId: user?.id,
       page: page.value,
       size: rows.value,
     },
   });
   if (results.data.value) {
     totalCount.value = results.data.value.totalCount;
-    queryQueueItems.value = results.data.value.result.sort((a, b) => {
+    jobs.value = results.data.value.result.sort((a, b) => {
       if (!a.queuedAt) return 1;
       if (!b.queuedAt) return -1;
       return new Date(b.queuedAt).getTime() - new Date(a.queuedAt).getTime();
     });
   } else {
     totalCount.value = 0;
-    queryQueueItems.value = [];
+    jobs.value = [];
   }
   searchLoading.value = false;
 }
 
 async function refresh() {
   searchLoading.value = true;
-  const results = await $fetch<{ totalCount: number; result: QueueItem[] }>(
+  const results = await $fetch<{ totalCount: number; result: Job[] }>(
     "/api/queue/user/",
     {
       query: {
-        userId: user.value?.id,
+        userId: user?.id,
         page: page.value,
         size: rows.value,
       },
-    }
+    },
   );
   if (results) {
     totalCount.value = results.totalCount;
-    queryQueueItems.value = results.result.sort((a, b) => {
+    jobs.value = results.result.sort((a, b) => {
       if (!a.queuedAt) return 1;
       if (!b.queuedAt) return -1;
       return new Date(b.queuedAt).getTime() - new Date(a.queuedAt).getTime();
     });
   } else {
     totalCount.value = 0;
-    queryQueueItems.value = [];
+    jobs.value = [];
   }
   searchLoading.value = false;
 }
 
 function getStatusSeverity(
-  status: QueueItemStatus
+  status: JobStatus,
 ): "secondary" | "success" | "info" | "warn" | "danger" | "contrast" {
   switch (status) {
-    case QueueItemStatus.QUEUED:
+    case JobStatus.QUEUED:
       return "warn";
-    case QueueItemStatus.RUNNING:
+    case JobStatus.RUNNING:
       return "info";
-    case QueueItemStatus.COMPLETED:
+    case JobStatus.COMPLETED:
       return "success";
-    case QueueItemStatus.ERRORED:
+    case JobStatus.ERRORED:
       return "danger";
-    case QueueItemStatus.CANCELLED:
+    case JobStatus.CANCELLED:
       return "contrast";
     default:
       return "info";
@@ -238,14 +238,14 @@ async function goToQuery(queryIri: string) {
       const config = useRuntimeConfig();
       await navigateTo(
         `${config.public.imDirectoryUrl!}"directory/folder/"${encodeURI(
-          queryIri
-        )}`
+          queryIri,
+        )}`,
       );
     },
   });
 }
 
-async function viewQueryResults(queryItem: QueueItem) {
+async function viewQueryResults(queryItem: Job) {
   selectedQuery.value = queryItem;
   showQueryResults.value = true;
 }
@@ -272,8 +272,8 @@ async function requeueQuery(queryId: string) {
   await initSearch();
 }
 
-function getById(queryId: string): QueueItem | undefined {
-  return queryQueueItems.value.find((item) => item.id === queryId);
+function getById(queryId: string): Job | undefined {
+  return jobs.value.find((item) => item.id === queryId);
 }
 
 async function onPage(event: any) {
@@ -285,24 +285,25 @@ async function onPage(event: any) {
 
 function scrollToTop() {
   const scrollArea = document.getElementsByClassName(
-    "p-datatable-scrollable-table"
+    "p-datatable-scrollable-table",
   )[0] as HTMLElement;
   scrollArea?.scrollIntoView({ block: "start", behavior: "smooth" });
 }
 
-function getDisplayDateTime(date: Date) {
+function getDisplayDateTime(date: string) {
+  const d = new Date(date);
   return (
-    date.getUTCDate() +
+    d.getUTCDate() +
     "/" +
-    (date.getUTCMonth() + 1) +
+    (d.getUTCMonth() + 1) +
     "/" +
-    date.getUTCFullYear() +
+    d.getUTCFullYear() +
     " " +
-    date.getUTCHours() +
+    d.getUTCHours() +
     ":" +
-    date.getUTCMinutes() +
+    d.getUTCMinutes() +
     ":" +
-    date.getUTCMilliseconds()
+    d.getUTCMilliseconds()
   );
 }
 
@@ -324,7 +325,7 @@ onBeforeUnmount(() => {
 });
 
 socket.on("queueUpdate", (value) => {
-  queryQueueItems.value = value;
+  jobs.value = value;
 });
 </script>
 

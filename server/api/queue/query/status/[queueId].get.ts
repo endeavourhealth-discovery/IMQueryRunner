@@ -1,8 +1,7 @@
-import { QueueItemStatus } from "~~/enums";
 import { z } from "zod";
-import {postgresDb} from "~~/server/db/postgres";
-import {eq} from "drizzle-orm";
-import {queueItem} from "~~/server/db/postgres/schema";
+import { postgresDb } from "~~/server/db/postgres";
+import { eq } from "drizzle-orm";
+import { jobTable } from "~~/server/db/postgres/schema";
 
 const paramSchema = z.object({
   queueId: z.string(),
@@ -10,8 +9,8 @@ const paramSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
-  const item = await postgresDb.query.queueItem.findFirst({
-    where: eq(queueItem.id, queueId ),
+  const item = await postgresDb.query.jobTable.findFirst({
+    where: eq(jobTable.id, queueId),
   });
 
   return item;

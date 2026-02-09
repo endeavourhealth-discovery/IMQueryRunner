@@ -1,45 +1,49 @@
 import z from "zod";
-import {pgQueueItemSelect, postgresDb} from "~~/server/db/postgres";
-import {queueItem} from "~~/server/db/postgres/schema";
-import {and, desc, eq, lte, SQL} from "drizzle-orm";
+import { pgJobSelect, postgresDb } from "~~/server/db/postgres";
+import { jobTable } from "~~/server/db/postgres/schema";
+import { and, desc, eq, lte, SQL } from "drizzle-orm";
 import Logger from "#shared/logger";
 
 const querySchema = z.object({
   page: z.coerce.number().default(1),
   size: z.coerce.number().default(25),
   date: z.iso.date().optional(),
-  userId: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
   const LOG = Logger("api/queue/user");
-  const user = globalThis.authenticator.getUser(event);
+  const user = await globalThis.apiGuard.getUser(event);
 
-  const { page, size, userId, date } = await getValidatedQuery(
+  const { page, size, date } = await getValidatedQuery(
     event,
-    querySchema.parse
+    querySchema.parse,
   );
 
-  const totalCount = await postgresDb.$count(queueItem, eq(queueItem.userId, userId));
+  const userId = user!.id;
+
+  const totalCount = await postgresDb.$count(
+    jobTable,
+    eq(jobTable.userId, userId),
+  );
 
   const filters: SQL[] = [];
   // if (!user?.groups.includes("Endeavour/Admin"))
-    filters.push(eq(queueItem.userId, userId));
-  if (date)
-    filters.push(lte(queueItem.queuedAt, date));
+  filters.push(eq(jobTable.userId, userId));
+  if (date) filters.push(lte(jobTable.queuedAt, date));
 
-  let qry = postgresDb.select()
-    .from(queueItem)
+  let qry = postgresDb
+    .select()
+    .from(jobTable)
     .where(and(...filters))
-    .orderBy(desc(queueItem.queuedAt))
+    .orderBy(desc(jobTable.queuedAt))
     .offset((+page - 1) * +size)
     .limit(size);
 
-  LOG.debug(qry.toSQL().sql)
+  LOG.debug(qry.toSQL().sql);
 
   const rs = await qry.execute();
 
-  const items = rs.map((row) => pgQueueItemSelect.parse(row));
+  const items = rs.map((row) => pgJobSelect.parse(row));
 
   return {
     result: items,

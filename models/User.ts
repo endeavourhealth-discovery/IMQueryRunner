@@ -1,13 +1,14 @@
-import { z } from "zod";
+import {object, string, uuid, array, type output} from "zod/v4/mini";
 
-export const userSchema = z.object({
-  id: z.uuid(),
-  userName: z.string(),
-  displayName: z.string(),
-  email: z.string(),
-  avatar: z.string(),
-  type: z.string(),
-  groups: z.array(z.string())
+export const userSchema = object({
+  id: uuid(),
+  userName: string(),
+  displayName: string(),
+  email: string(),
+  avatar: string(),
+  type: string(),
+  groups: array(string()),
+  roles: array(string())
 });
 
-export type User = z.infer<typeof userSchema>;
+export type User = output<typeof userSchema>;

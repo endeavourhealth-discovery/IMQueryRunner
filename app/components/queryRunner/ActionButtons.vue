@@ -9,10 +9,7 @@
     />
     <Button
       v-if="
-        queryQueueItem.status &&
-        [QueueItemStatus.QUEUED, QueueItemStatus.RUNNING].includes(
-          queryQueueItem.status
-        )
+        job.status && [JobStatus.QUEUED, JobStatus.RUNNING].includes(job.status)
       "
       icon="fa-duotone fa-solid fa-ban"
       severity="danger"
@@ -23,12 +20,10 @@
     />
     <Button
       v-if="
-        queryQueueItem.status &&
-        [
-          QueueItemStatus.COMPLETED,
-          QueueItemStatus.CANCELLED,
-          QueueItemStatus.ERRORED,
-        ].includes(queryQueueItem.status)
+        job.status &&
+        [JobStatus.COMPLETED, JobStatus.CANCELLED, JobStatus.ERRORED].includes(
+          job.status,
+        )
       "
       icon="fa-duotone fa-solid fa-repeat"
       severity="warn"
@@ -38,10 +33,7 @@
       data-testid="requeue-query-button"
     />
     <Button
-      v-if="
-        queryQueueItem.status &&
-        [QueueItemStatus.ERRORED].includes(queryQueueItem.status)
-      "
+      v-if="job.status && [JobStatus.ERRORED].includes(job.status)"
       icon="fa-duotone fa-solid fa-triangle-exclamation"
       class="p-button-rounded p-button-text activity-row-button"
       @click="showErrorDialog = true"
@@ -49,7 +41,7 @@
       data-testid="show-error-button"
     />
     <Button
-      v-if="queryQueueItem.status === QueueItemStatus.COMPLETED"
+      v-if="job.status === JobStatus.COMPLETED"
       icon="fa-duotone fa-solid fa-list"
       class="p-button-rounded p-button-text p-button-plain activity-row-button"
       @click="viewQueryResults"
@@ -71,7 +63,7 @@
     maximizable
     header="Error details"
   >
-    <div>{{ queryQueueItem.error }}</div>
+    <div>{{ job.error }}</div>
     <template #footer>
       <div class="im-dialog-footer">
         <div class="button-footer">
@@ -83,13 +75,13 @@
 </template>
 
 <script setup lang="ts">
-import { QueueItemStatus } from "@@/enums";
-import type { QueueItem } from "~~/models";
+import { JobStatus } from "@@/enums";
+import type { Job } from "~~/models";
 import { useConfirm } from "primevue/useconfirm";
 import { ref } from "vue";
 
 interface Props {
-  queryQueueItem: QueueItem;
+  job: Job;
 }
 
 const props = defineProps<Props>();
@@ -107,15 +99,13 @@ const confirm = useConfirm();
 const showErrorDialog = ref(false);
 
 function goToQuery() {
-  emit("goToQuery", props.queryQueueItem.queryIri);
+  emit("goToQuery", props.job.queryIri);
 }
 
 function cancelQuery() {
   confirm.require({
     message:
-      "Are you sure you want to cancel query '" +
-      props.queryQueueItem.queryName +
-      "'?",
+      "Are you sure you want to cancel query '" + props.job.jobName + "'?",
     header: "Confirm cancellation",
     icon: "pi pi-exclamation-triangle",
     rejectProps: {
@@ -126,7 +116,7 @@ function cancelQuery() {
     acceptProps: {
       label: "Yes",
     },
-    accept: () => emit("cancelQuery", props.queryQueueItem.id),
+    accept: () => emit("cancelQuery", props.job.id),
     reject: () => confirm.close(),
   });
 }
@@ -135,7 +125,7 @@ function deleteQuery() {
   confirm.require({
     message:
       "Are you sure you want to delete query '" +
-      props.queryQueueItem.queryName +
+      props.job.jobName +
       "' from the queue?",
     header: "Confirm cancellation",
     icon: "pi pi-exclamation-triangle",
@@ -147,17 +137,17 @@ function deleteQuery() {
     acceptProps: {
       label: "Yes",
     },
-    accept: () => emit("deleteQuery", props.queryQueueItem.id),
+    accept: () => emit("deleteQuery", props.job.id),
     reject: () => confirm.close(),
   });
 }
 
 function viewQueryResults() {
-  emit("viewQueryResults", props.queryQueueItem);
+  emit("viewQueryResults", props.job);
 }
 
 function requeueQuery() {
-  emit("requeueQuery", props.queryQueueItem.id);
+  emit("requeueQuery", props.job.id);
 }
 
 function showErrorDetails() {}

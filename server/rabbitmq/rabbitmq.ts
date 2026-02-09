@@ -1,14 +1,12 @@
 import { Connection } from "rabbitmq-client";
-import { QueueItemStatus } from "~~/enums";
-import hash from "object-hash";
-import { v4 as uuidv4 } from "uuid";
+import { JobStatus } from "~~/enums";
 import { imapi } from "~~/server/utils/imapi";
 import { postgresDb } from "~~/server/db/postgres";
 import { eq } from "drizzle-orm";
-import { mysqlDb } from "~~/server/db/mysql";
-import { queueItem } from "~~/server/db/postgres/schema";
+import { jobTable } from "~~/server/db/postgres/schema";
 import type { QueryRequest } from "~~/models/AutoGen";
 import { executeQuery } from "../utils/executeQuery";
+import type { Job } from "~~/models/job.schema";
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
 rabbit.on("error", (err) => {});
@@ -30,45 +28,52 @@ const sub = rabbit.createConsumer(
   },
   async (msg) => {
     const id = msg.messageId!;
-    const entry = await postgresDb.query.queueItem.findFirst({
-      where: eq(queueItem.id, id),
+    const job = await postgresDb.query.jobTable.findFirst({
+      where: eq(jobTable.dbid, id),
     });
-    if (entry && QueueItemStatus.CANCELLED === entry.status) {
+    if (job && JobStatus.CANCELLED === job.status) {
       throw new Error("Item is cancelled. Query rejected.");
     }
-    if (!entry) {
-      throw new Error("Could not find entry with id: " + id);
+    if (!job) {
+      throw new Error("Could not find job with id: " + id);
     }
 
     await postgresDb
-      .update(queueItem)
+      .update(jobTable)
       .set({
-        status: QueueItemStatus.RUNNING,
-        startedAt: new Date().toISOString(),
+        status: JobStatus.RUNNING,
+        runDate: new Date().toISOString(),
       })
-      .where(eq(queueItem.id, id));
-
-    const queryRequest: QueryRequest = JSON.parse(msg.body);
-
+      .where(eq(jobTable.dbid, id));
+    const parsedJob = JSON.parse(msg.body);
+    const queryRequest: QueryRequest = parsedJob.queryRequest;
     let sql: string | undefined = await imapi
       .getQuerySql(queryRequest)
       .catch(async (err) => {
         console.error(err);
         await postgresDb
-          .update(queueItem)
+          .update(jobTable)
           .set({
-            status: QueueItemStatus.ERRORED,
+            status: JobStatus.ERRORED,
             error: JSON.stringify(err),
-            killedAt: new Date().toISOString(),
+            finishDate: new Date().toISOString(),
           })
-          .where(eq(queueItem.id, id));
+          .where(eq(jobTable.dbid, id));
         return undefined;
       });
-
-    if (sql) {
-      await executeQuery(sql, queryRequest, id);
+    if (!sql) {
+      throw new Error("Could generate SQL for job with id: " + id);
     }
-  }
+    const pid = await executeQuery(sql, queryRequest);
+    await postgresDb
+      .update(jobTable)
+      .set({
+        pid: pid,
+        status: JobStatus.COMPLETED,
+        finishDate: new Date().toISOString(),
+      })
+      .where(eq(jobTable.dbid, id));
+  },
 );
 
 sub.on("error", (err) => {});
@@ -79,22 +84,17 @@ const pub = rabbit.createPublisher({
   exchanges: [{ exchange: "query_runner", type: "topic", durable: true }],
 });
 
-export async function sendMessage(userId: string, message: any) {
-  const id = uuidv4();
-
-  if (message instanceof Object) message = JSON.stringify(message);
-
+export async function sendMessage(userId: string, message: Job) {
   await pub.send(
     {
-      messageId: id,
+      messageId: message.dbid,
       exchange: "query_runner",
       routingKey: "query.execute." + userId,
       durable: true,
     },
-    message
+    JSON.stringify(message),
   );
-
-  return id;
+  return message.dbid;
 }
 
 async function onShutdown() {
