@@ -10,7 +10,7 @@ const paramSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
   const item = await postgresDb.query.jobTable.findFirst({
-    where: eq(jobTable.id, queueId),
+    where: eq(jobTable.dbid, queueId),
   });
 
   return item;

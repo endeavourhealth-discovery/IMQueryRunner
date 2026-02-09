@@ -99,7 +99,7 @@ const confirm = useConfirm();
 const showErrorDialog = ref(false);
 
 function goToQuery() {
-  emit("goToQuery", props.job.queryIri);
+  emit("goToQuery", props.job.queryRequest.query.iri);
 }
 
 function cancelQuery() {
@@ -116,7 +116,7 @@ function cancelQuery() {
     acceptProps: {
       label: "Yes",
     },
-    accept: () => emit("cancelQuery", props.job.id),
+    accept: () => emit("cancelQuery", props.job.dbid),
     reject: () => confirm.close(),
   });
 }
@@ -137,7 +137,7 @@ function deleteQuery() {
     acceptProps: {
       label: "Yes",
     },
-    accept: () => emit("deleteQuery", props.job.id),
+    accept: () => emit("deleteQuery", props.job.dbid),
     reject: () => confirm.close(),
   });
 }
@@ -147,7 +147,7 @@ function viewQueryResults() {
 }
 
 function requeueQuery() {
-  emit("requeueQuery", props.job.id);
+  emit("requeueQuery", props.job.dbid);
 }
 
 function showErrorDetails() {}

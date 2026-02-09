@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
   const rs = await postgresDb.query.jobTable.findMany({
     where: eq(jobTable.status, status),
-    orderBy: [desc(jobTable.queuedAt)],
+    orderBy: [desc(jobTable.queueDate)],
     offset: (+page - 1) * +size,
     limit: size,
   });

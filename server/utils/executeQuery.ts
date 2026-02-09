@@ -62,10 +62,10 @@ function hashArgument(argument: Argument): string {
   if (argument.valuePath) hashString += argument.valuePath;
   if (argument.valueNodeRef) hashString += argument.valueNodeRef;
   if (argument.dataType) hashString += argument.dataType.iri;
-  if (argument.valuePathList) {
-    const sorted = argument.valuePathList.toSorted();
-    for (const path of sorted) {
-      hashString += path.iri;
+  if (argument.valueIriList) {
+    const sorted = argument.valueIriList.toSorted();
+    for (const valueIri of sorted) {
+      hashString += valueIri.iri;
     }
   }
   if (argument.valueObject) hashString += argument.valueObject;
