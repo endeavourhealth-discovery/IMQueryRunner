@@ -48,14 +48,7 @@
               }}</span>
             </template>
           </Column>
-          <Column field="startedAt" header="Started at">
-            <template #body="{ data }: { data: Job }">
-              <span>{{
-                data.runDate ? getDisplayDateTime(data.runDate) : "-"
-              }}</span>
-            </template>
-          </Column>
-          <Column field="finishDate" header="Stopped at">
+          <Column field="stoppedAt" header="Stopped at">
             <template #body="{ data }: { data: Job }">
               <span>{{
                 data.finishDate ? getDisplayDateTime(data.finishDate) : "-"
@@ -107,7 +100,7 @@ import { useUserStore } from "~/plugins/end-sec-ui";
 definePageMeta({
   requiresAuth: true,
   requiresRole: ["EXECUTOR", "ADMIN"],
-})
+});
 
 const { user } = useUserStore();
 const confirm = useConfirm();
@@ -140,7 +133,7 @@ onMounted(async () => {
     alert(data);
   });
   socket.emit("hello");
-  await initSearch()
+  await initSearch();
 });
 
 async function initSearch() {
@@ -233,7 +226,6 @@ async function goToQuery(queryIri: string) {
     },
     accept: async () => {
       const config = useRuntimeConfig();
-      console.log(config.public.imDirectoryUrl)
       await navigateTo(
         `${config.public.imDirectoryUrl!}directory/folder/${encodeURI(
           queryIri,
