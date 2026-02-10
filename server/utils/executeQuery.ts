@@ -10,18 +10,33 @@ export async function executeQuery(sql: string, queryRequest: QueryRequest) {
   if (!queryRequestForSQL.query.iri)
     throw new Error("Query IRI is required for execution");
   const queryIrisToHashCodes = {} as { [key: string]: number };
-  queryIrisToHashCodes["$hashcode"] = hashQueryRequest(queryRequestForSQL);
+  queryIrisToHashCodes["$hash"] = hashQueryRequest(queryRequestForSQL);
+  console.log("Hash code for query:", queryIrisToHashCodes["$hash"]);
   // TODO: check if hashcode exists in db and is relevant, if so return cached results
   const subQueries = await imapi.getSubqueryIris(queryRequestForSQL.query.iri!);
+  console.log("Subqueries to run:", subQueries.length);
   if (subQueries.length)
-    await runSubQueries(subQueries, queryRequestForSQL, queryIrisToHashCodes);
+    try {
+      await runSubQueries(subQueries, queryRequestForSQL, queryIrisToHashCodes);
+    } catch (err) {
+      console.error("Error running subqueries");
+      throw err;
+    }
   const resolvedSql = await getResolvedSql(
     sql,
     queryRequestForSQL,
     queryIrisToHashCodes,
   );
-  const [result] = await mysqlDb.execute<ResultSetHeader>(resolvedSql);
-  return result.insertId;
+  try {
+    const [result] = await mysqlDb.execute<ResultSetHeader>(resolvedSql);
+    return {
+      insertId: result.insertId,
+      hashCode: queryIrisToHashCodes["$hash"],
+    };
+  } catch (err) {
+    console.error("Error executing SQL");
+    throw err;
+  }
 }
 
 export function hashQueryRequest(queryRequest: QueryRequest) {
