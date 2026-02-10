@@ -1,11 +1,11 @@
-import type {DisplayMode, QueryRequest, SearchResponse} from "~~/models/AutoGen";
+import type {QueryRequest, SearchResponse} from "~~/models/AutoGen";
 import type { SubQueryDependency } from "~~/models/SubQueryDependency";
 import { $fetch } from "ofetch";
 
 export class IMAPI {
 
     public async getQuerySql(queryRequest: QueryRequest): Promise<string> {
-        return await $fetch(process.env.IMAPI_URL! + "query/private/sql", {
+        return await $fetch(`${useRuntimeConfig().public.imapiUrl!}query/private/sql`, {
             body: queryRequest,
             method: "post",
         });
@@ -14,7 +14,7 @@ export class IMAPI {
     public async getSubqueryIris(
         queryIri: String,
     ): Promise<SubQueryDependency[]> {
-        return await $fetch(process.env.IMAPI_URL! + "query/private/subQueries", {
+        return await $fetch(`${useRuntimeConfig().public.imapiUrl!}query/private/subQueries`, {
             params: {
                 queryIri: queryIri,
             },
@@ -23,7 +23,7 @@ export class IMAPI {
     }
 
     public async getPartialEntity(iri: string, predicates: string[]) {
-        return await $fetch(process.env.IMAPI_URL! + "entity/public/partial", {
+        return await $fetch(`${useRuntimeConfig().public.imapiUrl!}entity/public/partial`, {
             params: {
                 iri: iri,
                 predicates: predicates.join(","),
