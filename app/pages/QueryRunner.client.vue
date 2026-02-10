@@ -41,7 +41,7 @@
               />
             </template>
           </Column>
-          <Column field="userName" header="User"></Column>
+          <Column field="userId" header="User"></Column>
           <Column field="queuedAt" header="Queued at">
             <template #body="{ data }: { data: Job }">
               <span>{{
@@ -210,7 +210,7 @@ function getStatusSeverity(
 
 async function cancelQuery(queryId: string) {
   await useFetch(`/api/queue/query/cancel/${queryId}`);
-  await initSearch();
+  await refresh();
 }
 
 async function goToQuery(queryIri: string) {
@@ -252,7 +252,7 @@ function runQuery() {
 
 async function deleteQuery(queryId: string) {
   await useFetch(`/api/queue/query/delete/${queryId}`);
-  await initSearch();
+  await refresh();
 }
 
 async function requeueQuery(queryId: string) {
@@ -262,7 +262,7 @@ async function requeueQuery(queryId: string) {
       method: "post",
       body: found,
     });
-  await initSearch();
+  await refresh();
 }
 
 function getById(queryId: string): Job | undefined {
