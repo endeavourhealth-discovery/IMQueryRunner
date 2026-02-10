@@ -23,12 +23,12 @@
       <i v-if="editing" class="fa fa-times-circle clear-icon" @mousedown.prevent="clearSearch()"></i>
     </IconField>
     <Button
+        class="search-button px-2"
       :disabled="disabled"
-      severity="info"
       @click="advancedSearch"
       data-testid="autocomplete-search-button"
       icon="fa-solid fa-magnifying-glass"
-      v-tooltip="'Advanced search'"
+      label="Advanced"
     />
     <Popover ref="resultsOP" :breakpoints="{ '960px': '75vw', '640px': '100vw' }" :style="{ width: '450px' }" appendTo="body">
       <div v-if="searchLoading" class="loading-container">
@@ -58,9 +58,9 @@
     </Popover>
   </div>
   <Dialog v-model:visible="showDialog" modal>
-    <Tree v-model:expandedKeys="expandedKeys" v-model:selectionKeys="selectedKeys" selectionMode="single" @nodeSelect="onNodeSelect" :loading="loading" loadingMode="icon" :value="entities" @nodeExpand="onNodeExpand" class="w-full md:w-[30rem]"></Tree>
+    <Tree v-model:expandedKeys="expandedKeys" v-model:selectionKeys="selectedKeys" selectionMode="single" @nodeSelect="onNodeSelect" :loading="loading" loadingMode="icon" :value="entities" @nodeExpand="onNodeExpand" class="dialog w-full md:w-[30rem]"></Tree>
     <template #footer>
-      <Button label="Select" :disabled="!isQuery" variant="outlined" severity="secondary" @click="setSelectedQuery" autofocus />
+      <Button label="Select" :disabled="!isQuery" variant="outlined" @click="setSelectedQuery" autofocus />
     </template>
   </Dialog>
 </template>
@@ -378,6 +378,7 @@ function onListBoxOptionClick(selected: SearchResultSummary) {
   align-items: center;
   gap: 0.2rem;
   overflow: auto;
+  width: 40%;
 }
 
 .mic {
@@ -439,5 +440,13 @@ function onListBoxOptionClick(selected: SearchResultSummary) {
 
 .clear-icon:hover {
   color: #555;
+}
+
+.search-button {
+  height: 35px;
+}
+
+.dialog {
+  height: 700px;
 }
 </style>

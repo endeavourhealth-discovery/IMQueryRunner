@@ -1,18 +1,18 @@
 <template>
   <div>
     <div class="flex gap-2 m-2">
-      <div class="m-2"><Button icon="fa-solid fa-arrow-left" label="Back to queue" @click="backToQueue" /></div>
+      <div class="m-2"><Button icon="fa-solid fa-arrow-left" label="Back to queue" severity="secondary" @click="backToQueue" /></div>
 
     </div>
     <div class="m-2">
-      Find a query:
+      <span class="m-2">Find a query:</span>
       <AutocompleteSearchBar v-model:selected="selected" :im-query="request" :search-placeholder="'Search queries'" />
     </div>
     <div class="m-2"><Button icon="fa-solid fa-play" label="Add to queue" :disabled="selected === undefined" @click="showDialog = true" /></div>
     <Dialog v-model:visible="showDialog" modal>
       Run query <span class="font-bold">{{selected?.name}}</span>?
       <template #footer>
-        <Button label="Select" variant="outlined" @click="runQuery" autofocus />
+        <Button class="m-4" label="Select" variant="outlined" @click="runQuery" autofocus />
       </template>
     </Dialog>
   </div>
