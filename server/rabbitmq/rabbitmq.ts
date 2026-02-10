@@ -64,15 +64,31 @@ const sub = rabbit.createConsumer(
     if (!sql) {
       throw new Error("Could generate SQL for job with id: " + id);
     }
-    const pid = await executeQuery(sql, queryRequest);
-    await postgresDb
-      .update(jobTable)
-      .set({
-        pid: pid,
-        status: JobStatus.COMPLETED,
-        finishDate: new Date().toISOString(),
-      })
-      .where(eq(jobTable.dbid, id));
+    console.log("Generated SQL:", sql);
+    try {
+      const { insertId, hashCode } = await executeQuery(sql, queryRequest);
+      console.log(
+        `Query executed with insertId: ${insertId} and hashCode: ${hashCode}`,
+      );
+      await postgresDb
+        .update(jobTable)
+        .set({
+          pid: insertId,
+          status: JobStatus.COMPLETED,
+          finishDate: new Date().toISOString(),
+        })
+        .where(eq(jobTable.dbid, id));
+    } catch (err) {
+      console.error("Error executing query:", err);
+      await postgresDb
+        .update(jobTable)
+        .set({
+          status: JobStatus.ERRORED,
+          error: JSON.stringify(err),
+          finishDate: new Date().toISOString(),
+        })
+        .where(eq(jobTable.dbid, id));
+    }
   },
 );
 
