@@ -6,6 +6,7 @@
       >
         <div class="flex gap-2 m-2">
           <Button class="flex" severity="secondary" icon="fa-solid fa-arrows-rotate" label="Refresh" @click="refresh" />
+          <Button class="flex" icon="fa-solid fa-magnifying-glass" label="Run a query" @click="runQuery" />
         </div>
         <DataTable
           :value="jobs"
@@ -243,6 +244,10 @@ async function viewQueryResults(queryItem: Job) {
 async function viewArgumentDisplay(args: Argument[]) {
   currentArguments.value = args;
   showArgumentDisplay.value = true;
+}
+
+function runQuery() {
+  navigateTo("/run");
 }
 
 async function deleteQuery(queryId: string) {
