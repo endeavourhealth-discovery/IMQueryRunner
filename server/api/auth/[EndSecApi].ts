@@ -119,7 +119,7 @@ export default defineEventHandler(async (event): Promise<any> => {
       }
       case "machineLogin": {
         const machineLoginParams = await getQueryParams(event, machineLoginSchema.parse);
-        const { sessionId, user } = (await $fetch<string>(
+        return (await $fetch<string>(
           `${EndSecHost}/api/${EndSecApp}/authn/machineLogin`,
           {
             headers: { "x-client-ip": clientIp },
@@ -129,7 +129,6 @@ export default defineEventHandler(async (event): Promise<any> => {
             },
           },
         )) as any;
-        return user;
       }
       case "logout": {
         await $fetch<string>(`${EndSecHost}/api/${EndSecApp}/authn/logout`, {

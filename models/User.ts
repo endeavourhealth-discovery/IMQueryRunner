@@ -1,12 +1,12 @@
 import {object, string, uuid, array, type output} from "zod/v4/mini";
 
 export const userSchema = object({
-  id: uuid(),
+  id: string(),
+  type: string(),
   userName: string(),
   displayName: string(),
   email: string(),
   avatar: string(),
-  type: string(),
   groups: array(string()),
   roles: array(string())
 });
