@@ -28,6 +28,7 @@ CREATE TABLE `compass`.`cohort` (
   `dbid` INT NOT NULL,
   `hash` INT NOT NULL,
   `cohort_id` INT NOT NULL,
+  UNIQUE KEY `uq_hash_cohort` (`hash`, `cohort_id`),
   PRIMARY KEY (`dbid`));
 
 DROP TABLE IF EXISTS `compass`.`dataset`;
@@ -38,4 +39,5 @@ CREATE TABLE `compass`.`dataset` (
   `cohort_id` INT NOT NULL,
   `group` VARCHAR(45) NOT NULL,
   `json` JSON NULL,
+  UNIQUE KEY `uq_dataset` (`hash`, `cohort_id`, `group`),
   PRIMARY KEY (`dbid`));

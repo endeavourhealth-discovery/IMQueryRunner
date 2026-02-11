@@ -64,7 +64,7 @@ const sub = rabbit.createConsumer(
     if (!sql) {
       throw new Error("Could generate SQL for job with id: " + id);
     }
-    console.log("Generated SQL:", sql);
+
     try {
       const { insertId, hashCode } = await executeQuery(sql, queryRequest);
       console.log(
