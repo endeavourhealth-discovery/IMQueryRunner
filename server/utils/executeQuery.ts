@@ -27,15 +27,33 @@ export async function executeQuery(sql: string, queryRequest: QueryRequest) {
     queryRequestForSQL,
     queryIrisToHashCodes,
   );
-  try {
-    const [result] = await mysqlDb.execute<ResultSetHeader>(resolvedSql);
+  if (queryRequestForSQL.query.queryType === "DATASET") {
+    const sqlParts = resolvedSql.split(
+      "----------------------------------------",
+    );
+    for (const sqlPart of sqlParts) {
+      try {
+        const [result] = await mysqlDb.execute<ResultSetHeader>(sqlPart);
+        console.log("Executed SQL part, insertId:", result.insertId);
+      } catch (err) {
+        console.error("Error executing SQL part:", sqlPart);
+        throw err;
+      }
+    }
     return {
-      insertId: result.insertId,
       hashCode: queryIrisToHashCodes["$hash"],
     };
-  } catch (err) {
-    console.error("Error executing SQL");
-    throw err;
+  } else {
+    try {
+      const [result] = await mysqlDb.execute<ResultSetHeader>(resolvedSql);
+      return {
+        insertId: result.insertId,
+        hashCode: queryIrisToHashCodes["$hash"],
+      };
+    } catch (err) {
+      console.error("Error executing SQL:", err);
+      throw err;
+    }
   }
 }
 
