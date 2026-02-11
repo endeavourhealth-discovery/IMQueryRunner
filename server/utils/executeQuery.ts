@@ -147,7 +147,7 @@ async function runSubQueries(
       const [result] = await mysqlDb.execute<ResultSetHeader>(resolvedSql);
       console.log("Subquery executed, insertId:", result.insertId);
     } catch (err) {
-      console.error("Error running subquery:", subQuery.iri);
+      console.error("Error running subquery sql:", err);
       throw err;
     }
   }
