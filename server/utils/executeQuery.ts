@@ -10,18 +10,13 @@ export async function executeQuery(sessionId: string, sql: string, queryRequest:
   if (!queryRequestForSQL.query.iri)
     throw new Error("Query IRI is required for execution");
   const queryIrisToHashCodes = {} as { [key: string]: number };
-  queryIrisToHashCodes["$hash"] = hashQueryRequest(queryRequestForSQL);
-  console.log("Hash code for query:", queryIrisToHashCodes["$hash"]);
+  queryIrisToHashCodes[queryRequestForSQL.query.iri] = hashQueryRequest(queryRequestForSQL);
+  console.log("Hash code for query:", queryIrisToHashCodes[queryRequestForSQL.query.iri]);
   // TODO: check if hashcode exists in db and is relevant, if so return cached results
   const subQueries = await imapi.getSubqueryIris(sessionId, queryRequestForSQL.query.iri);
   console.log("Subqueries to run:", subQueries.length);
   if (subQueries.length)
-    try {
-      await runSubQueries(sessionId, subQueries, queryRequestForSQL, queryIrisToHashCodes);
-    } catch (err) {
-      console.error("Error running subqueries");
-      throw err;
-    }
+    await runSubQueries(sessionId, subQueries, queryRequestForSQL, queryIrisToHashCodes);
   const resolvedSql = await getResolvedSql(
     sql,
     queryRequestForSQL,
@@ -147,8 +142,8 @@ async function runSubQueries(
       // awaiting drizzle pr #1523 for typings to work correctly. This is a fix as described in drizzle issue #661
       const [result] = await mysqlDb.execute<ResultSetHeader>(resolvedSql);
       console.log("Subquery executed, insertId:", result.insertId);
-    } catch (err) {
-      console.error("Error running subquery sql:", err);
+    } catch (err: any) {
+      console.error("Error running subquery sql:", err.message);
       throw err;
     }
   }
@@ -179,6 +174,7 @@ async function getResolvedSql(
       sql = sql.replaceAll(iri, JSON.stringify(queryIrisToHashCodes[iri]));
     }
   }
+  // console.log("Resolved SQL:", sql);
   return sql;
 }
 
