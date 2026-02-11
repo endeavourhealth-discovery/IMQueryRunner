@@ -13,14 +13,15 @@ const paramSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const sessionId = getCookie(event, "session_id")
+  const sessionId = getCookie(event, "session_id");
   const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
   const item = await postgresDb.query.jobTable.findFirst({
     where: eq(jobTable.dbid, queueId),
   });
   if (item?.queryRequest) {
     const queryRequestForSQL = await imapi.getQueryRequestForSQL(
-      sessionId!, item.queryRequest as QueryRequest,
+      sessionId!,
+      item.queryRequest as QueryRequest,
     );
     if (!queryRequestForSQL.query.iri)
       throw new Error("Query IRI is required for execution");
