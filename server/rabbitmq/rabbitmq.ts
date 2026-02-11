@@ -79,7 +79,6 @@ const sub = rabbit.createConsumer(
         })
         .where(eq(jobTable.dbid, id));
     } catch (err) {
-      console.error("Error executing query:", err);
       await postgresDb
         .update(jobTable)
         .set({

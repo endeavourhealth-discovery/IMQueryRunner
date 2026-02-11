@@ -51,6 +51,7 @@ export async function executeQuery(sql: string, queryRequest: QueryRequest) {
         hashCode: queryIrisToHashCodes["$hash"],
       };
     } catch (err) {
+      console.error("Error executing query:", queryRequestForSQL.query.iri);
       console.error("Error executing SQL:", err);
       throw err;
     }
@@ -126,28 +127,28 @@ async function runSubQueries(
   queryRequest: QueryRequest,
   queryIrisToHashCodes: { [key: string]: number },
 ) {
-  await getQueryIrisToHashCodes(
-    subQueries,
-    queryRequest.argument ?? [],
-    queryIrisToHashCodes,
-  );
-  if (subQueries.length) {
-    for (const subQueryIri of subQueries) {
+  for (const subQuery of subQueries) {
+    try {
+      console.log("Running subquery:", subQuery.iri);
       const subQueryRequest = await imapi.getQueryRequestForSQL({
-        query: subQueryIri,
+        query: { iri: subQuery.iri },
         argument: queryRequest.argument,
       } as QueryRequest);
       const hashCode = hashQueryRequest(subQueryRequest);
+      queryIrisToHashCodes[subQuery.iri] = hashCode;
       const subQuerySql = await imapi.getQuerySql(subQueryRequest);
-      if (!isCachedAndRelevant(hashCode)) {
-        const resolvedSql = await getResolvedSql(
-          subQuerySql,
-          subQueryRequest,
-          queryIrisToHashCodes,
-        );
-        // awaiting drizzle pr #1523 for typings to work correctly. This is a fix as described in drizzle issue #661
-        await mysqlDb.execute(resolvedSql);
-      }
+      // if (!isCachedAndRelevant(hashCode))
+      const resolvedSql = await getResolvedSql(
+        subQuerySql,
+        subQueryRequest,
+        queryIrisToHashCodes,
+      );
+      // awaiting drizzle pr #1523 for typings to work correctly. This is a fix as described in drizzle issue #661
+      const [result] = await mysqlDb.execute<ResultSetHeader>(resolvedSql);
+      console.log("Subquery executed, insertId:", result.insertId);
+    } catch (err) {
+      console.error("Error running subquery:", subQuery.iri);
+      throw err;
     }
   }
   return queryIrisToHashCodes;
@@ -185,21 +186,4 @@ function getIriLine(stringIris: string[]): string {
     if (stringIri.indexOf(":") === -1) throw createError("Invalid iri");
   }
   return stringIris.join(" ");
-}
-
-async function getQueryIrisToHashCodes(
-  subQueries: SubQueryDependency[],
-  argument: Argument[],
-  queryIrisToHashCodes: { [key: string]: number },
-) {
-  for (const subQueryDep of subQueries) {
-    const subQueryIri = subQueryDep.iri;
-    const subQueryRequest = await imapi.getQueryRequestForSQL({
-      query: subQueryIri,
-      argument: argument,
-    } as QueryRequest);
-    const hashCode = hashQueryRequest(subQueryRequest);
-    queryIrisToHashCodes[subQueryIri] = hashCode;
-  }
-  return queryIrisToHashCodes;
 }
