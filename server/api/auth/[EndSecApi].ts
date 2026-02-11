@@ -8,7 +8,6 @@ import {
 } from "h3";
 import { Namespace, UserRole } from "~~/models/AutoGen";
 import Resource from "~~/enums/Resource";
-import type { output } from "zod/v4/mini";
 
 const loginUrlSchema = object({
   redirectUri: string(),
