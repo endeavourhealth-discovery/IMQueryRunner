@@ -20,6 +20,11 @@ const loginSchema = object({
   state: string(),
 });
 
+const machineLoginSchema = object({
+  clientId: string(),
+  clientSecret: string(),
+});
+
 const NamespacePermissionSchema = object({
   iri: zenum(Namespace),
   read: boolean(),
@@ -104,6 +109,24 @@ export default defineEventHandler(async (event): Promise<any> => {
             query: {
               code: loginParams.code,
               state: loginParams.state,
+            },
+          },
+        )) as any;
+        setCookie(event, "session_id", sessionId, {
+          httpOnly: true,
+          maxAge: 60 * 60 * 24 * 30,
+        });
+        return user;
+      }
+      case "machineLogin": {
+        const machineLoginParams = await getQueryParams(event, machineLoginSchema.parse);
+        const { sessionId, user } = (await $fetch<string>(
+          `${EndSecHost}/api/${EndSecApp}/authn/machineLogin`,
+          {
+            headers: { "x-client-ip": clientIp },
+            query: {
+              clientId: machineLoginParams.clientId,
+              clientSecret: machineLoginParams.clientSecret,
             },
           },
         )) as any;
