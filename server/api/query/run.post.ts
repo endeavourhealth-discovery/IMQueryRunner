@@ -56,7 +56,7 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event) => {
-  const sessionId = getCookie(event, "session-id")
+  const sessionId = getCookie(event, "session_id")
 
   const currentUser = await globalThis.apiGuard.getUser();
 

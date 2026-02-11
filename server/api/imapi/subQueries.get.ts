@@ -10,7 +10,7 @@ defineRouteMeta({
     tags: ["query"],
     description: "Get the sub-queries a given query is dependent upon",
     parameters: [
-      {name: "session-id", description: "User session id", in: "cookie"},
+      {name: "session_id", description: "User session id", in: "cookie"},
       {name: "queryIri", description: "Iri of the query", in: "query"}
     ],
   },

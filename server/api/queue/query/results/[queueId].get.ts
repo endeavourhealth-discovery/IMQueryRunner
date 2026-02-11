@@ -13,7 +13,7 @@ const paramSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const sessionId = getCookie(event, "session-id")
+  const sessionId = getCookie(event, "session_id")
   const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
   const item = await postgresDb.query.jobTable.findFirst({
     where: eq(jobTable.dbid, queueId),

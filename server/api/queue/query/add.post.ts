@@ -7,7 +7,7 @@ import type { Job } from "~~/models/job.schema";
 import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
-  const sessionId = getCookie(event, "session-id")
+  const sessionId = getCookie(event, "session_id")
 
   const user = await globalThis.apiGuard.getUser(event);
   const queryRequest: QueryRequest = await readBody(event);
