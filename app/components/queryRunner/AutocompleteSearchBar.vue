@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, nextTick, computed, onBeforeUnmount } from "vue";
+import { onMounted, ref, watch, nextTick, onBeforeUnmount } from "vue";
 import {
   type SearchResponse,
   type SearchResultSummary,
@@ -76,9 +76,11 @@ import {
 } from "~~/models/AutoGen";
 import {cloneDeep, debounce, isEqual} from "lodash-es";
 import {useAutocompleteRegistry} from "~/composables/useAutocompleteRegistry";
-const { registerAutocomplete, unregisterAutocomplete } = useAutocompleteRegistry();
-import { imapi } from "~~/server/utils/imapi";
 import type {TreeNode} from "primevue/treenode";
+import {useIMAPI} from "~/composables/useIMAPI";
+
+const { registerAutocomplete, unregisterAutocomplete } = useAutocompleteRegistry();
+const imapi = useIMAPI();
 
 interface Props {
   selected?: SearchResultSummary;
@@ -120,6 +122,7 @@ const loading = ref(false);
 let searchDebounce: any;
 const editing = ref(false);
 const autocompleteRoot = ref<HTMLElement | null>(null);
+
 defineExpose({ searchText });
 watch(
   () => cloneDeep(props.selected),
@@ -142,7 +145,6 @@ watch(
     selectedKeys,
     (newValue, oldValue) => {
       if (newValue !== oldValue) {
-
       }
     },
     { deep: true }

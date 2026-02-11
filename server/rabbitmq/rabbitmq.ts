@@ -12,6 +12,19 @@ const rabbit = new Connection(process.env.RABBITMQ_URL);
 rabbit.on("error", (err) => {});
 rabbit.on("connection", () => {});
 
+let sessionId: string | undefined = undefined;
+async function getSession() {
+  if (!sessionId) {
+    sessionId = await $fetch<string>("/api/auth/machineLogin",{
+      query: {
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET
+      }
+    });
+  }
+  return sessionId;
+}
+
 const sub = rabbit.createConsumer(
   {
     queue: "query.execute",
@@ -48,7 +61,7 @@ const sub = rabbit.createConsumer(
     const parsedJob = JSON.parse(msg.body);
     const queryRequest: QueryRequest = parsedJob.queryRequest;
     let sql: string | undefined = await imapi
-      .getQuerySql(queryRequest)
+      .getQuerySql(await getSession(), queryRequest)
       .catch(async (err) => {
         console.error(err);
         await postgresDb
@@ -66,7 +79,7 @@ const sub = rabbit.createConsumer(
     }
 
     try {
-      const { insertId, hashCode } = await executeQuery(sql, queryRequest);
+      const { insertId, hashCode } = await executeQuery(await getSession(), sql, queryRequest);
       console.log(
         `Query executed with insertId: ${insertId} and hashCode: ${hashCode}`,
       );

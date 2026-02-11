@@ -22,7 +22,6 @@
 
 import AutocompleteSearchBar from "~/components/queryRunner/AutocompleteSearchBar.vue";
 import type {SearchResultSummary} from "~~/models/AutoGen";
-import { imapi } from "~~/server/utils/imapi";
 
 const selected: Ref<SearchResultSummary | undefined> = ref();
 const request: any = {

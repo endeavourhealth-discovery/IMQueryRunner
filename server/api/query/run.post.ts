@@ -1,5 +1,4 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
-import { imapi } from "~~/server/utils/imapi";
 import { pgJobInsert, postgresDb } from "~~/server/db/postgres";
 import { jobTable } from "~~/server/db/postgres/schema";
 import { IM, RDFS } from "~~/models/AutoGen";
@@ -57,6 +56,8 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event) => {
+  const sessionId = getCookie(event, "session-id")
+
   const currentUser = await globalThis.apiGuard.getUser();
 
   const userId = currentUser!.id;
@@ -64,7 +65,7 @@ export default defineEventHandler(async (event) => {
 
   const data = await readValidatedBody(event, queryRunRequestSchema.parse);
 
-  const entity = await imapi.getPartialEntity(data.query_id, [
+  const entity = await imapi.getPartialEntity(sessionId!, data.query_id, [
     RDFS.LABEL,
     IM.DEFINITION,
   ]);

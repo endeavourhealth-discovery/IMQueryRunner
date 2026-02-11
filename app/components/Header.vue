@@ -71,7 +71,6 @@
 <script setup lang="ts">
 import type { MenuItem } from "primevue/menuitem";
 import { useUserStore } from "~/plugins/end-sec-ui";
-import {useRouter} from "#app";
 
 const userStore = useUserStore();
 

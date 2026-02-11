@@ -5,19 +5,18 @@ import { mysqlDb } from "../db/mysql";
 import { imapi } from "~~/server/utils/imapi";
 import { type SubQueryDependency } from "~~/models/SubQueryDependency";
 
-export async function executeQuery(sql: string, queryRequest: QueryRequest) {
-  const queryRequestForSQL = await imapi.getQueryRequestForSQL(queryRequest);
+export async function executeQuery(sessionId: string, sql: string, queryRequest: QueryRequest) {
+  const queryRequestForSQL = await imapi.getQueryRequestForSQL(sessionId, queryRequest);
   if (!queryRequestForSQL.query.iri)
     throw new Error("Query IRI is required for execution");
   const queryIrisToHashCodes = {} as { [key: string]: number };
   queryIrisToHashCodes[queryRequestForSQL.query.iri] = hashQueryRequest(queryRequestForSQL);
   console.log("Hash code for query:", queryIrisToHashCodes[queryRequestForSQL.query.iri]);
   // TODO: check if hashcode exists in db and is relevant, if so return cached results
-  const subQueries = await imapi.getSubqueryIris(queryRequestForSQL.query.iri!);
+  const subQueries = await imapi.getSubqueryIris(sessionId, queryRequestForSQL.query.iri);
   console.log("Subqueries to run:", subQueries.length);
   if (subQueries.length)
-    await runSubQueries(subQueries, queryRequestForSQL, queryIrisToHashCodes);
-
+    await runSubQueries(sessionId, subQueries, queryRequestForSQL, queryIrisToHashCodes);
   const resolvedSql = await getResolvedSql(
     sql,
     queryRequestForSQL,
@@ -119,6 +118,7 @@ export async function isCachedAndRelevant(hashCode: number): Promise<boolean> {
 }
 
 async function runSubQueries(
+  sessionId: string,
   subQueries: SubQueryDependency[],
   queryRequest: QueryRequest,
   queryIrisToHashCodes: { [key: string]: number },
@@ -126,13 +126,13 @@ async function runSubQueries(
   for (const subQuery of subQueries) {
     try {
       console.log("Running subquery:", subQuery.iri);
-      const subQueryRequest = await imapi.getQueryRequestForSQL({
+      const subQueryRequest = await imapi.getQueryRequestForSQL(sessionId, {
         query: { iri: subQuery.iri },
         argument: queryRequest.argument,
       } as QueryRequest);
       const hashCode = hashQueryRequest(subQueryRequest);
       queryIrisToHashCodes[subQuery.iri] = hashCode;
-      const subQuerySql = await imapi.getQuerySql(subQueryRequest);
+      const subQuerySql = await imapi.getQuerySql(sessionId, subQueryRequest);
       // if (!isCachedAndRelevant(hashCode))
       const resolvedSql = await getResolvedSql(
         subQuerySql,
