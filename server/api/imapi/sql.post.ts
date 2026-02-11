@@ -3,7 +3,7 @@ defineRouteMeta({
     tags: ["query"],
     description: "Get SQL for given query",
     parameters: [
-      {name: "session-id", description: "User session id", in: "cookie"},
+      {name: "session_id", description: "User session id", in: "cookie"},
     ],
     requestBody: {
       description: "Query Request object",

@@ -11,7 +11,7 @@ defineRouteMeta({
     tags: ["query"],
     description: "Get children of a given entity, optionally filtered by scheme",
     parameters: [
-      {name: "session-id", description: "User session id", in: "cookie"},
+      {name: "session_id", description: "User session id", in: "cookie"},
       {name: "iri", description: "Iri of the entity", in: "query"},
       {name: "schemeIris", description: "Array of scheme IRIs", in: "query"}
     ],

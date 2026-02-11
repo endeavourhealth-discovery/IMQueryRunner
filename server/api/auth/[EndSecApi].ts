@@ -129,10 +129,6 @@ export default defineEventHandler(async (event): Promise<any> => {
             },
           },
         )) as any;
-        setCookie(event, "session_id", sessionId, {
-          httpOnly: true,
-          maxAge: 60 * 60 * 24 * 30,
-        });
         return user;
       }
       case "logout": {
