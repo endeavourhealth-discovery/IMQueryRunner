@@ -4,7 +4,7 @@ import { jobTable } from "~~/server/db/postgres/schema";
 import { IM, RDFS } from "~~/models/AutoGen";
 import z from "zod";
 import { JobStatus } from "~~/enums";
-import type {Job} from "~~/models";
+import type { Job } from "~~/models";
 
 export const queryRunRequestSchema = z.object({
   query_id: z.string(),
@@ -56,7 +56,7 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event) => {
-  const sessionId = getCookie(event, "session-id")
+  const sessionId = getCookie(event, "session_id");
 
   const currentUser = await globalThis.apiGuard.getUser();
 
@@ -75,8 +75,8 @@ export default defineEventHandler(async (event) => {
     queryRequest: {
       query: query,
       referenceDate: data.reference_date,
-    }
-  } as Job
+    },
+  } as Job;
 
   return await postgresDb
     .transaction(async (tx) => {
