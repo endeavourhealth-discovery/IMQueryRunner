@@ -7,7 +7,7 @@ import { jobTable } from "~~/server/db/postgres/schema";
 import type { QueryRequest } from "~~/models/AutoGen";
 import { executeQuery } from "../utils/executeQuery";
 import type { Job } from "~~/models/job.schema";
-import type {User} from "~~/models/User";
+import type { User } from "~~/models/User";
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
 rabbit.on("error", (err) => {});
@@ -16,12 +16,15 @@ rabbit.on("connection", () => {});
 let sessionId: string | undefined = undefined;
 async function getSession() {
   if (!sessionId) {
-    const response = await $fetch<{sessionId: string, user: User}>("/api/auth/machineLogin",{
-      query: {
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET
-      }
-    });
+    const response = await $fetch<{ sessionId: string; user: User }>(
+      "/api/auth/machineLogin",
+      {
+        query: {
+          clientId: process.env.CLIENT_ID,
+          clientSecret: process.env.CLIENT_SECRET,
+        },
+      },
+    );
     sessionId = response.sessionId;
   }
   return sessionId;
@@ -81,7 +84,11 @@ const sub = rabbit.createConsumer(
     }
 
     try {
-      const { insertId, hashCode } = await executeQuery(await getSession(), sql, queryRequest);
+      const { insertId, hashCode } = await executeQuery(
+        await getSession(),
+        sql,
+        queryRequest,
+      );
       console.log(
         `Query executed with insertId: ${insertId} and hashCode: ${hashCode}`,
       );

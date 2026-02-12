@@ -7,11 +7,14 @@ import type { Job } from "~~/models/job.schema";
 import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
-  const sessionId = getCookie(event, "session_id")
-
+  const sessionId = getCookie(event, "session_id");
   const user = await globalThis.apiGuard.getUser(event);
   const queryRequest: QueryRequest = await readBody(event);
-  if (!queryRequest.language) queryRequest.language = DatabaseOption.MYSQL;
+  const getQueryRequestForSQL = await imapi.getQueryRequestForSQL(
+    sessionId!,
+    queryRequest,
+  );
+  const hash = hashQueryRequest(getQueryRequestForSQL);
   try {
     await imapi.getQuerySql(sessionId!, queryRequest);
   } catch (e: unknown) {
@@ -19,8 +22,10 @@ export default defineEventHandler(async (event) => {
   }
   const queryTask: Job = {
     dbid: v4(),
-    jobName: queryRequest.query.name || "Unnamed Query",
+    jobName: getQueryRequestForSQL.query.name || "Unnamed Query",
     queryRequest: queryRequest,
+    queryHash: "" + hash,
+    queryType: getQueryRequestForSQL.query.queryType,
     status: JobStatus.QUEUED,
     userId: user!.id,
     queueDate: new Date().toISOString(),
