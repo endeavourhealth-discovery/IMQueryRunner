@@ -9,10 +9,11 @@
       <AutocompleteSearchBar v-model:selected="selected" :im-query="request" :search-placeholder="'Search queries'" />
     </div>
     <div class="m-2"><Button icon="fa-solid fa-play" label="Add to queue" :disabled="selected === undefined" @click="showDialog = true" /></div>
-    <Dialog v-model:visible="showDialog" modal>
+    <Dialog v-model:visible="showDialog" :closable="false" modal>
       Run query <span class="font-bold">{{selected?.name}}</span>?
       <template #footer>
-        <Button class="m-4" label="Select" variant="outlined" @click="runQuery" autofocus />
+        <Button class="m-1" label="Cancel" variant="outlined" @click="showDialog = false" autofocus />
+        <Button class="m-1" label="Select" @click="runQuery" autofocus />
       </template>
     </Dialog>
   </div>
