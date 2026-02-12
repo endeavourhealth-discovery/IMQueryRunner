@@ -238,12 +238,10 @@ async function goToQuery(queryIri: string) {
     },
     accept: async () => {
       const config = useRuntimeConfig();
-      await navigateTo(
-        `${config.public.imDirectoryUrl!}directory/folder/${encodeURI(
-          queryIri,
-        )}`,
-        { external: true },
-      );
+      const encoded = `${config.public.imDirectoryUrl!}#/directory/folder/${encodeURIComponent(
+        queryIri,
+      )}`;
+      await navigateTo(encoded, { external: true });
     },
   });
 }
