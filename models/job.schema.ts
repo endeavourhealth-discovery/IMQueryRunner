@@ -5,7 +5,7 @@ export const jobSchema = z.object({
   dbid: z.uuid(),
   jobName: z.string(),
   queryRequest: z.any(),
-  queryHash: z.number(),
+  queryHash: z.string(),
   queryType: z.string(),
   userId: z.uuid(),
   queueDate: z.string().optional(),

@@ -13,24 +13,18 @@ const paramSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  const sessionId = getCookie(event, "session_id");
   const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
-  const item = await postgresDb.query.jobTable.findFirst({
+  const job = await postgresDb.query.jobTable.findFirst({
     where: eq(jobTable.dbid, queueId),
   });
-  if (item?.queryRequest) {
-    const queryRequestForSQL = await imapi.getQueryRequestForSQL(
-      sessionId!,
-      item.queryRequest as QueryRequest,
-    );
-    if (!queryRequestForSQL.query.iri)
-      throw new Error("Query IRI is required for execution");
-    const hashcode = hashQueryRequest(queryRequestForSQL);
-    var sqlToRun = "";
-    if (queryRequestForSQL.query.queryType === "DATASET")
-      sqlToRun = `SELECT * FROM dataset WHERE hash = ${hashcode}`;
-    else sqlToRun = `SELECT * FROM cohort WHERE hash = ${hashcode}`;
-    const results = await mysqlDb.execute(sql.raw(sqlToRun));
-    return results[0];
+  if (!job) {
+    throw createError("Job not found");
   }
+
+  var sqlToRun = "";
+  if (job?.queryType === "DATASET")
+    sqlToRun = `SELECT * FROM dataset WHERE hash = ${job.queryHash}`;
+  else sqlToRun = `SELECT * FROM cohort WHERE hash = ${job.queryHash}`;
+  const results = await mysqlDb.execute(sql.raw(sqlToRun));
+  return results[0];
 });

@@ -5,8 +5,19 @@
         class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
       >
         <div class="flex gap-2 m-2">
-          <Button class="flex" severity="secondary" icon="fa-solid fa-arrows-rotate" label="Refresh" @click="refresh" />
-          <Button class="flex" icon="fa-solid fa-magnifying-glass" label="Run a query" @click="runQuery" />
+          <Button
+            class="flex"
+            severity="secondary"
+            icon="fa-solid fa-arrows-rotate"
+            label="Refresh"
+            @click="refresh"
+          />
+          <Button
+            class="flex"
+            icon="fa-solid fa-magnifying-glass"
+            label="Run a query"
+            @click="runQuery"
+          />
         </div>
         <DataTable
           :value="jobs"
@@ -230,7 +241,8 @@ async function goToQuery(queryIri: string) {
       await navigateTo(
         `${config.public.imDirectoryUrl!}directory/folder/${encodeURI(
           queryIri,
-        )}`, {external: true},
+        )}`,
+        { external: true },
       );
     },
   });
@@ -258,15 +270,15 @@ async function deleteQuery(queryId: string) {
 async function requeueQuery(queryId: string) {
   const found = getById(queryId);
   if (found)
-    await $fetch("/api/queue/query/requeue", {
+    await $fetch("/api/queue/query/add", {
       method: "post",
-      body: found,
+      body: found.queryRequest,
     });
   await refresh();
 }
 
-function getById(queryId: string): Job | undefined {
-  return jobs.value.find((item) => item.dbid === queryId);
+function getById(jobId: string): Job | undefined {
+  return jobs.value.find((item) => item.dbid === jobId);
 }
 
 async function onPage(event: any) {
