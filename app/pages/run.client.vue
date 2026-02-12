@@ -44,7 +44,7 @@ const request: any = {
 const showDialog = ref(false);
 
 async function runQuery() {
-  await useFetch("/api/queue/query/add", {
+  await $fetch("/api/queue/query/add", {
     method: "post",
     body: {
       "query": {

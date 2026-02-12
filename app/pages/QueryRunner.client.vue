@@ -209,7 +209,7 @@ function getStatusSeverity(
 }
 
 async function cancelQuery(queryId: string) {
-  await useFetch(`/api/queue/query/cancel/${queryId}`);
+  await $fetch(`/api/queue/query/cancel/${queryId}`);
   await refresh();
 }
 
@@ -251,14 +251,14 @@ function runQuery() {
 }
 
 async function deleteQuery(queryId: string) {
-  await useFetch(`/api/queue/query/delete/${queryId}`);
+  await $fetch(`/api/queue/query/delete/${queryId}`);
   await refresh();
 }
 
 async function requeueQuery(queryId: string) {
   const found = getById(queryId);
   if (found)
-    await useFetch("/api/queue/query/requeue", {
+    await $fetch("/api/queue/query/requeue", {
       method: "post",
       body: found,
     });
