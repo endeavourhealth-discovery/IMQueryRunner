@@ -107,7 +107,7 @@ import type { Argument } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import { io } from "socket.io-client";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
-import { useUserStore } from "~/plugins/end-sec-ui";
+import { useUserStore } from "~/stores/useUserStore";
 
 definePageMeta({
   requiresAuth: true,

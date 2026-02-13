@@ -8,6 +8,7 @@ import {
 } from "h3";
 import { Namespace, UserRole } from "~~/models/AutoGen";
 import Resource from "~~/enums/Resource";
+import { getIp } from "~~/server/helpers/getIp";
 
 const loginUrlSchema = object({
   redirectUri: string(),
@@ -58,13 +59,7 @@ export default defineEventHandler(async (event): Promise<any> => {
   const EndSecApp = process.env.ENDEAVOUR_SECURITY_APPLICATION;
   const method = event.method;
   const name = getRouterParam(event, "EndSecApi");
-  const req = event?.node?.req;
-  const clientIp =
-    getRequestHeader(event, "x-real-ip") ||
-    getRequestHeader(event, "x-forwarded-for")?.split(",")[0] ||
-    req?.socket?.remoteAddress ||
-    "UNKNOWN";
-
+  const clientIp = getIp(event);
   if (method == "POST") {
     switch (name) {
       case "hasPermission": {
@@ -118,7 +113,10 @@ export default defineEventHandler(async (event): Promise<any> => {
         return user;
       }
       case "machineLogin": {
-        const machineLoginParams = await getQueryParams(event, machineLoginSchema.parse);
+        const machineLoginParams = await getQueryParams(
+          event,
+          machineLoginSchema.parse,
+        );
         return (await $fetch<string>(
           `${EndSecHost}/api/${EndSecApp}/authn/machineLogin`,
           {
@@ -149,6 +147,23 @@ export default defineEventHandler(async (event): Promise<any> => {
             },
           },
         );
+      }
+      case "isLoggedIn": {
+        try {
+          const user = await $fetch<string>(
+            `${EndSecHost}/api/${EndSecApp}/authn/getUser`,
+            {
+              headers: { "x-client-ip": clientIp },
+              query: {
+                sessionId: sessionId,
+              },
+            },
+          );
+          if (user) return true;
+          return false;
+        } catch (e: any) {
+          return false;
+        }
       }
     }
   }
