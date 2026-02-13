@@ -27,8 +27,9 @@ export default defineEventHandler(async (event) => {
   );
 
   const filters: SQL[] = [];
-  // if (!user?.groups.includes("Endeavour/Admin"))
+  // if (user?.groups.includes("Endeavour/Admin")) // Admins can see all jobs, so no userId filter is added
   filters.push(eq(jobTable.userId, userId));
+
   if (date) filters.push(lte(jobTable.queueDate, date));
 
   let qry = postgresDb

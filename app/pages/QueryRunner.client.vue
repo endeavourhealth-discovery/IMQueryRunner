@@ -79,11 +79,11 @@
             <template #body="slotProps">
               <ActionButtons
                 :job="slotProps.data"
-                @cancel-query="cancelQuery"
+                @cancel-query="cancelJob"
                 @go-to-query="goToQuery"
                 @view-query-results="viewQueryResults"
-                @delete-query="deleteQuery"
-                @requeue-query="requeueQuery"
+                @delete-query="deleteJob"
+                @requeue-query="requeueJob"
               />
             </template>
           </Column>
@@ -153,7 +153,7 @@ async function initSearch() {
   const results = await useFetch<{
     totalCount: number;
     result: Job[];
-  }>("/api/queue/user/", {
+  }>("/api/queue", {
     query: {
       userId: user?.id,
       page: page.value,
@@ -177,7 +177,7 @@ async function initSearch() {
 async function refresh() {
   searchLoading.value = true;
   const results = await $fetch<{ totalCount: number; result: Job[] }>(
-    "/api/queue/user/",
+    "/api/queue",
     {
       query: {
         userId: user?.id,
@@ -219,8 +219,8 @@ function getStatusSeverity(
   }
 }
 
-async function cancelQuery(queryId: string) {
-  await $fetch(`/api/queue/query/cancel/${queryId}`);
+async function cancelJob(jobId: string) {
+  await $fetch(`/api/queue/job/cancel/${jobId}`);
   await refresh();
 }
 
@@ -260,15 +260,17 @@ function runQuery() {
   navigateTo("/run");
 }
 
-async function deleteQuery(queryId: string) {
-  await $fetch(`/api/queue/query/delete/${queryId}`);
+async function deleteJob(jobId: string) {
+  await $fetch(`/api/queue/job/${jobId}`, {
+    method: "delete",
+  });
   await refresh();
 }
 
-async function requeueQuery(queryId: string) {
-  const found = getById(queryId);
+async function requeueJob(jobId: string) {
+  const found = getById(jobId);
   if (found)
-    await $fetch("/api/queue/query/add", {
+    await $fetch("/api/queue/job/add", {
       method: "post",
       body: found.queryRequest,
     });

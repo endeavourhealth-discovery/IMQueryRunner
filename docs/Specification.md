@@ -2,7 +2,7 @@
 
 ## Add a Job (Query) to the Queue
 
-Currently, the only way to add a query to the queue is via a direct request to the `/queue/query/add` API.
+Currently, the only way to add a query to the queue is via a direct request to the `/queue/job/add` API.
 
 ### TODO
 

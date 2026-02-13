@@ -4,13 +4,13 @@ import { eq } from "drizzle-orm";
 import { jobTable } from "~~/server/db/postgres/schema";
 
 const paramSchema = z.object({
-  queueId: z.string(),
+  jobId: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
-  const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
+  const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
   const item = await postgresDb.query.jobTable.findFirst({
-    where: eq(jobTable.dbid, queueId),
+    where: eq(jobTable.dbid, jobId),
   });
 
   return item;
