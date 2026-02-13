@@ -39,8 +39,8 @@
           :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
         >
           <template #empty>None</template>
-          <Column field="dbid" header="ID"></Column>
-          <Column field="queryRequest.query.iri" header="Iri"></Column>
+          <!-- <Column field="dbid" header="ID"></Column> -->
+          <!-- <Column field="queryRequest.query.iri" header="Iri"></Column> -->
           <Column field="jobName" header="Job name"></Column>
           <Column>
             <template #body="{ data }: { data: Job }">
@@ -52,15 +52,15 @@
               />
             </template>
           </Column>
-          <Column field="userId" header="User"></Column>
-          <Column field="queuedAt" header="Queued at">
+          <Column v-if="adminView" field="userId" header="User"></Column>
+          <Column field="queuedAt" header="Queued">
             <template #body="{ data }: { data: Job }">
               <span>{{
                 data.queueDate ? getDisplayDateTime(data.queueDate) : "-"
               }}</span>
             </template>
           </Column>
-          <Column field="stoppedAt" header="Stopped at">
+          <Column field="stoppedAt" header="Finished">
             <template #body="{ data }: { data: Job }">
               <span>{{
                 data.finishDate ? getDisplayDateTime(data.finishDate) : "-"
@@ -136,7 +136,7 @@ const websocketIsConnected = ref(false);
 const transport = ref("N/A");
 const showArgumentDisplay = ref(false);
 const currentArguments: Ref<Argument[]> = ref([]);
-
+const adminView = false; //TODO: determine admin view based on user role and preference
 onMounted(async () => {
   loading.value = true;
   loading.value = false;
@@ -176,27 +176,24 @@ async function initSearch() {
 
 async function refresh() {
   searchLoading.value = true;
-  const results = await $fetch<{ totalCount: number; result: Job[] }>(
+  const foundJobs = await $fetch<{ totalCount: number; result: Job[] }>(
     "/api/queue",
     {
       query: {
         userId: user?.id,
-        page: page.value,
+        page: page.value + 1,
         size: rows.value,
       },
     },
   );
-  if (results) {
-    totalCount.value = results.totalCount;
-    jobs.value = results.result.sort((a, b) => {
-      if (!a.queueDate) return 1;
-      if (!b.queueDate) return -1;
-      return new Date(b.queueDate).getTime() - new Date(a.queueDate).getTime();
-    });
+  if (foundJobs) {
+    totalCount.value = foundJobs.totalCount;
+    jobs.value = foundJobs.result;
   } else {
     totalCount.value = 0;
     jobs.value = [];
   }
+
   searchLoading.value = false;
 }
 
