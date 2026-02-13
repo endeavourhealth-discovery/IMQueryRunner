@@ -9,13 +9,13 @@ import { mysqlDb } from "~~/server/db/mysql";
 import { sql } from "drizzle-orm";
 
 const paramSchema = z.object({
-  queueId: z.string(),
+  jobId: z.string(),
 });
 
 export default defineEventHandler(async (event) => {
-  const { queueId } = await getValidatedRouterParams(event, paramSchema.parse);
+  const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
   const job = await postgresDb.query.jobTable.findFirst({
-    where: eq(jobTable.dbid, queueId),
+    where: eq(jobTable.dbid, jobId),
   });
   if (!job) {
     throw createError("Job not found");

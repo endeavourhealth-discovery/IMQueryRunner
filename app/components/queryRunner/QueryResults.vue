@@ -2,44 +2,55 @@
   <div class="flex-auto overflow-auto">
     <div class="h-[calc(100% - 3.5rem)] overflow-auto">
       <div
-          class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
+        class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
       >
-        <div class="m-2"><Button icon="fa-solid fa-arrow-left" label="Back to queue" @click="backToQueue" /></div>
+        <div class="m-2">
+          <Button
+            icon="fa-solid fa-arrow-left"
+            label="Back to queue"
+            @click="backToQueue"
+          />
+        </div>
         <DataTable
-        :size="'small'"
-        :value="queryResults"
-        :paginator="true"
-        :rows="size"
-        :scrollable="true"
-        scroll-height="600px"
-        :autoLayout="true"
-        @page="onPage($event)"
-        :lazy="true"
-        :total-records="totalCount"
-        :rows-per-page-options="[
-          originalSize,
-          originalSize * 2,
-          originalSize * 4,
-          originalSize * 8,
-        ]"
-        :loading="loading"
-        :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
-      >
-        <template #header>
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <span class="text-xl font-bold"
-              >Total results: {{ totalCount }}</span
-            >
-          </div>
-        </template>
-        <template #empty>None</template>
-        <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
-      </DataTable>
-    </div>
+          :size="'small'"
+          :value="queryResults"
+          :paginator="true"
+          :rows="size"
+          :scrollable="true"
+          scroll-height="600px"
+          :autoLayout="true"
+          @page="onPage($event)"
+          :lazy="true"
+          :total-records="totalCount"
+          :rows-per-page-options="[
+            originalSize,
+            originalSize * 2,
+            originalSize * 4,
+            originalSize * 8,
+          ]"
+          :loading="loading"
+          :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
+        >
+          <template #header>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xl font-bold"
+                >Total results: {{ totalCount }}</span
+              >
+            </div>
+          </template>
+          <template #empty>None</template>
+          <Column
+            v-for="col of columns"
+            :key="col.field"
+            :field="col.field"
+            :header="col.header"
+          ></Column>
+        </DataTable>
+      </div>
       <div class="im-dialog-footer">
         <div class="button-footer">
           <Button
-              class="m-2"
+            class="m-2"
             :disabled="!queryResults.length"
             data-testid="query-results-download"
             label="Download"
@@ -59,7 +70,7 @@ import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
 
 interface Props {
-  queryId: string | string[] | undefined;
+  jobId: string | string[] | undefined;
 }
 
 const props = defineProps<Props>();
@@ -71,7 +82,7 @@ const pageNumber = ref(1);
 const size = ref(25);
 const originalSize = ref(25);
 const totalCount = ref();
-const columns: Ref<any[]> = ref( []);
+const columns: Ref<any[]> = ref([]);
 
 onMounted(async () => {
   await getQueryResults();
@@ -79,10 +90,10 @@ onMounted(async () => {
 });
 
 async function getQueryResults() {
-  if (props.queryId) {
+  if (props.jobId) {
     // request.page = { pageNumber: pageNumber.value, pageSize: size.value }; //TODO: fix paging mechanism
-    //const results = await useFetch(`/api/queue/query/results/hashcode/1); //TODO: for testing, remove later
-    const value = await $fetch(`/api/queue/query/results/${props.queryId}`);
+    //const results = await useFetch(`/api/job/results/hashcode/1); //TODO: for testing, remove later
+    const value = await $fetch(`/api/queue/job/results/${props.jobId}`);
     if (value && isArray(value)) {
       totalCount.value = value.length; //TODO: replace with actual count
       queryResults.value = value;
@@ -91,14 +102,13 @@ async function getQueryResults() {
 }
 
 function formatResultsForTable() {
-    for (const key of Object.keys(queryResults.value[0])) {
-      if (key !== "hashcode") columns.value.push({field: key, header: key.replace("_", " ")})
-    }
+  for (const key of Object.keys(queryResults.value[0])) {
+    if (key !== "hashcode")
+      columns.value.push({ field: key, header: key.replace("_", " ") });
+  }
 }
 
-function downloadQueryResults() {
-
-}
+function downloadQueryResults() {}
 
 async function onPage(event: any) {
   pageNumber.value = event.page;
