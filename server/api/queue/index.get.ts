@@ -40,8 +40,6 @@ export default defineEventHandler(async (event) => {
     .offset((+page - 1) * +size)
     .limit(size);
 
-  LOG.debug(qry.toSQL().sql);
-
   const rs = await qry.execute();
 
   const items = rs.map((row) => pgJobSelect.parse(row));

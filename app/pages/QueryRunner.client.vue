@@ -181,7 +181,7 @@ async function refresh() {
     {
       query: {
         userId: user?.id,
-        page: page.value + 1,
+        page: page.value,
         size: rows.value,
       },
     },
@@ -279,7 +279,7 @@ function getById(jobId: string): Job | undefined {
 }
 
 async function onPage(event: any) {
-  page.value = event.page;
+  page.value = ++event.page;
   rows.value = event.rows;
   await refresh();
   scrollToTop();
