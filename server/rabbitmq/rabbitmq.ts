@@ -89,9 +89,6 @@ const sub = rabbit.createConsumer(
         sql,
         queryRequest,
       );
-      console.log(
-        `Query executed with insertId: ${insertId} and hashCode: ${hashCode}`,
-      );
       await postgresDb
         .update(jobTable)
         .set({
