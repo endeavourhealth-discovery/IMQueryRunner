@@ -16,14 +16,29 @@ export async function executeQuery(
   );
   if (!queryRequestForSQL.query.iri)
     throw new Error("Query IRI is required for execution");
+  const hashCode = hashQueryRequest(queryRequestForSQL);
+
+  if (
+    queryRequestForSQL.query.queryType === "DATASET" &&
+    (await isCached(hashCode, "dataset"))
+  ) {
+    console.log(
+      `Subquery cache hit for hashCode: ${hashCode} and iri: ${queryRequestForSQL.query.iri}`,
+    );
+    return { hashCode };
+  } else if (
+    queryRequestForSQL.query.queryType === "COHORT" &&
+    (await isCached(hashCode, "cohort"))
+  ) {
+    console.log(
+      `Subquery cache hit for hashCode: ${hashCode} and iri: ${queryRequestForSQL.query.iri}`,
+    );
+    return { hashCode: hashCode };
+  }
+
   const queryIrisToHashCodes = {} as { [key: string]: number };
-  queryIrisToHashCodes[queryRequestForSQL.query.iri] =
-    hashQueryRequest(queryRequestForSQL);
-  console.log(
-    "Hash code for query:",
-    queryIrisToHashCodes[queryRequestForSQL.query.iri],
-  );
-  // TODO: check if hashcode exists in db and is relevant, if so return cached results
+  queryIrisToHashCodes[queryRequestForSQL.query.iri] = hashCode;
+  console.log("Hash code for query:", hashCode);
   const subQueries = await imapi.getSubqueryIris(
     sessionId,
     queryRequestForSQL.query.iri,
@@ -50,7 +65,7 @@ export async function executeQuery(
       try {
         const [result] = await mysqlDb.execute<ResultSetHeader>(sqlPart);
         console.log(
-          `Executed datset with insertId: ${result.insertId} and hashCode: ${queryIrisToHashCodes[queryRequestForSQL.query.iri]}`,
+          `Executed dataset with insertId: ${result.insertId} and hashCode: ${hashCode}`,
         );
       } catch (err) {
         console.error("Error executing SQL part:", sqlPart);
@@ -58,14 +73,14 @@ export async function executeQuery(
       }
     }
     return {
-      hashCode: queryIrisToHashCodes[queryRequestForSQL.query.iri],
+      hashCode: hashCode,
     };
   } else {
     try {
       const [result] = await mysqlDb.execute<ResultSetHeader>(resolvedSql);
       return {
         insertId: result.insertId,
-        hashCode: queryIrisToHashCodes[queryRequestForSQL.query.iri],
+        hashCode: hashCode,
       };
     } catch (err) {
       console.error("Error executing query:", queryRequestForSQL.query.iri);
@@ -124,19 +139,13 @@ function hashArgument(argument: Argument): string {
   return hashString;
 }
 
-export async function getCachedQueryResults(
-  queryRequest: QueryRequest,
-): Promise<string[] | undefined> {
-  const queryHash = hashQueryRequest(queryRequest);
-  // TODO: call results/[queueId].get.ts to fetch results from dataset;
-  return [];
-  // return result.map((r) => r.id);
-}
-
-export async function isCachedAndRelevant(hashCode: number): Promise<boolean> {
-  // check if query has been run
-  // check if the results are still relevant (by date)
-  return false;
+export async function isCached(
+  hashCode: number,
+  table: string,
+): Promise<boolean> {
+  const sql = `SELECT 1 FROM compass.${table} WHERE hash = ${hashCode} LIMIT 1`;
+  const [result] = await mysqlDb.execute<ResultSetHeader>(sql);
+  return (result as any).length > 0 ? true : false;
 }
 
 async function runSubQueries(
@@ -154,13 +163,17 @@ async function runSubQueries(
       const hashCode = hashQueryRequest(subQueryRequest);
       queryIrisToHashCodes[subQuery.iri] = hashCode;
       const subQuerySql = await imapi.getQuerySql(sessionId, subQueryRequest);
-      // if (!isCachedAndRelevant(hashCode))
+      if (await isCached(hashCode, "cohort")) {
+        console.log(
+          `Subquery cache hit for hashCode: ${hashCode} and iri: ${subQuery.iri}`,
+        );
+        continue;
+      }
       const resolvedSql = await getResolvedSql(
         subQuerySql,
         subQueryRequest,
         queryIrisToHashCodes,
       );
-      // awaiting drizzle pr #1523 for typings to work correctly. This is a fix as described in drizzle issue #661
       const [result] = await mysqlDb.execute<ResultSetHeader>(resolvedSql);
       console.log(
         `Subquery executed with insertId: ${result.insertId} and hashCode: ${hashCode}`,
@@ -197,7 +210,6 @@ async function getResolvedSql(
       sql = sql.replaceAll(iri, JSON.stringify(queryIrisToHashCodes[iri]));
     }
   }
-  // console.log("Resolved SQL:", sql);
   return sql;
 }
 
