@@ -15,7 +15,7 @@
           :size="'small'"
           :value="queryResults"
           :paginator="true"
-          :rows="size"
+          :rows="rows"
           :scrollable="true"
           scroll-height="600px"
           :autoLayout="true"
@@ -68,18 +68,20 @@
 import { isArray } from "lodash-es";
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
+import { useUserStore } from "~/plugins/end-sec-ui";
 
 interface Props {
   jobId: string | string[] | undefined;
 }
 
 const props = defineProps<Props>();
+const { user } = useUserStore();
 
 const loading = ref(false);
 const downloadLoading = ref(false);
 const queryResults: Ref<any[]> = ref([]);
-const pageNumber = ref(1);
-const size = ref(25);
+const page = ref(1);
+const rows = ref(25);
 const originalSize = ref(25);
 const totalCount = ref();
 const columns: Ref<any[]> = ref([]);
@@ -91,12 +93,19 @@ onMounted(async () => {
 
 async function getQueryResults() {
   if (props.jobId) {
-    // request.page = { pageNumber: pageNumber.value, pageSize: size.value }; //TODO: fix paging mechanism
-    //const results = await useFetch(`/api/job/results/hashcode/1); //TODO: for testing, remove later
-    const value = await $fetch(`/api/queue/job/results/${props.jobId}`);
-    if (value && isArray(value)) {
-      totalCount.value = value.length; //TODO: replace with actual count
-      queryResults.value = value;
+    const value = await $fetch<{ totalCount: number; result: any[] }>(
+      `/api/queue/job/results/${props.jobId}`,
+      {
+        query: {
+          userId: user?.id,
+          page: page.value,
+          size: rows.value,
+        },
+      },
+    );
+    if (value && isArray(value.result)) {
+      totalCount.value = value.totalCount;
+      queryResults.value = value.result;
     }
   }
 }
@@ -111,8 +120,8 @@ function formatResultsForTable() {
 function downloadQueryResults() {}
 
 async function onPage(event: any) {
-  pageNumber.value = event.page;
-  size.value = event.rows;
+  page.value = ++event.page;
+  rows.value = event.rows;
   await getQueryResults();
 }
 
