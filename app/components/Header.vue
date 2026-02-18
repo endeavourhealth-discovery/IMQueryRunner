@@ -23,7 +23,7 @@
       id="header-end"
       class="h-full flex-grow-0 flex-shrink-1 flex-auto flex flex-row items-center justify-self-end justify-end gap-[0.25rem]"
     >
-      {{user?.userName}}
+      {{ user?.userName }}
       <Button
         v-tooltip.left="'Account'"
         v-if="!isLoggedIn"
@@ -70,14 +70,14 @@
 
 <script setup lang="ts">
 import type { MenuItem } from "primevue/menuitem";
-import { useUserStore } from "~/plugins/end-sec-ui";
+import { useUserStore } from "~/stores/useUserStore";
 
 const userStore = useUserStore();
 
 const loginItems: Ref<MenuItem[]> = ref([]);
 const accountItems: Ref<MenuItem[]> = ref([]);
-const user = computed(() => userStore.user)
-const isLoggedIn = computed(() => userStore.isLoggedIn)
+const user = computed(() => userStore.user);
+const isLoggedIn = computed(() => userStore.isLoggedIn);
 const userMenu = ref();
 
 onMounted(() => {
@@ -103,8 +103,8 @@ function setUserMenuItems(): void {
       label: "Login",
       icon: "fa-solid fa-fw fa-user",
       command: async () => {
-        await globalThis.uiGuard.login()
-      }
+        await globalThis.uiGuard.login();
+      },
     },
   ];
   accountItems.value = [
@@ -112,19 +112,18 @@ function setUserMenuItems(): void {
       label: "My Account",
       icon: "fa-solid fa-fw fa-cog",
       command: async () => {
-        await globalThis.uiGuard.profile()
-      }
+        await globalThis.uiGuard.profile();
+      },
     },
     {
       label: "Logout",
       icon: "fa-solid fa-fw fa-arrow-right-from-bracket",
       command: async () => {
-        await globalThis.uiGuard.logout()
-      }
+        await globalThis.uiGuard.logout();
+      },
     },
   ];
 }
-
 </script>
 
 <style scoped></style>

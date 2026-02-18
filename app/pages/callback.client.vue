@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {useRoute} from "vue-router";
-import { useUserStore } from "~/plugins/end-sec-ui";
+import { useRoute } from "vue-router";
+import { useUserStore } from "~/stores/useUserStore";
 
 const route = useRoute();
 
@@ -10,7 +10,7 @@ onMounted(async () => {
   const code = route.query.code as string;
   if (code) {
     await globalThis.uiGuard.callback(code, state);
-    if (!userStore.isLoggedIn){
+    if (!userStore.isLoggedIn) {
       throw createError("Failed to fetch login session");
     }
     await navigateTo(state);
