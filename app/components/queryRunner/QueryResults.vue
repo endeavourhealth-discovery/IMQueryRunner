@@ -68,7 +68,7 @@
 import { isArray } from "lodash-es";
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
-import { useUserStore } from "~/plugins/end-sec-ui";
+import { useUserStore } from "~/stores/useUserStore";
 
 interface Props {
   jobId: string | string[] | undefined;
