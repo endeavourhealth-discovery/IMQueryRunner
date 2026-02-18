@@ -23,6 +23,9 @@ async function getSession() {
           clientId: process.env.CLIENT_ID,
           clientSecret: process.env.CLIENT_SECRET,
         },
+        headers: {
+          "X-IGNORE-IP": "true",
+        },
       },
     );
     sessionId = response.sessionId;
