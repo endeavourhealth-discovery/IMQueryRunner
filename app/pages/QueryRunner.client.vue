@@ -2,53 +2,50 @@
   <div class="flex-auto overflow-auto">
     <div class="h-[calc(100% - 3.5rem)] overflow-auto">
       <div
-        class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
+          class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
       >
         <div class="flex gap-2 m-2">
           <Button
-            class="flex"
-            severity="secondary"
-            icon="fa-solid fa-arrows-rotate"
-            label="Refresh"
-            @click="refresh"
+              class="flex"
+              severity="secondary"
+              icon="fa-solid fa-arrows-rotate"
+              label="Refresh"
+              @click="refresh"
           />
           <Button
-            class="flex"
-            icon="fa-solid fa-magnifying-glass"
-            label="Run a query"
-            @click="runQuery"
+              class="flex"
+              icon="fa-solid fa-magnifying-glass"
+              label="Run a query"
+              @click="runQuery"
           />
         </div>
         <DataTable
-          :value="jobs"
-          :paginator="true"
-          :rows="rows"
-          :scrollable="true"
-          scrollHeight="flex"
-          :autoLayout="true"
-          @page="onPage($event)"
-          :lazy="true"
-          :totalRecords="totalCount"
-          :rows-per-page-options="[
+            :value="jobs"
+            :paginator="true"
+            :rows="rows"
+            :scrollable="true"
+            scrollHeight="flex"
+            :autoLayout="true"
+            @page="onPage($event)"
+            :lazy="true"
+            :totalRecords="totalCount"
+            :rows-per-page-options="[
             rowsOriginal,
             rowsOriginal * 2,
             rowsOriginal * 4,
             rowsOriginal * 8,
           ]"
-          :loading="searchLoading"
-          :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
+            :loading="searchLoading"
+            :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
         >
           <template #empty>None</template>
-          <!-- <Column field="dbid" header="ID"></Column> -->
-          <!-- <Column field="queryRequest.query.iri" header="Iri"></Column> -->
           <Column field="jobName" header="Job name"></Column>
           <Column>
             <template #body="{ data }: { data: Job }">
               <Button
-                :disabled="!data.queryRequest.argument"
-                label="View arguments"
-                @click="viewArgumentDisplay(data.queryRequest.argument)"
-                v-tooltip.top="'No arguments available'"
+                  :disabled="!data.queryRequest.argument.length"
+                  label="View arguments"
+                  @click="viewArgumentDisplay(data.queryRequest.argument)"
               />
             </template>
           </Column>
@@ -56,34 +53,34 @@
           <Column field="queuedAt" header="Queued">
             <template #body="{ data }: { data: Job }">
               <span>{{
-                data.queueDate ? getDisplayDateTime(data.queueDate) : "-"
-              }}</span>
+                  data.queueDate ? getDisplayDateTime(data.queueDate) : "-"
+                }}</span>
             </template>
           </Column>
           <Column field="stoppedAt" header="Finished">
             <template #body="{ data }: { data: Job }">
               <span>{{
-                data.finishDate ? getDisplayDateTime(data.finishDate) : "-"
-              }}</span>
+                  data.finishDate ? getDisplayDateTime(data.finishDate) : "-"
+                }}</span>
             </template>
           </Column>
           <Column field="status" header="Status">
             <template #body="{ data }: { data: Job }">
               <Tag
-                :severity="data.status ? getStatusSeverity(data.status) : '-'"
-                :value="data.status"
+                  :severity="data.status ? getStatusSeverity(data.status) : '-'"
+                  :value="data.status"
               />
             </template>
           </Column>
           <Column>
             <template #body="slotProps">
               <ActionButtons
-                :job="slotProps.data"
-                @cancel-query="cancelJob"
-                @go-to-query="goToQuery"
-                @view-query-results="viewQueryResults"
-                @delete-query="deleteJob"
-                @requeue-query="requeueJob"
+                  :job="slotProps.data"
+                  @cancel-query="cancelJob"
+                  @go-to-query="goToQuery"
+                  @view-query-results="viewQueryResults"
+                  @delete-query="deleteJob"
+                  @requeue-query="requeueJob"
               />
             </template>
           </Column>
@@ -91,30 +88,30 @@
       </div>
     </div>
     <ArgumentDisplayDialog
-      :arguments="currentArguments"
-      :show-footer-buttons="false"
-      v-model:showDialog="showArgumentDisplay"
+        :arguments="currentArguments"
+        :show-footer-buttons="false"
+        v-model:showDialog="showArgumentDisplay"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Job } from "~~/models";
-import { JobStatus } from "~~/enums";
-import { onMounted, ref } from "vue";
-import type { Ref } from "vue";
-import type { Argument } from "~~/models/AutoGen";
+import type {Job} from "~~/models";
+import {JobStatus} from "~~/enums";
+import {onMounted, ref} from "vue";
+import type {Ref} from "vue";
+import type {Argument} from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
-import { io } from "socket.io-client";
+import {io} from "socket.io-client";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
-import { useUserStore } from "~/stores/useUserStore";
+import {useUserStore} from "~/stores/useUserStore";
 
 definePageMeta({
   requiresAuth: true,
   requiresRole: ["EXECUTOR", "ADMIN"],
 });
 
-const { user } = useUserStore();
+const {user} = useUserStore();
 const confirm = useConfirm();
 
 const socket = io({
@@ -177,14 +174,14 @@ async function initSearch() {
 async function refresh() {
   searchLoading.value = true;
   const foundJobs = await $fetch<{ totalCount: number; result: Job[] }>(
-    "/api/queue",
-    {
-      query: {
-        userId: user?.id,
-        page: page.value,
-        size: rows.value,
+      "/api/queue",
+      {
+        query: {
+          userId: user?.id,
+          page: page.value,
+          size: rows.value,
+        },
       },
-    },
   );
   if (foundJobs) {
     totalCount.value = foundJobs.totalCount;
@@ -198,7 +195,7 @@ async function refresh() {
 }
 
 function getStatusSeverity(
-  status: JobStatus,
+    status: JobStatus,
 ): "secondary" | "success" | "info" | "warn" | "danger" | "contrast" {
   switch (status) {
     case JobStatus.QUEUED:
@@ -236,9 +233,9 @@ async function goToQuery(queryIri: string) {
     accept: async () => {
       const config = useRuntimeConfig();
       const encoded = `${config.public.imDirectoryUrl!}#/directory/folder/${encodeURIComponent(
-        queryIri,
+          queryIri,
       )}`;
-      await navigateTo(encoded, { external: true });
+      await navigateTo(encoded, {external: true});
     },
   });
 }
@@ -287,25 +284,25 @@ async function onPage(event: any) {
 
 function scrollToTop() {
   const scrollArea = document.getElementsByClassName(
-    "p-datatable-scrollable-table",
+      "p-datatable-scrollable-table",
   )[0] as HTMLElement;
-  scrollArea?.scrollIntoView({ block: "start", behavior: "smooth" });
+  scrollArea?.scrollIntoView({block: "start", behavior: "smooth"});
 }
 
 function getDisplayDateTime(date: string) {
   const d = new Date(date);
   return (
-    d.getUTCDate() +
-    "/" +
-    (d.getUTCMonth() + 1) +
-    "/" +
-    d.getUTCFullYear() +
-    " " +
-    d.getUTCHours() +
-    ":" +
-    d.getUTCMinutes() +
-    ":" +
-    d.getUTCMilliseconds()
+      d.getUTCDate() +
+      "/" +
+      (d.getUTCMonth() + 1) +
+      "/" +
+      d.getUTCFullYear() +
+      " " +
+      d.getUTCHours() +
+      ":" +
+      d.getUTCMinutes() +
+      ":" +
+      d.getUTCMilliseconds()
   );
 }
 
