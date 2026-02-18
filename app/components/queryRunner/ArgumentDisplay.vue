@@ -116,7 +116,6 @@ watch(
     }
 );
 
-
 function formatArgumentDisplayName(arg: Argument) {
   const result = arg
       .parameter!.replace("$", "")
