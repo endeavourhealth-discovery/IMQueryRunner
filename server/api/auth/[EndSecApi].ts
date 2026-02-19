@@ -34,7 +34,7 @@ const NamespacePermissionSchema = object({
 const PermissionSchema = object({
   resource: zenum(Resource),
   allowableRoles: array(zenum(UserRole)).prefault([]),
-  allowableNamespaces: array(NamespacePermissionSchema).prefault([]),
+  requiredNamespaces: array(NamespacePermissionSchema).prefault([]),
 });
 
 async function getQueryParams<
