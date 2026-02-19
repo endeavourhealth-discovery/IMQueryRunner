@@ -1,29 +1,31 @@
 import type { NitroApp } from "nitropack";
-import type {User} from "~~/models/User";
-import { H3Event, EventHandlerRequest } from 'h3';
+import type { User } from "~~/models/User";
+import { H3Event, EventHandlerRequest } from "h3";
 import Resource from "~~/enums/Resource";
-import {UserRole, Namespace} from "~~/models/AutoGen";
+import { UserRole, Namespace } from "~~/models/AutoGen";
 
 interface EndSecApi {
-  getUser(event: H3Event<EventHandlerRequest>): Promise<User>
-  checkPermissions(event: H3Event<EventHandlerRequest>): Promise<boolean>
+  getUser(event: H3Event<EventHandlerRequest>): Promise<User>;
+  checkPermissions(event: H3Event<EventHandlerRequest>): Promise<boolean>;
 }
 
 export default defineNitroPlugin((nitroApp: NitroApp) => {
   globalThis.apiGuard = {
     getUser: async (event: H3Event<EventHandlerRequest>): Promise<User> => {
-      return await event.$fetch<User>("/api/auth/getUser")
+      return await event.$fetch<User>("/api/auth/getUser");
     },
-    checkPermissions: async (event: H3Event<EventHandlerRequest>): Promise<boolean> => {
-        const path = getRequestURL(event).pathname;
-        return await event.$fetch<boolean>("/api/auth/hasPermission", {
-            method: "POST",
-            body: {
-                resource: Resource.QUERY,
-                allowableRoles: [UserRole.ADMIN],
-                allowableNamespaces: [{iri: Namespace.IM, read: true , write: true}]
-            }
-        })
-    }
-  } as EndSecApi
+    checkPermissions: async (
+      event: H3Event<EventHandlerRequest>,
+    ): Promise<boolean> => {
+      const path = getRequestURL(event).pathname;
+      return await event.$fetch<boolean>("/api/auth/hasPermission", {
+        method: "POST",
+        body: {
+          resource: Resource.QUERY,
+          allowableRoles: [UserRole.ADMIN],
+          requiredNamespaces: [{ iri: Namespace.IM, read: true, write: true }],
+        },
+      });
+    },
+  } as EndSecApi;
 });
