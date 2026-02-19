@@ -1,9 +1,7 @@
 <template>
   <div class="flex-auto overflow-auto">
     <div class="h-[calc(100% - 3.5rem)] overflow-auto">
-      <div
-        class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
-      >
+      <div class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)">
         <div class="m-2">
           <Button
             icon="fa-solid fa-arrow-left"
@@ -12,6 +10,7 @@
           />
         </div>
         <DataTable
+          ref="dt"
           :size="'small'"
           :value="queryResults"
           :paginator="true"
@@ -34,8 +33,7 @@
           <template #header>
             <div class="flex flex-wrap items-center justify-between gap-2">
               <span class="text-xl font-bold"
-                >Total results: {{ totalCount }}</span
-              >
+              >Total results: {{ totalCount }}</span>
             </div>
           </template>
           <template #empty>None</template>
@@ -65,21 +63,22 @@
 </template>
 
 <script setup lang="ts">
-import { isArray } from "lodash-es";
-import { onMounted, ref } from "vue";
-import type { Ref } from "vue";
-import { useUserStore } from "~/stores/useUserStore";
+import {isArray} from "lodash-es";
+import type {Ref} from "vue";
+import {onMounted, ref} from "vue";
+import {useUserStore} from "~/stores/useUserStore";
 
 interface Props {
   jobId: string | string[] | undefined;
 }
 
 const props = defineProps<Props>();
-const { user } = useUserStore();
+const {user} = useUserStore();
 
 const loading = ref(false);
 const downloadLoading = ref(false);
 const queryResults: Ref<any[]> = ref([]);
+const totalResults: Ref<any[]> = ref([]);
 const page = ref(1);
 const rows = ref(25);
 const originalSize = ref(25);
@@ -110,14 +109,55 @@ async function getQueryResults() {
   }
 }
 
+async function getTotalQueryResults() {
+  if (props.jobId) {
+    const value = await $fetch<{ result: any[] }>(
+      `/api/queue/job/results/total/${props.jobId}`,
+      {
+        query: {
+          userId: user?.id
+        },
+      },
+    );
+    if (value && isArray(value.result)) {
+      totalResults.value = value.result;
+    }
+  }
+  console.log(totalResults.value)
+}
+
 function formatResultsForTable() {
   for (const key of Object.keys(queryResults.value[0])) {
     if (key !== "hashcode")
-      columns.value.push({ field: key, header: key.replace("_", " ") });
+      columns.value.push({field: key, header: key.replace("_", " ")});
   }
 }
 
-function downloadQueryResults() {}
+async function downloadQueryResults() {
+  await getTotalQueryResults();
+
+  const headers = Object.keys(totalResults.value[0]);
+  const csv = [
+    headers.join(","),
+    ...totalResults.value.map(row =>
+      headers.map(field => {
+        const value = row[field] ?? "";
+        return `"${String(value).replace(/"/g, '""')}"`;
+      }).join(",")
+    )
+  ].join("\n");
+
+  const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", props.jobId!.toString());
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
 
 async function onPage(event: any) {
   page.value = ++event.page;
