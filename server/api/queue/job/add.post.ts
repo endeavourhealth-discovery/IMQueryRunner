@@ -32,4 +32,5 @@ export default defineEventHandler(async (event) => {
   } as Job;
   await postgresDb.insert(jobTable).values(pgJobInsert.parse(queryTask));
   await sendMessage(user!.id, queryTask);
+  return { jobId: queryTask.dbid };
 });

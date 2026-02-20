@@ -1,7 +1,9 @@
 <template>
   <div class="flex-auto overflow-auto">
     <div class="h-[calc(100% - 3.5rem)] overflow-auto">
-      <div class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)">
+      <div
+        class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
+      >
         <div class="m-2">
           <Button
             icon="fa-solid fa-arrow-left"
@@ -33,7 +35,8 @@
           <template #header>
             <div class="flex flex-wrap items-center justify-between gap-2">
               <span class="text-xl font-bold"
-              >Total results: {{ totalCount }}</span>
+                >Total results: {{ totalCount }}</span
+              >
             </div>
           </template>
           <template #empty>None</template>
@@ -63,17 +66,17 @@
 </template>
 
 <script setup lang="ts">
-import {isArray} from "lodash-es";
-import type {Ref} from "vue";
-import {onMounted, ref} from "vue";
-import {useUserStore} from "~/stores/useUserStore";
+import { isArray } from "lodash-es";
+import type { Ref } from "vue";
+import { onMounted, ref } from "vue";
+import { useUserStore } from "~/stores/useUserStore";
 
 interface Props {
   jobId: string | string[] | undefined;
 }
 
 const props = defineProps<Props>();
-const {user} = useUserStore();
+const { user } = useUserStore();
 
 const loading = ref(false);
 const downloadLoading = ref(false);
@@ -115,7 +118,7 @@ async function getTotalQueryResults() {
       `/api/queue/job/results/total/${props.jobId}`,
       {
         query: {
-          userId: user?.id
+          userId: user?.id,
         },
       },
     );
@@ -123,13 +126,12 @@ async function getTotalQueryResults() {
       totalResults.value = value.result;
     }
   }
-  console.log(totalResults.value)
 }
 
 function formatResultsForTable() {
   for (const key of Object.keys(queryResults.value[0])) {
     if (key !== "hashcode")
-      columns.value.push({field: key, header: key.replace("_", " ")});
+      columns.value.push({ field: key, header: key.replace("_", " ") });
   }
 }
 
@@ -139,15 +141,17 @@ async function downloadQueryResults() {
   const headers = Object.keys(totalResults.value[0]);
   const csv = [
     headers.join(","),
-    ...totalResults.value.map(row =>
-      headers.map(field => {
-        const value = row[field] ?? "";
-        return `"${String(value).replace(/"/g, '""')}"`;
-      }).join(",")
-    )
+    ...totalResults.value.map((row) =>
+      headers
+        .map((field) => {
+          const value = row[field] ?? "";
+          return `"${String(value).replace(/"/g, '""')}"`;
+        })
+        .join(","),
+    ),
   ].join("\n");
 
-  const blob = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement("a");
