@@ -67,7 +67,7 @@ export class IMAPI {
   }
 
   public async findRequestMissingArguments(sessionId: string, ip: string, queryRequest: QueryRequest): Promise<ArgumentReference[]> {
-    return await $fetch(`${useRuntimeConfig().public.imapiUrl}query/private/findRequestMissingArguments`, {
+    return await $fetch(`${useRuntimeConfig().public.imapiUrl}query/public/findRequestMissingArguments`, {
       headers: {cookie: `session_id=${sessionId}`, "x-forwarded-for": ip},
       body: queryRequest,
       method: "post",
