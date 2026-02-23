@@ -9,35 +9,36 @@
     </Column>
     <Column field="parameter" header="Raw Parameter"></Column>
     <Column
-        v-if="includeIri"
-        field="referenceIri.iri"
-        header="Reference Iri"
+      v-if="includeIri"
+      field="referenceIri.iri"
+      header="Reference Iri"
     ></Column>
     <Column field="valueData" header="Value">
       <template #body="{ data }">
         <div class="argument-selector-content">
           <div v-if="editArguments && data.dataType && [XSD.STRING].includes(data.dataType?.iri)">
             <InputText
-                type="text"
-                v-model="data.valueData"
-                data-testid="property-value-input"
+              type="text"
+              v-model="data.valueData"
+              data-testid="property-value-input"
             />
           </div>
           <div v-if="editArguments && data.dataType && [XSD.BOOLEAN].includes(data.dataType.iri)">
             <Select
-                :options="booleanOptions"
-                optionLabel="name"
-                optionValue="value"
-                v-model="data.valueData"
+              :options="booleanOptions"
+              optionLabel="name"
+              optionValue="value"
+              v-model="data.valueData"
             />
           </div>
           <div v-if="editArguments && data.dataType && [IM.DATE, IM.DATE_TIME, IM.TIME].includes(data.dataType.iri)">
             <DatePicker
-                v-model="data.valueData"
-                :showTime="IM.DATE_TIME === data.dataType.iri"
-                :timeOnly="IM.TIME === data.dataType.iri"
-                dateFormat="yy/mm/dd"
-                showIcon iconDisplay="input"
+              v-model="data.valueData"
+              :showTime="IM.DATE_TIME === data.dataType.iri"
+              :timeOnly="IM.TIME === data.dataType.iri"
+              dateFormat="yy/mm/dd"
+              showIcon iconDisplay="input"
+              updateModelType="string"
             />
           </div>
           <div v-else>{{ data.valueData }}</div>
@@ -48,10 +49,10 @@
   <div v-if="showFooterButtons" class="button-container">
     <Button label="Back" @click="resetArguments()" severity="secondary"/>
     <Button
-        label="Confirm"
-        @click="confirmArguments"
-        :loading="submitting"
-        :disabled="!allArgumentsValid"
+      label="Confirm"
+      @click="confirmArguments"
+      :loading="submitting"
+      :disabled="!allArgumentsValid"
     />
   </div>
 </template>
@@ -82,7 +83,7 @@ const emit = defineEmits<{
 
 const showDialog = defineModel<boolean>("showDialog");
 const allArgumentsValid: ComputedRef<boolean> = computed(() =>
-    argumentList.value!.every((as) => as.valueData)
+  argumentList.value!.every((as) => as.valueData)
 );
 
 const loading = ref(false);
@@ -108,19 +109,19 @@ onMounted(() => {
 });
 
 watch(
-    () => cloneDeep(argumentList.value),
-    (newValue) => {
-      if (newValue) {
-        confirmArguments();
-      }
+  () => cloneDeep(argumentList.value),
+  (newValue) => {
+    if (newValue) {
+      confirmArguments();
     }
+  }
 );
 
 function formatArgumentDisplayName(arg: Argument) {
   const result = arg
-      .parameter!.replace("$", "")
-      .replace(/([A-Z])/g, " $1")
-      .toLowerCase();
+    .parameter!.replace("$", "")
+    .replace(/([A-Z])/g, " $1")
+    .toLowerCase();
   return result.charAt(0).toUpperCase() + result.slice(1);
 }
 

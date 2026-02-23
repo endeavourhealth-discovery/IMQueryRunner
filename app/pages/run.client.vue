@@ -19,7 +19,7 @@
       />
     </div>
     <div class="m-2">
-      <Button icon="fa-solid fa-play" label="Add to queue" :disabled="selected === undefined || missingArgs"
+      <Button icon="fa-solid fa-play" label="Add to queue" :disabled="selected === undefined"
               @click="showDialog = true"/>
     </div>
     <Dialog v-model:visible="showDialog" :closable="false" modal>
@@ -74,28 +74,28 @@ const missingArgs = ref(true);
 const imapi = useIMAPI();
 
 watch(
-    selected,
-    (newValue, oldValue) => {
-      if (newValue !== oldValue && newValue) {
-        args.value = [];
-        getArguments();
-      }
-    },
-    {deep: true}
+  selected,
+  (newValue, oldValue) => {
+    if (newValue !== oldValue && newValue) {
+      args.value = [];
+      getArguments();
+    }
+  },
+  {deep: true}
 );
 
 watch(
-    () => cloneDeep(completedArguments.value),
-    (newValue, oldValue) => {
-      if (newValue !== oldValue) {
-        if (completedArguments.value && completedArguments.value.length) {
-          for (const arg of completedArguments.value) {
-            missingArgs.value = !arg.valueData;
-          }
+  () => cloneDeep(completedArguments.value),
+  (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      if (completedArguments.value && completedArguments.value.length) {
+        for (const arg of completedArguments.value) {
+          missingArgs.value = !arg.valueData;
         }
       }
-    },
-    {deep: true}
+    }
+  },
+  {deep: true}
 );
 
 function passArguments(args: Argument[], runOnConfirm: boolean) {
