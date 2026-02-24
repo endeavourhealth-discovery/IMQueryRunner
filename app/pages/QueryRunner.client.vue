@@ -208,13 +208,15 @@ function getStatusSeverity(
       return "danger";
     case JobStatus.CANCELLED:
       return "contrast";
+    case JobStatus.KILLED:
+      return "contrast";
     default:
       return "info";
   }
 }
 
 async function cancelJob(jobId: string) {
-  await $fetch(`/api/queue/job/cancel/${jobId}`);
+  await $fetch(`/api/queue/job/stop/${jobId}`);
   await refresh();
 }
 
