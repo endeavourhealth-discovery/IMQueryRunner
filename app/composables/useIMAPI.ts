@@ -2,7 +2,7 @@ import type {
   ArgumentReference,
   QueryRequest,
   SearchResponse,
-} from "vue-library";
+} from "vue-library/interfaces";
 import type { SubQueryDependency } from "~~/models/SubQueryDependency";
 
 export function useIMAPI() {

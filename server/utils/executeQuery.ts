@@ -1,6 +1,6 @@
 import murmurhash from "murmurhash";
 import { type ResultSetHeader } from "mysql2";
-import { type Argument, type QueryRequest } from "vue-library";
+import { type Argument, type QueryRequest } from "vue-library/interfaces";
 import { mysqlDb } from "../db/mysql";
 import { imapi } from "~~/server/utils/imapi";
 import { type SubQueryDependency } from "~~/models/SubQueryDependency";

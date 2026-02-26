@@ -114,10 +114,9 @@ import {
   type SearchResponse,
   type SearchResultSummary,
   type QueryRequest,
-  TextSearchStyle,
   type TTIriRef,
-  IM,
-} from "vue-library";
+} from "vue-library/interfaces";
+import { IM, TextSearchStyle } from "vue-library/enums";
 import { cloneDeep, debounce, isEqual } from "lodash-es";
 import { useAutocompleteRegistry } from "~/composables/useAutocompleteRegistry";
 import type { TreeNode } from "primevue/treenode";

@@ -3,7 +3,7 @@ import type {
   Query,
   QueryRequest,
   SearchResponse,
-} from "vue-library";
+} from "vue-library/interfaces";
 import type { SubQueryDependency } from "~~/models/SubQueryDependency";
 
 export class IMAPI {

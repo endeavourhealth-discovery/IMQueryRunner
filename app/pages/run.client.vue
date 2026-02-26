@@ -60,7 +60,7 @@ import {
   type ArgumentReference,
   type QueryRequest,
   type SearchResultSummary,
-} from "vue-library";
+} from "vue-library/interfaces";
 import { watch } from "vue";
 import { cloneDeep } from "lodash-es";
 import ArgumentDisplay from "~/components/queryRunner/ArgumentDisplay.vue";

@@ -6,7 +6,7 @@ import {
   type InferEventInput,
   type ValidateFunction,
 } from "h3";
-import { PermissionSchema } from "vue-library";
+import { PermissionSchema } from "vue-library/models";
 import { getIp } from "~~/server/helpers/getIp";
 
 const loginUrlSchema = object({

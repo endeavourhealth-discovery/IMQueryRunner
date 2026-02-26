@@ -76,7 +76,8 @@
 </template>
 
 <script setup lang="ts">
-import { type Argument, type ArgumentReference, IM, XSD } from "vue-library";
+import { type Argument, type ArgumentReference } from "vue-library/interfaces";
+import { IM, XSD } from "vue-library/enums";
 import Column from "primevue/column";
 import { cloneDeep } from "lodash-es";
 import { watch } from "vue";

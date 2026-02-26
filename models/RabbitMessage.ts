@@ -1,4 +1,4 @@
-import type { QueryRequest } from "vue-library";
+import type { QueryRequest } from "vue-library/interfaces";
 
 export interface RabbitMessage {
   data: QueryRequest;

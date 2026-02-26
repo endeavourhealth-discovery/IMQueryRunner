@@ -100,7 +100,7 @@ import type { Job } from "~~/models";
 import { JobStatus } from "~~/enums";
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
-import type { Argument } from "vue-library";
+import type { Argument } from "vue-library/interfaces";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import { io } from "socket.io-client";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";

@@ -1,4 +1,4 @@
-import type { User } from "vue-library";
+import type { User } from "vue-library/models";
 import { defineStore } from "pinia";
 
 export const useUserStore = defineStore("user", () => {
