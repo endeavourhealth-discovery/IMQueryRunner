@@ -1,7 +1,7 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
 import { pgJobInsert, postgresDb } from "~~/server/db/postgres";
 import { jobTable } from "~~/server/db/postgres/schema";
-import { type QueryRequest, DatabaseOption } from "~~/models/AutoGen";
+import { type QueryRequest } from "~~/models/AutoGen";
 import { JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
 import { v4 } from "uuid";
@@ -32,4 +32,5 @@ export default defineEventHandler(async (event) => {
   } as Job;
   await postgresDb.insert(jobTable).values(pgJobInsert.parse(queryTask));
   await sendMessage(user!.id, queryTask);
+  return { jobId: queryTask.dbid };
 });

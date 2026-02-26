@@ -39,32 +39,29 @@
           :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
         >
           <template #empty>None</template>
-          <Column field="dbid" header="ID"></Column>
-          <Column field="queryRequest.query.iri" header="Iri"></Column>
           <Column field="jobName" header="Job name"></Column>
           <Column>
             <template #body="{ data }: { data: Job }">
               <Button
-                :disabled="!data.queryRequest.argument"
+                :disabled="!data.queryRequest.argument.length"
                 label="View arguments"
                 @click="viewArgumentDisplay(data.queryRequest.argument)"
-                v-tooltip.top="'No arguments available'"
               />
             </template>
           </Column>
-          <Column field="userId" header="User"></Column>
-          <Column field="queuedAt" header="Queued at">
+          <Column v-if="adminView" field="userId" header="User"></Column>
+          <Column field="queuedAt" header="Queued">
             <template #body="{ data }: { data: Job }">
               <span>{{
-                data.queueDate ? getDisplayDateTime(data.queueDate) : "-"
-              }}</span>
+                  data.queueDate ? getDisplayDateTime(data.queueDate) : "-"
+                }}</span>
             </template>
           </Column>
-          <Column field="stoppedAt" header="Stopped at">
+          <Column field="stoppedAt" header="Finished">
             <template #body="{ data }: { data: Job }">
               <span>{{
-                data.finishDate ? getDisplayDateTime(data.finishDate) : "-"
-              }}</span>
+                  data.finishDate ? getDisplayDateTime(data.finishDate) : "-"
+                }}</span>
             </template>
           </Column>
           <Column field="status" header="Status">
@@ -79,11 +76,11 @@
             <template #body="slotProps">
               <ActionButtons
                 :job="slotProps.data"
-                @cancel-query="cancelQuery"
+                @cancel-query="cancelJob"
                 @go-to-query="goToQuery"
                 @view-query-results="viewQueryResults"
-                @delete-query="deleteQuery"
-                @requeue-query="requeueQuery"
+                @delete-query="deleteJob"
+                @requeue-query="requeueJob"
               />
             </template>
           </Column>
@@ -99,22 +96,22 @@
 </template>
 
 <script setup lang="ts">
-import type { Job } from "~~/models";
-import { JobStatus } from "~~/enums";
-import { onMounted, ref } from "vue";
-import type { Ref } from "vue";
-import type { Argument } from "~~/models/AutoGen";
+import type {Job} from "~~/models";
+import {JobStatus} from "~~/enums";
+import {onMounted, ref} from "vue";
+import type {Ref} from "vue";
+import type {Argument} from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
-import { io } from "socket.io-client";
+import {io} from "socket.io-client";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
-import { useUserStore } from "~/plugins/end-sec-ui";
+import {useUserStore} from "~/stores/useUserStore";
 
 definePageMeta({
   requiresAuth: true,
   requiresRole: ["EXECUTOR", "ADMIN"],
 });
 
-const { user } = useUserStore();
+const {user} = useUserStore();
 const confirm = useConfirm();
 
 const socket = io({
@@ -136,7 +133,7 @@ const websocketIsConnected = ref(false);
 const transport = ref("N/A");
 const showArgumentDisplay = ref(false);
 const currentArguments: Ref<Argument[]> = ref([]);
-
+const adminView = false; //TODO: determine admin view based on user role and preference
 onMounted(async () => {
   loading.value = true;
   loading.value = false;
@@ -153,7 +150,7 @@ async function initSearch() {
   const results = await useFetch<{
     totalCount: number;
     result: Job[];
-  }>("/api/queue/user/", {
+  }>("/api/queue", {
     query: {
       userId: user?.id,
       page: page.value,
@@ -176,8 +173,8 @@ async function initSearch() {
 
 async function refresh() {
   searchLoading.value = true;
-  const results = await $fetch<{ totalCount: number; result: Job[] }>(
-    "/api/queue/user/",
+  const foundJobs = await $fetch<{ totalCount: number; result: Job[] }>(
+    "/api/queue",
     {
       query: {
         userId: user?.id,
@@ -186,17 +183,14 @@ async function refresh() {
       },
     },
   );
-  if (results) {
-    totalCount.value = results.totalCount;
-    jobs.value = results.result.sort((a, b) => {
-      if (!a.queueDate) return 1;
-      if (!b.queueDate) return -1;
-      return new Date(b.queueDate).getTime() - new Date(a.queueDate).getTime();
-    });
+  if (foundJobs) {
+    totalCount.value = foundJobs.totalCount;
+    jobs.value = foundJobs.result;
   } else {
     totalCount.value = 0;
     jobs.value = [];
   }
+
   searchLoading.value = false;
 }
 
@@ -219,8 +213,8 @@ function getStatusSeverity(
   }
 }
 
-async function cancelQuery(queryId: string) {
-  await $fetch(`/api/queue/query/cancel/${queryId}`);
+async function cancelJob(jobId: string) {
+  await $fetch(`/api/queue/job/cancel/${jobId}`);
   await refresh();
 }
 
@@ -241,7 +235,7 @@ async function goToQuery(queryIri: string) {
       const encoded = `${config.public.imDirectoryUrl!}#/directory/folder/${encodeURIComponent(
         queryIri,
       )}`;
-      await navigateTo(encoded, { external: true });
+      await navigateTo(encoded, {external: true});
     },
   });
 }
@@ -260,15 +254,17 @@ function runQuery() {
   navigateTo("/run");
 }
 
-async function deleteQuery(queryId: string) {
-  await $fetch(`/api/queue/query/delete/${queryId}`);
+async function deleteJob(jobId: string) {
+  await $fetch(`/api/queue/job/${jobId}`, {
+    method: "delete",
+  });
   await refresh();
 }
 
-async function requeueQuery(queryId: string) {
-  const found = getById(queryId);
+async function requeueJob(jobId: string) {
+  const found = getById(jobId);
   if (found)
-    await $fetch("/api/queue/query/add", {
+    await $fetch("/api/queue/job/add", {
       method: "post",
       body: found.queryRequest,
     });
@@ -280,7 +276,7 @@ function getById(jobId: string): Job | undefined {
 }
 
 async function onPage(event: any) {
-  page.value = event.page;
+  page.value = ++event.page;
   rows.value = event.rows;
   await refresh();
   scrollToTop();
@@ -290,7 +286,7 @@ function scrollToTop() {
   const scrollArea = document.getElementsByClassName(
     "p-datatable-scrollable-table",
   )[0] as HTMLElement;
-  scrollArea?.scrollIntoView({ block: "start", behavior: "smooth" });
+  scrollArea?.scrollIntoView({block: "start", behavior: "smooth"});
 }
 
 function getDisplayDateTime(date: string) {

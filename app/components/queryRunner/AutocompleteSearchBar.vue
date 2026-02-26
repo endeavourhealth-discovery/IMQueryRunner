@@ -57,10 +57,11 @@
       </div>
     </Popover>
   </div>
-  <Dialog v-model:visible="showDialog" modal>
+  <Dialog v-model:visible="showDialog" modal :closable="false">
     <Tree v-model:expandedKeys="expandedKeys" v-model:selectionKeys="selectedKeys" selectionMode="single" @nodeSelect="onNodeSelect" :loading="loading" loadingMode="icon" :value="entities" @nodeExpand="onNodeExpand" class="dialog w-full md:w-[30rem]"></Tree>
     <template #footer>
-      <Button label="Select" :disabled="!isQuery" variant="outlined" @click="setSelectedQuery" autofocus />
+      <Button class="m-1" label="Cancel" variant="outlined" @click="showDialog = false" />
+      <Button class="m-1" label="Select" :disabled="!isQuery" @click="setSelectedQuery" autofocus />
     </template>
   </Dialog>
 </template>
@@ -381,10 +382,6 @@ function onListBoxOptionClick(selected: SearchResultSummary) {
   gap: 0.2rem;
   overflow: auto;
   width: 40%;
-}
-
-.mic {
-  cursor: pointer;
 }
 
 #autocomplete-search {

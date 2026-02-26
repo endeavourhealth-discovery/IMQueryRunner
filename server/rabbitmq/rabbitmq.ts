@@ -23,6 +23,9 @@ async function getSession() {
           clientId: process.env.CLIENT_ID,
           clientSecret: process.env.CLIENT_SECRET,
         },
+        headers: {
+          "X-IGNORE-IP": "true",
+        },
       },
     );
     sessionId = response.sessionId;
@@ -88,9 +91,6 @@ const sub = rabbit.createConsumer(
         await getSession(),
         sql,
         queryRequest,
-      );
-      console.log(
-        `Query executed with insertId: ${insertId} and hashCode: ${hashCode}`,
       );
       await postgresDb
         .update(jobTable)
