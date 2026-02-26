@@ -1,87 +1,83 @@
-import type {ArgumentReference, QueryRequest, SearchResponse} from "~~/models/AutoGen";
-import type {SubQueryDependency} from "~~/models/SubQueryDependency";
+import type {
+  ArgumentReference,
+  QueryRequest,
+  SearchResponse,
+} from "vue-library";
+import type { SubQueryDependency } from "~~/models/SubQueryDependency";
 
 export function useIMAPI() {
-
   async function getQuerySql(queryRequest: QueryRequest): Promise<string> {
-    return await $fetch(`/api/imapi/sql`, {
+    return (await $fetch(`/api/imapi/sql`, {
       body: queryRequest,
       method: "post",
-    }) as any;
+    })) as any;
   }
 
   async function getSubqueryIris(
-      queryIri: string,
+    queryIri: string,
   ): Promise<SubQueryDependency[]> {
-    return await $fetch(`/api/imapi/subQueries`, {
+    return (await $fetch(`/api/imapi/subQueries`, {
       params: {
         queryIri: queryIri,
       },
       method: "get",
-    }) as any;
+    })) as any;
   }
 
   async function getPartialEntity(iri: string, predicates: string[]) {
-    return await $fetch(`/api/imapi/partial`, {
+    return (await $fetch(`/api/imapi/partial`, {
       params: {
         iri: iri,
         predicates: predicates.join(","),
       },
       method: "get",
-    }) as any;
+    })) as any;
   }
 
   async function getEntityChildren(iri: string, filters?: any) {
-    return await $fetch(`/api/imapi/children`, {
+    return (await $fetch(`/api/imapi/children`, {
       params: {
         iri: iri,
         schemeIris: filters?.join(","),
       },
       method: "get",
-    }) as any;
+    })) as any;
   }
 
   async function getQueryRequestForSQL(
-      queryRequest: QueryRequest,
+    queryRequest: QueryRequest,
   ): Promise<QueryRequest> {
-    return await $fetch(
-        `/api/imapi/queryRequestForSQL`,
-        {
-          body: queryRequest,
-          method: "post",
-        },
-    ) as any;
+    return (await $fetch(`/api/imapi/queryRequestForSQL`, {
+      body: queryRequest,
+      method: "post",
+    })) as any;
   }
 
   async function queryIMSearch(
-      queryRequest: QueryRequest,
+    queryRequest: QueryRequest,
   ): Promise<SearchResponse> {
-    return await $fetch(
-        `/api/imapi/queryIMSearch`,
-        {
-          body: queryRequest,
-          method: "post",
-        },
-    ) as any;
+    return (await $fetch(`/api/imapi/queryIMSearch`, {
+      body: queryRequest,
+      method: "post",
+    })) as any;
   }
 
-  async function findRequestMissingArguments(queryRequest: QueryRequest): Promise<ArgumentReference[]> {
-    return await $fetch(
-        `/api/imapi/findRequestMissingArguments`,
-        {
-          body: queryRequest,
-          method: "post",
-        },
-    ) as any;
+  async function findRequestMissingArguments(
+    queryRequest: QueryRequest,
+  ): Promise<ArgumentReference[]> {
+    return (await $fetch(`/api/imapi/findRequestMissingArguments`, {
+      body: queryRequest,
+      method: "post",
+    })) as any;
   }
 
   async function getQueryFromIri(iri: string) {
-    return await $fetch(`/api/imapi/queryFromIri`, {
+    return (await $fetch(`/api/imapi/queryFromIri`, {
       params: {
-        queryIri: iri
+        queryIri: iri,
       },
       method: "get",
-    }) as any;
+    })) as any;
   }
 
   return {
@@ -92,7 +88,6 @@ export function useIMAPI() {
     getQueryRequestForSQL,
     queryIMSearch,
     getQueryFromIri,
-    findRequestMissingArguments
-  }
+    findRequestMissingArguments,
+  };
 }
-

@@ -6,3 +6,6 @@ onlyBuiltDependencies:
   - '@tailwindcss/oxide'
   - esbuild
   - prisma
+
+overrides:
+  vue-library: link:../VueLibrary

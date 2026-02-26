@@ -1,7 +1,7 @@
 <template>
   <div class="search-container" ref="autocompleteRoot">
     <IconField class="autocomplete-search" iconPosition="right">
-<!--
+      <!--
       <InputIcon v-if="!searchLoading && !listening" class="pi pi-microphone mic" :class="{ listening }" @click="toggleListen" />
 -->
       <InputText
@@ -18,31 +18,50 @@
         @focus="handleFocus"
         @blur="editing = false"
         @mouseover="selected?.iri != 'any'"
-        :pt="{ root: { autocomplete: allowBrowserAutocomplete ? 'on' : 'off' } }"
+        :pt="{
+          root: { autocomplete: allowBrowserAutocomplete ? 'on' : 'off' },
+        }"
       />
-      <i v-if="editing" class="fa fa-times-circle clear-icon" @mousedown.prevent="clearSearch()"></i>
+      <i
+        v-if="editing"
+        class="fa fa-times-circle clear-icon"
+        @mousedown.prevent="clearSearch()"
+      ></i>
     </IconField>
     <Button
-        class="search-button px-2"
+      class="search-button px-2"
       :disabled="disabled"
       @click="advancedSearch"
       data-testid="autocomplete-search-button"
       icon="fa-solid fa-magnifying-glass"
       label="Advanced"
     />
-    <Popover ref="resultsOP" :breakpoints="{ '960px': '75vw', '640px': '100vw' }" :style="{ width: '450px' }" appendTo="body">
+    <Popover
+      ref="resultsOP"
+      :breakpoints="{ '960px': '75vw', '640px': '100vw' }"
+      :style="{ width: '450px' }"
+      appendTo="body"
+    >
       <div v-if="searchLoading" class="loading-container">
         <ProgressSpinner />
       </div>
       <div v-else class="results-container" :tabindex="0">
-        <Listbox v-if="results?.entities" v-model="listBoxSelected" :options="results.entities">
+        <Listbox
+          v-if="results?.entities"
+          v-model="listBoxSelected"
+          :options="results.entities"
+        >
           <template #option="slotProps">
             <div
               class="listbox-item"
               @mouseover="slotProps.option.iri != 'any'"
               @click="onListBoxOptionClick(slotProps.option)"
             >
-              <span>{{ slotProps.option.bestMatch ? slotProps.option.bestMatch : slotProps.option.name }}</span>
+              <span>{{
+                slotProps.option.bestMatch
+                  ? slotProps.option.bestMatch
+                  : slotProps.option.name
+              }}</span>
             </div>
           </template>
         </Listbox>
@@ -50,18 +69,41 @@
 
         <div class="advanced-search-container">
           <small>
-            Showing {{ results?.entities?.length ? 1 : 0 }}-{{ results?.entities?.length ? results.entities.length : 0 }} of
-            {{ results?.count ? results.count : 0 }} results
+            Showing {{ results?.entities?.length ? 1 : 0 }}-{{
+              results?.entities?.length ? results.entities.length : 0
+            }}
+            of {{ results?.count ? results.count : 0 }} results
           </small>
         </div>
       </div>
     </Popover>
   </div>
   <Dialog v-model:visible="showDialog" modal :closable="false">
-    <Tree v-model:expandedKeys="expandedKeys" v-model:selectionKeys="selectedKeys" selectionMode="single" @nodeSelect="onNodeSelect" :loading="loading" loadingMode="icon" :value="entities" @nodeExpand="onNodeExpand" class="dialog w-full md:w-[30rem]"></Tree>
+    <Tree
+      v-model:expandedKeys="expandedKeys"
+      v-model:selectionKeys="selectedKeys"
+      selectionMode="single"
+      @nodeSelect="onNodeSelect"
+      :loading="loading"
+      loadingMode="icon"
+      :value="entities"
+      @nodeExpand="onNodeExpand"
+      class="dialog w-full md:w-[30rem]"
+    ></Tree>
     <template #footer>
-      <Button class="m-1" label="Cancel" variant="outlined" @click="showDialog = false" />
-      <Button class="m-1" label="Select" :disabled="!isQuery" @click="setSelectedQuery" autofocus />
+      <Button
+        class="m-1"
+        label="Cancel"
+        variant="outlined"
+        @click="showDialog = false"
+      />
+      <Button
+        class="m-1"
+        label="Select"
+        :disabled="!isQuery"
+        @click="setSelectedQuery"
+        autofocus
+      />
     </template>
   </Dialog>
 </template>
@@ -73,14 +115,16 @@ import {
   type SearchResultSummary,
   type QueryRequest,
   TextSearchStyle,
-  type TTIriRef, IM
-} from "~~/models/AutoGen";
-import {cloneDeep, debounce, isEqual} from "lodash-es";
-import {useAutocompleteRegistry} from "~/composables/useAutocompleteRegistry";
-import type {TreeNode} from "primevue/treenode";
-import {useIMAPI} from "~/composables/useIMAPI";
+  type TTIriRef,
+  IM,
+} from "vue-library";
+import { cloneDeep, debounce, isEqual } from "lodash-es";
+import { useAutocompleteRegistry } from "~/composables/useAutocompleteRegistry";
+import type { TreeNode } from "primevue/treenode";
+import { useIMAPI } from "~/composables/useIMAPI";
 
-const { registerAutocomplete, unregisterAutocomplete } = useAutocompleteRegistry();
+const { registerAutocomplete, unregisterAutocomplete } =
+  useAutocompleteRegistry();
 const imapi = useIMAPI();
 
 interface Props {
@@ -96,7 +140,10 @@ interface Props {
   validEntityQuery?: QueryRequest;
 }
 
-const props = withDefaults(defineProps<Props>(), { rootEntities: () => [] as string[], allowBrowserAutocomplete: false });
+const props = withDefaults(defineProps<Props>(), {
+  rootEntities: () => [] as string[],
+  allowBrowserAutocomplete: false,
+});
 
 const emit = defineEmits<{
   "update:selected": [payload: SearchResultSummary | undefined];
@@ -131,7 +178,9 @@ watch(
     if (!isEqual(newValue, oldValue)) {
       searchLoading.value = true;
       if (newValue && (newValue.name || newValue.bestMatch)) {
-        searchText.value = newValue.bestMatch ? newValue.bestMatch : newValue.name!;
+        searchText.value = newValue.bestMatch
+          ? newValue.bestMatch
+          : newValue.name!;
         selectedLocal.value = newValue;
       } else {
         searchText.value = "";
@@ -139,16 +188,16 @@ watch(
       }
       searchLoading.value = false;
     }
-  }
+  },
 );
 
 watch(
-    selectedKeys,
-    (newValue, oldValue) => {
-      if (newValue !== oldValue) {
-      }
-    },
-    { deep: true }
+  selectedKeys,
+  (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+    }
+  },
+  { deep: true },
 );
 
 watch(
@@ -161,10 +210,10 @@ watch(
       emit("update:selected", newValue);
     }
   },
-  { deep: true }
+  { deep: true },
 );
 
-watch(searchText, newValue => {
+watch(searchText, (newValue) => {
   if (!newValue) {
     selectedLocal.value = undefined;
   }
@@ -180,12 +229,13 @@ onMounted(async () => {
     registerAutocomplete({
       element: autocompleteRoot.value,
       reset: () => {
-        searchText.value = props.selected && props.selected.name ? props.selected.name : "";
-      }
+        searchText.value =
+          props.selected && props.selected.name ? props.selected.name : "";
+      },
     });
   }
   searchLoading.value = false;
-  await getInitialTreeEntities()
+  await getInitialTreeEntities();
 });
 
 onBeforeUnmount(() => {
@@ -199,7 +249,8 @@ function handleGlobalFocus(event: FocusEvent) {
   if (!root) return;
   const target = event.target as Node;
   if (!root.contains(target)) {
-    if (props.selected && props.selected.name) searchText.value = props.selected.name;
+    if (props.selected && props.selected.name)
+      searchText.value = props.selected.name;
     else searchText.value = "";
   }
 }
@@ -223,32 +274,33 @@ async function advancedSearch() {
 
 async function getInitialTreeEntities() {
   loading.value = true;
-  const retrievedEntities = await imapi.getEntityChildren("http://endhealth.info/im#Q_Queries");
+  const retrievedEntities = await imapi.getEntityChildren(
+    "http://endhealth.info/im#Q_Queries",
+  );
   for (const entity in retrievedEntities) {
-    entities.value.push(
-        { key: retrievedEntities[entity].iri,
-          label: retrievedEntities[entity].name,
-          data: retrievedEntities[entity].type[0].iri,
-          icon: 'fa-solid fa-folder',
-          children: [],
-          loading: false
-        }
-    )
+    entities.value.push({
+      key: retrievedEntities[entity].iri,
+      label: retrievedEntities[entity].name,
+      data: retrievedEntities[entity].type[0].iri,
+      icon: "fa-solid fa-folder",
+      children: [],
+      loading: false,
+    });
     if (retrievedEntities[entity].hasChildren) {
-      const retrievedChildEntities = await imapi.getEntityChildren(retrievedEntities[entity].iri);
+      const retrievedChildEntities = await imapi.getEntityChildren(
+        retrievedEntities[entity].iri,
+      );
       for (const childEntity in retrievedChildEntities) {
-        let icon = 'fa-magnifying-glass'
-        if (retrievedChildEntities[childEntity].hasChildren) icon = 'fa-folder';
-        entities.value[parseInt(entity)].children.push(
-            {
-              key: retrievedChildEntities[childEntity].iri,
-              label: retrievedChildEntities[childEntity].name,
-              data: retrievedChildEntities[childEntity].type[0].iri,
-              icon: 'fa-solid ' + icon,
-              children: [],
-              loading: false
-            }
-        )
+        let icon = "fa-magnifying-glass";
+        if (retrievedChildEntities[childEntity].hasChildren) icon = "fa-folder";
+        entities.value[parseInt(entity)].children.push({
+          key: retrievedChildEntities[childEntity].iri,
+          label: retrievedChildEntities[childEntity].name,
+          data: retrievedChildEntities[childEntity].type[0].iri,
+          icon: "fa-solid " + icon,
+          children: [],
+          loading: false,
+        });
       }
     }
   }
@@ -256,27 +308,32 @@ async function getInitialTreeEntities() {
 }
 
 const onNodeExpand = async (node: any) => {
- for (const child in node.children) {
-   if (node.children[child].children.length === 0 && node.children[child].icon === 'fa-solid fa-folder') {
-     node.children[child].loading = true;
-     const retrievedEntities = await imapi.getEntityChildren(node.children[child].key);
-     let children = [];
-     for (const entity in retrievedEntities) {
-       let icon = 'fa-magnifying-glass'
-       if (retrievedEntities[entity].hasChildren) icon = 'fa-folder';
-       children.push({
-         key: retrievedEntities[entity].iri,
-         label: retrievedEntities[entity].name,
-         data: retrievedEntities[entity].type[0].iri,
-         icon: 'fa-solid ' + icon,
-         children: [],
-         loading: false
-       })
-     }
-     node.children[child].children = children;
-     node.children[child].loading = false;
-   }
- }
+  for (const child in node.children) {
+    if (
+      node.children[child].children.length === 0 &&
+      node.children[child].icon === "fa-solid fa-folder"
+    ) {
+      node.children[child].loading = true;
+      const retrievedEntities = await imapi.getEntityChildren(
+        node.children[child].key,
+      );
+      let children = [];
+      for (const entity in retrievedEntities) {
+        let icon = "fa-magnifying-glass";
+        if (retrievedEntities[entity].hasChildren) icon = "fa-folder";
+        children.push({
+          key: retrievedEntities[entity].iri,
+          label: retrievedEntities[entity].name,
+          data: retrievedEntities[entity].type[0].iri,
+          icon: "fa-solid " + icon,
+          children: [],
+          loading: false,
+        });
+      }
+      node.children[child].children = children;
+      node.children[child].loading = false;
+    }
+  }
 };
 
 function onNodeSelect(node: TreeNode) {
@@ -287,10 +344,10 @@ function onNodeSelect(node: TreeNode) {
 function setSelectedQuery() {
   selectedLocal.value = {
     iri: selectedQuery.value?.key,
-    scheme: {iri: ""} as TTIriRef,
-    status: {iri: ""} as TTIriRef,
+    scheme: { iri: "" } as TTIriRef,
+    status: { iri: "" } as TTIriRef,
     type: [] as TTIriRef[],
-    name: selectedQuery.value?.label
+    name: selectedQuery.value?.label,
   } as SearchResultSummary;
   showDialog.value = false;
 }
@@ -321,13 +378,17 @@ async function onEnter(event: KeyboardEvent) {
 function select(event: KeyboardEvent) {
   if (results.value?.entities && results.value?.entities.length)
     if (event.key === "ArrowDown") {
-      if (selectedIndex.value < results.value!.entities!.length - 1) listBoxSelected.value = results.value?.entities?.[++selectedIndex.value];
+      if (selectedIndex.value < results.value!.entities!.length - 1)
+        listBoxSelected.value =
+          results.value?.entities?.[++selectedIndex.value];
       else {
         selectedIndex.value = 0;
         listBoxSelected.value = results.value?.entities?.[selectedIndex.value];
       }
     } else if (event.key === "ArrowUp") {
-      if (selectedIndex.value > 0) listBoxSelected.value = results.value?.entities?.[--selectedIndex.value];
+      if (selectedIndex.value > 0)
+        listBoxSelected.value =
+          results.value?.entities?.[--selectedIndex.value];
       else {
         selectedIndex.value = results.value!.entities!.length - 1;
         listBoxSelected.value = results.value?.entities?.[selectedIndex.value];

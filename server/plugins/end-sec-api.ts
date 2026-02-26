@@ -1,8 +1,7 @@
 import type { NitroApp } from "nitropack";
-import type { User } from "~~/models/User";
+import type { User } from "vue-library";
 import { H3Event, EventHandlerRequest } from "h3";
-import Resource from "~~/enums/Resource";
-import { UserRole, Namespace } from "~~/models/AutoGen";
+import { UserRole, NAMESPACE, Resource } from "vue-library";
 
 interface EndSecApi {
   getUser(event: H3Event<EventHandlerRequest>): Promise<User>;
@@ -23,7 +22,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
         body: {
           resource: Resource.QUERY,
           allowableRoles: [UserRole.ADMIN],
-          requiredNamespaces: [{ iri: Namespace.IM, read: true, write: true }],
+          requiredNamespaces: [{ iri: NAMESPACE.IM, read: true, write: true }],
         },
       });
     },

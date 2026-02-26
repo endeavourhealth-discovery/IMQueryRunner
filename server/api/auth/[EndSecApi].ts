@@ -6,8 +6,7 @@ import {
   type InferEventInput,
   type ValidateFunction,
 } from "h3";
-import { Namespace, UserRole } from "~~/models/AutoGen";
-import Resource from "~~/enums/Resource";
+import { PermissionSchema } from "vue-library";
 import { getIp } from "~~/server/helpers/getIp";
 
 const loginUrlSchema = object({
@@ -23,18 +22,6 @@ const loginSchema = object({
 const machineLoginSchema = object({
   clientId: string(),
   clientSecret: string(),
-});
-
-const NamespacePermissionSchema = object({
-  iri: zenum(Namespace),
-  read: boolean(),
-  write: boolean(),
-});
-
-const PermissionSchema = object({
-  resource: zenum(Resource),
-  allowableRoles: array(zenum(UserRole)).prefault([]),
-  requiredNamespaces: array(NamespacePermissionSchema).prefault([]),
 });
 
 async function getQueryParams<

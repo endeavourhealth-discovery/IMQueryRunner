@@ -2,31 +2,52 @@
   <div>
     <div class="flex gap-2 m-2">
       <div class="m-2">
-        <Button icon="fa-solid fa-arrow-left" label="Back to queue" severity="secondary" @click="backToQueue"/>
+        <Button
+          icon="fa-solid fa-arrow-left"
+          label="Back to queue"
+          severity="secondary"
+          @click="backToQueue"
+        />
       </div>
     </div>
     <div class="m-2">
       <span class="m-2">Find a query:</span>
-      <AutocompleteSearchBar v-model:selected="selected" :im-query="request" :search-placeholder="'Search queries'"/>
+      <AutocompleteSearchBar
+        v-model:selected="selected"
+        :im-query="request"
+        :search-placeholder="'Search queries'"
+      />
     </div>
     <div>
-      <ArgumentDisplay v-if="selected && args?.length"
-                       :arguments="args"
-                       :showFooterButtons="false"
-                       :editArguments="true"
-                       @hide-dialog="showDialog = false"
-                       @arguments-completed="passArguments"
+      <ArgumentDisplay
+        v-if="selected && args?.length"
+        :arguments="args"
+        :showFooterButtons="false"
+        :editArguments="true"
+        @hide-dialog="showDialog = false"
+        @arguments-completed="passArguments"
       />
     </div>
     <div class="m-2">
-      <Button icon="fa-solid fa-play" label="Add to queue" :disabled="selected === undefined"
-              @click="showDialog = true"/>
+      <Button
+        icon="fa-solid fa-play"
+        label="Add to queue"
+        :disabled="selected === undefined"
+        @click="showDialog = true"
+      />
     </div>
     <Dialog v-model:visible="showDialog" :closable="false" modal>
-      Run query <span class="font-bold">{{ selected?.name }}</span>?
+      Run query <span class="font-bold">{{ selected?.name }}</span
+      >?
       <template #footer>
-        <Button class="m-1" label="Cancel" variant="outlined" @click="showDialog = false" autofocus/>
-        <Button class="m-1" label="Select" @click="runQuery" autofocus/>
+        <Button
+          class="m-1"
+          label="Cancel"
+          variant="outlined"
+          @click="showDialog = false"
+          autofocus
+        />
+        <Button class="m-1" label="Select" @click="runQuery" autofocus />
       </template>
     </Dialog>
   </div>
@@ -39,9 +60,9 @@ import {
   type ArgumentReference,
   type QueryRequest,
   type SearchResultSummary,
-} from "~~/models/AutoGen";
-import {watch} from "vue";
-import {cloneDeep} from "lodash-es";
+} from "vue-library";
+import { watch } from "vue";
+import { cloneDeep } from "lodash-es";
 import ArgumentDisplay from "~/components/queryRunner/ArgumentDisplay.vue";
 
 interface ArgumentSelection extends ArgumentReference {
@@ -81,7 +102,7 @@ watch(
       getArguments();
     }
   },
-  {deep: true}
+  { deep: true },
 );
 
 watch(
@@ -95,7 +116,7 @@ watch(
       }
     }
   },
-  {deep: true}
+  { deep: true },
 );
 
 function passArguments(args: Argument[], runOnConfirm: boolean) {
@@ -110,7 +131,7 @@ async function runQuery() {
       query: {
         iri: selected.value?.iri,
       },
-      argument: completedArguments.value
+      argument: completedArguments.value,
     } as QueryRequest,
   });
   showDialog.value = false;
@@ -120,7 +141,9 @@ async function runQuery() {
 async function getArguments() {
   const query = await imapi.getQueryFromIri(selected.value!.iri);
   query.iri = selected.value!.iri;
-  args.value = await imapi.findRequestMissingArguments({query: query} as QueryRequest);
+  args.value = await imapi.findRequestMissingArguments({
+    query: query,
+  } as QueryRequest);
   missingArgs.value = !!args.value.length;
 }
 

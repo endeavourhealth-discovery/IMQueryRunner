@@ -23,7 +23,7 @@
       id="header-end"
       class="h-full flex-grow-0 flex-shrink-1 flex-auto flex flex-row items-center justify-self-end justify-end gap-[0.25rem]"
     >
-      {{ user?.userName }}
+      {{ user?.username }}
       <Button
         v-tooltip.left="'Account'"
         v-if="!isLoggedIn"

@@ -1,7 +1,7 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
 import { pgJobInsert, postgresDb } from "~~/server/db/postgres";
 import { jobTable } from "~~/server/db/postgres/schema";
-import { type QueryRequest } from "~~/models/AutoGen";
+import { type QueryRequest } from "vue-library";
 import { JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
 import { v4 } from "uuid";

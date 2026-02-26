@@ -1,4 +1,4 @@
-import type { QueryRequest } from "./AutoGen";
+import type { QueryRequest } from "vue-library";
 
 export interface RabbitMessage {
   data: QueryRequest;

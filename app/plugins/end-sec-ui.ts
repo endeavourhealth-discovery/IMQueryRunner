@@ -1,5 +1,5 @@
 import { FetchError } from "ofetch";
-import type { User } from "~~/models/User";
+import type { User } from "vue-library";
 
 interface EndSecUI {
   login(): Promise<void>;

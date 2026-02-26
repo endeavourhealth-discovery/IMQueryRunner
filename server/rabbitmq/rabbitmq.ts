@@ -4,10 +4,10 @@ import { imapi } from "~~/server/utils/imapi";
 import { postgresDb } from "~~/server/db/postgres";
 import { eq } from "drizzle-orm";
 import { jobTable } from "~~/server/db/postgres/schema";
-import type { QueryRequest } from "~~/models/AutoGen";
+import type { QueryRequest } from "vue-library";
 import { executeQuery } from "../utils/executeQuery";
 import type { Job } from "~~/models/job.schema";
-import type { User } from "~~/models/User";
+import type { User } from "vue-library";
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
 rabbit.on("error", (err) => {});
