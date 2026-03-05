@@ -29,16 +29,8 @@ export default defineEventHandler(async (event) => {
   const limit = size;
   const offset = (page - 1) * size;
 
-  let dataSql = "";
-  let countSql = "";
-
-  if (job?.queryType === "DATASET") {
-    dataSql = `SELECT * FROM dataset WHERE hash = ${job.queryHash} LIMIT ${limit} OFFSET ${offset}`;
-    countSql = `SELECT COUNT(*) AS total FROM dataset WHERE hash = ${job.queryHash}`;
-  } else {
-    dataSql = `SELECT * FROM cohort WHERE hash = ${job.queryHash} LIMIT ${limit} OFFSET ${offset}`;
-    countSql = `SELECT COUNT(*) AS total FROM cohort WHERE hash = ${job.queryHash}`;
-  }
+  const dataSql = `SELECT * FROM \`${job.queryHash}\` LIMIT ${limit} OFFSET ${offset}`;
+  const countSql = `SELECT COUNT(*) AS total FROM \`${job.queryHash}\``;
 
   const [dataRows] = await mysqlDb.execute(sql.raw(dataSql));
   const [countRows]: any = await mysqlDb.execute(sql.raw(countSql));

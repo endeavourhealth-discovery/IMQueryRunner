@@ -19,27 +19,5 @@ FIELDS TERMINATED BY '\t'
 SET `parent` = @s,
      `member` = @m,
      `im1id` = @i,
-     `self` = (`parent` == `member`)
+     `self` = (`parent` = `member`)
 ;
-
-DROP TABLE IF EXISTS `compass`.`cohort`;
-
-CREATE TABLE `compass`.`cohort` (
-    `dbid` INT AUTO_INCREMENT,
-    `hash` BIGINT NOT NULL,
-    `cohort_id` INT NOT NULL,
-    UNIQUE KEY `uq_hash_cohort` (`hash`, `cohort_id`),
-    PRIMARY KEY (`dbid`)
-);
-
-DROP TABLE IF EXISTS `compass`.`dataset`;
-
-CREATE TABLE `compass`.`dataset` (
-  `dbid` INT AUTO_INCREMENT,
-  `hash` BIGINT NOT NULL,
-  `cohort_id` INT NOT NULL,
-  `group` VARCHAR(45) NOT NULL,
-  `json` JSON NULL,
-  UNIQUE KEY `uq_dataset` (`hash`, `cohort_id`, `group`),
-  PRIMARY KEY (`dbid`)
-);
