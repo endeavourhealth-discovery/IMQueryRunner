@@ -18,18 +18,7 @@ export async function executeQuery(
     throw new Error("Query IRI is required for execution");
   const hashCode = hashQueryRequest(queryRequestForSQL);
 
-  if (
-    queryRequestForSQL.query.queryType === "DATASET" &&
-    (await isCached(hashCode, "dataset"))
-  ) {
-    console.log(
-      `Subquery cache hit for hashCode: ${hashCode} and iri: ${queryRequestForSQL.query.iri}`,
-    );
-    return { hashCode };
-  } else if (
-    queryRequestForSQL.query.queryType === "COHORT" &&
-    (await isCached(hashCode, "cohort"))
-  ) {
+  if (await isCached(hashCode)) {
     console.log(
       `Subquery cache hit for hashCode: ${hashCode} and iri: ${queryRequestForSQL.query.iri}`,
     );
@@ -90,7 +79,7 @@ export async function executeQuery(
   }
 }
 
-export function hashQueryRequest(queryRequest: QueryRequest) {
+export function hashQueryRequest(queryRequest: QueryRequest): number {
   resolveArgs(queryRequest);
   let argHash = "";
   for (const arg of queryRequest.argument!) {
@@ -139,13 +128,14 @@ function hashArgument(argument: Argument): string {
   return hashString;
 }
 
-export async function isCached(
-  hashCode: number,
-  table: string,
-): Promise<boolean> {
-  const sql = `SELECT 1 FROM compass.${table} WHERE hash = ${hashCode} LIMIT 1`;
-  const [result] = await mysqlDb.execute<ResultSetHeader>(sql);
-  return (result as any).length > 0 ? true : false;
+export async function isCached(hashCode: number): Promise<boolean> {
+  try {
+    const sql = `SELECT 1 FROM compass.\`${hashCode}\` LIMIT 1`;
+    await mysqlDb.execute<ResultSetHeader>(sql);
+    return true;
+  } catch (error) {
+    return false;
+  }
 }
 
 async function runSubQueries(
@@ -163,7 +153,7 @@ async function runSubQueries(
       const hashCode = hashQueryRequest(subQueryRequest);
       queryIrisToHashCodes[subQuery.iri] = hashCode;
       const subQuerySql = await imapi.getQuerySql(sessionId, subQueryRequest);
-      if (await isCached(hashCode, "cohort")) {
+      if (await isCached(hashCode)) {
         console.log(
           `Subquery cache hit for hashCode: ${hashCode} and iri: ${subQuery.iri}`,
         );
@@ -207,7 +197,7 @@ async function getResolvedSql(
   }
   if (Object.keys(queryIrisToHashCodes).length > 0) {
     for (const iri of Object.keys(queryIrisToHashCodes)) {
-      sql = sql.replaceAll(iri, JSON.stringify(queryIrisToHashCodes[iri]));
+      sql = sql.replaceAll(iri, "" + queryIrisToHashCodes[iri]);
     }
   }
   return sql;

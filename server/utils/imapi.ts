@@ -12,7 +12,7 @@ export class IMAPI {
     queryRequest: QueryRequest,
   ): Promise<string> {
     return (await $fetch(
-      `${useRuntimeConfig().public.imapiUrl}query/private/sql`,
+      `${useRuntimeConfig().public.imapiUrl}query/protected/sql`,
       {
         headers: { cookie: `session_id=${sessionId}` },
         body: queryRequest,
@@ -26,7 +26,7 @@ export class IMAPI {
     queryIri: string,
   ): Promise<SubQueryDependency[]> {
     return (await $fetch(
-      `${useRuntimeConfig().public.imapiUrl}query/private/subQueries`,
+      `${useRuntimeConfig().public.imapiUrl}query/protected/subQueries`,
       {
         headers: { cookie: `session_id=${sessionId}` },
         params: {
@@ -43,7 +43,7 @@ export class IMAPI {
     predicates: string[],
   ) {
     return (await $fetch(
-      `${useRuntimeConfig().public.imapiUrl}entity/private/partial`,
+      `${useRuntimeConfig().public.imapiUrl}entity/protected/partial`,
       {
         headers: { cookie: `session_id=${sessionId}` },
         params: {
@@ -61,7 +61,7 @@ export class IMAPI {
     schemeIris?: any,
   ) {
     return (await $fetch(
-      `${useRuntimeConfig().public.imapiUrl}entity/private/children`,
+      `${useRuntimeConfig().public.imapiUrl}entity/protected/children`,
       {
         headers: { cookie: `session_id=${sessionId}` },
         params: {
@@ -78,7 +78,7 @@ export class IMAPI {
     queryRequest: QueryRequest,
   ): Promise<QueryRequest> {
     return (await $fetch(
-      `${useRuntimeConfig().public.imapiUrl}query/private/queryRequestForSQL`,
+      `${useRuntimeConfig().public.imapiUrl}query/protected/queryRequestForSQL`,
       {
         headers: { cookie: `session_id=${sessionId}` },
         body: queryRequest,
@@ -92,7 +92,7 @@ export class IMAPI {
     queryRequest: QueryRequest,
   ): Promise<SearchResponse> {
     return (await $fetch(
-      `${useRuntimeConfig().public.imapiUrl}query/private/queryIMSearch`,
+      `${useRuntimeConfig().public.imapiUrl}query/protected/queryIMSearch`,
       {
         headers: { cookie: `session_id=${sessionId}` },
         body: queryRequest,
