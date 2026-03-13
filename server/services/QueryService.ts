@@ -19,24 +19,12 @@ const QueryService = {
   async queryIM(
     sessionId: string,
     query: QueryRequest,
-    controller?: AbortController,
-    raw: boolean = false,
   ): Promise<QueryResponse> {
-    if (controller)
-      return await $fetch(API_URL + "/queryIM", {
-        headers: { cookie: `session_id=${sessionId}` },
-        body: query,
-        signal: controller.signal,
-        raw: raw,
-        method: "POST",
-      });
-    else
-      return await $fetch(API_URL + "/queryIM", {
-        headers: { cookie: `session_id=${sessionId}` },
-        body: query,
-        raw: raw,
-        method: "POST",
-      });
+    return await $fetch(API_URL + "/queryIM", {
+      headers: { cookie: `session_id=${sessionId}` },
+      body: query,
+      method: "POST",
+    });
   },
 
   async flattenBooleans(
@@ -61,14 +49,10 @@ const QueryService = {
   async queryIMSearch(
     sessionId: string,
     query: QueryRequest,
-    controller?: AbortController,
-    raw: boolean = false,
   ): Promise<SearchResponse> {
     return await $fetch(API_URL + "/queryIMSearch", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
-      signal: controller?.signal,
-      raw: raw,
       method: "POST",
     });
   },
@@ -76,42 +60,19 @@ const QueryService = {
   async pathQuery(
     sessionId: string,
     pathQuery: PathQuery,
-    controller?: AbortController,
-    raw: boolean = false,
   ): Promise<{ match: Match[] }> {
     return await $fetch(API_URL + "/pathQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: pathQuery,
-      signal: controller?.signal,
-      raw: raw,
       method: "POST",
     });
   },
 
-  async askQuery(
-    sessionId: string,
-    query: QueryRequest,
-    controller?: AbortController,
-    raw: boolean = false,
-  ): Promise<boolean> {
+  async askQuery(sessionId: string, query: QueryRequest): Promise<boolean> {
     return await $fetch(API_URL + "/askQueryIM", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
-      signal: controller?.signal,
-      raw: raw,
       method: "POST",
-    });
-  },
-
-  async getQueryDisplay(
-    sessionId: string,
-    iri: string,
-    includeLogicDesc: boolean,
-  ): Promise<Query> {
-    return await $fetch(API_URL + "/queryDisplay", {
-      headers: { cookie: `session_id=${sessionId}` },
-      params: { queryIri: iri, includeLogicDesc: includeLogicDesc },
-      method: "GET",
     });
   },
 
@@ -138,6 +99,7 @@ const QueryService = {
       method: "GET",
     });
   },
+
   async getQueryFromIri(sessionId: string, iri: string): Promise<Query> {
     return await $fetch(API_URL + "/queryFromIri", {
       headers: { cookie: `session_id=${sessionId}` },

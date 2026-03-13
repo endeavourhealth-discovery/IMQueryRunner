@@ -2,8 +2,8 @@ import type {
   ArgumentReference,
   QueryRequest,
   SearchResponse,
+  SubQueryDependency,
 } from "vue-library/interfaces";
-import type { SubQueryDependency } from "~~/models/SubQueryDependency";
 
 export function useIMAPI() {
   async function getQuerySql(queryRequest: QueryRequest): Promise<string> {

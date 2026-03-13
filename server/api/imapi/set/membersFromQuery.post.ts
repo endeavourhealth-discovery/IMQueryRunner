@@ -1,0 +1,31 @@
+import { getQueryParams } from "~~/server/helpers/getQueryParams";
+import { any, array, boolean, number, object, string } from "zod/v4";
+import QueryService from "~~/server/services/QueryService";
+import SetService from "~~/server/services/SetService";
+
+const bodySchema = object({
+  query: any(),
+  page: number(),
+  size: number(),
+}).openapi({
+  description: "Query request",
+});
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["query"],
+    description: "Get members from query",
+    parameters: [
+      { name: "session_id", description: "User session id", in: "cookie" },
+    ],
+  },
+});
+
+export default defineEventHandler(async (event): Promise<any> => {
+  const sessionId = getCookie(event, "session_id")!;
+  const { query, page, size } = await readValidatedBody(
+    event,
+    bodySchema.parse,
+  );
+  return await SetService.getMembersFromQuery(sessionId, query, page, size);
+});

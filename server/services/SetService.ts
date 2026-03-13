@@ -19,16 +19,11 @@ const SetService = {
     });
   },
 
-  async IMV1(
-    sessionId: string,
-    conceptIri: string,
-    raw?: boolean,
-  ): Promise<Blob> {
+  async IMV1(sessionId: string, conceptIri: string): Promise<Blob> {
     return await $fetch(API_URL + "/protected/export", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: conceptIri },
       responseType: "blob",
-      raw: raw,
       method: "GET",
     });
   },
@@ -38,7 +33,6 @@ const SetService = {
     entailments: boolean,
     pageIndex: number,
     pageSize: number,
-    controller?: AbortController,
   ): Promise<Pageable<Node>> {
     return await $fetch(API_URL + "/protected/members", {
       headers: { cookie: `session_id=${sessionId}` },
@@ -48,7 +42,6 @@ const SetService = {
         page: pageIndex,
         size: pageSize,
       },
-      signal: controller?.signal,
       method: "GET",
     });
   },
@@ -84,13 +77,11 @@ const SetService = {
   async getFullExportSet(
     sessionId: string,
     setRequest: SetExportRequest,
-    raw?: boolean,
   ): Promise<Blob> {
     return await $fetch(API_URL + "/protected/setExport", {
       headers: { cookie: `session_id=${sessionId}` },
       body: setRequest,
       responseType: "blob",
-      raw: raw,
       method: "POST",
     });
   },

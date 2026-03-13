@@ -1,0 +1,23 @@
+import { getQueryParams } from "~~/server/helpers/getQueryParams";
+import { any, array, boolean, number, object, string } from "zod/v4";
+import SetService from "~~/server/services/SetService";
+
+const bodySchema = any().openapi({
+  description: "Entity",
+});
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["query"],
+    description: "Update subsets from super",
+    parameters: [
+      { name: "session_id", description: "User session id", in: "cookie" },
+    ],
+  },
+});
+
+export default defineEventHandler(async (event): Promise<any> => {
+  const sessionId = getCookie(event, "session_id")!;
+  const entity = await readValidatedBody(event, bodySchema.parse);
+  return await SetService.updateSubsetsFromSuper(sessionId, entity);
+});

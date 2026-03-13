@@ -10,12 +10,10 @@ const EclService = {
   async ECLSearch(
     sessionId: string,
     eclSearchRequest: ECLQueryRequest,
-    controller?: AbortController,
   ): Promise<SearchResponse> {
     const results: SearchResponse = await $fetch(API_URL + "/eclSearch", {
       headers: { cookie: `session_id=${sessionId}` },
       body: eclSearchRequest,
-      signal: controller?.signal,
       method: "POST",
     });
     return results;
@@ -91,6 +89,7 @@ const EclService = {
       method: "POST",
     });
   },
+
   async validateModelFromQuery(
     sessionId: string,
     query: Query,

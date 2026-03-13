@@ -103,7 +103,7 @@ const EntityService = {
   async getEntityChildren(
     sessionId: string,
     iri: string,
-    filters?: FiltersAsIris,
+    schemeIris?: string[],
     controller?: AbortController,
   ): Promise<ExtendedEntityReferenceNode[]> {
     return await $fetch<ExtendedEntityReferenceNode[]>(
@@ -112,7 +112,7 @@ const EntityService = {
         headers: { cookie: `session_id=${sessionId}` },
         params: {
           iri: iri,
-          schemeIris: filters?.schemes.join(","),
+          schemeIris: schemeIris,
         },
         signal: controller?.signal,
         method: "get",
@@ -157,7 +157,7 @@ const EntityService = {
     iri: string,
     pageIndex: number,
     pageSize: number,
-    filters?: FiltersAsIris,
+    schemes?: string[],
     controller?: AbortController,
     typeFilter?: string[],
   ): Promise<{
@@ -177,7 +177,7 @@ const EntityService = {
         iri: iri,
         page: pageIndex,
         size: pageSize,
-        schemeIris: filters?.schemes.join(","),
+        schemeIris: schemes?.join(","),
         typeFilter: typeFilter?.join(","),
       },
       signal: controller?.signal,
@@ -191,7 +191,7 @@ const EntityService = {
     predicate: string,
     pageIndex: number,
     pageSize: number,
-    filters?: FiltersAsIris,
+    schemeIris?: string[],
     controller?: AbortController,
   ): Promise<Pageable<TTIriRef>> {
     return await $fetch<Pageable<TTIriRef>>(
@@ -203,7 +203,7 @@ const EntityService = {
           predicate: predicate,
           page: pageIndex,
           size: pageSize,
-          schemeIris: filters?.schemes.join(","),
+          schemeIris: schemeIris?.join(","),
         },
         signal: controller?.signal,
         method: "GET",
@@ -218,7 +218,6 @@ const EntityService = {
         headers: { cookie: `session_id=${sessionId}` },
         params: { iri: iri },
         responseType: "blob",
-        raw: true,
         method: "GET",
       },
     );
@@ -227,13 +226,13 @@ const EntityService = {
   async getEntityParents(
     sessionId: string,
     iri: string,
-    filters?: FiltersAsIris,
+    schemeIris?: string[],
   ): Promise<ExtendedEntityReferenceNode[]> {
     return await $fetch<ExtendedEntityReferenceNode[]>(
       `${useRuntimeConfig().public.imapiUrl}entity/protected/parents`,
       {
         headers: { cookie: `session_id=${sessionId}` },
-        params: { iri: iri, schemeIris: filters?.schemes.join(",") },
+        params: { iri: iri, schemeIris: schemeIris?.join(",") },
         method: "GET",
       },
     );
@@ -358,13 +357,12 @@ const EntityService = {
     sessionId: string,
     iri: string,
     predicates: string[],
-    graph?: string,
   ): Promise<TTBundle> {
     return await $fetch<TTBundle>(
       `${useRuntimeConfig().public.imapiUrl}entity/protected/bundleByPredicateExclusions`,
       {
         headers: { cookie: `session_id=${sessionId}` },
-        params: { iri: iri, predicates: predicates.join(","), graph: graph },
+        params: { iri: iri, predicates: predicates.join(",") },
         method: "GET",
       },
     );

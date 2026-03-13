@@ -1,0 +1,38 @@
+import { getQueryParams } from "~~/server/helpers/getQueryParams";
+import { any, array, boolean, object, string } from "zod/v4";
+import EntityService from "~~/server/services/EntityService";
+
+const paramSchema = object({
+  iri: string(),
+  schemeIris: string(),
+});
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["query"],
+    description: "Get entity parents",
+    parameters: [
+      { name: "session_id", description: "User session id", in: "cookie" },
+      {
+        name: "iri",
+        description: "Entity iri",
+        in: "query",
+      },
+      {
+        name: "schemeIris",
+        description: "Scheme iris as comma separated string to filter results",
+        in: "query",
+      },
+    ],
+  },
+});
+
+export default defineEventHandler(async (event): Promise<any> => {
+  const sessionId = getCookie(event, "session_id")!;
+  const { iri, schemeIris } = await getQueryParams(event, paramSchema.parse);
+  return await EntityService.getEntityParents(
+    sessionId,
+    iri,
+    schemeIris.split(","),
+  );
+});

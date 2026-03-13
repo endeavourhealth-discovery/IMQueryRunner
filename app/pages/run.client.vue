@@ -65,6 +65,7 @@ import {
 import { watch } from "vue";
 import { cloneDeep } from "lodash-es";
 import ArgumentDisplay from "~/components/queryRunner/ArgumentDisplay.vue";
+import QueryService from "~/services/QueryService";
 
 interface ArgumentSelection extends ArgumentReference {
   valueData?: any;
@@ -140,9 +141,9 @@ async function runQuery() {
 }
 
 async function getArguments() {
-  const query = await imapi.getQueryFromIri(selected.value!.iri);
+  const query = await QueryService.getQueryFromIri(selected.value!.iri);
   query.iri = selected.value!.iri;
-  args.value = await imapi.findRequestMissingArguments({
+  args.value = await QueryService.findMissingArguments({
     query: query,
   } as QueryRequest);
   missingArgs.value = !!args.value.length;

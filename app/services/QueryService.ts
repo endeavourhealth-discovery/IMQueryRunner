@@ -85,16 +85,6 @@ const QueryService = {
     });
   },
 
-  async getDisplayFromQueryIri(
-    iri: string,
-    displayMode: DisplayMode,
-  ): Promise<Query> {
-    return await $fetch(API_URL + "/queryDisplay", {
-      params: { queryIri: iri, displayMode: displayMode },
-      method: "GET",
-    });
-  },
-
   async getDisplayFromIndicatorIri(iri: string): Promise<Indicator> {
     return await $fetch(API_URL + "/indicatorDisplay", {
       params: { queryIri: iri },

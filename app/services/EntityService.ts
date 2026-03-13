@@ -309,7 +309,7 @@ const EntityService = {
     pageSize: number,
   ): Promise<TreeNode[]> {
     return await $fetch<TreeNode[]>(
-      API_URL + "/protected/detailsDisplay/loadMore",
+      API_URL + "/protected/detailsDisplayLoadMore",
       {
         params: {
           iri: iri,

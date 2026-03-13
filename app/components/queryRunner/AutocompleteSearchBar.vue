@@ -121,6 +121,8 @@ import { cloneDeep, debounce, isEqual } from "lodash-es";
 import { useAutocompleteRegistry } from "~/composables/useAutocompleteRegistry";
 import type { TreeNode } from "primevue/treenode";
 import { useIMAPI } from "~/composables/useIMAPI";
+import EntityService from "~/services/EntityService";
+import QueryService from "~/services/QueryService";
 
 const { registerAutocomplete, unregisterAutocomplete } =
   useAutocompleteRegistry();
@@ -273,29 +275,32 @@ async function advancedSearch() {
 
 async function getInitialTreeEntities() {
   loading.value = true;
-  const retrievedEntities = await imapi.getEntityChildren(
+  const retrievedEntities = await EntityService.getEntityChildren(
     "http://endhealth.info/im#Q_Queries",
   );
-  for (const entity in retrievedEntities) {
+  for (const entity of retrievedEntities) {
+    const type = entity.type as TTIriRef[];
     entities.value.push({
-      key: retrievedEntities[entity].iri,
-      label: retrievedEntities[entity].name,
-      data: retrievedEntities[entity].type[0].iri,
+      key: entity.iri,
+      label: entity.name,
+      data: type[0]!.iri,
       icon: "fa-solid fa-folder",
       children: [],
       loading: false,
     });
-    if (retrievedEntities[entity].hasChildren) {
-      const retrievedChildEntities = await imapi.getEntityChildren(
-        retrievedEntities[entity].iri,
+    if (entity.hasChildren) {
+      const retrievedChildEntities = await EntityService.getEntityChildren(
+        entity.iri,
       );
-      for (const childEntity in retrievedChildEntities) {
+      for (const childEntity of retrievedChildEntities) {
         let icon = "fa-magnifying-glass";
-        if (retrievedChildEntities[childEntity].hasChildren) icon = "fa-folder";
-        entities.value[parseInt(entity)].children.push({
-          key: retrievedChildEntities[childEntity].iri,
-          label: retrievedChildEntities[childEntity].name,
-          data: retrievedChildEntities[childEntity].type[0].iri,
+        if (childEntity.hasChildren) icon = "fa-folder";
+        const childType = childEntity.type as TTIriRef[];
+        const found = entities.value.find((e) => e.key === entity.iri);
+        found.children.push({
+          key: childEntity.iri,
+          label: childEntity.name,
+          data: childType[0]!.iri,
           icon: "fa-solid " + icon,
           children: [],
           loading: false,
@@ -313,17 +318,18 @@ const onNodeExpand = async (node: any) => {
       node.children[child].icon === "fa-solid fa-folder"
     ) {
       node.children[child].loading = true;
-      const retrievedEntities = await imapi.getEntityChildren(
+      const retrievedEntities = await EntityService.getEntityChildren(
         node.children[child].key,
       );
       let children = [];
-      for (const entity in retrievedEntities) {
+      for (const entity of retrievedEntities) {
         let icon = "fa-magnifying-glass";
-        if (retrievedEntities[entity].hasChildren) icon = "fa-folder";
+        if (entity.hasChildren) icon = "fa-folder";
+        const type = entity.type as TTIriRef[];
         children.push({
-          key: retrievedEntities[entity].iri,
-          label: retrievedEntities[entity].name,
-          data: retrievedEntities[entity].type[0].iri,
+          key: entity.iri,
+          label: entity.name,
+          data: type[0]!.iri,
           icon: "fa-solid " + icon,
           children: [],
           loading: false,
@@ -409,7 +415,7 @@ async function search() {
       imQueryCopy.textSearch = searchText.value;
       imQueryCopy.page = { pageNumber: 1, pageSize: 10 };
       imQueryCopy.textSearchStyle = TextSearchStyle.autocomplete;
-      const response = await imapi.queryIMSearch(imQueryCopy);
+      const response = await QueryService.queryIMSearch(imQueryCopy);
       searchLoading.value = false;
       return response;
     }

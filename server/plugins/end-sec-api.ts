@@ -11,7 +11,7 @@ interface EndSecApi {
 export default defineNitroPlugin((nitroApp: NitroApp) => {
   globalThis.apiGuard = {
     getUser: async (event: H3Event<EventHandlerRequest>): Promise<User> => {
-      return await event.$fetch<User>("/api/auth/getUser");
+      return await event.$fetch<User>("/api/auth/user", { method: "GET" });
     },
     checkPermissions: async (
       event: H3Event<EventHandlerRequest>,
@@ -24,6 +24,15 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
           allowableRoles: [UserRole.ADMIN],
           requiredNamespaces: [{ iri: NAMESPACE.IM, read: true, write: true }],
         },
+      });
+    },
+    updateUser: async (
+      event: H3Event<EventHandlerRequest>,
+      user: User,
+    ): Promise<User> => {
+      return await event.$fetch<User>("/api/auth/updateUser", {
+        method: "POST",
+        body: user,
       });
     },
   } as EndSecApi;
