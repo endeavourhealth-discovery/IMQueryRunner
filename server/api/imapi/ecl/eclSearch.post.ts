@@ -1,5 +1,5 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/server/libs/zod";
+import { z } from "~~/shared/zod";
 import EclService from "~~/server/services/EclService";
 
 const bodySchema = z

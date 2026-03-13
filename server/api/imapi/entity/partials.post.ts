@@ -1,13 +1,15 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { array, boolean, object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import EntityService from "~~/server/services/EntityService";
 
-const bodySchema = object({
-  typeIris: array(string()),
-  predicates: array(string()),
-}).openapi({
-  description: "Request allowing for multiple getPartial requests at once",
-});
+const bodySchema = z
+  .object({
+    typeIris: z.array(z.string()),
+    predicates: z.array(z.string()),
+  })
+  .openapi({
+    description: "Request allowing for multiple getPartial requests at once",
+  });
 
 defineRouteMeta({
   openAPI: {

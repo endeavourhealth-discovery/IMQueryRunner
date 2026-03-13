@@ -1,9 +1,9 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import ConceptService from "~~/server/services/ConceptService";
 
-const paramSchema = object({
-  iri: string(),
+const paramSchema = z.object({
+  iri: z.string(),
 });
 
 defineRouteMeta({

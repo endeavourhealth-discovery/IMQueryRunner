@@ -1,14 +1,16 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, array, boolean, object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import FilerService from "~~/server/services/FilerService";
 
-const bodySchema = object({
-  entity: string(),
-  folder: string(),
-}).openapi({
-  description:
-    "Add a new folder to a new location in the information model hierarchy",
-});
+const bodySchema = z
+  .object({
+    entity: z.string(),
+    folder: z.string(),
+  })
+  .openapi({
+    description:
+      "Add a new folder to a new location in the information model hierarchy",
+  });
 
 defineRouteMeta({
   openAPI: {

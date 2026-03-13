@@ -178,7 +178,7 @@ const EntityService = {
   },
 
   async downloadEntity(iri: string): Promise<Blob> {
-    return await $fetch<Blob>(API_URL + "/protected/downloadEntity", {
+    return await useApi<Blob>(API_URL + "/protected/downloadEntity", {
       params: { iri: iri },
       responseType: "blob",
       raw: true,
@@ -240,7 +240,7 @@ const EntityService = {
   async downloadSearchResults(
     downloadSettings: DownloadByQueryOptions,
   ): Promise<Blob> {
-    return await $fetch<Blob>(API_URL + "/protected/downloadSearchResults", {
+    return await useApi<Blob>(API_URL + "/protected/downloadSearchResults", {
       body: downloadSettings,
       responseType: "blob",
       raw: true,

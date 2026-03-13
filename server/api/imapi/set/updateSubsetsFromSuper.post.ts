@@ -1,8 +1,8 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, array, boolean, number, object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import SetService from "~~/server/services/SetService";
 
-const bodySchema = any().openapi({
+const bodySchema = z.any().openapi({
   description: "Entity",
 });
 

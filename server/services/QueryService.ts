@@ -10,10 +10,11 @@ import type {
   Indicator,
   Return,
   TTEntity,
+  SubQueryDependency,
 } from "vue-library/interfaces";
 import { DisplayMode } from "vue-library/enums";
 import { isArrayHasLength, isObjectHasKeys } from "vue-library/helpers";
-const API_URL = `${useRuntimeConfig().public.imapiUrl}/query`;
+const API_URL = `${useRuntimeConfig().public.imapiUrl}/protected/query`;
 
 const QueryService = {
   async queryIM(
@@ -48,11 +49,11 @@ const QueryService = {
 
   async queryIMSearch(
     sessionId: string,
-    query: QueryRequest,
+    queryRequest: QueryRequest,
   ): Promise<SearchResponse> {
     return await $fetch(API_URL + "/queryIMSearch", {
       headers: { cookie: `session_id=${sessionId}` },
-      body: query,
+      body: queryRequest,
       method: "POST",
     });
   },
@@ -168,11 +169,11 @@ const QueryService = {
 
   async generateQuerySQLfromQuery(
     sessionId: string,
-    query: Query,
+    queryRequest: QueryRequest,
   ): Promise<string> {
     return await $fetch(API_URL + "/sql", {
       headers: { cookie: `session_id=${sessionId}` },
-      body: query,
+      body: queryRequest,
       method: "POST",
     });
   },
@@ -205,11 +206,11 @@ const QueryService = {
 
   async findMissingArguments(
     sessionId: string,
-    request: QueryRequest,
+    queryRequest: QueryRequest,
   ): Promise<ArgumentReference[]> {
     return $fetch(API_URL + "/public/findRequestMissingArguments", {
       headers: { cookie: `session_id=${sessionId}` },
-      body: request,
+      body: queryRequest,
       method: "POST",
     });
   },
@@ -228,6 +229,36 @@ const QueryService = {
       body: { match: match },
       method: "POST",
     });
+  },
+
+  async getSubqueryIris(
+    sessionId: string,
+    queryIri: string,
+  ): Promise<SubQueryDependency[]> {
+    return await $fetch<SubQueryDependency[]>(
+      `${useRuntimeConfig().public.imapiUrl}query/protected/subQueries`,
+      {
+        headers: { cookie: `session_id=${sessionId}` },
+        params: {
+          queryIri: queryIri,
+        },
+        method: "get",
+      },
+    );
+  },
+
+  async getQueryRequestForSQL(
+    sessionId: string,
+    queryRequest: QueryRequest,
+  ): Promise<QueryRequest> {
+    return await $fetch<QueryRequest>(
+      `${useRuntimeConfig().public.imapiUrl}query/protected/queryRequestForSQL`,
+      {
+        headers: { cookie: `session_id=${sessionId}` },
+        body: queryRequest,
+        method: "post",
+      },
+    );
   },
 };
 

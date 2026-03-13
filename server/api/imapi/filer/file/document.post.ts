@@ -1,13 +1,15 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, array, boolean, object, string, enum as zenum } from "zod/v4";
+import { z } from "~~/shared/zod";
 import FilerService from "~~/server/services/FilerService";
 import { NAMESPACE } from "vue-library/enums";
 
-const bodySchema = object({
-  document: any(),
-}).openapi({
-  description: "File a document of entities in the information model",
-});
+const bodySchema = z
+  .object({
+    document: z.any(),
+  })
+  .openapi({
+    description: "File a document of entities in the information model",
+  });
 
 defineRouteMeta({
   openAPI: {

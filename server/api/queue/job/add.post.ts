@@ -5,18 +5,19 @@ import { type QueryRequest } from "vue-library/interfaces";
 import { JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
 import { v4 } from "uuid";
+import QueryService from "~~/server/services/QueryService";
 
 export default defineEventHandler(async (event) => {
   const sessionId = getCookie(event, "session_id");
   const user = await globalThis.apiGuard.getUser(event);
   const queryRequest: QueryRequest = await readBody(event);
-  const getQueryRequestForSQL = await imapi.getQueryRequestForSQL(
+  const getQueryRequestForSQL = await QueryService.getQueryRequestForSQL(
     sessionId!,
     queryRequest,
   );
   const hash = hashQueryRequest(getQueryRequestForSQL);
   try {
-    await imapi.getQuerySql(sessionId!, queryRequest);
+    await QueryService.generateQuerySQLfromQuery(sessionId!, queryRequest);
   } catch (e: unknown) {
     throw createError("Unable to convert query to SQL");
   }

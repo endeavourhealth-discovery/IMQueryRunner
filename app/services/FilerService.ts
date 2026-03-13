@@ -9,7 +9,7 @@ const FilerService = {
     oldFolder: string,
     newFolder: string,
   ): Promise<void> {
-    return await $fetch(API_URL + "/folder/move", {
+    return await $fetch<void>(API_URL + "/folder/move", {
       params: {
         entity,
         oldFolder,

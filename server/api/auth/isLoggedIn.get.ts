@@ -1,4 +1,3 @@
-import { User } from "vue-library/models";
 import { getIp } from "~~/server/helpers/getIp";
 
 export default defineEventHandler(async (event): Promise<boolean> => {

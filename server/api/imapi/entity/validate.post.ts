@@ -1,14 +1,16 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, array, boolean, object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import EntityService from "~~/server/services/EntityService";
 
-const bodySchema = object({
-  validationIri: string(),
-  entity: any(),
-}).openapi({
-  description:
-    "Validation request with validation iri and entity to be validated",
-});
+const bodySchema = z
+  .object({
+    validationIri: z.string(),
+    entity: z.any(),
+  })
+  .openapi({
+    description:
+      "Validation request with validation iri and entity to be validated",
+  });
 
 defineRouteMeta({
   openAPI: {

@@ -1,23 +1,25 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, array, boolean, number, object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import SetService from "~~/server/services/SetService";
 
-const bodySchema = object({
-  ownRow: boolean().default(false),
-  format: string(),
-  options: object({
-    setIri: string(),
-    schemes: array(string()).prefault([]),
-    includeIM1id: boolean().default(false),
-    subsumptions: array(string()).prefault([]),
-    includeDefinition: boolean().default(false),
-    includeCore: boolean().default(false),
-    includeLegacy: boolean().default(false),
-    includeSubsets: boolean().default(false),
-  }),
-}).openapi({
-  description: "Set export request",
-});
+const bodySchema = z
+  .object({
+    ownRow: z.boolean().default(false),
+    format: z.string(),
+    options: z.object({
+      setIri: z.string(),
+      schemes: z.array(z.string()).prefault([]),
+      includeIM1id: z.boolean().default(false),
+      subsumptions: z.array(z.string()).prefault([]),
+      includeDefinition: z.boolean().default(false),
+      includeCore: z.boolean().default(false),
+      includeLegacy: z.boolean().default(false),
+      includeSubsets: z.boolean().default(false),
+    }),
+  })
+  .openapi({
+    description: "Set export request",
+  });
 
 defineRouteMeta({
   openAPI: {

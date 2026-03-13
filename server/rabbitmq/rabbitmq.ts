@@ -1,6 +1,5 @@
 import { Connection } from "rabbitmq-client";
 import { JobStatus } from "~~/enums";
-import { imapi } from "~~/server/utils/imapi";
 import { postgresDb } from "~~/server/db/postgres";
 import { eq } from "drizzle-orm";
 import { jobTable } from "~~/server/db/postgres/schema";
@@ -8,6 +7,7 @@ import type { QueryRequest } from "vue-library/interfaces";
 import { executeQuery } from "../utils/executeQuery";
 import type { Job } from "~~/models/job.schema";
 import type { User } from "vue-library/models";
+import QueryService from "../services/QueryService";
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
 rabbit.on("error", (err) => {});
@@ -68,20 +68,21 @@ const sub = rabbit.createConsumer(
       .where(eq(jobTable.dbid, id));
     const parsedJob = JSON.parse(msg.body);
     const queryRequest: QueryRequest = parsedJob.queryRequest;
-    let sql: string | undefined = await imapi
-      .getQuerySql(await getSession(), queryRequest)
-      .catch(async (err) => {
-        console.error(err);
-        await postgresDb
-          .update(jobTable)
-          .set({
-            status: JobStatus.ERRORED,
-            error: JSON.stringify(err),
-            finishDate: new Date().toISOString(),
-          })
-          .where(eq(jobTable.dbid, id));
-        return undefined;
-      });
+    let sql: string | undefined = await QueryService.generateQuerySQLfromQuery(
+      await getSession(),
+      queryRequest,
+    ).catch(async (err) => {
+      console.error(err);
+      await postgresDb
+        .update(jobTable)
+        .set({
+          status: JobStatus.ERRORED,
+          error: JSON.stringify(err),
+          finishDate: new Date().toISOString(),
+        })
+        .where(eq(jobTable.dbid, id));
+      return undefined;
+    });
     if (!sql) {
       throw new Error("Could generate SQL for job with id: " + id);
     }

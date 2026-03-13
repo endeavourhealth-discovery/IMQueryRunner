@@ -1,5 +1,5 @@
 import { IM } from "vue-library/enums";
-import {
+import type {
   DownloadByQueryOptions,
   EntityValidationRequest,
   ExtendedEntityReferenceNode,

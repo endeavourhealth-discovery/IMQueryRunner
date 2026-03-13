@@ -1,6 +1,6 @@
 import { User } from "vue-library/models";
 import { PrimeVuePresetThemes, PrimeVueColors } from "vue-library/enums";
-import {
+import type {
   NamespacePermissionJava,
   RecentActivityItemDto,
 } from "vue-library/interfaces";

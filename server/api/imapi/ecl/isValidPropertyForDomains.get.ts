@@ -1,10 +1,10 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, array, boolean, object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import EclService from "~~/server/services/EclService";
 
-const paramSchema = object({
-  propertyIri: string(),
-  conceptIri: array(string()),
+const paramSchema = z.object({
+  propertyIri: z.string(),
+  conceptIri: z.array(z.string()),
 });
 
 defineRouteMeta({

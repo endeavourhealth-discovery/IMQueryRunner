@@ -1,16 +1,19 @@
 import murmurhash from "murmurhash";
 import { type ResultSetHeader } from "mysql2";
-import { type Argument, type QueryRequest } from "vue-library/interfaces";
+import {
+  type SubQueryDependency,
+  type Argument,
+  type QueryRequest,
+} from "vue-library/interfaces";
 import { mysqlDb } from "../db/mysql";
-import { imapi } from "~~/server/utils/imapi";
-import { type SubQueryDependency } from "~~/models/SubQueryDependency";
+import QueryService from "../services/QueryService";
 
 export async function executeQuery(
   sessionId: string,
   sql: string,
   queryRequest: QueryRequest,
 ) {
-  const queryRequestForSQL = await imapi.getQueryRequestForSQL(
+  const queryRequestForSQL = await QueryService.getQueryRequestForSQL(
     sessionId,
     queryRequest,
   );
@@ -28,7 +31,7 @@ export async function executeQuery(
   const queryIrisToHashCodes = {} as { [key: string]: number };
   queryIrisToHashCodes[queryRequestForSQL.query.iri] = hashCode;
   console.log("Hash code for query:", hashCode);
-  const subQueries = await imapi.getSubqueryIris(
+  const subQueries = await QueryService.getSubqueryIris(
     sessionId,
     queryRequestForSQL.query.iri,
   );
@@ -146,13 +149,19 @@ async function runSubQueries(
 ) {
   for (const subQuery of subQueries) {
     try {
-      const subQueryRequest = await imapi.getQueryRequestForSQL(sessionId, {
-        query: { iri: subQuery.iri },
-        argument: queryRequest.argument,
-      } as QueryRequest);
+      const subQueryRequest = await QueryService.getQueryRequestForSQL(
+        sessionId,
+        {
+          query: { iri: subQuery.iri },
+          argument: queryRequest.argument,
+        } as QueryRequest,
+      );
       const hashCode = hashQueryRequest(subQueryRequest);
-      queryIrisToHashCodes[subQuery.iri] = hashCode;
-      const subQuerySql = await imapi.getQuerySql(sessionId, subQueryRequest);
+      queryIrisToHashCodes[subQuery.iri!] = hashCode;
+      const subQuerySql = await QueryService.generateQuerySQLfromQuery(
+        sessionId,
+        subQueryRequest,
+      );
       if (await isCached(hashCode)) {
         console.log(
           `Subquery cache hit for hashCode: ${hashCode} and iri: ${subQuery.iri}`,

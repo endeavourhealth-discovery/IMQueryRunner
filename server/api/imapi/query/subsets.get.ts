@@ -1,17 +1,9 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import {
-  any,
-  array,
-  boolean,
-  number,
-  object,
-  string,
-  enum as zenum,
-} from "zod/v4";
+import { z } from "~~/shared/zod";
 import SetService from "~~/server/services/SetService";
 
-const paramSchema = object({
-  iri: string(),
+const paramSchema = z.object({
+  iri: z.string(),
 });
 
 defineRouteMeta({

@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "~~/shared/zod";
 import { pgJobSelect, postgresDb } from "~~/server/db/postgres";
 import { jobTable } from "~~/server/db/postgres/schema";
 import { and, desc, eq, lte, SQL } from "drizzle-orm";

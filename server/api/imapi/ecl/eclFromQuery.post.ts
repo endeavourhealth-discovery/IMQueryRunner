@@ -1,13 +1,15 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, boolean, object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import EclService from "~~/server/services/EclService";
 
-const bodySchema = object({
-  query: any(),
-  showNames: boolean().optional(),
-}).openapi({
-  description: "Request containing the query for conversion to ecl",
-});
+const bodySchema = z
+  .object({
+    query: z.any(),
+    showNames: z.boolean().optional(),
+  })
+  .openapi({
+    description: "Request containing the query for conversion to ecl",
+  });
 
 defineRouteMeta({
   openAPI: {

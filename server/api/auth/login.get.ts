@@ -1,11 +1,11 @@
-import { PermissionSchema, User } from "vue-library/models";
-import { object, string } from "zod/v4";
+import { PermissionSchema, type User } from "vue-library/models";
+import { z } from "~~/shared/zod";
 import { getIp } from "~~/server/helpers/getIp";
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
 
-const loginSchema = object({
-  code: string(),
-  state: string(),
+const loginSchema = z.object({
+  code: z.string(),
+  state: z.string(),
 });
 
 export default defineEventHandler(async (event): Promise<User> => {

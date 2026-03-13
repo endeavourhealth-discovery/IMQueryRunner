@@ -1,11 +1,11 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, array, boolean, object, string, enum as zenum } from "zod/v4";
+import { z } from "~~/shared/zod";
 import QueryService from "~~/server/services/QueryService";
 import { DisplayMode } from "vue-library/enums";
 
-const paramSchema = object({
-  queryIri: string(),
-  lang: string().optional(),
+const paramSchema = z.object({
+  queryIri: z.string(),
+  lang: z.string().optional(),
 });
 
 defineRouteMeta({

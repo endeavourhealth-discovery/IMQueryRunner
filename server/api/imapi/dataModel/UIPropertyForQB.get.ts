@@ -1,10 +1,10 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import DataModelService from "~~/server/services/DataModelService";
 
-const paramSchema = object({
-  dmIri: string(),
-  propIri: string(),
+const paramSchema = z.object({
+  dmIri: z.string(),
+  propIri: z.string(),
 });
 
 defineRouteMeta({

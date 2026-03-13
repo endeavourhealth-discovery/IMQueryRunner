@@ -1,14 +1,14 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, array, boolean, number, object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import EntityService from "~~/server/services/EntityService";
 import { filterOptionsSchema } from "~~/models/filterOptions.schema";
 
-const paramSchema = object({
-  iri: string(),
-  predicate: string(),
-  page: number(),
-  size: number(),
-  schemeIris: string().optional(),
+const paramSchema = z.object({
+  iri: z.string(),
+  predicate: z.string(),
+  page: z.number(),
+  size: z.number(),
+  schemeIris: z.string().optional(),
 });
 
 defineRouteMeta({

@@ -1,14 +1,6 @@
 import { FetchError } from "ofetch";
 import type { User } from "vue-library/models";
-
-interface EndSecUI {
-  login(): Promise<void>;
-  callback(code: string, state: string): Promise<void>;
-  profile(): Promise<void>;
-  logout(): Promise<void>;
-  getUser(): Promise<User>;
-  isLoggedIn(): Promise<boolean>;
-}
+import type { EndSecUI } from "~~/shared/EndSecUI";
 
 export default defineNuxtPlugin((nuxtApp) => {
   globalThis.uiGuard = {
@@ -29,23 +21,23 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     callback: async (code: string, state: string): Promise<void> => {
       const headers = useRequestHeaders();
-      const response = await $fetch("/api/auth/login", {
+      const response = await $fetch<User>("/api/auth/login", {
         query: { code: code, state: state },
         headers: headers,
       });
-      useUserStore().setUser(response as User);
+      useUserStore().setUser(response);
     },
 
     getUser: async (): Promise<User> => {
       const headers = useRequestHeaders();
-      const response = await $fetch("/api/auth/getUser", {
+      const response = await $fetch<User>("/api/auth/getUser", {
         headers: headers,
       });
       return response;
     },
 
     profile: async (): Promise<void> => {
-      const profileUrl = await $fetch("/api/auth/getProfileUrl");
+      const profileUrl = await $fetch<string>("/api/auth/getProfileUrl");
       await nuxtApp.runWithContext(() =>
         navigateTo(profileUrl, { external: true }),
       );

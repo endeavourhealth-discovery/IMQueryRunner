@@ -1,4 +1,4 @@
-import { PermissionSchema, User, UserSchema } from "vue-library/models";
+import { PermissionSchema, type User, UserSchema } from "vue-library/models";
 import { getIp } from "~~/server/helpers/getIp";
 
 export default defineEventHandler(async (event): Promise<User> => {

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "~~/shared/zod";
 
 export const oathTokenRequestSchema = z.object({
   grant_type: z.string().optional(),

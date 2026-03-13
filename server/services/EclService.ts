@@ -11,7 +11,7 @@ const EclService = {
     sessionId: string,
     eclSearchRequest: ECLQueryRequest,
   ): Promise<SearchResponse> {
-    const results: SearchResponse = await $fetch(API_URL + "/eclSearch", {
+    const results = await $fetch<SearchResponse>(API_URL + "/eclSearch", {
       headers: { cookie: `session_id=${sessionId}` },
       body: eclSearchRequest,
       method: "POST",

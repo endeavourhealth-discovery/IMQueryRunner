@@ -1,19 +1,21 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, boolean, number, object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import EntityService from "~~/server/services/EntityService";
 
-const bodySchema = object({
-  queryRequest: any().optional(),
-  eclSearchRequest: any().optional(),
-  totalCount: number().optional(),
-  format: string().optional(),
-  includeDefinition: boolean().optional(),
-  includeCore: boolean().optional(),
-  includeLegacy: boolean().optional(),
-  includeSubsets: boolean().optional(),
-  subsetsOnOwnRow: boolean().optional(),
-  im1id: boolean().optional(),
-}).openapi({ description: "Download options" });
+const bodySchema = z
+  .object({
+    queryRequest: z.any().optional(),
+    eclSearchRequest: z.any().optional(),
+    totalCount: z.number().optional(),
+    format: z.string().optional(),
+    includeDefinition: z.boolean().optional(),
+    includeCore: z.boolean().optional(),
+    includeLegacy: z.boolean().optional(),
+    includeSubsets: z.boolean().optional(),
+    subsetsOnOwnRow: z.boolean().optional(),
+    im1id: z.boolean().optional(),
+  })
+  .openapi({ description: "Download options" });
 
 defineRouteMeta({
   openAPI: {

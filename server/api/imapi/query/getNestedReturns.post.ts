@@ -1,12 +1,14 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, array, boolean, object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import QueryService from "~~/server/services/QueryService";
 
-const bodySchema = object({
-  match: any(),
-}).openapi({
-  description: "Match",
-});
+const bodySchema = z
+  .object({
+    match: z.any(),
+  })
+  .openapi({
+    description: "Match",
+  });
 
 defineRouteMeta({
   openAPI: {

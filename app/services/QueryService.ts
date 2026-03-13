@@ -23,21 +23,21 @@ const QueryService = {
     raw: boolean = false,
   ): Promise<QueryResponse> {
     if (controller)
-      return await $fetch(API_URL + "/queryIM", {
+      return await useApi<QueryResponse>(API_URL + "/queryIM", {
         body: query,
         signal: controller.signal,
         raw: raw,
         method: "POST",
       });
     else
-      return await $fetch(API_URL + "/queryIM", {
+      return await useApi<QueryResponse>(API_URL + "/queryIM", {
         body: query,
         raw: raw,
         method: "POST",
       });
   },
   async flattenBooleans(query: Query | Match): Promise<Query | Match> {
-    return await $fetch(API_URL + "/flattenBooleans", {
+    return await $fetch<Query | Match>(API_URL + "/flattenBooleans", {
       body: query,
       method: "POST",
     });
@@ -117,6 +117,22 @@ const QueryService = {
   async generateQueryIML(queryIri: string): Promise<IMLLanguage> {
     return await $fetch(API_URL + "/imlFromIri", {
       params: { queryIri: queryIri },
+      method: "GET",
+    });
+  },
+
+  async findMissingArguments(
+    queryRequest: QueryRequest,
+  ): Promise<ArgumentReference[]> {
+    return await $fetch(API_URL + "/findRequestMissingArguments", {
+      body: queryRequest,
+      method: "POST",
+    });
+  },
+
+  async getQueryFromIri(iri: string): Promise<Query> {
+    return await $fetch(API_URL + "/queryFromIri", {
+      params: { queryIri: iri },
       method: "GET",
     });
   },

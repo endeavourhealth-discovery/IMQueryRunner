@@ -2,11 +2,7 @@ import type { NitroApp } from "nitropack";
 import type { User } from "vue-library/models";
 import { H3Event, EventHandlerRequest } from "h3";
 import { UserRole, NAMESPACE, Resource } from "vue-library/enums";
-
-interface EndSecApi {
-  getUser(event: H3Event<EventHandlerRequest>): Promise<User>;
-  checkPermissions(event: H3Event<EventHandlerRequest>): Promise<boolean>;
-}
+import type { EndSecApi } from "~~/shared/EndSecApi";
 
 export default defineNitroPlugin((nitroApp: NitroApp) => {
   globalThis.apiGuard = {

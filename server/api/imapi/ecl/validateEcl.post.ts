@@ -1,11 +1,13 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, boolean, object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import EclService from "~~/server/services/EclService";
 
-const bodySchema = object({
-  ecl: string(),
-  showNames: boolean(),
-}).openapi({ description: "Request containing the ecl for validation" });
+const bodySchema = z
+  .object({
+    ecl: z.string(),
+    showNames: z.boolean(),
+  })
+  .openapi({ description: "Request containing the ecl for validation" });
 
 defineRouteMeta({
   openAPI: {

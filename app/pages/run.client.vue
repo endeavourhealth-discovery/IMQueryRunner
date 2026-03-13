@@ -94,8 +94,6 @@ const request: any = {
 const showDialog = ref(false);
 const missingArgs = ref(true);
 
-const imapi = useIMAPI();
-
 watch(
   selected,
   (newValue, oldValue) => {

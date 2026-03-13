@@ -1,14 +1,16 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { any, array, boolean, object, string, enum as zenum } from "zod/v4";
+import { z } from "~~/shared/zod";
 import QueryService from "~~/server/services/QueryService";
 import { DisplayMode } from "vue-library/enums";
 
-const bodySchema = object({
-  query: any(),
-  displayMode: zenum(DisplayMode),
-}).openapi({
-  description: "Get query display from a query",
-});
+const bodySchema = z
+  .object({
+    query: z.any(),
+    displayMode: z.enum(DisplayMode),
+  })
+  .openapi({
+    description: "Get query display from a query",
+  });
 
 defineRouteMeta({
   openAPI: {

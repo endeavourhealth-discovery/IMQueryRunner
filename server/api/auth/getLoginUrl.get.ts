@@ -1,11 +1,11 @@
 import { PermissionSchema } from "vue-library/models";
-import { object, string } from "zod/v4";
+import { z } from "~~/shared/zod";
 import { getIp } from "~~/server/helpers/getIp";
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
 
-const loginUrlSchema = object({
-  redirectUri: string(),
-  state: string(),
+const loginUrlSchema = z.object({
+  redirectUri: z.string(),
+  state: z.string(),
 });
 
 export default defineEventHandler(async (event): Promise<string> => {

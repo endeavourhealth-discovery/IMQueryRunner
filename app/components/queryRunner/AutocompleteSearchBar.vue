@@ -120,13 +120,11 @@ import { IM, TextSearchStyle } from "vue-library/enums";
 import { cloneDeep, debounce, isEqual } from "lodash-es";
 import { useAutocompleteRegistry } from "~/composables/useAutocompleteRegistry";
 import type { TreeNode } from "primevue/treenode";
-import { useIMAPI } from "~/composables/useIMAPI";
 import EntityService from "~/services/EntityService";
 import QueryService from "~/services/QueryService";
 
 const { registerAutocomplete, unregisterAutocomplete } =
   useAutocompleteRegistry();
-const imapi = useIMAPI();
 
 interface Props {
   selected?: SearchResultSummary;
