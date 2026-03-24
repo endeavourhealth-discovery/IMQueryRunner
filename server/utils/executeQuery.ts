@@ -56,8 +56,8 @@ export async function executeQuery(
         console.log(
           `Executed dataset with insertId: ${result.insertId} and hashCode: ${hashCode}`,
         );
-      } catch (err) {
-        console.error("Error executing SQL part:", sqlPart);
+      } catch (err: any) {
+        console.error("Error executing SQL part:", err.cause || err.message || err);
         throw err;
       }
     }
