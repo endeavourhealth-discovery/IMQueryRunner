@@ -34,7 +34,7 @@ export default defineTask({
         }
         const processes = results as ProcessRow[];
         processes.forEach((p) => {
-          if (p.Time > parseInt(process.env.QUERY_KILL_TIME_LIMIT!) && p.Command === 'Query' && p.State !== 'Sleep' && p.User === user) {
+          if (p.Time > parseInt(process.env.QUERY_KILL_TIME_LIMIT!) * 60 && p.Command === 'Query' && p.State !== 'Sleep' && p.User === user) {
             const killSql = `KILL QUERY ${p.Id}`;
             db.query(killSql, (err) => {
               if (err) {
