@@ -19,22 +19,25 @@ const db = mysql.createPool(process.env.COMPASS_URL as string);
 export default defineTask({
   meta: {
     name: 'timeout-query-connections',
-    description: `Kills running for more than x minutes`,
+    description: `Kills running for more than ${process.env.QUERY_KILL_TIMEOUT} seconds`,
   },
-
   run() {
     if (process.env.QUERY_KILL_TIMEOUT) {
       let user = process.env.COMPASS_URL!.split('mysql://').pop();
       user = user!.split(':')[0];
 
-      db.query(`SHOW PROCESSLIST`, (err, results) => {
+      const showSql = `SHOW PROCESSLIST`
+
+      db.query(showSql, (err, results) => {
         if (err) {
           LOG.error(err);
           return;
         }
+
         const processes = results as ProcessRow[];
+
         processes.forEach((p) => {
-          if (p.Time > parseInt(process.env.QUERY_KILL_TIMEOUT!) * 60 && p.Command === 'Query' && p.State !== 'Sleep' && p.User === user) {
+          if (p.Time > parseInt(process.env.QUERY_KILL_TIMEOUT!) && p.Command === 'Query' && p.State !== 'Sleep' && p.User === user) {
             const killSql = `KILL QUERY ${p.Id}`;
             db.query(killSql, (err) => {
               if (err) {
@@ -47,6 +50,6 @@ export default defineTask({
         });
       });
     }
-    return {result: 'started'};
+    return {result: 'executed'};
   },
 });
