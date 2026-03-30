@@ -14,7 +14,6 @@
       <span class="m-2">Find a query:</span>
       <AutocompleteSearchBar
         v-model:selected="selected"
-        :root-entities="['http://endhealth.info/im#Q_Queries']"
         :im-query="request"
         :search-placeholder="'Search queries'"
       />
@@ -55,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { AutocompleteSearchBar } from "vue-library/components";
+import AutocompleteSearchBar from "~/components/queryRunner/AutocompleteSearchBar.vue";
 import {
   type Argument,
   type ArgumentReference,
