@@ -27,12 +27,16 @@ export default defineNuxtConfig({
   },
   compatibilityDate: "2025-07-15",
   $development: {
-    devtools: { enabled: true },
+    devtools: {enabled: true},
   },
   nitro: {
+    scheduledTasks: {
+      //[process.env.QUERY_KILL_INTERVAL_CRON as string]: ['kill-queries']
+    },
     experimental: {
       websocket: true,
       openAPI: true,
+      tasks: true
     },
   },
   runtimeConfig: {
@@ -42,7 +46,7 @@ export default defineNuxtConfig({
       casdoorClientId: process.env.CASDOOR_CLIENT_ID,
       casdoorClientSecret: process.env.CASDOOR_CLIENT_SECRET,
       imapiUrl: process.env.IMAPI_URL,
-      imDirectoryUrl: process.env.IM_DIRECTORY_URL,
+      imDirectoryUrl: process.env.IM_DIRECTORY_URL
       // cognitoIdentityPoolId: process.env.COGNITO_IDENTITY_POOL,
       // cognitoRegion: process.env.COGNITO_REGION,
       // cognitoUserPool: process.env.COGNITO_USER_POOL,
