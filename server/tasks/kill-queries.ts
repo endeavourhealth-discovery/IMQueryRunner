@@ -23,7 +23,7 @@ export default defineTask({
   },
 
   run() {
-    if (process.env.QUERY_KILL_TIME_LIMIT) {
+    if (process.env.QUERY_KILL_TIMEOUT) {
       let user = process.env.COMPASS_URL!.split('mysql://').pop();
       user = user!.split(':')[0];
 
@@ -34,7 +34,7 @@ export default defineTask({
         }
         const processes = results as ProcessRow[];
         processes.forEach((p) => {
-          if (p.Time > parseInt(process.env.QUERY_KILL_TIME_LIMIT!) * 60 && p.Command === 'Query' && p.State !== 'Sleep' && p.User === user) {
+          if (p.Time > parseInt(process.env.QUERY_KILL_TIMEOUT!) * 60 && p.Command === 'Query' && p.State !== 'Sleep' && p.User === user) {
             const killSql = `KILL QUERY ${p.Id}`;
             db.query(killSql, (err) => {
               if (err) {
