@@ -9,8 +9,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "drizzle-pull": "pnpm drizzle-pull-postgres && pnpm drizzle-pull-mysql",
-    "drizzle-pull-postgres": "npx drizzle-kit pull --config=server/db/postgres.drizzle.ts",
+    "drizzle-pull": "pnpm drizzle-pull-mysql",
     "drizzle-pull-mysql": "npx drizzle-kit pull --config=server/db/mysql.drizzle.ts"
   },
   "dependencies": {

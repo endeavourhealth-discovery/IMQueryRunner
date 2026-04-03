@@ -1,10 +1,9 @@
 import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
-import { pgJobInsert, postgresDb } from "~~/server/db/postgres";
-import { jobTable } from "~~/server/db/postgres/schema";
+import { jobTable } from "~~/server/db/mysql/schema";
+import { mysqlDb } from "~~/server/db/mysql";
 import { type QueryRequest } from "~~/models/AutoGen";
 import { JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
-import { v4 } from "uuid";
 
 export default defineEventHandler(async (event) => {
   const sessionId = getCookie(event, "session_id");
@@ -20,17 +19,27 @@ export default defineEventHandler(async (event) => {
   } catch (e: unknown) {
     throw createError("Unable to convert query to SQL");
   }
-  const queryTask: Job = {
-    dbid: v4(),
+  const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+  const queryTask = {
     jobName: getQueryRequestForSQL.query.name || "Unnamed Query",
-    queryRequest: queryRequest,
-    queryHash: "" + hash,
+    queryIri: getQueryRequestForSQL.query.iri!,
+    queryDefinition: getQueryRequestForSQL,
     queryType: getQueryRequestForSQL.query.queryType,
-    status: JobStatus.QUEUED,
+    searchDate: queryRequest.argument?.find(
+      (arg) => arg.parameter === "searchDate",
+    )?.valueData as string | undefined,
+    achievementDate: queryRequest.argument?.find(
+      (arg) => arg.parameter === "achievementDate",
+    )?.valueData as string | undefined,
+    hash: hash,
     userId: user!.id,
-    queueDate: new Date().toISOString(),
+    queueDate: now,
+    status: JobStatus.QUEUED,
+    error: null,
   } as Job;
-  await postgresDb.insert(jobTable).values(pgJobInsert.parse(queryTask));
+
+  const result = await mysqlDb.insert(jobTable).values(queryTask);
+  queryTask.dbid = result[0].insertId;
   await sendMessage(user!.id, queryTask);
   return { jobId: queryTask.dbid };
 });

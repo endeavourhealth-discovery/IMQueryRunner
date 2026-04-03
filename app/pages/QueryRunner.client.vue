@@ -43,9 +43,9 @@
           <Column>
             <template #body="{ data }: { data: Job }">
               <Button
-                :disabled="!data.queryRequest.argument.length"
+                :disabled="!data.queryDefinition.argument.length"
                 label="View arguments"
-                @click="viewArgumentDisplay(data.queryRequest.argument)"
+                @click="viewArgumentDisplay(data.queryDefinition.argument)"
               />
             </template>
           </Column>
@@ -53,15 +53,15 @@
           <Column field="queuedAt" header="Queued">
             <template #body="{ data }: { data: Job }">
               <span>{{
-                  data.queueDate ? getDisplayDateTime(data.queueDate) : "-"
-                }}</span>
+                data.queueDate ? getDisplayDateTime(data.queueDate) : "-"
+              }}</span>
             </template>
           </Column>
           <Column field="stoppedAt" header="Finished">
             <template #body="{ data }: { data: Job }">
               <span>{{
-                  data.finishDate ? getDisplayDateTime(data.finishDate) : "-"
-                }}</span>
+                data.finishDate ? getDisplayDateTime(data.finishDate) : "-"
+              }}</span>
             </template>
           </Column>
           <Column field="status" header="Status">
@@ -96,22 +96,22 @@
 </template>
 
 <script setup lang="ts">
-import type {Job} from "~~/models";
-import {JobStatus} from "~~/enums";
-import {onMounted, ref} from "vue";
-import type {Ref} from "vue";
-import type {Argument} from "~~/models/AutoGen";
+import type { Job } from "~~/models";
+import { JobStatus } from "~~/enums";
+import { onMounted, ref } from "vue";
+import type { Ref } from "vue";
+import type { Argument } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
-import {io} from "socket.io-client";
+import { io } from "socket.io-client";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
-import {useUserStore} from "~/stores/useUserStore";
+import { useUserStore } from "~/stores/useUserStore";
 
 definePageMeta({
   requiresAuth: true,
   requiresRole: ["EXECUTOR", "ADMIN"],
 });
 
-const {user} = useUserStore();
+const { user } = useUserStore();
 const confirm = useConfirm();
 
 const socket = io({
@@ -214,7 +214,7 @@ function getStatusSeverity(
 }
 
 async function cancelJob(jobId: string) {
-  await $fetch(`/api/queue/job/cancel/${jobId}`);
+  await $fetch(`/api/queue/job/stop/${jobId}`);
   await refresh();
 }
 
@@ -235,7 +235,7 @@ async function goToQuery(queryIri: string) {
       const encoded = `${config.public.imDirectoryUrl!}#/directory/folder/${encodeURIComponent(
         queryIri,
       )}`;
-      await navigateTo(encoded, {external: true});
+      await navigateTo(encoded, { external: true });
     },
   });
 }
@@ -266,13 +266,13 @@ async function requeueJob(jobId: string) {
   if (found)
     await $fetch("/api/queue/job/add", {
       method: "post",
-      body: found.queryRequest,
+      body: found.queryDefinition,
     });
   await refresh();
 }
 
 function getById(jobId: string): Job | undefined {
-  return jobs.value.find((item) => item.dbid === jobId);
+  return jobs.value.find((item) => item.dbid === Number(jobId));
 }
 
 async function onPage(event: any) {
@@ -286,7 +286,7 @@ function scrollToTop() {
   const scrollArea = document.getElementsByClassName(
     "p-datatable-scrollable-table",
   )[0] as HTMLElement;
-  scrollArea?.scrollIntoView({block: "start", behavior: "smooth"});
+  scrollArea?.scrollIntoView({ block: "start", behavior: "smooth" });
 }
 
 function getDisplayDateTime(date: string) {

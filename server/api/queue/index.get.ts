@@ -1,8 +1,8 @@
 import z from "zod";
-import { pgJobSelect, postgresDb } from "~~/server/db/postgres";
-import { jobTable } from "~~/server/db/postgres/schema";
 import { and, desc, eq, lte, SQL } from "drizzle-orm";
 import Logger from "#shared/logger";
+import { mysqlDb } from "~~/server/db/mysql";
+import { jobTable } from "~~/server/db/mysql/schema";
 
 const querySchema = z.object({
   page: z.coerce.number().default(1),
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
   const userId = user!.id;
 
-  const totalCount = await postgresDb.$count(
+  const totalCount = await mysqlDb.$count(
     jobTable,
     eq(jobTable.userId, userId),
   );
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
 
   if (date) filters.push(lte(jobTable.queueDate, date));
 
-  let qry = postgresDb
+  let qry = mysqlDb
     .select()
     .from(jobTable)
     .where(and(...filters))
@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
 
   const rs = await qry.execute();
 
-  const items = rs.map((row) => pgJobSelect.parse(row));
+  const items = rs;
 
   return {
     result: items,

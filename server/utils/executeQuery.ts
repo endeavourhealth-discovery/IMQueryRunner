@@ -18,10 +18,7 @@ export async function executeQuery(
     throw new Error("Query IRI is required for execution");
   const hashCode = hashQueryRequest(queryRequestForSQL);
 
-  if (await isCached(hashCode)) {
-    console.log(
-      `Subquery cache hit for hashCode: ${hashCode} and iri: ${queryRequestForSQL.query.iri}`,
-    );
+  if (await isCached(hashCode, queryRequestForSQL.query.iri)) {
     return { hashCode: hashCode };
   }
 
@@ -57,7 +54,10 @@ export async function executeQuery(
           `Executed dataset with insertId: ${result.insertId} and hashCode: ${hashCode}`,
         );
       } catch (err: any) {
-        console.error("Error executing SQL part:", err.cause || err.message || err);
+        console.error(
+          "Error executing SQL part:",
+          err.cause || err.message || err,
+        );
         throw err;
       }
     }
@@ -128,14 +128,19 @@ function hashArgument(argument: Argument): string {
   return hashString;
 }
 
-export async function isCached(hashCode: number): Promise<boolean> {
-  try {
-    const sql = `SELECT 1 FROM compass.\`${hashCode}\` LIMIT 1`;
-    await mysqlDb.execute<ResultSetHeader>(sql);
-    return true;
-  } catch (error) {
-    return false;
-  }
+export async function isCached(
+  hashCode: number,
+  iri: string,
+): Promise<boolean> {
+  const jobResult = await mysqlDb.query.jobTable.findFirst({
+    where: (jobTable, { eq, and }) =>
+      and(eq(jobTable.hash, hashCode), eq(jobTable.status, "COMPLETED")),
+  });
+  console.log(jobResult);
+  if (jobResult)
+    console.log(`Cache hit for hashCode: ${hashCode}, and iri: ${iri}`);
+
+  return !!jobResult;
 }
 
 async function runSubQueries(
@@ -153,10 +158,7 @@ async function runSubQueries(
       const hashCode = hashQueryRequest(subQueryRequest);
       queryIrisToHashCodes[subQuery.iri] = hashCode;
       const subQuerySql = await imapi.getQuerySql(sessionId, subQueryRequest);
-      if (await isCached(hashCode)) {
-        console.log(
-          `Subquery cache hit for hashCode: ${hashCode} and iri: ${subQuery.iri}`,
-        );
+      if (await isCached(hashCode, subQuery.iri)) {
         continue;
       }
       const resolvedSql = await getResolvedSql(

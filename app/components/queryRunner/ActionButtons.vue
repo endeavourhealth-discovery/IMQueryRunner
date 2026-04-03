@@ -99,7 +99,7 @@ const confirm = useConfirm();
 const showErrorDialog = ref(false);
 
 function goToQuery() {
-  emit("goToQuery", props.job.queryRequest.query.iri);
+  emit("goToQuery", props.job.queryIri);
 }
 
 function cancelQuery() {
@@ -143,7 +143,7 @@ function deleteQuery() {
 }
 
 async function viewQueryResults() {
-  await navigateTo({ path: `/results/${props.job.dbid}` })
+  await navigateTo({ path: `/results/${props.job.dbid}` });
 }
 
 function requeueQuery() {
