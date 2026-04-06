@@ -40,6 +40,18 @@ export const jobTable = mysqlTable(
   (table) => [primaryKey({ columns: [table.dbid], name: "dbid" })],
 );
 
+export const datasetTable = mysqlTable("dataset`.`dataset", {
+  hash: int("hash").notNull(),
+  cohortId: int("cohort_id").notNull(),
+  columnGroup: varchar("column_group", { length: 255 }).notNull(),
+  json: json("json").notNull(),
+});
+
+export const cohortTable = mysqlTable("dataset`.`cohort", {
+  hash: int("hash").notNull(),
+  cohortId: int("cohort_id").notNull(),
+});
+
 export const allergyIntolerance = mysqlTable(
   "compass.allergy_intolerance",
   {

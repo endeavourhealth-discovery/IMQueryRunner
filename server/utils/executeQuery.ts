@@ -136,11 +136,31 @@ export async function isCached(
     where: (jobTable, { eq, and }) =>
       and(eq(jobTable.hash, hashCode), eq(jobTable.status, "COMPLETED")),
   });
-  console.log(jobResult);
-  if (jobResult)
+  if (jobResult) {
     console.log(`Cache hit for hashCode: ${hashCode}, and iri: ${iri}`);
-
-  return !!jobResult;
+    return true;
+  } else {
+    const cohortResult = await mysqlDb.query.cohortTable.findFirst({
+      where: (cohortTable, { eq }) => eq(cohortTable.hash, hashCode),
+    });
+    if (cohortResult) {
+      console.log(
+        `Cache hit in cohort for hashCode: ${hashCode}, and iri: ${iri}`,
+      );
+      return true;
+    } else {
+      const datasetResult = await mysqlDb.query.datasetTable.findFirst({
+        where: (datasetTable, { eq }) => eq(datasetTable.hash, hashCode),
+      });
+      if (datasetResult) {
+        console.log(
+          `Cache hit in dataset for hashCode: ${hashCode}, and iri: ${iri}`,
+        );
+        return true;
+      }
+      return false;
+    }
+  }
 }
 
 async function runSubQueries(
@@ -171,7 +191,12 @@ async function runSubQueries(
         `Subquery executed with insertId: ${result.insertId} and hashCode: ${hashCode}`,
       );
     } catch (err: any) {
-      console.error("Error running subquery sql:", err.message);
+      console.error(
+        "Error running subquery sql:",
+        subQuery.iri,
+        "\nError:",
+        err.message,
+      );
       throw err;
     }
   }
