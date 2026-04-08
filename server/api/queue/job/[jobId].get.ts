@@ -10,7 +10,7 @@ const paramSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
   const item = await mysqlDb.query.jobTable.findFirst({
-    where: eq(jobTable.dbid, Number(jobId)),
+    where: eq(jobTable.id, Number(jobId)),
   });
 
   return item;

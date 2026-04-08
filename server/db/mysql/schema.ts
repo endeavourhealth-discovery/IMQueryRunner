@@ -14,42 +14,88 @@ import {
   date,
   double,
   json,
-  timestamp,
 } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
 
 export const jobTable = mysqlTable(
   "dataset`.`job",
   {
-    dbid: int("dbid").autoincrement().notNull(),
+    id: int("id").autoincrement().notNull(),
     jobName: varchar("job_name", { length: 255 }).notNull(),
-    queryIri: varchar("query_iri", { length: 255 }).notNull(),
-    queryDefinition: json("query_definition").notNull(),
-    queryType: varchar("query_type", { length: 16 }).notNull(),
-    searchDate: datetime("search_date", { mode: "string" }),
-    achievementDate: datetime("achievement_date", { mode: "string" }),
-    hash: int("hash").notNull(),
+    queryRequests: json("query_requests").notNull(),
+    startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
+    persistent: tinyint("persistent").notNull(),
+    useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
     userId: varchar("user_id", { length: 45 }).notNull(),
     queueDate: datetime("queue_date", { mode: "string" }).notNull(),
     runDate: datetime("run_date", { mode: "string" }).notNull(),
     finishDate: datetime("finish_date", { mode: "string" }),
-    pid: int("pid"),
     status: varchar("status", { length: 45 }).notNull(),
     error: json("error"),
   },
-  (table) => [primaryKey({ columns: [table.dbid], name: "dbid" })],
+  (table) => [primaryKey({ columns: [table.id], name: "id" })],
 );
 
-export const datasetTable = mysqlTable("dataset`.`dataset", {
-  hash: int("hash").notNull(),
-  cohortId: int("cohort_id").notNull(),
+export const queryResultSetTable = mysqlTable(
+  "dataset`.`query_result_set",
+  {
+    id: int("id").autoincrement().notNull(),
+    startTime: datetime("start_time", { mode: "string" }).notNull(),
+    endTime: datetime("end_time", { mode: "string" }),
+    startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
+    persistent: tinyint("persistent").notNull(),
+    useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
+    jobId: varchar("job_id", { length: 45 }).notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.id], name: "id" })],
+);
+
+export const indicatorResultTable = mysqlTable(
+  "dataset`.`indicator_result",
+  {
+    id: int("id").autoincrement().notNull(),
+    iri: varchar("iri", { length: 255 }).notNull(),
+    queryResultSetId: int("query_result_set_id"),
+    searchDate: date("search_date"),
+    achievementDate: date("achievement_date"),
+    startTime: datetime("start_time", { mode: "string" }),
+    endTime: datetime("end_time", { mode: "string" }),
+    startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
+    persistent: tinyint("persistent").notNull(),
+    useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
+    version: int("version").notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.id], name: "id" })],
+);
+
+export const queryResultTable = mysqlTable(
+  "dataset`.`indicator_result",
+  {
+    id: int("id").autoincrement().notNull(),
+    iri: varchar("iri", { length: 255 }).notNull(),
+    queryResultSetId: int("query_result_set_id"),
+    indicator: int("indicator"),
+    searchDate: date("search_date"),
+    achievementDate: date("achievement_date"),
+    startTime: datetime("start_time", { mode: "string" }),
+    endTime: datetime("end_time", { mode: "string" }),
+    startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
+    persistent: tinyint("persistent").notNull(),
+    useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
+    version: int("version").notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.id], name: "id" })],
+);
+
+export const datasetResultsTable = mysqlTable("dataset`.`dataset_results", {
+  cohortEntityId: int("cohort_entity_id").notNull(),
   columnGroup: varchar("column_group", { length: 255 }).notNull(),
   json: json("json").notNull(),
 });
 
-export const cohortTable = mysqlTable("dataset`.`cohort", {
-  hash: int("hash").notNull(),
-  cohortId: int("cohort_id").notNull(),
+export const cohortResultsTable = mysqlTable("dataset`.`cohort_results", {
+  queryResultId: int("query_result_id").notNull(),
+  entityId: int("cohort_id").notNull(),
 });
 
 export const allergyIntolerance = mysqlTable(

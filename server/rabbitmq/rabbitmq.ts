@@ -50,7 +50,7 @@ const sub = rabbit.createConsumer(
   async (msg) => {
     const id = msg.messageId!;
     const job = await mysqlDb.query.jobTable.findFirst({
-      where: eq(jobTable.dbid, Number(id)),
+      where: eq(jobTable.id, Number(id)),
     });
     if (job && JobStatus.CANCELLED === job.status) {
       throw new Error("Item is cancelled. Query rejected.");
@@ -66,51 +66,57 @@ const sub = rabbit.createConsumer(
         status: JobStatus.RUNNING,
         runDate: now,
       })
-      .where(eq(jobTable.dbid, Number(id)));
-    const parsedJob = JSON.parse(msg.body);
-    const queryRequest: QueryRequest = parsedJob.queryDefinition;
-    let sql: string | undefined = await imapi
-      .getQuerySql(await getSession(), queryRequest)
-      .catch(async (err) => {
-        console.error(err);
-        await mysqlDb
-          .update(jobTable)
-          .set({
-            status: JobStatus.ERRORED,
-            error: JSON.stringify(err),
-            finishDate: now,
-          })
-          .where(eq(jobTable.dbid, Number(id)));
-        return undefined;
-      });
-    if (!sql) {
-      throw new Error("Could generate SQL for job with id: " + id);
+      .where(eq(jobTable.id, Number(id)));
+    const parsedJob: Job = JSON.parse(msg.body);
+    for (const queryRequest of parsedJob.queryRequests) {
+      let sql: string | undefined = await imapi
+        .getQuerySql(await getSession(), queryRequest)
+        .catch(async (err) => {
+          console.error(err);
+          await mysqlDb
+            .update(jobTable)
+            .set({
+              status: JobStatus.ERRORED,
+              error: JSON.stringify(err),
+              finishDate: now,
+            })
+            .where(eq(jobTable.id, Number(id)));
+          return undefined;
+        });
+      if (!sql) {
+        throw new Error(
+          "Could generate SQL for query: " +
+            queryRequest?.query?.iri +
+            ", for job: " +
+            id,
+        );
+      }
     }
 
-    try {
-      const { insertId, hashCode } = await executeQuery(
-        await getSession(),
-        sql,
-        queryRequest,
-      );
-      await mysqlDb
-        .update(jobTable)
-        .set({
-          pid: insertId,
-          status: JobStatus.COMPLETED,
-          finishDate: now,
-        })
-        .where(eq(jobTable.dbid, Number(id)));
-    } catch (err) {
-      await mysqlDb
-        .update(jobTable)
-        .set({
-          status: JobStatus.ERRORED,
-          error: JSON.stringify(err),
-          finishDate: now,
-        })
-        .where(eq(jobTable.dbid, Number(id)));
-    }
+    //   try {
+    //     const { insertId, hashCode } = await executeQuery(
+    //       await getSession(),
+    //       sql,
+    //       queryRequest,
+    //     );
+    //     await mysqlDb
+    //       .update(jobTable)
+    //       .set({
+    //         // pid: insertId,
+    //         status: JobStatus.COMPLETED,
+    //         finishDate: now,
+    //       })
+    //       .where(eq(jobTable.dbid, Number(id)));
+    //   } catch (err) {
+    //     await mysqlDb
+    //       .update(jobTable)
+    //       .set({
+    //         status: JobStatus.ERRORED,
+    //         error: JSON.stringify(err),
+    //         finishDate: now,
+    //       })
+    //       .where(eq(jobTable.dbid, Number(id)));
+    //   }
   },
 );
 

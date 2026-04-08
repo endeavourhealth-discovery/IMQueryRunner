@@ -99,7 +99,7 @@ const confirm = useConfirm();
 const showErrorDialog = ref(false);
 
 function goToQuery() {
-  emit("goToQuery", props.job.queryIri);
+  // emit("goToQuery", props.job.queryIri);
 }
 
 function cancelQuery() {

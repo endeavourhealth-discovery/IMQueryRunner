@@ -4,42 +4,56 @@ import { mysqlDb } from "~~/server/db/mysql";
 import { type QueryRequest } from "~~/models/AutoGen";
 import { JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
+import { eq } from "drizzle-orm";
 
 export default defineEventHandler(async (event) => {
   const sessionId = getCookie(event, "session_id");
   const user = await globalThis.apiGuard.getUser(event);
-  const queryRequest: QueryRequest = await readBody(event);
-  const getQueryRequestForSQL = await imapi.getQueryRequestForSQL(
-    sessionId!,
-    queryRequest,
-  );
-  const hash = hashQueryRequest(getQueryRequestForSQL);
-  try {
-    await imapi.getQuerySql(sessionId!, queryRequest);
-  } catch (e: unknown) {
-    throw createError("Unable to convert query to SQL");
+  const jobRequest: {
+    jobName: string;
+    queryRequests: QueryRequest[];
+    startOfDaySnapshot: boolean;
+    persistent: boolean;
+    useStartOfDaySnapshot: boolean;
+  } = await readBody(event);
+  const queryRequestsForSql = [];
+  for (const queryRequest of jobRequest.queryRequests) {
+    const getQueryRequestForSQL = await imapi.getQueryRequestForSQL(
+      sessionId!,
+      queryRequest,
+    );
+    queryRequestsForSql.push(getQueryRequestForSQL);
   }
   const now = new Date().toISOString().slice(0, 19).replace("T", " ");
-  const queryTask = {
-    jobName: getQueryRequestForSQL.query.name || "Unnamed Query",
-    queryIri: getQueryRequestForSQL.query.iri!,
-    queryDefinition: getQueryRequestForSQL,
-    queryType: getQueryRequestForSQL.query.queryType,
-    searchDate: queryRequest.argument?.find(
-      (arg) => arg.parameter === "searchDate",
-    )?.valueData as string | undefined,
-    achievementDate: queryRequest.argument?.find(
-      (arg) => arg.parameter === "achievementDate",
-    )?.valueData as string | undefined,
-    hash: hash,
+  const queryJob = {
+    jobName: jobRequest.jobName || "Unnamed Job",
+    queryRequests: queryRequestsForSql,
+    startOfDaySnapshot: jobRequest.startOfDaySnapshot ? 1 : 0,
+    persistent: jobRequest.persistent ? 1 : 0,
+    useStartOfDaySnapshot: jobRequest.useStartOfDaySnapshot ? 1 : 0,
     userId: user!.id,
     queueDate: now,
     status: JobStatus.QUEUED,
     error: null,
   } as Job;
 
-  const result = await mysqlDb.insert(jobTable).values(queryTask);
-  queryTask.dbid = result[0].insertId;
-  await sendMessage(user!.id, queryTask);
-  return { jobId: queryTask.dbid };
+  const result = await mysqlDb.insert(jobTable).values(queryJob);
+  if (!result?.[0]?.insertId)
+    throw new Error("Failed to insert job into database");
+  queryJob.dbid = result[0].insertId;
+  try {
+    await sendMessage(user!.id, queryJob);
+  } catch (err) {
+    console.error("Failed to send message to RabbitMQ:", err);
+    await mysqlDb
+      .update(jobTable)
+      .set({
+        status: JobStatus.ERRORED,
+        finishDate: now,
+        error: JSON.stringify(err),
+      })
+      .where(eq(jobTable.id, queryJob.dbid));
+    throw new Error("Failed to queue job for execution");
+  }
+  return { jobId: queryJob.dbid };
 });

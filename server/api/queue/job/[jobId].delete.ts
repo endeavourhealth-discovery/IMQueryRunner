@@ -9,11 +9,12 @@ const paramSchema = z.object({
 
 export default defineEventHandler(async (event) => {
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
+  console.log("Deleting job with ID:", jobId);
   const item = await mysqlDb.query.jobTable.findFirst({
-    where: eq(jobTable.dbid, Number(jobId)),
+    where: eq(jobTable.id, Number(jobId)),
   });
   if (item) {
-    await mysqlDb.delete(jobTable).where(eq(jobTable.dbid, item.dbid));
+    await mysqlDb.delete(jobTable).where(eq(jobTable.id, item.id));
   } else {
     createError("Query queue item not found for id: " + jobId);
   }

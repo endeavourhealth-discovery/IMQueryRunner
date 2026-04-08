@@ -42,11 +42,11 @@
           <Column field="jobName" header="Job name"></Column>
           <Column>
             <template #body="{ data }: { data: Job }">
-              <Button
+              <!-- <Button
                 :disabled="!data.queryDefinition.argument.length"
                 label="View arguments"
                 @click="viewArgumentDisplay(data.queryDefinition.argument)"
-              />
+              /> -->
             </template>
           </Column>
           <Column v-if="adminView" field="userId" header="User"></Column>
@@ -266,7 +266,7 @@ async function requeueJob(jobId: string) {
   if (found)
     await $fetch("/api/queue/job/add", {
       method: "post",
-      body: found.queryDefinition,
+      // body: found.queryDefinition,
     });
   await refresh();
 }

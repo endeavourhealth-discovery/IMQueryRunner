@@ -89,6 +89,18 @@ export function hashQueryRequest(queryRequest: QueryRequest): number {
   return murmurhash.v3(argHash);
 }
 
+export function hashQueryRequests(queryRequests: QueryRequest[]): number {
+  let argHash = "";
+  for (const queryRequest of queryRequests) {
+    resolveArgs(queryRequest);
+    for (const arg of queryRequest.argument!) {
+      argHash += hashArgument(arg);
+    }
+    if (queryRequest.query.iri) argHash += queryRequest.query.iri;
+  }
+  return murmurhash.v3(argHash);
+}
+
 function resolveArgs(queryRequest: QueryRequest) {
   if (!queryRequest.argument) queryRequest.argument = [];
   const defaultDates = ["$searchDate", "$achievementDate"];
@@ -132,35 +144,36 @@ export async function isCached(
   hashCode: number,
   iri: string,
 ): Promise<boolean> {
-  const jobResult = await mysqlDb.query.jobTable.findFirst({
-    where: (jobTable, { eq, and }) =>
-      and(eq(jobTable.hash, hashCode), eq(jobTable.status, "COMPLETED")),
-  });
-  if (jobResult) {
-    console.log(`Cache hit for hashCode: ${hashCode}, and iri: ${iri}`);
-    return true;
-  } else {
-    const cohortResult = await mysqlDb.query.cohortTable.findFirst({
-      where: (cohortTable, { eq }) => eq(cohortTable.hash, hashCode),
-    });
-    if (cohortResult) {
-      console.log(
-        `Cache hit in cohort for hashCode: ${hashCode}, and iri: ${iri}`,
-      );
-      return true;
-    } else {
-      const datasetResult = await mysqlDb.query.datasetTable.findFirst({
-        where: (datasetTable, { eq }) => eq(datasetTable.hash, hashCode),
-      });
-      if (datasetResult) {
-        console.log(
-          `Cache hit in dataset for hashCode: ${hashCode}, and iri: ${iri}`,
-        );
-        return true;
-      }
-      return false;
-    }
-  }
+  return false;
+  // const jobResult = await mysqlDb.query.jobTable.findFirst({
+  //   where: (jobTable, { eq, and }) =>
+  //     and(eq(jobTable.scheduleId, hashCode), eq(jobTable.status, "COMPLETED")),
+  // });
+  // if (jobResult) {
+  //   console.log(`Cache hit for hashCode: ${hashCode}, and iri: ${iri}`);
+  //   return true;
+  // } else {
+  //   const cohortResult = await mysqlDb.query.cohortTable.findFirst({
+  //     where: (cohortTable, { eq }) => eq(cohortTable.hash, hashCode),
+  //   });
+  //   if (cohortResult) {
+  //     console.log(
+  //       `Cache hit in cohort for hashCode: ${hashCode}, and iri: ${iri}`,
+  //     );
+  //     return true;
+  //   } else {
+  //     const datasetResult = await mysqlDb.query.datasetTable.findFirst({
+  //       where: (datasetTable, { eq }) => eq(datasetTable.hash, hashCode),
+  //     });
+  //     if (datasetResult) {
+  //       console.log(
+  //         `Cache hit in dataset for hashCode: ${hashCode}, and iri: ${iri}`,
+  //       );
+  //       return true;
+  //     }
+  //     return false;
+  //   }
+  // }
 }
 
 async function runSubQueries(

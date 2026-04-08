@@ -11,7 +11,7 @@ const paramSchema = z.object({
 export default defineEventHandler(async (event) => {
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
   const item = await mysqlDb.query.jobTable.findFirst({
-    where: eq(jobTable.dbid, Number(jobId)),
+    where: eq(jobTable.id, Number(jobId)),
   });
   const now = new Date().toISOString().slice(0, 19).replace("T", " ");
 
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
         status: JobStatus.CANCELLED,
         finishDate: now,
       })
-      .where(eq(jobTable.dbid, item.dbid));
+      .where(eq(jobTable.id, item.id));
   } else if (item?.status === JobStatus.RUNNING) {
     // TODO: kill query in mysql
     const activeQuery = mysqlDb.execute(`
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
         status: JobStatus.CANCELLED,
         finishDate: now,
       })
-      .where(eq(jobTable.dbid, item.dbid));
+      .where(eq(jobTable.id, item.id));
   } else {
     createError("Query queue item not found for id: " + jobId);
   }
