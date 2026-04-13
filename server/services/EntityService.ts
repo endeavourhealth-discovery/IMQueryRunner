@@ -12,8 +12,6 @@ import type {
   TTBundle,
   TTIriRef,
 } from "vue-library/interfaces";
-import type { TreeNode } from "primevue/treenode";
-import { buildDetails } from "vue-library/helpers";
 import type { OrganizationChartNode } from "primevue";
 
 const EntityService = {
@@ -366,44 +364,6 @@ const EntityService = {
         method: "GET",
       },
     );
-  },
-
-  async getEntityDetailsDisplay(
-    sessionId: string,
-    iri: string,
-  ): Promise<TreeNode[]> {
-    const response = await $fetch<TTBundle>(
-      `${useRuntimeConfig().public.imapiUrl}entity/protected/detailsDisplay`,
-      {
-        params: { iri: iri },
-        method: "GET",
-        headers: { cookie: `session_id=${sessionId}` },
-      },
-    );
-    return buildDetails(response);
-  },
-
-  async loadMoreDetailsDisplay(
-    sessionId: string,
-    iri: string,
-    predicate: string,
-    pageIndex: number,
-    pageSize: number,
-  ): Promise<TreeNode[]> {
-    const response = await $fetch<TTBundle>(
-      `${useRuntimeConfig().public.imapiUrl}entity/protected/detailsDisplay`,
-      {
-        headers: { cookie: `session_id=${sessionId}` },
-        params: {
-          iri: iri,
-          predicate: predicate,
-          pageIndex: pageIndex,
-          pageSize: pageSize,
-        },
-        method: "GET",
-      },
-    );
-    return buildDetails(response);
   },
 
   async checkValidation(

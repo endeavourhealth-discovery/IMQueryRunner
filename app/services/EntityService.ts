@@ -16,7 +16,6 @@ import type {
   EntityReferenceNode,
 } from "vue-library/interfaces";
 import type { TreeNode } from "primevue/treenode";
-import { buildDetails } from "vue-library/helpers";
 import { type OrganizationChartNode } from "primevue/organizationchart";
 
 const API_URL = "api/imapi/entity";
