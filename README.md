@@ -1,4 +1,13 @@
-# Nuxt Minimal Starter
+# IM Query Runner
+
+## Current Status
+| Environment | Status                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Live        | ![Version](https://s3.eu-west-2.amazonaws.com/endeavour-codebuild-output/badges/IMQueryRunner-live/version.svg) ![Build](https://s3.eu-west-2.amazonaws.com/endeavour-codebuild-output/badges/IMQueryRunner-live/build.svg) ![Unit Tests](https://s3.eu-west-2.amazonaws.com/endeavour-codebuild-output/badges/IMQueryRunner-live/unit-test.svg)                                                                                                                                                                                |
+| UAT         | ![Version](https://s3.eu-west-2.amazonaws.com/endeavour-codebuild-output/badges/IMQueryRunner-uat/version.svg) ![Build](https://s3.eu-west-2.amazonaws.com/endeavour-codebuild-output/badges/IMQueryRunner-uat/build.svg) ![Unit Tests](https://s3.eu-west-2.amazonaws.com/endeavour-codebuild-output/badges/IMQueryRunner-uat/unit-test.svg)                                                                                                                                                                                   |
+| Dev         | ![Version](https://s3.eu-west-2.amazonaws.com/endeavour-codebuild-output/badges/IMQueryRunner-dev/version.svg) ![Build](https://s3.eu-west-2.amazonaws.com/endeavour-codebuild-output/badges/IMQueryRunner-dev/build.svg) ![Unit Tests](https://s3.eu-west-2.amazonaws.com/endeavour-codebuild-output/badges/IMQueryRunner-dev/unit-test.svg) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=IMQueryRunner&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=IMQueryRunner) |
+
+## Description
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
