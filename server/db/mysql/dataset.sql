@@ -38,12 +38,16 @@ CREATE TABLE query_result_set (
     persistent BIT(1),
     use_start_of_day_snapshot BIT(1),
     job_id BIGINT,
+	user_id VARCHAR(45),
+    query_iri VARCHAR(100),
+	search_date DATE,
+    achievement_date DATE,
 	FOREIGN KEY (job_id) REFERENCES job(id)
 );
 
 CREATE TABLE indicator_result (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    iri VARCHAR(255),
+    query_iri VARCHAR(255),
     query_result_set_id BIGINT,
     search_date DATE,
     achievement_date DATE,
@@ -58,7 +62,7 @@ CREATE TABLE indicator_result (
 
 CREATE TABLE query_result (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    iri VARCHAR(255),
+    query_iri VARCHAR(255),
     query_result_set_id BIGINT,
     indicator BIGINT,
     search_date DATE,
@@ -81,7 +85,7 @@ CREATE TABLE cohort_results (
 
 CREATE TABLE dataset_results (
     cohort_entity_id BIGINT,
-    column_group VARCHAR(100),
+    column_group VARCHAR(255),
     `json` JSON,
     FOREIGN KEY (cohort_entity_id) REFERENCES cohort_results(entity_id)
 );

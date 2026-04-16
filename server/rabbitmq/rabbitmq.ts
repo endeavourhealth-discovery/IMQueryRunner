@@ -5,9 +5,10 @@ import { eq } from "drizzle-orm";
 import type { QueryRequest } from "~~/models/AutoGen";
 import { executeQuery } from "../utils/executeQuery";
 import type { Job } from "~~/models/job.schema";
+import type { QueryResultSet } from "~~/models/queryResultSet.schema";
 import type { User } from "~~/models/User";
 import { mysqlDb } from "../db/mysql";
-import { jobTable } from "../db/mysql/schema";
+import { jobTable, queryResultSetTable } from "../db/mysql/schema";
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
 rabbit.on("error", (err) => {});
@@ -48,25 +49,24 @@ const sub = rabbit.createConsumer(
     ],
   },
   async (msg) => {
-    const id = msg.messageId!;
+    const jobId = Number(msg.messageId!);
     const job = await mysqlDb.query.jobTable.findFirst({
-      where: eq(jobTable.id, Number(id)),
+      where: eq(jobTable.id, jobId),
     });
     if (job && JobStatus.CANCELLED === job.status) {
       throw new Error("Item is cancelled. Query rejected.");
     }
     if (!job) {
-      throw new Error("Could not find job with id: " + id);
+      throw new Error("Could not find job with id: " + jobId);
     }
-    const now = new Date().toISOString().slice(0, 19).replace("T", " ");
-
+    console.log(job);
     await mysqlDb
       .update(jobTable)
       .set({
         status: JobStatus.RUNNING,
-        runDate: now,
+        runDate: new Date().toISOString().slice(0, 19).replace("T", " "),
       })
-      .where(eq(jobTable.id, Number(id)));
+      .where(eq(jobTable.id, jobId));
     const parsedJob: Job = JSON.parse(msg.body);
     for (const queryRequest of parsedJob.queryRequests) {
       let sql: string | undefined = await imapi
@@ -78,9 +78,12 @@ const sub = rabbit.createConsumer(
             .set({
               status: JobStatus.ERRORED,
               error: JSON.stringify(err),
-              finishDate: now,
+              finishDate: new Date()
+                .toISOString()
+                .slice(0, 19)
+                .replace("T", " "),
             })
-            .where(eq(jobTable.id, Number(id)));
+            .where(eq(jobTable.id, jobId));
           return undefined;
         });
       if (!sql) {
@@ -88,35 +91,66 @@ const sub = rabbit.createConsumer(
           "Could generate SQL for query: " +
             queryRequest?.query?.iri +
             ", for job: " +
-            id,
+            jobId,
         );
       }
-    }
 
-    //   try {
-    //     const { insertId, hashCode } = await executeQuery(
-    //       await getSession(),
-    //       sql,
-    //       queryRequest,
-    //     );
-    //     await mysqlDb
-    //       .update(jobTable)
-    //       .set({
-    //         // pid: insertId,
-    //         status: JobStatus.COMPLETED,
-    //         finishDate: now,
-    //       })
-    //       .where(eq(jobTable.dbid, Number(id)));
-    //   } catch (err) {
-    //     await mysqlDb
-    //       .update(jobTable)
-    //       .set({
-    //         status: JobStatus.ERRORED,
-    //         error: JSON.stringify(err),
-    //         finishDate: now,
-    //       })
-    //       .where(eq(jobTable.dbid, Number(id)));
-    //   }
+      const queryResultSet = {
+        startOfDaySnapshot: queryRequest.startOfDaySnapshot ? 1 : 0,
+        persistent: queryRequest.persistent ? 1 : 0,
+        useStartOfDaySnapshot: queryRequest.useStartOfDaySnapshot ? 1 : 0,
+        userId: parsedJob.userId,
+        startTime: new Date().toISOString().slice(0, 19).replace("T", " "),
+        jobId: jobId,
+        queryIri: queryRequest.query.iri,
+        searchDate: queryRequest?.searchDate as any,
+        achievementDate: queryRequest?.achievementDate as any,
+      } as QueryResultSet;
+
+      const result = await mysqlDb
+        .insert(queryResultSetTable)
+        .values(queryResultSet);
+      const queryResultSetId = result?.[0]?.insertId;
+      console.log(
+        "Inserted query result set with ID:",
+        queryResultSetId,
+        "for job ID:",
+        jobId,
+      );
+
+      try {
+        const { id } = await executeQuery(
+          await getSession(),
+          sql,
+          queryRequest,
+          queryResultSet,
+        );
+        await mysqlDb
+          .update(queryResultSetTable)
+          .set({
+            // pid: insertId,
+            endTime: new Date().toISOString().slice(0, 19).replace("T", " "),
+          })
+          .where(eq(queryResultSetTable.id, queryResultSetId));
+      } catch (err) {
+        //   await mysqlDb
+        //     .update(jobTable)
+        //     .set({
+        //       status: JobStatus.ERRORED,
+        //       error: JSON.stringify(err),
+        //       finishDate: now,
+        //     })
+        //     .where(eq(jobTable.id, jobId));
+        // }
+      }
+    }
+    await mysqlDb
+      .update(jobTable)
+      .set({
+        status: JobStatus.COMPLETED,
+        finishDate: new Date().toISOString().slice(0, 19).replace("T", " "),
+      })
+      .where(eq(jobTable.id, jobId));
   },
 );
 
@@ -131,14 +165,14 @@ const pub = rabbit.createPublisher({
 export async function sendMessage(userId: string, message: Job) {
   await pub.send(
     {
-      messageId: "" + message.dbid,
+      messageId: "" + message.id,
       exchange: "query_runner",
       routingKey: "query.execute." + userId,
       durable: true,
     },
     JSON.stringify(message),
   );
-  return message.dbid;
+  return message.id;
 }
 
 async function onShutdown() {

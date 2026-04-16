@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Job } from "~~/models";
+import type { Job, JobRequest } from "~~/models";
 import { JobStatus } from "~~/enums";
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
@@ -263,16 +263,25 @@ async function deleteJob(jobId: string) {
 
 async function requeueJob(jobId: string) {
   const found = getById(jobId);
-  if (found)
+  if (!found) {
+    console.error("Job not found for requeueing:", jobId);
+    return;
+  }
+  if (found) {
+    const jobRequest = {
+      jobName: "Requeued " + (found?.jobName || "Requeued Job"),
+      queryRequests: found?.queryRequests,
+    } as JobRequest;
     await $fetch("/api/queue/job/add", {
       method: "post",
-      // body: found.queryDefinition,
+      body: jobRequest,
     });
+  }
   await refresh();
 }
 
 function getById(jobId: string): Job | undefined {
-  return jobs.value.find((item) => item.dbid === Number(jobId));
+  return jobs.value.find((item) => item.id === Number(jobId));
 }
 
 async function onPage(event: any) {

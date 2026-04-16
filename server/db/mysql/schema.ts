@@ -45,7 +45,10 @@ export const queryResultSetTable = mysqlTable(
     startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
     persistent: tinyint("persistent").notNull(),
     useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
-    jobId: varchar("job_id", { length: 45 }).notNull(),
+    queryIri: varchar("query_iri", { length: 255 }).notNull(),
+    searchDate: date("search_date", { mode: "string" }),
+    achievementDate: date("achievement_date", { mode: "string" }),
+    jobId: int("job_id").notNull(),
   },
   (table) => [primaryKey({ columns: [table.id], name: "id" })],
 );
@@ -54,7 +57,7 @@ export const indicatorResultTable = mysqlTable(
   "dataset`.`indicator_result",
   {
     id: int("id").autoincrement().notNull(),
-    iri: varchar("iri", { length: 255 }).notNull(),
+    queryIri: varchar("query_iri", { length: 255 }).notNull(),
     queryResultSetId: int("query_result_set_id"),
     searchDate: date("search_date"),
     achievementDate: date("achievement_date"),
@@ -69,10 +72,10 @@ export const indicatorResultTable = mysqlTable(
 );
 
 export const queryResultTable = mysqlTable(
-  "dataset`.`indicator_result",
+  "dataset`.`query_result",
   {
     id: int("id").autoincrement().notNull(),
-    iri: varchar("iri", { length: 255 }).notNull(),
+    queryIri: varchar("query_iri", { length: 255 }).notNull(),
     queryResultSetId: int("query_result_set_id"),
     indicator: int("indicator"),
     searchDate: date("search_date"),

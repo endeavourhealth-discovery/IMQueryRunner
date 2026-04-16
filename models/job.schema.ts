@@ -2,7 +2,7 @@ import { z } from "zod";
 import { JobStatus } from "~~/enums";
 
 export const jobSchema = z.object({
-  dbid: z.number().int(),
+  id: z.number().int(),
   jobName: z.string(),
   queryRequests: z.array(z.any()),
   startOfDaySnapshot: z.number().int(),

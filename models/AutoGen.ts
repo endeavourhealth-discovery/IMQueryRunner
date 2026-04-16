@@ -1192,6 +1192,7 @@ export enum Entail {
 export enum IMQType {
   COHORT = "COHORT",
   DATASET = "DATASET",
+  INDICATOR = "INDICATOR",
 }
 
 export enum Operator {

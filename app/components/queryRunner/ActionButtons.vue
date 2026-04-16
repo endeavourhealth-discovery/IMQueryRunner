@@ -116,7 +116,7 @@ function cancelQuery() {
     acceptProps: {
       label: "Yes",
     },
-    accept: () => emit("cancelQuery", props.job.dbid),
+    accept: () => emit("cancelQuery", props.job.id),
     reject: () => confirm.close(),
   });
 }
@@ -137,17 +137,17 @@ function deleteQuery() {
     acceptProps: {
       label: "Yes",
     },
-    accept: () => emit("deleteQuery", props.job.dbid),
+    accept: () => emit("deleteQuery", props.job.id),
     reject: () => confirm.close(),
   });
 }
 
 async function viewQueryResults() {
-  await navigateTo({ path: `/results/${props.job.dbid}` });
+  await navigateTo({ path: `/results/${props.job.id}` });
 }
 
 function requeueQuery() {
-  emit("requeueQuery", props.job.dbid);
+  emit("requeueQuery", props.job.id);
 }
 
 function showErrorDetails() {}
