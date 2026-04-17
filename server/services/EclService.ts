@@ -20,7 +20,7 @@ const EclService = {
   },
 
   async getEcl(sessionId: string, query: Query): Promise<string> {
-    return await $fetch(API_URL + "/ecl", {
+    return await $fetch<string>(API_URL + "/ecl", {
       headers: { cookie: `session_id=${sessionId}` },
       body: { query: query },
       method: "POST",
@@ -32,13 +32,13 @@ const EclService = {
     ecl: string,
     raw: boolean = false,
   ): Promise<ECLQueryRequest> {
-    return await $fetch(API_URL + "/queryFromEcl", {
+    return await $fetch<ECLQueryRequest>(API_URL + "/queryFromEcl", {
       headers: {
         cookie: `session_id=${sessionId}`,
         "Content-Type": "application/json",
       },
       body: { ecl: ecl, status: { valid: true } },
-      raw: raw,
+      ignoreResponseError: raw,
       method: "POST",
     });
   },
@@ -48,13 +48,13 @@ const EclService = {
     ecl: string,
     showNames: boolean,
   ): Promise<ECLQueryRequest> {
-    return await $fetch(API_URL + "/eclFromEcl", {
+    return await $fetch<ECLQueryRequest>(API_URL + "/eclFromEcl", {
       body: { ecl: ecl, showNames: showNames, status: { valid: true } },
       headers: {
         "Content-Type": "application/json",
         cookie: `session_id=${sessionId}`,
       },
-      raw: true,
+      ignoreResponseError: true,
       method: "POST",
     });
   },
@@ -64,7 +64,7 @@ const EclService = {
     ecl: string,
     showNames: boolean,
   ): Promise<ECLQueryRequest> {
-    return await $fetch(API_URL + "/validateEcl", {
+    return await $fetch<ECLQueryRequest>(API_URL + "/validateEcl", {
       body: { ecl: ecl, showNames: showNames, status: { valid: true } },
       headers: {
         "Content-Type": "application/json",
@@ -79,13 +79,13 @@ const EclService = {
     ecl: string,
     showNames: boolean,
   ): Promise<ECLQueryRequest> {
-    return await $fetch(API_URL + "/validateModelFromECL", {
+    return await $fetch<ECLQueryRequest>(API_URL + "/validateModelFromECL", {
       body: { ecl: ecl, showNames: showNames, status: { valid: true } },
       headers: {
         "Content-Type": "application/json",
         cookie: `session_id=${sessionId}`,
       },
-      raw: true,
+      ignoreResponseError: true,
       method: "POST",
     });
   },
@@ -94,13 +94,13 @@ const EclService = {
     sessionId: string,
     query: Query,
   ): Promise<ECLQueryRequest> {
-    return await $fetch(API_URL + "/validateModelFromQuery", {
+    return await $fetch<ECLQueryRequest>(API_URL + "/validateModelFromQuery", {
       body: { query: query, status: { valid: true } },
       headers: {
         "Content-Type": "application/json",
         cookie: `session_id=${sessionId}`,
       },
-      raw: true,
+      ignoreResponseError: true,
       method: "POST",
     });
   },
@@ -110,7 +110,7 @@ const EclService = {
     conceptIri: string[],
     controller?: AbortController,
   ): Promise<string[]> {
-    return await $fetch(API_URL + "/propertiesForDomains", {
+    return await $fetch<string[]>(API_URL + "/propertiesForDomains", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { conceptIri: conceptIri.join(",") },
       signal: controller?.signal,
@@ -124,7 +124,7 @@ const EclService = {
     conceptIri: string[],
     controller?: AbortController,
   ): Promise<string[]> {
-    return await $fetch(API_URL + "/isValidPropertyForDomains", {
+    return await $fetch<string[]>(API_URL + "/isValidPropertyForDomains", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { propertyIri: propertyIri, conceptIri: conceptIri.join(",") },
       signal: controller?.signal,
@@ -137,7 +137,7 @@ const EclService = {
     propertyIri: string,
     controller?: AbortController,
   ): Promise<string[]> {
-    return await $fetch(API_URL + "/rangesForProperty", {
+    return await $fetch<string[]>(API_URL + "/rangesForProperty", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { propertyIri: propertyIri },
       signal: controller?.signal,
@@ -150,13 +150,13 @@ const EclService = {
     query: Query,
     showNames?: boolean,
   ): Promise<ECLQueryRequest> {
-    return await $fetch(API_URL + "/eclFromQuery", {
+    return await $fetch<ECLQueryRequest>(API_URL + "/eclFromQuery", {
       body: { query: query, showNames: showNames },
       headers: {
         "Content-Type": "application/json",
         cookie: `session_id=${sessionId}`,
       },
-      raw: true,
+      ignoreResponseError: true,
       method: "POST",
     });
   },

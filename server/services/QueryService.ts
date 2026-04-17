@@ -21,7 +21,7 @@ const QueryService = {
     sessionId: string,
     query: QueryRequest,
   ): Promise<QueryResponse> {
-    return await $fetch(API_URL + "/queryIM", {
+    return await $fetch<QueryResponse>(API_URL + "/queryIM", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
       method: "POST",
@@ -32,7 +32,7 @@ const QueryService = {
     sessionId: string,
     query: Query | Match,
   ): Promise<Query | Match> {
-    return await $fetch(API_URL + "/flattenBooleans", {
+    return await $fetch<Query | Match>(API_URL + "/flattenBooleans", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
       method: "POST",
@@ -40,7 +40,7 @@ const QueryService = {
   },
 
   async optimiseECLQuery(sessionId: string, query: Query): Promise<Query> {
-    return await $fetch(API_URL + "/optimiseECLQuery", {
+    return await $fetch<Query>(API_URL + "/optimiseECLQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
       method: "POST",
@@ -51,7 +51,7 @@ const QueryService = {
     sessionId: string,
     queryRequest: QueryRequest,
   ): Promise<SearchResponse> {
-    return await $fetch(API_URL + "/queryIMSearch", {
+    return await $fetch<SearchResponse>(API_URL + "/queryIMSearch", {
       headers: { cookie: `session_id=${sessionId}` },
       body: queryRequest,
       method: "POST",
@@ -62,7 +62,7 @@ const QueryService = {
     sessionId: string,
     pathQuery: PathQuery,
   ): Promise<{ match: Match[] }> {
-    return await $fetch(API_URL + "/pathQuery", {
+    return await $fetch<{ match: Match[] }>(API_URL + "/pathQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: pathQuery,
       method: "POST",
@@ -70,7 +70,7 @@ const QueryService = {
   },
 
   async askQuery(sessionId: string, query: QueryRequest): Promise<boolean> {
-    return await $fetch(API_URL + "/askQueryIM", {
+    return await $fetch<boolean>(API_URL + "/askQueryIM", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
       method: "POST",
@@ -82,7 +82,7 @@ const QueryService = {
     query: Query,
     displayMode: DisplayMode,
   ): Promise<Query> {
-    return await $fetch(API_URL + "/queryDisplayFromQuery", {
+    return await $fetch<Query>(API_URL + "/queryDisplayFromQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: { query: query, displayMode: displayMode },
       method: "POST",
@@ -94,7 +94,7 @@ const QueryService = {
     iri: string,
     displayMode: DisplayMode,
   ): Promise<Query> {
-    return await $fetch(API_URL + "/queryDisplay", {
+    return await $fetch<Query>(API_URL + "/queryDisplay", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { queryIri: iri, displayMode: displayMode },
       method: "GET",
@@ -102,7 +102,7 @@ const QueryService = {
   },
 
   async getQueryFromIri(sessionId: string, iri: string): Promise<Query> {
-    return await $fetch(API_URL + "/queryFromIri", {
+    return await $fetch<Query>(API_URL + "/queryFromIri", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { queryIri: iri },
       method: "GET",
@@ -113,7 +113,7 @@ const QueryService = {
     sessionId: string,
     iri: string,
   ): Promise<Indicator> {
-    return await $fetch(API_URL + "/indicatorDisplay", {
+    return await $fetch<Indicator>(API_URL + "/indicatorDisplay", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { queryIri: iri },
       method: "GET",
@@ -126,7 +126,7 @@ const QueryService = {
     cohortIri: string,
     displayMode: DisplayMode,
   ): Promise<Query> {
-    return await $fetch(API_URL + "/expandCohort", {
+    return await $fetch<Query>(API_URL + "/expandCohort", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         queryIri: queryIri,
@@ -138,7 +138,7 @@ const QueryService = {
   },
 
   async getDefaultQuery(sessionId: string): Promise<Query> {
-    return await $fetch(API_URL + "/defaultQuery", {
+    return await $fetch<Query>(API_URL + "/defaultQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       method: "GET",
     });
@@ -149,7 +149,7 @@ const QueryService = {
     queryIri: string,
     lang?: string,
   ): Promise<string> {
-    return await $fetch(API_URL + "/sql", {
+    return await $fetch<string>(API_URL + "/sql", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { queryIri: queryIri, lang: lang },
       method: "GET",
@@ -160,7 +160,7 @@ const QueryService = {
     sessionId: string,
     queryIri: string,
   ): Promise<IMLLanguage> {
-    return await $fetch(API_URL + "/imlFromIri", {
+    return await $fetch<IMLLanguage>(API_URL + "/imlFromIri", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { queryIri: queryIri },
       method: "GET",
@@ -171,7 +171,7 @@ const QueryService = {
     sessionId: string,
     queryRequest: QueryRequest,
   ): Promise<string> {
-    return await $fetch(API_URL + "/sql", {
+    return await $fetch<string>(API_URL + "/sql", {
       headers: { cookie: `session_id=${sessionId}` },
       body: queryRequest,
       method: "POST",
@@ -197,7 +197,7 @@ const QueryService = {
     sessionId: string,
     request: QueryRequest,
   ): Promise<string[]> {
-    return $fetch(API_URL + "/testRunQuery", {
+    return $fetch<string[]>(API_URL + "/testRunQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: request,
       method: "POST",
@@ -208,15 +208,18 @@ const QueryService = {
     sessionId: string,
     queryRequest: QueryRequest,
   ): Promise<ArgumentReference[]> {
-    return $fetch(API_URL + "/public/findRequestMissingArguments", {
-      headers: { cookie: `session_id=${sessionId}` },
-      body: queryRequest,
-      method: "POST",
-    });
+    return $fetch<ArgumentReference[]>(
+      API_URL + "/public/findRequestMissingArguments",
+      {
+        headers: { cookie: `session_id=${sessionId}` },
+        body: queryRequest,
+        method: "POST",
+      },
+    );
   },
 
   async validateQuery(sessionId: string, query: Query): Promise<Query> {
-    return await $fetch(API_URL + "/validateQuery", {
+    return await $fetch<Query>(API_URL + "/validateQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
       method: "POST",
@@ -224,7 +227,7 @@ const QueryService = {
   },
 
   async getNestedReturns(sessionId: string, match: Match): Promise<Return[]> {
-    return await $fetch(API_URL + "/nestedReturns", {
+    return await $fetch<Return[]>(API_URL + "/nestedReturns", {
       headers: { cookie: `session_id=${sessionId}` },
       body: { match: match },
       method: "POST",

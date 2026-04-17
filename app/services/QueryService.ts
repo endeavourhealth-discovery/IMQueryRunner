@@ -43,7 +43,7 @@ const QueryService = {
     });
   },
   async optimiseECLQuery(query: Query): Promise<Query> {
-    return await $fetch(API_URL + "/optimiseECLQuery", {
+    return await $fetch<Query>(API_URL + "/optimiseECLQuery", {
       body: query,
       method: "POST",
     });
@@ -54,10 +54,10 @@ const QueryService = {
     controller?: AbortController,
     raw: boolean = false,
   ): Promise<SearchResponse> {
-    return await $fetch(API_URL + "/queryIMSearch", {
+    return await $fetch<SearchResponse>(API_URL + "/queryIMSearch", {
       body: query,
       signal: controller?.signal,
-      raw: raw,
+      ignoreResponseError: raw,
       method: "POST",
     });
   },
@@ -67,10 +67,10 @@ const QueryService = {
     controller?: AbortController,
     raw: boolean = false,
   ): Promise<boolean> {
-    return await $fetch(API_URL + "/askQueryIM", {
+    return await $fetch<boolean>(API_URL + "/askQueryIM", {
       body: query,
       signal: controller?.signal,
-      raw: raw,
+      ignoreResponseError: raw,
       method: "POST",
     });
   },
@@ -79,14 +79,14 @@ const QueryService = {
     query: Query,
     displayMode: DisplayMode,
   ): Promise<Query> {
-    return await $fetch(API_URL + "/queryDisplayFromQuery", {
+    return await $fetch<Query>(API_URL + "/queryDisplayFromQuery", {
       body: { query: query, displayMode: displayMode },
       method: "POST",
     });
   },
 
   async getDisplayFromIndicatorIri(iri: string): Promise<Indicator> {
-    return await $fetch(API_URL + "/indicatorDisplay", {
+    return await $fetch<Indicator>(API_URL + "/indicatorDisplay", {
       params: { queryIri: iri },
       method: "GET",
     });
@@ -97,7 +97,7 @@ const QueryService = {
     cohortIri: string,
     displayMode: DisplayMode,
   ): Promise<Query> {
-    return await $fetch(API_URL + "/expandCohort", {
+    return await $fetch<Query>(API_URL + "/expandCohort", {
       params: {
         queryIri: queryIri,
         cohortIri: cohortIri,
@@ -108,14 +108,14 @@ const QueryService = {
   },
 
   async generateQuerySQL(queryIri: string, lang?: string): Promise<string> {
-    return await $fetch(API_URL + "/sql", {
+    return await $fetch<string>(API_URL + "/sql", {
       params: { queryIri: queryIri, lang: lang },
       method: "GET",
     });
   },
 
   async generateQueryIML(queryIri: string): Promise<IMLLanguage> {
-    return await $fetch(API_URL + "/imlFromIri", {
+    return await $fetch<IMLLanguage>(API_URL + "/imlFromIri", {
       params: { queryIri: queryIri },
       method: "GET",
     });
@@ -124,14 +124,17 @@ const QueryService = {
   async findMissingArguments(
     queryRequest: QueryRequest,
   ): Promise<ArgumentReference[]> {
-    return await $fetch(API_URL + "/findRequestMissingArguments", {
-      body: queryRequest,
-      method: "POST",
-    });
+    return await $fetch<ArgumentReference[]>(
+      API_URL + "/findRequestMissingArguments",
+      {
+        body: queryRequest,
+        method: "POST",
+      },
+    );
   },
 
   async getQueryFromIri(iri: string): Promise<Query> {
-    return await $fetch(API_URL + "/queryFromIri", {
+    return await $fetch<Query>(API_URL + "/queryFromIri", {
       params: { queryIri: iri },
       method: "GET",
     });

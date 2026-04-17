@@ -12,7 +12,7 @@ const UserService = {
     sessionId: string,
     preset: PrimeVuePresetThemes,
   ): Promise<User> {
-    return await $fetch(API_URL + "/preset", {
+    return await $fetch<User>(API_URL + "/preset", {
       headers: {
         cookie: `session_id=${sessionId}`,
         "Content-Type": "text/plain",
@@ -26,7 +26,7 @@ const UserService = {
     sessionId: string,
     color: PrimeVueColors,
   ): Promise<User> {
-    return await $fetch(API_URL + "/primaryColor", {
+    return await $fetch<User>(API_URL + "/primaryColor", {
       body: color,
       headers: {
         "Content-Type": "text/plain",
@@ -40,7 +40,7 @@ const UserService = {
     sessionId: string,
     color: PrimeVueColors,
   ): Promise<User> {
-    return await $fetch(API_URL + "/surfaceColor", {
+    return await $fetch<User>(API_URL + "/surfaceColor", {
       body: color,
       headers: {
         "Content-Type": "text/plain",
@@ -51,7 +51,7 @@ const UserService = {
   },
 
   async updateUserDarkMode(sessionId: string, bool: boolean): Promise<User> {
-    return await $fetch(API_URL + "/darkMode", {
+    return await $fetch<User>(API_URL + "/darkMode", {
       headers: { cookie: `session_id=${sessionId}` },
       body: { bool: bool },
       method: "POST",
@@ -59,7 +59,7 @@ const UserService = {
   },
 
   async updateUserFontSize(sessionId: string, fontSize: string): Promise<User> {
-    return await $fetch(API_URL + "/fontSize", {
+    return await $fetch<User>(API_URL + "/fontSize", {
       body: fontSize,
       headers: {
         "Content-Type": "text/plain",
@@ -73,7 +73,7 @@ const UserService = {
     sessionId: string,
     recentActivity: RecentActivityItemDto[],
   ): Promise<User> {
-    return await $fetch(API_URL + "/recentActivity", {
+    return await $fetch<User>(API_URL + "/recentActivity", {
       headers: { cookie: `session_id=${sessionId}` },
       body: recentActivity,
       method: "POST",
@@ -84,7 +84,7 @@ const UserService = {
     sessionId: string,
     favourites: string[],
   ): Promise<User> {
-    return await $fetch(API_URL + "/favourites", {
+    return await $fetch<User>(API_URL + "/favourites", {
       headers: { cookie: `session_id=${sessionId}` },
       body: favourites,
       method: "POST",
@@ -95,7 +95,7 @@ const UserService = {
     sessionId: string,
     organisations: string[],
   ): Promise<User> {
-    return await $fetch(API_URL + "/organisations", {
+    return await $fetch<User>(API_URL + "/organisations", {
       headers: { cookie: `session_id=${sessionId}` },
       body: organisations,
       method: "POST",
@@ -106,7 +106,7 @@ const UserService = {
     sessionId: string,
     namespaces: NamespacePermissionJava[],
   ): Promise<User> {
-    return await $fetch(API_URL + "/namespaces", {
+    return await $fetch<User>(API_URL + "/namespaces", {
       headers: { cookie: `session_id=${sessionId}` },
       body: namespaces,
       method: "POST",

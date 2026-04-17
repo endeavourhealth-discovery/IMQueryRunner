@@ -9,7 +9,7 @@ const FilerService = {
     oldFolder: string,
     newFolder: string,
   ): Promise<void> {
-    return await $fetch(API_URL + "/folder/move", {
+    return await $fetch<void>(API_URL + "/folder/move", {
       headers: { cookie: `session_id=${sessionId}` },
       body: null,
       params: {
@@ -26,7 +26,7 @@ const FilerService = {
     entity: string,
     folder: string,
   ): Promise<void> {
-    return await $fetch(API_URL + "/folder/add", {
+    return await $fetch<void>(API_URL + "/folder/add", {
       headers: { cookie: `session_id=${sessionId}` },
       body: null,
       params: {
@@ -42,7 +42,7 @@ const FilerService = {
     container: string,
     name: string,
   ): Promise<string> {
-    return await $fetch(API_URL + "/folder/create", {
+    return await $fetch<string>(API_URL + "/folder/create", {
       headers: { cookie: `session_id=${sessionId}` },
       body: null,
       params: {
@@ -54,7 +54,7 @@ const FilerService = {
   },
 
   async downloadDeltas(sessionId: string): Promise<Blob> {
-    return await $fetch(API_URL + "/deltas/download", {
+    return await $fetch<Blob>(API_URL + "/deltas/download", {
       headers: { cookie: `session_id=${sessionId}` },
       responseType: "blob",
       method: "GET",
@@ -67,7 +67,7 @@ const FilerService = {
     namespace: NAMESPACE,
     crud: string,
   ): Promise<void> {
-    return await $fetch(API_URL + "/file/entity", {
+    return await $fetch<void>(API_URL + "/file/entity", {
       headers: { cookie: `session_id=${sessionId}` },
       body: { entity: entity, namespace: namespace, crud: crud },
       method: "POST",
@@ -78,7 +78,7 @@ const FilerService = {
     sessionId: string,
     document: TTDocument,
   ): Promise<{ [x: string]: string }> {
-    return await $fetch(API_URL + "/file/document", {
+    return await $fetch<{ [x: string]: string }>(API_URL + "/file/document", {
       headers: { cookie: `session_id=${sessionId}` },
       body: { document: document, insertNamespace: NAMESPACE.IM },
       method: "POST",
@@ -89,10 +89,13 @@ const FilerService = {
     sessionId: string,
     taskId: string,
   ): Promise<{ [x: string]: number }> {
-    return await $fetch(API_URL + `/file/document/${taskId}`, {
-      headers: { cookie: `session_id=${sessionId}` },
-      method: "GET",
-    });
+    return await $fetch<{ [x: string]: number }>(
+      API_URL + `/file/document/${taskId}`,
+      {
+        headers: { cookie: `session_id=${sessionId}` },
+        method: "GET",
+      },
+    );
   },
 };
 

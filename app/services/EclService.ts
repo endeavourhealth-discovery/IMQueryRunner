@@ -29,10 +29,10 @@ const EclService = {
     ecl: string,
     raw: boolean = false,
   ): Promise<ECLQueryRequest> {
-    return await $fetch(API_URL + "/queryFromEcl", {
+    return await $fetch<ECLQueryRequest>(API_URL + "/queryFromEcl", {
       body: { ecl: ecl, status: { valid: true } },
       headers: { "Content-Type": "application/json" },
-      raw: raw,
+      ignoreResponseError: raw,
       method: "POST",
     });
   },
@@ -41,16 +41,16 @@ const EclService = {
     ecl: string,
     showNames: boolean,
   ): Promise<ECLQueryRequest> {
-    return await $fetch(API_URL + "/eclFromEcl", {
+    return await $fetch<ECLQueryRequest>(API_URL + "/eclFromEcl", {
       body: { ecl: ecl, showNames: showNames, status: { valid: true } },
       headers: { "Content-Type": "application/json" },
-      raw: true,
+      ignoreResponseError: true,
       method: "POST",
     });
   },
 
   async validateECL(ecl: string, showNames: boolean): Promise<ECLQueryRequest> {
-    return await $fetch(API_URL + "/validateEcl", {
+    return await $fetch<ECLQueryRequest>(API_URL + "/validateEcl", {
       body: { ecl: ecl, showNames: showNames, status: { valid: true } },
       headers: { "Content-Type": "application/json" },
       method: "POST",
@@ -58,10 +58,10 @@ const EclService = {
   },
 
   async validateModelFromQuery(query: Query): Promise<ECLQueryRequest> {
-    return await $fetch(API_URL + "/validateModelFromQuery", {
+    return await $fetch<ECLQueryRequest>(API_URL + "/validateModelFromQuery", {
       body: { query: query, status: { valid: true } },
       headers: { "Content-Type": "application/json" },
-      raw: true,
+      ignoreResponseError: true,
       method: "POST",
     });
   },
@@ -70,7 +70,7 @@ const EclService = {
     propertyIri: string,
     controller?: AbortController,
   ): Promise<string[]> {
-    return await $fetch(API_URL + "/rangesForProperty", {
+    return await $fetch<string[]>(API_URL + "/rangesForProperty", {
       params: { propertyIri: propertyIri },
       signal: controller?.signal,
       method: "GET",
@@ -81,10 +81,10 @@ const EclService = {
     query: Query,
     showNames?: boolean,
   ): Promise<ECLQueryRequest> {
-    return await $fetch(API_URL + "/eclFromQuery", {
+    return await $fetch<ECLQueryRequest>(API_URL + "/eclFromQuery", {
       body: { query: query, showNames: showNames },
       headers: { "Content-Type": "application/json" },
-      raw: true,
+      ignoreResponseError: true,
       method: "POST",
     });
   },

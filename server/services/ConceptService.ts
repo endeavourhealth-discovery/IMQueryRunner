@@ -7,7 +7,7 @@ const API_URL = `${useRuntimeConfig().public.imapiUrl}concept/protected`;
 
 const ConceptService = {
   async getMatchedFrom(sessionId: string, iri: string): Promise<SimpleMap[]> {
-    return await $fetch(API_URL + "/matchedFrom", {
+    return await $fetch<SimpleMap[]>(API_URL + "/matchedFrom", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -17,7 +17,7 @@ const ConceptService = {
   },
 
   async getMatchedTo(sessionId: string, iri: string): Promise<SimpleMap[]> {
-    return await $fetch(API_URL + "/matchedTo", {
+    return await $fetch<SimpleMap[]>(API_URL + "/matchedTo", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -31,7 +31,7 @@ const ConceptService = {
     iri: string,
     includeInactive?: boolean,
   ): Promise<TermCode[]> {
-    return await $fetch(API_URL + "/termCode", {
+    return await $fetch<TermCode[]>(API_URL + "/termCode", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri, includeInactive: includeInactive },
       method: "GET",
@@ -42,7 +42,7 @@ const ConceptService = {
     sessionId: string,
     conceptIri: string,
   ): Promise<ConceptContextMap[]> {
-    return await $fetch(API_URL + "/conceptContextMaps", {
+    return await $fetch<ConceptContextMap[]>(API_URL + "/conceptContextMaps", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: conceptIri },
       method: "GET",

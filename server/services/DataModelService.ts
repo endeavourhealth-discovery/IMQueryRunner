@@ -12,7 +12,7 @@ const DataModelService = {
     iri: string,
     pathsOnly?: boolean,
   ): Promise<NodeShape> {
-    return await $fetch(API_URL + "/dataModelProperties", {
+    return await $fetch<NodeShape>(API_URL + "/dataModelProperties", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -26,20 +26,23 @@ const DataModelService = {
     iris: string[],
     valueType: string,
   ): Promise<NodeShape[]> {
-    return await $fetch(API_URL + "/dataModelPropertiesWithValueType", {
-      headers: { cookie: `session_id=${sessionId}` },
-      params: {
-        iris: iris.join(","),
-        valueType: valueType,
+    return await $fetch<NodeShape[]>(
+      API_URL + "/dataModelPropertiesWithValueType",
+      {
+        headers: { cookie: `session_id=${sessionId}` },
+        params: {
+          iris: iris.join(","),
+          valueType: valueType,
+        },
+        method: "GET",
       },
-      method: "GET",
-    });
+    );
   },
   async getDataModelsFromProperty(
     sessionId: string,
     propIri: string,
   ): Promise<TTIriRef[]> {
-    return await $fetch(API_URL + "/dataModels", {
+    return await $fetch<TTIriRef[]>(API_URL + "/dataModels", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         propIri: propIri,
@@ -48,7 +51,7 @@ const DataModelService = {
     });
   },
   async checkPropertyType(sessionId: string, iri: string): Promise<string> {
-    return await $fetch(API_URL + "/checkPropertyType", {
+    return await $fetch<string>(API_URL + "/checkPropertyType", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri },
       method: "GET",
@@ -60,7 +63,7 @@ const DataModelService = {
     dmIri: string,
     propIri: string,
   ): Promise<UIProperty> {
-    return await $fetch(API_URL + "/UIPropertyForQB", {
+    return await $fetch<UIProperty>(API_URL + "/UIPropertyForQB", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { dmIri: dmIri, propIri: propIri },
       method: "GET",
@@ -71,7 +74,7 @@ const DataModelService = {
     sessionId: string,
     iri: string,
   ): Promise<PropertyDisplay[]> {
-    return await $fetch(API_URL + "/propertiesDisplay", {
+    return await $fetch<PropertyDisplay[]>(API_URL + "/propertiesDisplay", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri },
       method: "GET",

@@ -12,7 +12,7 @@ const API_URL = `${useRuntimeConfig().public.imapiUrl}set`;
 
 const SetService = {
   async publish(sessionId: string, conceptIri: string): Promise<void> {
-    return await $fetch(API_URL + "/private/publish", {
+    return await $fetch<void>(API_URL + "/private/publish", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: conceptIri },
       method: "GET",
@@ -20,7 +20,7 @@ const SetService = {
   },
 
   async IMV1(sessionId: string, conceptIri: string): Promise<Blob> {
-    return await $fetch(API_URL + "/protected/export", {
+    return await $fetch<Blob>(API_URL + "/protected/export", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: conceptIri },
       responseType: "blob",
@@ -34,7 +34,7 @@ const SetService = {
     pageIndex: number,
     pageSize: number,
   ): Promise<Pageable<Node>> {
-    return await $fetch(API_URL + "/protected/members", {
+    return await $fetch<Pageable<Node>>(API_URL + "/protected/members", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -57,15 +57,18 @@ const SetService = {
       page: pageIndex,
       size: pageSize,
     } as ECLQueryRequest;
-    return await $fetch(API_URL + "/protected/membersFromQuery", {
-      headers: { cookie: `session_id=${sessionId}` },
-      body: request,
-      method: "POST",
-    });
+    return await $fetch<Pageable<Node>>(
+      API_URL + "/protected/membersFromQuery",
+      {
+        headers: { cookie: `session_id=${sessionId}` },
+        body: request,
+        method: "POST",
+      },
+    );
   },
 
   async getSubsets(sessionId: string, iri: string): Promise<TTIriRef[]> {
-    return await $fetch(API_URL + "/protected/subsets", {
+    return await $fetch<TTIriRef[]>(API_URL + "/protected/subsets", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -78,7 +81,7 @@ const SetService = {
     sessionId: string,
     setRequest: SetExportRequest,
   ): Promise<Blob> {
-    return await $fetch(API_URL + "/protected/setExport", {
+    return await $fetch<Blob>(API_URL + "/protected/setExport", {
       headers: { cookie: `session_id=${sessionId}` },
       body: setRequest,
       responseType: "blob",
@@ -91,7 +94,7 @@ const SetService = {
     iriA?: string,
     iriB?: string,
   ): Promise<SetDiffObject> {
-    return await $fetch(API_URL + "/protected/setDiff", {
+    return await $fetch<SetDiffObject>(API_URL + "/protected/setDiff", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         setIriA: iriA,
@@ -101,8 +104,11 @@ const SetService = {
     });
   },
 
-  async updateSubsetsFromSuper(sessionId: string, entity: TTEntity) {
-    return await $fetch(API_URL + "/private/updateSubsetsFromSuper", {
+  async updateSubsetsFromSuper(
+    sessionId: string,
+    entity: TTEntity,
+  ): Promise<void> {
+    return await $fetch<void>(API_URL + "/private/updateSubsetsFromSuper", {
       headers: { cookie: `session_id=${sessionId}` },
       body: entity,
       method: "POST",
