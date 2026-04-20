@@ -1,17 +1,17 @@
 import murmurhash from "murmurhash";
 import { type ResultSetHeader } from "mysql2";
-import {
-  IM,
-  IMQType,
-  type Argument,
-  type QueryRequest,
-} from "~~/models/AutoGen";
+import { IMQType, type Argument, type QueryRequest } from "~~/models/AutoGen";
 import { mysqlDb } from "../db/mysql";
 import { imapi } from "~~/server/utils/imapi";
-import { type SubQueryDependency } from "~~/models/SubQueryDependency";
-import { queryResultTable } from "../db/mysql/schema";
-import { type QueryResult } from "~~/models/queryResult.schema";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
+import { JobStatus } from "~~/enums";
+import {
+  createQueryResultEntry,
+  getToday,
+  updateJobStatus,
+  updateWithEndTime,
+} from "../helpers/mysqlHelper";
+import { queryResultTable } from "../db/mysql/schema";
 
 export async function executeQuery(
   sessionId: string,
@@ -19,113 +19,83 @@ export async function executeQuery(
   queryRequest: QueryRequest,
   queryResultSet: QueryResultSet,
 ) {
-  const queryRequestForSQL = await imapi.getQueryRequestForSQL(
-    sessionId,
-    queryRequest,
-  );
-  if (!queryRequestForSQL.query.iri)
+  if (!queryRequest.query.iri)
     throw new Error("Query IRI is required for execution");
-  const hashCodeVersion = hashQueryRequest(queryRequestForSQL);
-  // const queryResult = {} as QueryResult; // TODO: check if indicator
   const queryIrisToQueryResultIds = {} as { [key: string]: number };
-  const queryResultId = await saveResult(
-    queryRequestForSQL,
+  const hashCodeVersion = hashQueryRequest(queryRequest);
+  const queryResultId = await createQueryResultEntry(
+    queryRequest,
     queryResultSet,
     hashCodeVersion,
   );
-  queryIrisToQueryResultIds[queryRequestForSQL.query.iri] = queryResultId;
-  const subQueries = await imapi.getSubqueryIris(
+  queryIrisToQueryResultIds[queryRequest.query.iri] = queryResultId;
+
+  await runSubQueries(
     sessionId,
-    queryRequestForSQL.query.iri,
+    queryRequest,
+    queryIrisToQueryResultIds,
+    queryResultSet,
   );
-  console.log("Subqueries to run:", subQueries.length);
-  if (subQueries.length)
-    await runSubQueries(
-      sessionId,
-      subQueries,
-      queryRequestForSQL,
-      queryIrisToQueryResultIds,
-      queryResultSet,
-    );
+
   const resolvedSql = await getResolvedSql(
     sql,
-    queryRequestForSQL,
+    queryRequest,
     queryIrisToQueryResultIds,
   );
-  if (queryRequestForSQL.query.queryType === "DATASET") {
-    const sqlParts = resolvedSql.split(
-      "----------------------------------------",
-    );
-    console.log("Dataset parts to run:", sqlParts.length);
-    for (const sqlPart of sqlParts) {
-      try {
-        const [result] = await mysqlDb.execute<ResultSetHeader>(sqlPart);
-        console.log(`Executed dataset with id: ${queryResultId}`);
-      } catch (err: any) {
-        console.error(
-          "Error executing SQL part:",
-          err.cause || err.message || err,
-        );
-        throw err;
-      }
-    }
-    return {
-      id: queryResultId,
-    };
-  } else {
-    try {
-      const [result] = await mysqlDb.execute<ResultSetHeader>(resolvedSql);
-      return {
-        id: queryResultId,
-      };
-    } catch (err) {
-      console.error("Error executing query:", queryRequestForSQL.query.iri);
-      console.error("Error executing SQL:", err);
-      throw err;
-    }
-  }
-}
-
-export async function saveResult(
-  queryRequestForSQL: QueryRequest,
-  queryResultSet: QueryResultSet,
-  hashCodeVersion: number,
-) {
-  switch (queryRequestForSQL.query.queryType) {
-    case IMQType.COHORT:
+  switch (queryRequest.query.queryType) {
     case IMQType.DATASET:
-      const queryResult = {
-        startOfDaySnapshot: queryResultSet.startOfDaySnapshot,
-        persistent: queryResultSet.persistent,
-        useStartOfDaySnapshot: queryResultSet.useStartOfDaySnapshot,
-        startTime: new Date().toISOString().slice(0, 19).replace("T", " "),
-        queryIri: queryRequestForSQL.query.iri,
-        searchDate: queryResultSet.searchDate
-          ? new Date(queryResultSet.searchDate)
-          : null,
-        achievementDate: queryResultSet.achievementDate
-          ? new Date(queryResultSet.achievementDate)
-          : null,
-        indicator: 0, // TODO: set correct indicator
-        queryResultSetId: queryResultSet.id,
-        version: hashCodeVersion,
-      } as QueryResult;
-      const result = await mysqlDb.insert(queryResultTable).values(queryResult);
-      return result?.[0]?.insertId;
-
+      await executeDatasetQuery(resolvedSql, queryResultId);
+      break;
+    case IMQType.COHORT:
+      await executeCohortQuery(resolvedSql, queryRequest, queryResultId);
+      break;
     case IMQType.INDICATOR:
-      console.log("Indicator execution is not implemented yet");
-      return 0;
-
+      break;
     default:
       throw new Error(
-        "Unsupported query type: " + queryRequestForSQL.query.queryType,
+        "Unsupported query type: " + queryRequest.query.queryType,
       );
   }
 }
 
+export async function executeCohortQuery(
+  resolvedSql: string,
+  queryRequest: QueryRequest,
+  queryResultId: number,
+) {
+  try {
+    await mysqlDb.execute<ResultSetHeader>(resolvedSql);
+    await updateWithEndTime(queryResultId, queryResultTable);
+  } catch (err) {
+    console.error("Error executing query:", queryRequest.query.iri);
+    console.error("Error executing SQL:", err);
+    throw err;
+  }
+}
+
+export async function executeDatasetQuery(
+  resolvedSql: string,
+  queryResultId: number,
+) {
+  const sqlParts = resolvedSql.split(
+    "----------------------------------------",
+  );
+  console.log("Dataset parts to run:", sqlParts.length);
+  for (const sqlPart of sqlParts) {
+    try {
+      await mysqlDb.execute<ResultSetHeader>(sqlPart);
+    } catch (err: any) {
+      console.error(
+        "Error executing SQL part:",
+        err.cause || err.message || err,
+      );
+      throw err;
+    }
+  }
+  await updateWithEndTime(queryResultId, queryResultTable);
+}
+
 export function hashQueryRequest(queryRequest: QueryRequest): number {
-  resolveArgs(queryRequest);
   let argHash = "";
   for (const arg of queryRequest.argument!) {
     argHash += hashArgument(arg);
@@ -134,19 +104,7 @@ export function hashQueryRequest(queryRequest: QueryRequest): number {
   return murmurhash.v3(argHash);
 }
 
-export function hashQueryRequests(queryRequests: QueryRequest[]): number {
-  let argHash = "";
-  for (const queryRequest of queryRequests) {
-    resolveArgs(queryRequest);
-    for (const arg of queryRequest.argument!) {
-      argHash += hashArgument(arg);
-    }
-    if (queryRequest.query.iri) argHash += queryRequest.query.iri;
-  }
-  return murmurhash.v3(argHash);
-}
-
-function resolveArgs(queryRequest: QueryRequest) {
+export function resolveArgs(queryRequest: QueryRequest) {
   if (!queryRequest.argument) queryRequest.argument = [];
   const defaultDates = ["$searchDate", "$achievementDate"];
   for (const date of defaultDates) {
@@ -154,7 +112,7 @@ function resolveArgs(queryRequest: QueryRequest) {
     if (!hasDate)
       queryRequest.argument.push({
         parameter: date,
-        valueData: new Date().toISOString().split("T")[0],
+        valueData: getToday(),
       } as Argument);
   }
 }
@@ -223,44 +181,49 @@ export async function isCached(
 
 async function runSubQueries(
   sessionId: string,
-  subQueries: SubQueryDependency[],
   queryRequest: QueryRequest,
   queryIrisToHashCodes: { [key: string]: number },
   queryResultSet: QueryResultSet,
 ) {
-  for (const subQuery of subQueries) {
-    try {
-      const subQueryRequest = await imapi.getQueryRequestForSQL(sessionId, {
-        query: { iri: subQuery.iri },
-        argument: queryRequest.argument,
-      } as QueryRequest);
-      const hashCodeVersion = hashQueryRequest(subQueryRequest);
-      queryIrisToHashCodes[subQuery.iri] = await saveResult(
-        subQueryRequest,
-        queryResultSet,
-        hashCodeVersion,
-      );
-
-      const subQuerySql = await imapi.getQuerySql(sessionId, subQueryRequest);
-
-      const resolvedSql = await getResolvedSql(
-        subQuerySql,
-        subQueryRequest,
-        queryIrisToHashCodes,
-      );
-      const [result] = await mysqlDb.execute<ResultSetHeader>(resolvedSql);
-      console.log(`Subquery executed with id: ${result.insertId}`);
-    } catch (err: any) {
-      console.error(
-        "Error running subquery sql:",
-        subQuery.iri,
-        "\nError:",
-        err.message,
-      );
-      throw err;
+  const subQueries = await imapi.getSubqueryIris(
+    sessionId,
+    queryRequest.query.iri!,
+  );
+  console.log("Subqueries to run:", subQueries.length);
+  if (subQueries.length)
+    for (const subQuery of subQueries) {
+      try {
+        const subQueryRequest = await imapi.getQueryRequestForSQL(sessionId, {
+          query: { iri: subQuery.iri },
+          argument: queryRequest.argument,
+        } as QueryRequest);
+        const hashCodeVersion = hashQueryRequest(subQueryRequest);
+        queryIrisToHashCodes[subQuery.iri] = await createQueryResultEntry(
+          subQueryRequest,
+          queryResultSet,
+          hashCodeVersion,
+        );
+        const subQuerySql = await imapi.getQuerySql(sessionId, subQueryRequest);
+        const resolvedSql = await getResolvedSql(
+          subQuerySql,
+          subQueryRequest,
+          queryIrisToHashCodes,
+        );
+        await executeCohortQuery(
+          resolvedSql,
+          subQueryRequest,
+          queryIrisToHashCodes[subQuery.iri]!,
+        );
+      } catch (err: any) {
+        console.error(
+          "Error running subquery sql:",
+          subQuery.iri,
+          "\nError:",
+          err.message,
+        );
+        throw err;
+      }
     }
-  }
-  return queryIrisToHashCodes;
 }
 
 async function getResolvedSql(
@@ -295,4 +258,27 @@ function getIriLine(stringIris: string[]): string {
     if (stringIri.indexOf(":") === -1) throw createError("Invalid iri");
   }
   return stringIris.join(" ");
+}
+
+export async function getValidatedSQL(
+  queryRequest: QueryRequest,
+  sessionId: string,
+  jobId: number,
+): Promise<string> {
+  let sql: string | undefined = await imapi
+    .getQuerySql(sessionId, queryRequest)
+    .catch(async (err) => {
+      console.error(err);
+      await updateJobStatus(jobId, JobStatus.ERRORED, JSON.stringify(err));
+      return undefined;
+    });
+  if (!sql) {
+    throw new Error(
+      "Could generate SQL for query: " +
+        queryRequest?.query?.iri +
+        ", for job: " +
+        jobId,
+    );
+  }
+  return sql;
 }

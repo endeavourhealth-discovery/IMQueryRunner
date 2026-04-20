@@ -1,14 +1,15 @@
 import { Connection } from "rabbitmq-client";
 import { JobStatus } from "~~/enums";
-import { imapi } from "~~/server/utils/imapi";
-import { eq } from "drizzle-orm";
-import type { QueryRequest } from "~~/models/AutoGen";
-import { executeQuery } from "../utils/executeQuery";
+import { executeQuery, getValidatedSQL } from "../utils/executeQuery";
 import type { Job } from "~~/models/job.schema";
-import type { QueryResultSet } from "~~/models/queryResultSet.schema";
 import type { User } from "~~/models/User";
-import { mysqlDb } from "../db/mysql";
-import { jobTable, queryResultSetTable } from "../db/mysql/schema";
+import { queryResultSetTable } from "../db/mysql/schema";
+import {
+  createResultSetEntry,
+  getJobById,
+  updateJobStatus,
+  updateWithEndTime,
+} from "../helpers/mysqlHelper";
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
 rabbit.on("error", (err) => {});
@@ -49,108 +50,34 @@ const sub = rabbit.createConsumer(
     ],
   },
   async (msg) => {
-    const jobId = Number(msg.messageId!);
-    const job = await mysqlDb.query.jobTable.findFirst({
-      where: eq(jobTable.id, jobId),
-    });
+    const job = await getJobById(Number(msg.messageId!));
     if (job && JobStatus.CANCELLED === job.status) {
       throw new Error("Item is cancelled. Query rejected.");
     }
-    if (!job) {
-      throw new Error("Could not find job with id: " + jobId);
-    }
-    console.log(job);
-    await mysqlDb
-      .update(jobTable)
-      .set({
-        status: JobStatus.RUNNING,
-        runDate: new Date().toISOString().slice(0, 19).replace("T", " "),
-      })
-      .where(eq(jobTable.id, jobId));
-    const parsedJob: Job = JSON.parse(msg.body);
-    for (const queryRequest of parsedJob.queryRequests) {
-      let sql: string | undefined = await imapi
-        .getQuerySql(await getSession(), queryRequest)
-        .catch(async (err) => {
-          console.error(err);
-          await mysqlDb
-            .update(jobTable)
-            .set({
-              status: JobStatus.ERRORED,
-              error: JSON.stringify(err),
-              finishDate: new Date()
-                .toISOString()
-                .slice(0, 19)
-                .replace("T", " "),
-            })
-            .where(eq(jobTable.id, jobId));
-          return undefined;
-        });
-      if (!sql) {
-        throw new Error(
-          "Could generate SQL for query: " +
-            queryRequest?.query?.iri +
-            ", for job: " +
-            jobId,
-        );
-      }
-
-      const queryResultSet = {
-        startOfDaySnapshot: queryRequest.startOfDaySnapshot ? 1 : 0,
-        persistent: queryRequest.persistent ? 1 : 0,
-        useStartOfDaySnapshot: queryRequest.useStartOfDaySnapshot ? 1 : 0,
-        userId: parsedJob.userId,
-        startTime: new Date().toISOString().slice(0, 19).replace("T", " "),
-        jobId: jobId,
-        queryIri: queryRequest.query.iri,
-        searchDate: queryRequest?.searchDate as any,
-        achievementDate: queryRequest?.achievementDate as any,
-      } as QueryResultSet;
-
-      const result = await mysqlDb
-        .insert(queryResultSetTable)
-        .values(queryResultSet);
-      const queryResultSetId = result?.[0]?.insertId;
-      console.log(
-        "Inserted query result set with ID:",
-        queryResultSetId,
-        "for job ID:",
-        jobId,
+    await updateJobStatus(job.id, JobStatus.RUNNING);
+    for (const queryRequest of job.queryRequests) {
+      // TODO: check if indicator
+      const sql = await getValidatedSQL(
+        queryRequest,
+        await getSession(),
+        job.id,
       );
+      const queryResultSet = await createResultSetEntry(queryRequest, job);
 
       try {
-        const { id } = await executeQuery(
+        await executeQuery(
           await getSession(),
           sql,
           queryRequest,
           queryResultSet,
         );
-        await mysqlDb
-          .update(queryResultSetTable)
-          .set({
-            // pid: insertId,
-            endTime: new Date().toISOString().slice(0, 19).replace("T", " "),
-          })
-          .where(eq(queryResultSetTable.id, queryResultSetId));
+        await updateWithEndTime(queryResultSet.id!, queryResultSetTable);
       } catch (err) {
-        //   await mysqlDb
-        //     .update(jobTable)
-        //     .set({
-        //       status: JobStatus.ERRORED,
-        //       error: JSON.stringify(err),
-        //       finishDate: now,
-        //     })
-        //     .where(eq(jobTable.id, jobId));
-        // }
+        await updateJobStatus(job.id, JobStatus.ERRORED, JSON.stringify(err));
+        return;
       }
     }
-    await mysqlDb
-      .update(jobTable)
-      .set({
-        status: JobStatus.COMPLETED,
-        finishDate: new Date().toISOString().slice(0, 19).replace("T", " "),
-      })
-      .where(eq(jobTable.id, jobId));
+    await updateJobStatus(job.id, JobStatus.COMPLETED);
   },
 );
 

@@ -1,0 +1,175 @@
+import { JobStatus } from "~~/enums";
+import { type Job } from "~~/models/job.schema";
+import { mysqlDb } from "../db/mysql";
+import {
+  jobTable,
+  queryResultSetTable,
+  queryResultTable,
+} from "../db/mysql/schema";
+import { eq } from "drizzle-orm";
+import { type QueryResultSet } from "~~/models/queryResultSet.schema";
+import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";
+import { type JobRequest } from "~~/models/JobRequest";
+import { IMQType, type QueryRequest } from "~~/models/AutoGen";
+import { type QueryResult } from "~~/models/queryResult.schema";
+import { resolveArgs } from "../utils/executeQuery";
+
+export async function createJobEntry(
+  jobRequest: JobRequest,
+  sessionId: string,
+  userId: string,
+): Promise<Job> {
+  const queryRequestsForSql = [];
+  for (const queryRequest of jobRequest.queryRequests) {
+    const getQueryRequestForSQL = await imapi.getQueryRequestForSQL(
+      sessionId!,
+      queryRequest,
+    );
+    resolveArgs(getQueryRequestForSQL);
+    queryRequestsForSql.push(getQueryRequestForSQL);
+  }
+  const now = getNow();
+  const queryJob = {
+    jobName: jobRequest.jobName || "Unnamed Job",
+    queryRequests: queryRequestsForSql,
+    startOfDaySnapshot: jobRequest.startOfDaySnapshot ? 1 : 0,
+    persistent: jobRequest.persistent ? 1 : 0,
+    useStartOfDaySnapshot: jobRequest.useStartOfDaySnapshot ? 1 : 0,
+    userId: userId,
+    queueDate: now,
+    status: JobStatus.QUEUED,
+    error: null,
+  } as Job;
+
+  const result = await mysqlDb.insert(jobTable).values(queryJob);
+  if (!result?.[0]?.insertId)
+    throw new Error("Failed to insert job into database");
+  queryJob.id = result[0].insertId;
+  return queryJob;
+}
+
+export async function getJobById(jobId: number): Promise<Job> {
+  const job = await mysqlDb.query.jobTable.findFirst({
+    where: eq(jobTable.id, jobId),
+  });
+  if (!job) {
+    throw new Error("Could not find job with id: " + jobId);
+  }
+  return job;
+}
+
+export async function updateJobStatus(
+  jobId: number,
+  jobStatus: JobStatus,
+  error: string | null = null,
+) {
+  const now = getNow();
+  const set = {
+    status: jobStatus,
+  } as Job;
+  switch (jobStatus) {
+    case JobStatus.RUNNING:
+      set.runDate = now;
+      break;
+    case JobStatus.COMPLETED:
+      set.finishDate = now;
+      break;
+    case JobStatus.ERRORED:
+      console.error("Error executing query for job ID:", jobId, error);
+      set.finishDate = now;
+      set.error = error;
+      break;
+
+    default:
+      throw new Error(`Invalid job status: ${jobStatus}`);
+  }
+  await mysqlDb.update(jobTable).set(set).where(eq(jobTable.id, jobId));
+}
+
+export async function createResultSetEntry(
+  queryRequest: any,
+  job: Job,
+): Promise<QueryResultSet> {
+  const queryResultSet = {
+    startOfDaySnapshot: queryRequest.startOfDaySnapshot ? 1 : 0,
+    persistent: queryRequest.persistent ? 1 : 0,
+    useStartOfDaySnapshot: queryRequest.useStartOfDaySnapshot ? 1 : 0,
+    userId: job.userId, // probably not needed
+    startTime: getNow(),
+    jobId: job.id,
+    queryIri: queryRequest.query.iri,
+    searchDate: queryRequest?.searchDate as any,
+    achievementDate: queryRequest?.achievementDate as any,
+  } as QueryResultSet;
+
+  const result = await mysqlDb
+    .insert(queryResultSetTable)
+    .values(queryResultSet);
+  const queryResultSetId = result?.[0]?.insertId;
+  queryResultSet.id = queryResultSetId!;
+  console.log(
+    "Inserted query result set with id:",
+    queryResultSet.id,
+    "for job id:",
+    job.id,
+  );
+  return queryResultSet;
+}
+
+export async function createQueryResultEntry(
+  queryRequest: QueryRequest,
+  queryResultSet: QueryResultSet,
+  hashCodeVersion: number,
+) {
+  switch (queryRequest.query.queryType) {
+    case IMQType.COHORT:
+    case IMQType.DATASET:
+      const queryResult = {
+        startOfDaySnapshot: queryResultSet.startOfDaySnapshot,
+        persistent: queryResultSet.persistent,
+        useStartOfDaySnapshot: queryResultSet.useStartOfDaySnapshot,
+        startTime: getNow(),
+        queryIri: queryRequest.query.iri,
+        searchDate: queryResultSet.searchDate
+          ? new Date(queryResultSet.searchDate)
+          : null,
+        achievementDate: queryResultSet.achievementDate
+          ? new Date(queryResultSet.achievementDate)
+          : null,
+        // indicator: 0, // TODO: set correct indicator
+        queryResultSetId: queryResultSet.id,
+        version: hashCodeVersion,
+      } as QueryResult;
+      const result = await mysqlDb.insert(queryResultTable).values(queryResult);
+      return result?.[0]?.insertId;
+
+    case IMQType.INDICATOR:
+      console.log("Indicator execution is not implemented yet");
+      return 0;
+
+    default:
+      throw new Error(
+        "Unsupported query type: " + queryRequest.query.queryType,
+      );
+  }
+}
+
+export async function updateWithEndTime(
+  id: number,
+  table: MySqlTableWithColumns<any>,
+) {
+  await mysqlDb
+    .update(table)
+    .set({
+      endTime: getNow(),
+    })
+    .where(eq(table.id, id));
+}
+
+export function getToday() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+export function getNow() {
+  return new Date().toISOString().slice(0, 19).replace("T", " ");
+}

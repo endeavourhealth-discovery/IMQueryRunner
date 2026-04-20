@@ -79,13 +79,14 @@ CREATE TABLE query_result (
 
 CREATE TABLE cohort_results (
     query_result_id BIGINT,
-    entity_id BIGINT UNIQUE,
+    entity_id BIGINT,
     FOREIGN KEY (query_result_id) REFERENCES query_result(id)
 );
 
 CREATE TABLE dataset_results (
-    cohort_entity_id BIGINT,
+	query_result_id BIGINT,
+    entity_id BIGINT,
     column_group VARCHAR(255),
     `json` JSON,
-    FOREIGN KEY (cohort_entity_id) REFERENCES cohort_results(entity_id)
+    FOREIGN KEY (query_result_id) REFERENCES query_result(id)
 );

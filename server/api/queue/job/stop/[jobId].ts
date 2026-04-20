@@ -3,6 +3,7 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 import { mysqlDb } from "~~/server/db/mysql";
 import { jobTable } from "~~/server/db/mysql/schema";
+import { getNow } from "~~/server/helpers/mysqlHelper";
 
 const paramSchema = z.object({
   jobId: z.string(),
@@ -13,7 +14,7 @@ export default defineEventHandler(async (event) => {
   const item = await mysqlDb.query.jobTable.findFirst({
     where: eq(jobTable.id, Number(jobId)),
   });
-  const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+  const now = getNow();
 
   if (item?.status === JobStatus.QUEUED) {
     await mysqlDb

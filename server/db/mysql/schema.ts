@@ -16,13 +16,15 @@ import {
   json,
 } from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
+import { type QueryRequest } from "~~/models/AutoGen";
+import { JobStatus } from "~~/enums/JobStatus";
 
 export const jobTable = mysqlTable(
   "dataset`.`job",
   {
     id: int("id").autoincrement().notNull(),
     jobName: varchar("job_name", { length: 255 }).notNull(),
-    queryRequests: json("query_requests").notNull(),
+    queryRequests: json("query_requests").$type<QueryRequest[]>().notNull(),
     startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
     persistent: tinyint("persistent").notNull(),
     useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
@@ -30,7 +32,7 @@ export const jobTable = mysqlTable(
     queueDate: datetime("queue_date", { mode: "string" }).notNull(),
     runDate: datetime("run_date", { mode: "string" }).notNull(),
     finishDate: datetime("finish_date", { mode: "string" }),
-    status: varchar("status", { length: 45 }).notNull(),
+    status: varchar("status", { length: 45 }).$type<JobStatus>().notNull(),
     error: json("error"),
   },
   (table) => [primaryKey({ columns: [table.id], name: "id" })],
