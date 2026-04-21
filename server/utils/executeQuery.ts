@@ -23,6 +23,13 @@ export async function executeQuery(
     throw new Error("Query IRI is required for execution");
   const queryIrisToQueryResultIds = {} as { [key: string]: number };
   const hashCodeVersion = hashQueryRequest(queryRequest);
+  const existingQueryResultId = await getQueryResultIdIfExists(
+    queryResultSet.id!,
+    hashCodeVersion,
+    queryRequest.query.iri,
+  );
+  if (existingQueryResultId !== -1) return;
+
   const queryResultId = await createQueryResultEntry(
     queryRequest,
     queryResultSet,
@@ -141,6 +148,23 @@ function hashArgument(argument: Argument): string {
   return hashString;
 }
 
+export async function getQueryResultIdIfExists(
+  resultSetId: number,
+  hashCodeVersion: number,
+  iri: string,
+): Promise<number> {
+  const result = await mysqlDb.query.queryResultTable.findFirst({
+    where: (queryResultTable, { eq }) =>
+      eq(queryResultTable.id, resultSetId) &&
+      eq(queryResultTable.version, hashCodeVersion) &&
+      eq(queryResultTable.queryIri, iri),
+  });
+  console.log(
+    `Cache context check (${!!result}): ${resultSetId} with hash: ${hashCodeVersion}, iri: ${iri}.`,
+  );
+  return result ? result.id! : -1;
+}
+
 export async function isCached(
   hashCode: number,
   iri: string,
@@ -196,6 +220,17 @@ async function runSubQueries(
           argument: queryRequest.argument,
         } as QueryRequest);
         const hashCodeVersion = hashQueryRequest(subQueryRequest);
+
+        const existingQueryResultId = await getQueryResultIdIfExists(
+          queryResultSet.id!,
+          hashCodeVersion,
+          subQueryRequest.query.iri!,
+        );
+        if (existingQueryResultId !== -1) {
+          queryIrisToHashCodes[subQuery.iri] = existingQueryResultId;
+          continue;
+        }
+
         queryIrisToHashCodes[subQuery.iri] = await createQueryResultEntry(
           subQueryRequest,
           queryResultSet,
