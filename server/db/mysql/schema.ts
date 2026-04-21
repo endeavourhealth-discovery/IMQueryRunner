@@ -79,7 +79,7 @@ export const queryResultTable = mysqlTable(
     id: int("id").autoincrement().notNull(),
     queryIri: varchar("query_iri", { length: 255 }).notNull(),
     queryResultSetId: int("query_result_set_id"),
-    indicator: int("indicator"),
+    indicatorResultId: int("indicator_result_id"),
     searchDate: date("search_date"),
     achievementDate: date("achievement_date"),
     startTime: datetime("start_time", { mode: "string" }),

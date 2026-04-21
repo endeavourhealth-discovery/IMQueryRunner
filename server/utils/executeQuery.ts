@@ -49,8 +49,6 @@ export async function executeQuery(
     case IMQType.COHORT:
       await executeCohortQuery(resolvedSql, queryRequest, queryResultId);
       break;
-    case IMQType.INDICATOR:
-      break;
     default:
       throw new Error(
         "Unsupported query type: " + queryRequest.query.queryType,
@@ -281,4 +279,34 @@ export async function getValidatedSQL(
     );
   }
   return sql;
+}
+
+export async function getIndicatorSubQueryRequests(
+  session: string,
+  queryRequest: QueryRequest,
+  jobId: number,
+): Promise<{ sql: string; queryRequest: QueryRequest }[]> {
+  if (!queryRequest.query.iri)
+    throw new Error("Query IRI is required to get indicator subqueries");
+  const queriesToRun = [];
+  const subqueries = await imapi.getSubqueryIris(
+    session,
+    queryRequest.query.iri!,
+    true,
+  );
+  for (const subquery of subqueries) {
+    const subqueryRequest = await imapi.getQueryRequestForSQL(session, {
+      query: {
+        iri: subquery.iri,
+        queryType: IMQType.COHORT,
+      },
+      argument: queryRequest.argument,
+    } as QueryRequest);
+    const subquerySql = await getValidatedSQL(subqueryRequest, session, jobId);
+    queriesToRun.push({
+      sql: subquerySql,
+      queryRequest: subqueryRequest,
+    });
+  }
+  return queriesToRun;
 }

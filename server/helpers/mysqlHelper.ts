@@ -2,6 +2,7 @@ import { JobStatus } from "~~/enums";
 import { type Job } from "~~/models/job.schema";
 import { mysqlDb } from "../db/mysql";
 import {
+  indicatorResultTable,
   jobTable,
   queryResultSetTable,
   queryResultTable,
@@ -12,6 +13,7 @@ import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 import { type JobRequest } from "~~/models/JobRequest";
 import { IMQType, type QueryRequest } from "~~/models/AutoGen";
 import { type QueryResult } from "~~/models/queryResult.schema";
+import { type IndicatorResult } from "~~/models/indicatorResult.schema";
 import { resolveArgs } from "../utils/executeQuery";
 
 export async function createJobEntry(
@@ -120,6 +122,7 @@ export async function createQueryResultEntry(
   queryRequest: QueryRequest,
   queryResultSet: QueryResultSet,
   hashCodeVersion: number,
+  indicatorId?: number,
 ) {
   switch (queryRequest.query.queryType) {
     case IMQType.COHORT:
@@ -136,22 +139,44 @@ export async function createQueryResultEntry(
         achievementDate: queryResultSet.achievementDate
           ? new Date(queryResultSet.achievementDate)
           : null,
-        // indicator: 0, // TODO: set correct indicator
+        indicatorResultId: indicatorId,
         queryResultSetId: queryResultSet.id,
         version: hashCodeVersion,
       } as QueryResult;
       const result = await mysqlDb.insert(queryResultTable).values(queryResult);
       return result?.[0]?.insertId;
 
-    case IMQType.INDICATOR:
-      console.log("Indicator execution is not implemented yet");
-      return 0;
-
     default:
       throw new Error(
         "Unsupported query type: " + queryRequest.query.queryType,
       );
   }
+}
+
+export async function createIndicatorResultEntry(
+  queryRequest: QueryRequest,
+  queryResultSet: QueryResultSet,
+  hashCodeVersion: number,
+) {
+  const indicatorResult = {
+    startOfDaySnapshot: queryResultSet.startOfDaySnapshot,
+    persistent: queryResultSet.persistent,
+    useStartOfDaySnapshot: queryResultSet.useStartOfDaySnapshot,
+    startTime: getNow(),
+    queryIri: queryRequest.query.iri,
+    searchDate: queryResultSet.searchDate
+      ? new Date(queryResultSet.searchDate)
+      : null,
+    achievementDate: queryResultSet.achievementDate
+      ? new Date(queryResultSet.achievementDate)
+      : null,
+    queryResultSetId: queryResultSet.id,
+    version: hashCodeVersion,
+  } as IndicatorResult;
+  const result = await mysqlDb
+    .insert(indicatorResultTable)
+    .values(indicatorResult);
+  return result?.[0]?.insertId;
 }
 
 export async function updateWithEndTime(

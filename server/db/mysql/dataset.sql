@@ -64,7 +64,7 @@ CREATE TABLE query_result (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     query_iri VARCHAR(255),
     query_result_set_id BIGINT,
-    indicator BIGINT,
+    indicator_result_id BIGINT,
     search_date DATE,
     achievement_date DATE,
     start_time DATETIME,
@@ -74,7 +74,7 @@ CREATE TABLE query_result (
     use_start_of_day_snapshot BIT(1),
     version BIGINT,
     FOREIGN KEY (query_result_set_id) REFERENCES query_result_set(id),
-    FOREIGN KEY (indicator) REFERENCES indicator_result(id)
+    FOREIGN KEY (indicator_result_id) REFERENCES indicator_result(id)
 );
 
 CREATE TABLE cohort_results (

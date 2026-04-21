@@ -4,7 +4,7 @@ export const queryResultSchema = z.object({
   id: z.number().int().optional(),
   queryIri: z.string(),
   queryResultSetId: z.number().int(),
-  indicator: z.number().int(),
+  indicatorResultId: z.number().int(),
   searchDate: z.date().optional(),
   achievementDate: z.date().optional(),
   startTime: z.string(),

@@ -56,6 +56,8 @@
 <script setup lang="ts">
 import AutocompleteSearchBar from "~/components/queryRunner/AutocompleteSearchBar.vue";
 import {
+  IM,
+  RDF,
   type Argument,
   type ArgumentReference,
   type QueryRequest,
@@ -78,10 +80,13 @@ const request: any = {
     where: {
       and: [
         {
-          iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+          iri: RDF.TYPE,
           is: [
             {
-              iri: "http://endhealth.info/im#Query",
+              iri: IM.QUERY,
+            },
+            {
+              iri: IM.INDICATOR,
             },
           ],
         },
@@ -100,7 +105,12 @@ watch(
   (newValue, oldValue) => {
     if (newValue !== oldValue && newValue) {
       args.value = [];
-      getArguments();
+      const index = selected.value?.type.findIndex(
+        (tp) => tp.iri === IM.INDICATOR,
+      );
+      if (index === -1) {
+        getArguments();
+      }
     }
   },
   { deep: true },
