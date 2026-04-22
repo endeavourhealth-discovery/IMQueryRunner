@@ -30,7 +30,7 @@ export default defineNuxtPlugin(nuxtApp => {
 
     getUser: async (): Promise<User> => {
       const headers = useRequestHeaders();
-      const response = await $fetch<User>("/api/auth/getUser", {
+      const response = await $fetch<User>("/api/auth/user", {
         headers: headers
       });
       return response;
