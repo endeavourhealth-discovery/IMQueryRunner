@@ -1,6 +1,7 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import QueryService from "~~/server/services/QueryService";
+
+import * as z from "zod";
 
 const bodySchema = z.any();
 
@@ -8,21 +9,19 @@ defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Flatten booleans",
-    parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
-    ],
+    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
         "application/json": {
           schema: {
             type: "object",
-            summary: "Flatten booleans within a query",
-          },
-        },
-      },
-    },
-  },
+            summary: "Flatten booleans within a query"
+          }
+        }
+      }
+    }
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

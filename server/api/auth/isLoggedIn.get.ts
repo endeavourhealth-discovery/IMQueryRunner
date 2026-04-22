@@ -7,15 +7,12 @@ export default defineEventHandler(async (event): Promise<boolean> => {
   const clientIp = getIp(event);
 
   try {
-    const user = await $fetch<string>(
-      `${EndSecHost}/api/${EndSecApp}/authn/getUser`,
-      {
-        headers: { "x-client-ip": clientIp },
-        query: {
-          sessionId: sessionId,
-        },
-      },
-    );
+    const user = await $fetch<string>(`${EndSecHost}/api/${EndSecApp}/authn/getUser`, {
+      headers: { "x-client-ip": clientIp },
+      query: {
+        sessionId: sessionId
+      }
+    });
     if (user) return true;
     return false;
   } catch (e: any) {

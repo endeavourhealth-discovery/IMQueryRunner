@@ -1,6 +1,7 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import SetService from "~~/server/services/SetService";
+
+import * as z from "zod";
 
 const bodySchema = z.object({
   ownRow: z.boolean().default(false),
@@ -13,17 +14,15 @@ const bodySchema = z.object({
     includeDefinition: z.boolean().default(false),
     includeCore: z.boolean().default(false),
     includeLegacy: z.boolean().default(false),
-    includeSubsets: z.boolean().default(false),
-  }),
+    includeSubsets: z.boolean().default(false)
+  })
 });
 
 defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Get members from query",
-    parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
-    ],
+    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
@@ -34,57 +33,57 @@ defineRouteMeta({
             properties: {
               ownRow: {
                 type: "boolean",
-                default: false,
+                default: false
               },
               format: {
-                type: "string",
+                type: "string"
               },
               options: {
                 type: "object",
                 properties: {
                   setIri: {
-                    type: "string",
+                    type: "string"
                   },
                   schemes: {
                     type: "array",
                     items: { type: "string" },
-                    default: [],
+                    default: []
                   },
                   includeIM1id: {
                     type: "boolean",
-                    default: false,
+                    default: false
                   },
                   subsumptions: {
                     type: "array",
                     items: { type: "string" },
-                    default: [],
+                    default: []
                   },
                   includeDefinition: {
                     type: "boolean",
-                    default: false,
+                    default: false
                   },
                   includeCore: {
                     type: "boolean",
-                    default: false,
+                    default: false
                   },
                   includeLegacy: {
                     type: "boolean",
-                    default: false,
+                    default: false
                   },
                   includeSubsets: {
                     type: "boolean",
-                    default: false,
-                  },
+                    default: false
+                  }
                 },
-                required: ["setIri"],
-              },
+                required: ["setIri"]
+              }
             },
-            required: ["format", "options"],
-          },
-        },
-      },
-    },
-  },
+            required: ["format", "options"]
+          }
+        }
+      }
+    }
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

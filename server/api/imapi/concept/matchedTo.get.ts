@@ -1,9 +1,10 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import ConceptService from "~~/server/services/ConceptService";
 
+import * as z from "zod";
+
 const paramSchema = z.object({
-  iri: z.string(),
+  iri: z.string()
 });
 
 defineRouteMeta({
@@ -12,9 +13,9 @@ defineRouteMeta({
     description: "Get matchedTo of a given entity",
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
-      { name: "iri", description: "Iri of the entity", in: "query" },
-    ],
-  },
+      { name: "iri", description: "Iri of the entity", in: "query" }
+    ]
+  }
 });
 export default defineEventHandler(async (event): Promise<any> => {
   const sessionId = getCookie(event, "session_id")!;

@@ -8,7 +8,7 @@
       width: '90vw',
       height: '90vh',
       minWidth: '90vw',
-      minHeight: '90vh',
+      minHeight: '90vh'
     }"
     class="argument-selector"
     :pt="{ content: { class: 'flex-auto' } }"
@@ -26,8 +26,9 @@
 </template>
 
 <script setup lang="ts">
-import ArgumentDisplay from "@/components/queryRunner/ArgumentDisplay.vue";
 import { type Argument, type ArgumentReference } from "vue-library/interfaces";
+
+import ArgumentDisplay from "@/components/queryRunner/ArgumentDisplay.vue";
 
 interface Props {
   arguments: ArgumentReference[] | undefined;

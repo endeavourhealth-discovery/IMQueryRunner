@@ -1,9 +1,10 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import FilerService from "~~/server/services/FilerService";
 
+import * as z from "zod";
+
 const paramSchema = z.object({
-  taskId: z.string(),
+  taskId: z.string()
 });
 
 defineRouteMeta({
@@ -12,9 +13,9 @@ defineRouteMeta({
     description: "Get task progress",
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
-      { name: "taskId", description: "Id of the task", in: "path" },
-    ],
-  },
+      { name: "taskId", description: "Id of the task", in: "path" }
+    ]
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

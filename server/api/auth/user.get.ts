@@ -1,5 +1,6 @@
-import { type User } from "vue-library/models";
 import { getIp } from "~~/server/helpers/getIp";
+
+import { type User } from "vue-library/models";
 
 export default defineEventHandler(async (event): Promise<User> => {
   const sessionId = getCookie(event, "session_id");
@@ -10,7 +11,7 @@ export default defineEventHandler(async (event): Promise<User> => {
   return await $fetch<User>(`${EndSecHost}/api/${EndSecApp}/authn/getUser`, {
     headers: { "x-client-ip": clientIp },
     query: {
-      sessionId: sessionId,
-    },
+      sessionId: sessionId
+    }
   });
 });

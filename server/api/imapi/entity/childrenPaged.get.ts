@@ -1,14 +1,15 @@
-import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
-import EntityService from "~~/server/services/EntityService";
 import { filterOptionsSchema } from "~~/models/filterOptions.schema";
+import { getQueryParams } from "~~/server/helpers/getQueryParams";
+import EntityService from "~~/server/services/EntityService";
+
+import * as z from "zod";
 
 const paramSchema = z.object({
   iri: z.string(),
   page: z.number(),
   size: z.number(),
   schemeIris: z.string().optional(),
-  typeFilter: z.string().optional(),
+  typeFilter: z.string().optional()
 });
 
 defineRouteMeta({
@@ -20,35 +21,26 @@ defineRouteMeta({
       {
         name: "iri",
         description: "Entity iri",
-        in: "query",
+        in: "query"
       },
       { name: "page", description: "Page number", in: "query" },
       { name: "size", description: "Page size", in: "query" },
       {
         name: "schemeIris",
         description: "Optional scheme filters as comma separated string",
-        in: "query",
+        in: "query"
       },
       {
         name: "typeFilter",
         description: "Optional type filter as comma separated string",
-        in: "query",
-      },
-    ],
-  },
+        in: "query"
+      }
+    ]
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {
   const sessionId = getCookie(event, "session_id")!;
-  const { iri, page, size, schemeIris, typeFilter } = await getQueryParams(
-    event,
-    paramSchema.parse,
-  );
-  return await EntityService.getPagedChildren(
-    sessionId,
-    iri,
-    page,
-    size,
-    schemeIris?.split(","),
-  );
+  const { iri, page, size, schemeIris, typeFilter } = await getQueryParams(event, paramSchema.parse);
+  return await EntityService.getPagedChildren(sessionId, iri, page, size, schemeIris?.split(","));
 });

@@ -1,11 +1,13 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import QueryService from "~~/server/services/QueryService";
+
 import { DisplayMode } from "vue-library/enums";
+
+import * as z from "zod";
 
 const paramSchema = z.object({
   iri: z.string(),
-  displayMode: z.enum(DisplayMode),
+  displayMode: z.enum(DisplayMode)
 });
 
 defineRouteMeta({
@@ -17,15 +19,15 @@ defineRouteMeta({
       {
         name: "iri",
         description: "Query iri",
-        in: "query",
+        in: "query"
       },
       {
         name: "Display mode",
         description: "Mode to return the display",
-        in: "query",
-      },
-    ],
-  },
+        in: "query"
+      }
+    ]
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

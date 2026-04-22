@@ -1,10 +1,11 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import EntityService from "~~/server/services/EntityService";
+
+import * as z from "zod";
 
 const paramSchema = z.object({
   descendant: z.string(),
-  ancestor: z.string(),
+  ancestor: z.string()
 });
 
 defineRouteMeta({
@@ -16,26 +17,19 @@ defineRouteMeta({
       {
         name: "descendant",
         description: "Descendant iri",
-        in: "query",
+        in: "query"
       },
       {
         name: "ancestor",
         description: "Ancestor iri",
-        in: "query",
-      },
-    ],
-  },
+        in: "query"
+      }
+    ]
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {
   const sessionId = getCookie(event, "session_id")!;
-  const { descendant, ancestor } = await getQueryParams(
-    event,
-    paramSchema.parse,
-  );
-  return await EntityService.getPathBetweenNodes(
-    sessionId,
-    descendant,
-    ancestor,
-  );
+  const { descendant, ancestor } = await getQueryParams(event, paramSchema.parse);
+  return await EntityService.getPathBetweenNodes(sessionId, descendant, ancestor);
 });

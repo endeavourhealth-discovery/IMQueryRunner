@@ -1,33 +1,33 @@
-import { Connection } from "rabbitmq-client";
 import { JobStatus } from "~~/enums";
-import { postgresDb } from "~~/server/db/postgres";
-import { eq } from "drizzle-orm";
-import { jobTable } from "~~/server/db/postgres/schema";
-import type { QueryRequest } from "vue-library/interfaces";
-import { executeQuery } from "../utils/executeQuery";
 import type { Job } from "~~/models/job.schema";
+import { postgresDb } from "~~/server/db/postgres";
+import { jobTable } from "~~/server/db/postgres/schema";
+
+import type { QueryRequest } from "vue-library/interfaces";
 import type { User } from "vue-library/models";
+
+import { eq } from "drizzle-orm";
+import { Connection } from "rabbitmq-client";
+
 import QueryService from "../services/QueryService";
+import { executeQuery } from "../utils/executeQuery";
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
-rabbit.on("error", (err) => {});
+rabbit.on("error", err => {});
 rabbit.on("connection", () => {});
 
 let sessionId: string | undefined = undefined;
 async function getSession() {
   if (!sessionId) {
-    const response = await $fetch<{ sessionId: string; user: User }>(
-      "/api/auth/machineLogin",
-      {
-        query: {
-          clientId: process.env.CLIENT_ID,
-          clientSecret: process.env.CLIENT_SECRET,
-        },
-        headers: {
-          "X-IGNORE-IP": "true",
-        },
+    const response = await $fetch<{ sessionId: string; user: User }>("/api/auth/machineLogin", {
+      query: {
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET
       },
-    );
+      headers: {
+        "X-IGNORE-IP": "true"
+      }
+    });
     sessionId = response.sessionId;
   }
   return sessionId;
@@ -43,14 +43,14 @@ const sub = rabbit.createConsumer(
       {
         exchange: "query_runner",
         routingKey: "query.execute.#",
-        queue: "query.execute",
-      },
-    ],
+        queue: "query.execute"
+      }
+    ]
   },
-  async (msg) => {
+  async msg => {
     const id = msg.messageId!;
     const job = await postgresDb.query.jobTable.findFirst({
-      where: eq(jobTable.dbid, id),
+      where: eq(jobTable.dbid, id)
     });
     if (job && JobStatus.CANCELLED === job.status) {
       throw new Error("Item is cancelled. Query rejected.");
@@ -63,22 +63,19 @@ const sub = rabbit.createConsumer(
       .update(jobTable)
       .set({
         status: JobStatus.RUNNING,
-        runDate: new Date().toISOString(),
+        runDate: new Date().toISOString()
       })
       .where(eq(jobTable.dbid, id));
     const parsedJob = JSON.parse(msg.body);
     const queryRequest: QueryRequest = parsedJob.queryRequest;
-    let sql: string | undefined = await QueryService.generateQuerySQLfromQuery(
-      await getSession(),
-      queryRequest,
-    ).catch(async (err) => {
+    let sql: string | undefined = await QueryService.generateQuerySQLfromQuery(await getSession(), queryRequest).catch(async err => {
       console.error(err);
       await postgresDb
         .update(jobTable)
         .set({
           status: JobStatus.ERRORED,
           error: JSON.stringify(err),
-          finishDate: new Date().toISOString(),
+          finishDate: new Date().toISOString()
         })
         .where(eq(jobTable.dbid, id));
       return undefined;
@@ -88,17 +85,13 @@ const sub = rabbit.createConsumer(
     }
 
     try {
-      const { insertId, hashCode } = await executeQuery(
-        await getSession(),
-        sql,
-        queryRequest,
-      );
+      const { insertId, hashCode } = await executeQuery(await getSession(), sql, queryRequest);
       await postgresDb
         .update(jobTable)
         .set({
           pid: insertId,
           status: JobStatus.COMPLETED,
-          finishDate: new Date().toISOString(),
+          finishDate: new Date().toISOString()
         })
         .where(eq(jobTable.dbid, id));
     } catch (err) {
@@ -107,19 +100,19 @@ const sub = rabbit.createConsumer(
         .set({
           status: JobStatus.ERRORED,
           error: JSON.stringify(err),
-          finishDate: new Date().toISOString(),
+          finishDate: new Date().toISOString()
         })
         .where(eq(jobTable.dbid, id));
     }
-  },
+  }
 );
 
-sub.on("error", (err) => {});
+sub.on("error", err => {});
 
 const pub = rabbit.createPublisher({
   confirm: true,
   maxAttempts: 2,
-  exchanges: [{ exchange: "query_runner", type: "topic", durable: true }],
+  exchanges: [{ exchange: "query_runner", type: "topic", durable: true }]
 });
 
 export async function sendMessage(userId: string, message: Job) {
@@ -128,9 +121,9 @@ export async function sendMessage(userId: string, message: Job) {
       messageId: message.dbid,
       exchange: "query_runner",
       routingKey: "query.execute." + userId,
-      durable: true,
+      durable: true
     },
-    JSON.stringify(message),
+    JSON.stringify(message)
   );
   return message.dbid;
 }

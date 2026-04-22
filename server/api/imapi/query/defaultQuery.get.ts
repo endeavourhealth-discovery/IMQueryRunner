@@ -1,15 +1,14 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
 import QueryService from "~~/server/services/QueryService";
+
 import { DisplayMode } from "vue-library/enums";
 
 defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Get query display",
-    parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
-    ],
-  },
+    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }]
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

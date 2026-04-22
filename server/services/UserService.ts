@@ -1,52 +1,40 @@
+import { PrimeVueColors, PrimeVuePresetThemes } from "vue-library/enums";
+import type { NamespacePermissionJava, RecentActivityItemDto } from "vue-library/interfaces";
 import { User } from "vue-library/models";
-import { PrimeVuePresetThemes, PrimeVueColors } from "vue-library/enums";
-import type {
-  NamespacePermissionJava,
-  RecentActivityItemDto,
-} from "vue-library/interfaces";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}user/private`;
 
 const UserService = {
-  async updateUserPreset(
-    sessionId: string,
-    preset: PrimeVuePresetThemes,
-  ): Promise<User> {
+  async updateUserPreset(sessionId: string, preset: PrimeVuePresetThemes): Promise<User> {
     return await $fetch<User>(API_URL + "/preset", {
       headers: {
         cookie: `session_id=${sessionId}`,
-        "Content-Type": "text/plain",
+        "Content-Type": "text/plain"
       },
       body: preset,
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async updateUserPrimaryColor(
-    sessionId: string,
-    color: PrimeVueColors,
-  ): Promise<User> {
+  async updateUserPrimaryColor(sessionId: string, color: PrimeVueColors): Promise<User> {
     return await $fetch<User>(API_URL + "/primaryColor", {
       body: color,
       headers: {
         "Content-Type": "text/plain",
-        cookie: `session_id=${sessionId}`,
+        cookie: `session_id=${sessionId}`
       },
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async updateUserSurfaceColor(
-    sessionId: string,
-    color: PrimeVueColors,
-  ): Promise<User> {
+  async updateUserSurfaceColor(sessionId: string, color: PrimeVueColors): Promise<User> {
     return await $fetch<User>(API_URL + "/surfaceColor", {
       body: color,
       headers: {
         "Content-Type": "text/plain",
-        cookie: `session_id=${sessionId}`,
+        cookie: `session_id=${sessionId}`
       },
-      method: "POST",
+      method: "POST"
     });
   },
 
@@ -54,7 +42,7 @@ const UserService = {
     return await $fetch<User>(API_URL + "/darkMode", {
       headers: { cookie: `session_id=${sessionId}` },
       body: { bool: bool },
-      method: "POST",
+      method: "POST"
     });
   },
 
@@ -63,55 +51,43 @@ const UserService = {
       body: fontSize,
       headers: {
         "Content-Type": "text/plain",
-        cookie: `session_id=${sessionId}`,
+        cookie: `session_id=${sessionId}`
       },
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async updateUserRecentActivity(
-    sessionId: string,
-    recentActivity: RecentActivityItemDto[],
-  ): Promise<User> {
+  async updateUserRecentActivity(sessionId: string, recentActivity: RecentActivityItemDto[]): Promise<User> {
     return await $fetch<User>(API_URL + "/recentActivity", {
       headers: { cookie: `session_id=${sessionId}` },
       body: recentActivity,
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async updateUserFavourites(
-    sessionId: string,
-    favourites: string[],
-  ): Promise<User> {
+  async updateUserFavourites(sessionId: string, favourites: string[]): Promise<User> {
     return await $fetch<User>(API_URL + "/favourites", {
       headers: { cookie: `session_id=${sessionId}` },
       body: favourites,
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async updateUserOrganisations(
-    sessionId: string,
-    organisations: string[],
-  ): Promise<User> {
+  async updateUserOrganisations(sessionId: string, organisations: string[]): Promise<User> {
     return await $fetch<User>(API_URL + "/organisations", {
       headers: { cookie: `session_id=${sessionId}` },
       body: organisations,
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async updateUserNamespaces(
-    sessionId: string,
-    namespaces: NamespacePermissionJava[],
-  ): Promise<User> {
+  async updateUserNamespaces(sessionId: string, namespaces: NamespacePermissionJava[]): Promise<User> {
     return await $fetch<User>(API_URL + "/namespaces", {
       headers: { cookie: `session_id=${sessionId}` },
       body: namespaces,
-      method: "POST",
+      method: "POST"
     });
-  },
+  }
 };
 
 if (process.env.NODE_ENV !== "test") Object.freeze(UserService);

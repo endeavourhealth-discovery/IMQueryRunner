@@ -1,13 +1,5 @@
-import type {
-  ECLQueryRequest,
-  Node,
-  Pageable,
-  Query,
-  SetDiffObject,
-  SetExportRequest,
-  TTEntity,
-  TTIriRef,
-} from "vue-library/interfaces";
+import type { ECLQueryRequest, Node, Pageable, Query, SetDiffObject, SetExportRequest, TTEntity, TTIriRef } from "vue-library/interfaces";
+
 const API_URL = `${useRuntimeConfig().public.imapiUrl}set`;
 
 const SetService = {
@@ -15,7 +7,7 @@ const SetService = {
     return await $fetch<void>(API_URL + "/private/publish", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: conceptIri },
-      method: "GET",
+      method: "GET"
     });
   },
 
@@ -24,96 +16,72 @@ const SetService = {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: conceptIri },
       responseType: "blob",
-      method: "GET",
+      method: "GET"
     });
   },
-  async getMembers(
-    sessionId: string,
-    iri: string,
-    entailments: boolean,
-    pageIndex: number,
-    pageSize: number,
-  ): Promise<Pageable<Node>> {
+  async getMembers(sessionId: string, iri: string, entailments: boolean, pageIndex: number, pageSize: number): Promise<Pageable<Node>> {
     return await $fetch<Pageable<Node>>(API_URL + "/protected/members", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
         entailments: entailments,
         page: pageIndex,
-        size: pageSize,
+        size: pageSize
       },
-      method: "GET",
+      method: "GET"
     });
   },
 
-  async getMembersFromQuery(
-    sessionId: string,
-    query: Query,
-    pageIndex: number,
-    pageSize: number,
-  ): Promise<Pageable<Node>> {
+  async getMembersFromQuery(sessionId: string, query: Query, pageIndex: number, pageSize: number): Promise<Pageable<Node>> {
     const request = {
       query: query,
       page: pageIndex,
-      size: pageSize,
+      size: pageSize
     } as ECLQueryRequest;
-    return await $fetch<Pageable<Node>>(
-      API_URL + "/protected/membersFromQuery",
-      {
-        headers: { cookie: `session_id=${sessionId}` },
-        body: request,
-        method: "POST",
-      },
-    );
+    return await $fetch<Pageable<Node>>(API_URL + "/protected/membersFromQuery", {
+      headers: { cookie: `session_id=${sessionId}` },
+      body: request,
+      method: "POST"
+    });
   },
 
   async getSubsets(sessionId: string, iri: string): Promise<TTIriRef[]> {
     return await $fetch<TTIriRef[]>(API_URL + "/protected/subsets", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
-        iri: iri,
+        iri: iri
       },
-      method: "GET",
+      method: "GET"
     });
   },
 
-  async getFullExportSet(
-    sessionId: string,
-    setRequest: SetExportRequest,
-  ): Promise<Blob> {
+  async getFullExportSet(sessionId: string, setRequest: SetExportRequest): Promise<Blob> {
     return await $fetch<Blob>(API_URL + "/protected/setExport", {
       headers: { cookie: `session_id=${sessionId}` },
       body: setRequest,
       responseType: "blob",
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async getSetComparison(
-    sessionId: string,
-    iriA?: string,
-    iriB?: string,
-  ): Promise<SetDiffObject> {
+  async getSetComparison(sessionId: string, iriA?: string, iriB?: string): Promise<SetDiffObject> {
     return await $fetch<SetDiffObject>(API_URL + "/protected/setDiff", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         setIriA: iriA,
-        setIriB: iriB,
+        setIriB: iriB
       },
-      method: "GET",
+      method: "GET"
     });
   },
 
-  async updateSubsetsFromSuper(
-    sessionId: string,
-    entity: TTEntity,
-  ): Promise<void> {
+  async updateSubsetsFromSuper(sessionId: string, entity: TTEntity): Promise<void> {
     return await $fetch<void>(API_URL + "/private/updateSubsetsFromSuper", {
       headers: { cookie: `session_id=${sessionId}` },
       body: entity,
-      method: "POST",
+      method: "POST"
     });
-  },
+  }
 };
 
 if (process.env.NODE_ENV !== "test") Object.freeze(SetService);

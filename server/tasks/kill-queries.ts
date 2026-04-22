@@ -1,7 +1,8 @@
-import mysql from 'mysql2';
 import Logger from "#shared/logger";
 
-const LOG = Logger("server/tasks/kill-queries")
+import mysql from "mysql2";
+
+const LOG = Logger("server/tasks/kill-queries");
 
 type ProcessRow = {
   Id: number;
@@ -18,15 +19,15 @@ const db = mysql.createPool(process.env.COMPASS_URL as string);
 
 export default defineTask({
   meta: {
-    name: 'timeout-query-connections',
-    description: `Kills running for more than ${process.env.QUERY_KILL_TIMEOUT} seconds`,
+    name: "timeout-query-connections",
+    description: `Kills running for more than ${process.env.QUERY_KILL_TIMEOUT} seconds`
   },
   run() {
     if (process.env.QUERY_KILL_TIMEOUT) {
-      let user = process.env.COMPASS_URL!.split('mysql://').pop();
-      user = user!.split(':')[0];
+      let user = process.env.COMPASS_URL!.split("mysql://").pop();
+      user = user!.split(":")[0];
 
-      const showSql = `SHOW PROCESSLIST`
+      const showSql = `SHOW PROCESSLIST`;
 
       db.query(showSql, (err, results) => {
         if (err) {
@@ -36,10 +37,10 @@ export default defineTask({
 
         const processes = results as ProcessRow[];
 
-        processes.forEach((p) => {
-          if (p.Time > parseInt(process.env.QUERY_KILL_TIMEOUT!) && p.Command === 'Query' && p.State !== 'Sleep' && p.User === user) {
+        processes.forEach(p => {
+          if (p.Time > parseInt(process.env.QUERY_KILL_TIMEOUT!) && p.Command === "Query" && p.State !== "Sleep" && p.User === user) {
             const killSql = `KILL QUERY ${p.Id}`;
-            db.query(killSql, (err) => {
+            db.query(killSql, err => {
               if (err) {
                 LOG.error(err);
               } else {
@@ -50,6 +51,6 @@ export default defineTask({
         });
       });
     }
-    return {result: 'executed'};
-  },
+    return { result: "executed" };
+  }
 });

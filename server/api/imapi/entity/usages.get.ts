@@ -1,11 +1,12 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import EntityService from "~~/server/services/EntityService";
+
+import * as z from "zod";
 
 const paramSchema = z.object({
   iri: z.string(),
   page: z.number(),
-  size: z.number(),
+  size: z.number()
 });
 
 defineRouteMeta({
@@ -17,16 +18,16 @@ defineRouteMeta({
       {
         name: "iri",
         description: "Entity iri",
-        in: "query",
+        in: "query"
       },
       {
         name: "page",
         description: "Page size",
-        in: "query",
+        in: "query"
       },
-      { name: "size", description: "Page size", in: "query" },
-    ],
-  },
+      { name: "size", description: "Page size", in: "query" }
+    ]
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

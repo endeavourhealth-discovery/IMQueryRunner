@@ -1,11 +1,12 @@
-import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
-import EntityService from "~~/server/services/EntityService";
 import { filterOptionsSchema } from "~~/models/filterOptions.schema";
+import { getQueryParams } from "~~/server/helpers/getQueryParams";
+import EntityService from "~~/server/services/EntityService";
+
+import * as z from "zod";
 
 const paramSchema = z.object({
   iri: z.string(),
-  schemeIris: z.string().optional(),
+  schemeIris: z.string().optional()
 });
 
 defineRouteMeta({
@@ -17,23 +18,19 @@ defineRouteMeta({
       {
         name: "iri",
         description: "Entity iri",
-        in: "query",
+        in: "query"
       },
       {
         name: "schemeIris",
         description: "Optional scheme filters as comma separated string",
-        in: "query",
-      },
-    ],
-  },
+        in: "query"
+      }
+    ]
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {
   const sessionId = getCookie(event, "session_id")!;
   const { iri, schemeIris } = await getQueryParams(event, paramSchema.parse);
-  return await EntityService.getEntityChildren(
-    sessionId,
-    iri,
-    schemeIris?.split(","),
-  );
+  return await EntityService.getEntityChildren(sessionId, iri, schemeIris?.split(","));
 });

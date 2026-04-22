@@ -1,28 +1,12 @@
 <template>
-  <div
-    class="h-[3.5rem] flex flex-row flex-nowrap justify-start items-center border-b border-solid border-(--p-content-border-color)"
-  >
-    <div
-      id="header-start"
-      class="h-full flex-initial flex flex-row justify-center items-center"
-    >
-      <img
-        class="cursor-pointer w-[2.25rem] ml-[0.5rem] mr-[0.5rem]"
-        src="/Logo-object-empty.png"
-        alt="IM logo"
-        v-on:click="toLandingPage"
-      />
+  <div class="h-[3.5rem] flex flex-row flex-nowrap justify-start items-center border-b border-solid border-(--p-content-border-color)">
+    <div id="header-start" class="h-full flex-initial flex flex-row justify-center items-center">
+      <img class="cursor-pointer w-[2.25rem] ml-[0.5rem] mr-[0.5rem]" src="/Logo-object-empty.png" alt="IM logo" v-on:click="toLandingPage" />
     </div>
-    <div
-      id="header-content"
-      class="h-full flex-grow-1 flex-shrink-1 flex-auto flex flex-row justify-center items-center"
-    >
+    <div id="header-content" class="h-full flex-grow-1 flex-shrink-1 flex-auto flex flex-row justify-center items-center">
       <slot name="content" />
     </div>
-    <div
-      id="header-end"
-      class="h-full flex-grow-0 flex-shrink-1 flex-auto flex flex-row items-center justify-self-end justify-end gap-[0.25rem]"
-    >
+    <div id="header-end" class="h-full flex-grow-0 flex-shrink-1 flex-auto flex flex-row items-center justify-self-end justify-end gap-[0.25rem]">
       {{ user?.username }}
       <Button
         v-tooltip.left="'Account'"
@@ -44,19 +28,9 @@
         aria-controls="overlay_menu"
         data-testid="account-menu-logged-in"
       >
-        <img
-          class="avatar-i con"
-          alt="avatar icon"
-          :src="user?.avatar"
-          style="min-width: 1.75rem"
-        />
+        <img class="avatar-i con" alt="avatar icon" :src="user?.avatar" style="min-width: 1.75rem" />
       </Button>
-      <TieredMenu
-        ref="userMenu"
-        id="account-menu"
-        :model="getItems()"
-        :popup="true"
-      >
+      <TieredMenu ref="userMenu" id="account-menu" :model="getItems()" :popup="true">
         <template #item="{ item, props }">
           <div>
             <span :class="item.icon" />
@@ -69,8 +43,9 @@
 </template>
 
 <script setup lang="ts">
-import type { MenuItem } from "primevue/menuitem";
 import { useUserStore } from "~/stores/useUserStore";
+
+import type { MenuItem } from "primevue/menuitem";
 
 const userStore = useUserStore();
 
@@ -104,8 +79,8 @@ function setUserMenuItems(): void {
       icon: "fa-solid fa-fw fa-user",
       command: async () => {
         await globalThis.uiGuard.login();
-      },
-    },
+      }
+    }
   ];
   accountItems.value = [
     {
@@ -113,15 +88,15 @@ function setUserMenuItems(): void {
       icon: "fa-solid fa-fw fa-cog",
       command: async () => {
         await globalThis.uiGuard.profile();
-      },
+      }
     },
     {
       label: "Logout",
       icon: "fa-solid fa-fw fa-arrow-right-from-bracket",
       command: async () => {
         await globalThis.uiGuard.logout();
-      },
-    },
+      }
+    }
   ];
 }
 </script>

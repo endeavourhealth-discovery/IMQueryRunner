@@ -1,19 +1,18 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import EclService from "~~/server/services/EclService";
+
+import * as z from "zod";
 
 const bodySchema = z.object({
   ecl: z.string(),
-  showNames: z.boolean(),
+  showNames: z.boolean()
 });
 
 defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Validate model using ecl",
-    parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
-    ],
+    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       content: {
         "application/json": {
@@ -22,18 +21,18 @@ defineRouteMeta({
             summary: "Ecl model validation request",
             properties: {
               ecl: {
-                type: "string",
+                type: "string"
               },
               showNames: {
-                type: "boolean",
-              },
+                type: "boolean"
+              }
             },
-            required: ["ecl"],
-          },
-        },
-      },
-    },
-  },
+            required: ["ecl"]
+          }
+        }
+      }
+    }
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

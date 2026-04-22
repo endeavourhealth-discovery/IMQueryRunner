@@ -1,9 +1,10 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import EntityService from "~~/server/services/EntityService";
 
+import * as z from "zod";
+
 const paramSchema = z.object({
-  iris: z.string(),
+  iris: z.string()
 });
 
 defineRouteMeta({
@@ -15,17 +16,14 @@ defineRouteMeta({
       {
         name: "iris",
         description: "Entity iris as comma separated string",
-        in: "query",
-      },
-    ],
-  },
+        in: "query"
+      }
+    ]
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {
   const sessionId = getCookie(event, "session_id")!;
   const { iris } = await getQueryParams(event, paramSchema.parse);
-  return await EntityService.getAsEntityReferenceNodes(
-    sessionId,
-    iris.split(","),
-  );
+  return await EntityService.getAsEntityReferenceNodes(sessionId, iris.split(","));
 });

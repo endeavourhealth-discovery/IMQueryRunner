@@ -1,12 +1,13 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import EntityService from "~~/server/services/EntityService";
+
+import * as z from "zod";
 
 defineRouteMeta({
   openAPI: {
     tags: ["query"],
-    description: "Get namespaces",
-  },
+    description: "Get namespaces"
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

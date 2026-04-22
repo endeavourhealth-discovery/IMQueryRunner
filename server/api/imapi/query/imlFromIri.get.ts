@@ -1,10 +1,12 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import QueryService from "~~/server/services/QueryService";
+
 import { DisplayMode } from "vue-library/enums";
 
+import * as z from "zod";
+
 const paramSchema = z.object({
-  queryIri: z.string(),
+  queryIri: z.string()
 });
 
 defineRouteMeta({
@@ -16,10 +18,10 @@ defineRouteMeta({
       {
         name: "queryIri",
         description: "Query iri",
-        in: "query",
-      },
-    ],
-  },
+        in: "query"
+      }
+    ]
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

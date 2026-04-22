@@ -1,5 +1,6 @@
-import { isArray } from "lodash-es";
 import { useUserStore } from "~/stores/useUserStore";
+
+import { isArray } from "lodash-es";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { requiresAuth, requiresRole } = to.meta;
@@ -14,7 +15,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       } else return globalThis.uiGuard.login();
     }
 
-    if (!userStore.hasRole(requiresRole as string[]))
-      return navigateTo("/unauthorized");
+    if (!userStore.hasRole(requiresRole as string[])) return navigateTo("/unauthorized");
   }
 });

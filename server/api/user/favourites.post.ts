@@ -6,9 +6,7 @@ defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Update user favourites",
-    parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
-    ],
+    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
@@ -17,13 +15,13 @@ defineRouteMeta({
             type: "array",
             summary: "Favourites",
             items: {
-              type: "string",
-            },
-          },
-        },
-      },
-    },
-  },
+              type: "string"
+            }
+          }
+        }
+      }
+    }
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

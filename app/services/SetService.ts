@@ -1,97 +1,76 @@
-import type {
-  ECLQueryRequest,
-  Node,
-  Pageable,
-  Query,
-  SetDiffObject,
-  SetExportRequest,
-  TTEntity,
-  TTIriRef,
-} from "vue-library/interfaces";
+import type { ECLQueryRequest, Node, Pageable, Query, SetDiffObject, SetExportRequest, TTEntity, TTIriRef } from "vue-library/interfaces";
+
 const API_URL = +"api/imapi/set";
 
 const SetService = {
   async publish(conceptIri: string): Promise<void> {
-    return await $fetch(API_URL + "/private/publish", {
+    return await $fetch<void>(API_URL + "/private/publish", {
       params: { iri: conceptIri },
-      method: "GET",
+      method: "GET"
     });
   },
 
   async IMV1(conceptIri: string, raw?: boolean): Promise<Blob> {
-    return await $fetch(API_URL + "/protected/export", {
+    return await $fetch<Blob>(API_URL + "/protected/export", {
       params: { iri: conceptIri },
       responseType: "blob",
-      raw: raw,
-      method: "GET",
+      ignoreResponseError: raw,
+      method: "GET"
     });
   },
 
-  async getMembers(
-    iri: string,
-    entailments: boolean,
-    pageIndex: number,
-    pageSize: number,
-    controller?: AbortController,
-  ): Promise<Pageable<Node>> {
-    return await $fetch(API_URL + "/protected/members", {
+  async getMembers(iri: string, entailments: boolean, pageIndex: number, pageSize: number, controller?: AbortController): Promise<Pageable<Node>> {
+    return await $fetch<Pageable<Node>>(API_URL + "/protected/members", {
       params: {
         iri: iri,
         entailments: entailments,
         page: pageIndex,
-        size: pageSize,
+        size: pageSize
       },
       signal: controller?.signal,
-      method: "GET",
+      method: "GET"
     });
   },
 
-  async getMembersFromQuery(
-    query: Query,
-    pageIndex: number,
-    pageSize: number,
-  ): Promise<Pageable<Node>> {
+  async getMembersFromQuery(query: Query, pageIndex: number, pageSize: number): Promise<Pageable<Node>> {
     const request = {
       query: query,
       page: pageIndex,
-      size: pageSize,
+      size: pageSize
     } as ECLQueryRequest;
-    return await $fetch(API_URL + "/protected/membersFromQuery", {
+    return await $fetch<Pageable<Node>>(API_URL + "/protected/membersFromQuery", {
       body: request,
-      method: "POST",
+      method: "POST"
     });
   },
 
   async getSubsets(iri: string): Promise<TTIriRef[]> {
-    return await $fetch(API_URL + "/protected/subsets", {
+    return await $fetch<TTIriRef[]>(API_URL + "/protected/subsets", {
       params: {
-        iri: iri,
+        iri: iri
       },
-      method: "GET",
+      method: "GET"
     });
   },
 
-  async getFullExportSet(
-    setRequest: SetExportRequest,
-    raw?: boolean,
-  ): Promise<Blob> {
-    return await $fetch(API_URL + "/protected/setExport", {
+  async getFullExportSet(setRequest: SetExportRequest, raw?: boolean): Promise<Blob> {
+    return await $fetch<Blob>(API_URL + "/protected/setExport", {
       body: setRequest,
       responseType: "blob",
-      raw: raw,
-      method: "POST",
+      ignoreResponseError: raw,
+      method: "POST"
     });
   },
 
   async getSetComparison(iriA?: string, iriB?: string): Promise<SetDiffObject> {
-    return await $fetch(API_URL + "/protected/setDiff", {
+    return await $fetch<SetDiffObject>(API_URL + "/protected/setDiff", {
       params: {
         setIriA: iriA,
-        setIriB: iriB,
+        setIriB: iriB
       },
-      method: "GET",
+      method: "GET"
     });
-  },
+  }
 };
 
 if (process.env.NODE_ENV !== "test") Object.freeze(SetService);

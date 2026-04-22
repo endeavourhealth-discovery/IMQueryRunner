@@ -1,5 +1,6 @@
-import * as z from "zod";
 import { PrimeVuePresetThemes } from "vue-library/enums";
+
+import * as z from "zod";
 
 const bodySchema = z.array(z.string());
 
@@ -7,9 +8,7 @@ defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Update user organisations",
-    parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
-    ],
+    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
@@ -19,13 +18,13 @@ defineRouteMeta({
             summary: "Organisations list",
             items: {
               type: "string",
-              description: "Organisation iri",
-            },
-          },
-        },
-      },
-    },
-  },
+              description: "Organisation iri"
+            }
+          }
+        }
+      }
+    }
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

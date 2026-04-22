@@ -1,10 +1,11 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import SetService from "~~/server/services/SetService";
+
+import * as z from "zod";
 
 const paramSchema = z.object({
   iriA: z.string(),
-  iriB: z.string(),
+  iriB: z.string()
 });
 
 defineRouteMeta({
@@ -16,15 +17,15 @@ defineRouteMeta({
       {
         name: "iriA",
         description: "Set iri a",
-        in: "query",
+        in: "query"
       },
       {
         name: "iriB",
         description: "Set iri b",
-        in: "query",
-      },
-    ],
-  },
+        in: "query"
+      }
+    ]
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

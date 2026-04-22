@@ -1,51 +1,39 @@
-import type {
-  Query,
-  SearchResponse,
-  ECLQueryRequest,
-} from "vue-library/interfaces";
+import type { ECLQueryRequest, Query, SearchResponse } from "vue-library/interfaces";
 
 const API_URL = +"api/imapi/ecl";
 
 const EclService = {
-  async ECLSearch(
-    eclSearchRequest: ECLQueryRequest,
-    controller?: AbortController,
-  ): Promise<SearchResponse> {
-    const results: SearchResponse = await $fetch<SearchResponse>(
-      API_URL + "/eclSearch",
-      { body: eclSearchRequest, signal: controller?.signal, method: "POST" },
-    );
+  async ECLSearch(eclSearchRequest: ECLQueryRequest, controller?: AbortController): Promise<SearchResponse> {
+    const results: SearchResponse = await $fetch<SearchResponse>(API_URL + "/eclSearch", {
+      body: eclSearchRequest,
+      signal: controller?.signal,
+      method: "POST"
+    });
     return results;
   },
 
   async getEcl(query: Query): Promise<string> {
     return await $fetch<string>(API_URL + "/ecl", {
       body: { query: query },
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async getQueryFromECL(
-    ecl: string,
-    raw: boolean = false,
-  ): Promise<ECLQueryRequest> {
+  async getQueryFromECL(ecl: string, raw: boolean = false): Promise<ECLQueryRequest> {
     return await $fetch<ECLQueryRequest>(API_URL + "/queryFromEcl", {
       body: { ecl: ecl, status: { valid: true } },
       headers: { "Content-Type": "application/json" },
       ignoreResponseError: raw,
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async getEclFromEcl(
-    ecl: string,
-    showNames: boolean,
-  ): Promise<ECLQueryRequest> {
+  async getEclFromEcl(ecl: string, showNames: boolean): Promise<ECLQueryRequest> {
     return await $fetch<ECLQueryRequest>(API_URL + "/eclFromEcl", {
       body: { ecl: ecl, showNames: showNames, status: { valid: true } },
       headers: { "Content-Type": "application/json" },
       ignoreResponseError: true,
-      method: "POST",
+      method: "POST"
     });
   },
 
@@ -53,7 +41,7 @@ const EclService = {
     return await $fetch<ECLQueryRequest>(API_URL + "/validateEcl", {
       body: { ecl: ecl, showNames: showNames, status: { valid: true } },
       headers: { "Content-Type": "application/json" },
-      method: "POST",
+      method: "POST"
     });
   },
 
@@ -62,31 +50,25 @@ const EclService = {
       body: { query: query, status: { valid: true } },
       headers: { "Content-Type": "application/json" },
       ignoreResponseError: true,
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async getRangesForProperty(
-    propertyIri: string,
-    controller?: AbortController,
-  ): Promise<string[]> {
+  async getRangesForProperty(propertyIri: string, controller?: AbortController): Promise<string[]> {
     return await $fetch<string[]>(API_URL + "/rangesForProperty", {
       params: { propertyIri: propertyIri },
       signal: controller?.signal,
-      method: "GET",
+      method: "GET"
     });
   },
 
-  async getECLFromQuery(
-    query: Query,
-    showNames?: boolean,
-  ): Promise<ECLQueryRequest> {
+  async getECLFromQuery(query: Query, showNames?: boolean): Promise<ECLQueryRequest> {
     return await $fetch<ECLQueryRequest>(API_URL + "/eclFromQuery", {
       body: { query: query, showNames: showNames },
       headers: { "Content-Type": "application/json" },
       ignoreResponseError: true,
-      method: "POST",
+      method: "POST"
     });
-  },
+  }
 };
 export default EclService;

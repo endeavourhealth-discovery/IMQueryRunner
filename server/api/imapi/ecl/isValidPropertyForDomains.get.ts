@@ -1,10 +1,11 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import EclService from "~~/server/services/EclService";
+
+import * as z from "zod";
 
 const paramSchema = z.object({
   propertyIri: z.string(),
-  conceptIri: z.array(z.string()),
+  conceptIri: z.array(z.string())
 });
 
 defineRouteMeta({
@@ -17,21 +18,14 @@ defineRouteMeta({
       {
         name: "conceptIri",
         description: "Concept iris as comma separated string",
-        in: "query",
-      },
-    ],
-  },
+        in: "query"
+      }
+    ]
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {
   const sessionId = getCookie(event, "session_id")!;
-  const { conceptIri, propertyIri } = await getQueryParams(
-    event,
-    paramSchema.parse,
-  );
-  return await EclService.isValidPropertyForDomains(
-    sessionId,
-    propertyIri,
-    conceptIri,
-  );
+  const { conceptIri, propertyIri } = await getQueryParams(event, paramSchema.parse);
+  return await EclService.isValidPropertyForDomains(sessionId, propertyIri, conceptIri);
 });

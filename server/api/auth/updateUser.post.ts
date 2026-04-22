@@ -1,5 +1,6 @@
-import { PermissionSchema, type User, UserSchema } from "vue-library/models";
 import { getIp } from "~~/server/helpers/getIp";
+
+import { PermissionSchema, type User, UserSchema } from "vue-library/models";
 
 export default defineEventHandler(async (event): Promise<User> => {
   const sessionId = getCookie(event, "session_id");
@@ -13,7 +14,7 @@ export default defineEventHandler(async (event): Promise<User> => {
     headers: { "x-client-ip": clientIp },
     body: {
       sessionId: sessionId,
-      user: updatedUser,
-    },
+      user: updatedUser
+    }
   });
 });

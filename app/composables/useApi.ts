@@ -2,10 +2,7 @@ type ApiOptions<T> = {
   raw?: boolean;
 } & Parameters<typeof $fetch<T>>[1];
 
-export async function useApi<T = unknown>(
-  url: string,
-  options: ApiOptions<T> = {},
-): Promise<T | any> {
+export async function useApi<T = unknown>(url: string, options: ApiOptions<T> = {}): Promise<T | any> {
   const { raw = false, ...fetchOptions } = options;
 
   try {
@@ -15,7 +12,7 @@ export async function useApi<T = unknown>(
       return {
         status: res.status,
         data: res._data,
-        headers: res.headers,
+        headers: res.headers
       };
     }
 

@@ -1,19 +1,19 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import FilerService from "~~/server/services/FilerService";
+
 import { NAMESPACE } from "vue-library/enums";
 
+import * as z from "zod";
+
 const bodySchema = z.object({
-  document: z.any(),
+  document: z.any()
 });
 
 defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "File document",
-    parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
-    ],
+    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
@@ -25,15 +25,15 @@ defineRouteMeta({
               document: {
                 type: "object",
                 description: "Document",
-                additionalProperties: true,
-              },
+                additionalProperties: true
+              }
             },
-            required: ["document"],
-          },
-        },
-      },
-    },
-  },
+            required: ["document"]
+          }
+        }
+      }
+    }
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

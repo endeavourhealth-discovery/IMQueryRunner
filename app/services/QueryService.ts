@@ -1,144 +1,120 @@
+import { DisplayMode } from "vue-library/enums";
+import { isArrayHasLength, isObjectHasKeys } from "vue-library/helpers";
 import type {
+  ArgumentReference,
+  IMLLanguage,
+  Indicator,
   Match,
   PathQuery,
   Query,
   QueryRequest,
   QueryResponse,
-  SearchResponse,
-  ArgumentReference,
-  IMLLanguage,
-  Indicator,
   Return,
-  TTEntity,
+  SearchResponse,
+  TTEntity
 } from "vue-library/interfaces";
-import { DisplayMode } from "vue-library/enums";
-import { isArrayHasLength, isObjectHasKeys } from "vue-library/helpers";
 
 const API_URL = "api/impai/query";
 
 const QueryService = {
-  async queryIM(
-    query: QueryRequest,
-    controller?: AbortController,
-    raw: boolean = false,
-  ): Promise<QueryResponse> {
+  async queryIM(query: QueryRequest, controller?: AbortController, raw: boolean = false): Promise<QueryResponse> {
     if (controller)
       return await useApi<QueryResponse>(API_URL + "/queryIM", {
         body: query,
         signal: controller.signal,
         raw: raw,
-        method: "POST",
+        method: "POST"
       });
     else
       return await useApi<QueryResponse>(API_URL + "/queryIM", {
         body: query,
         raw: raw,
-        method: "POST",
+        method: "POST"
       });
   },
   async flattenBooleans(query: Query | Match): Promise<Query | Match> {
     return await $fetch<Query | Match>(API_URL + "/flattenBooleans", {
       body: query,
-      method: "POST",
+      method: "POST"
     });
   },
   async optimiseECLQuery(query: Query): Promise<Query> {
     return await $fetch<Query>(API_URL + "/optimiseECLQuery", {
       body: query,
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async queryIMSearch(
-    query: QueryRequest,
-    controller?: AbortController,
-    raw: boolean = false,
-  ): Promise<SearchResponse> {
+  async queryIMSearch(query: QueryRequest, controller?: AbortController, raw: boolean = false): Promise<SearchResponse> {
     return await $fetch<SearchResponse>(API_URL + "/queryIMSearch", {
       body: query,
       signal: controller?.signal,
       ignoreResponseError: raw,
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async askQuery(
-    query: QueryRequest,
-    controller?: AbortController,
-    raw: boolean = false,
-  ): Promise<boolean> {
+  async askQuery(query: QueryRequest, controller?: AbortController, raw: boolean = false): Promise<boolean> {
     return await $fetch<boolean>(API_URL + "/askQueryIM", {
       body: query,
       signal: controller?.signal,
       ignoreResponseError: raw,
-      method: "POST",
+      method: "POST"
     });
   },
 
-  async getQueryDisplayFromQuery(
-    query: Query,
-    displayMode: DisplayMode,
-  ): Promise<Query> {
+  async getQueryDisplayFromQuery(query: Query, displayMode: DisplayMode): Promise<Query> {
     return await $fetch<Query>(API_URL + "/queryDisplayFromQuery", {
       body: { query: query, displayMode: displayMode },
-      method: "POST",
+      method: "POST"
     });
   },
 
   async getDisplayFromIndicatorIri(iri: string): Promise<Indicator> {
     return await $fetch<Indicator>(API_URL + "/indicatorDisplay", {
       params: { queryIri: iri },
-      method: "GET",
+      method: "GET"
     });
   },
 
-  async expandCohort(
-    queryIri: string,
-    cohortIri: string,
-    displayMode: DisplayMode,
-  ): Promise<Query> {
+  async expandCohort(queryIri: string, cohortIri: string, displayMode: DisplayMode): Promise<Query> {
     return await $fetch<Query>(API_URL + "/expandCohort", {
       params: {
         queryIri: queryIri,
         cohortIri: cohortIri,
-        displayMode: displayMode,
+        displayMode: displayMode
       },
-      method: "GET",
+      method: "GET"
     });
   },
 
   async generateQuerySQL(queryIri: string, lang?: string): Promise<string> {
     return await $fetch<string>(API_URL + "/sql", {
       params: { queryIri: queryIri, lang: lang },
-      method: "GET",
+      method: "GET"
     });
   },
 
   async generateQueryIML(queryIri: string): Promise<IMLLanguage> {
     return await $fetch<IMLLanguage>(API_URL + "/imlFromIri", {
       params: { queryIri: queryIri },
-      method: "GET",
+      method: "GET"
     });
   },
 
-  async findMissingArguments(
-    queryRequest: QueryRequest,
-  ): Promise<ArgumentReference[]> {
-    return await $fetch<ArgumentReference[]>(
-      API_URL + "/findRequestMissingArguments",
-      {
-        body: queryRequest,
-        method: "POST",
-      },
-    );
+  async findMissingArguments(queryRequest: QueryRequest): Promise<ArgumentReference[]> {
+    return await $fetch<ArgumentReference[]>(API_URL + "/findRequestMissingArguments", {
+      body: queryRequest,
+      method: "POST"
+    });
   },
 
   async getQueryFromIri(iri: string): Promise<Query> {
     return await $fetch<Query>(API_URL + "/queryFromIri", {
       params: { queryIri: iri },
-      method: "GET",
+      method: "GET"
     });
-  },
+  }
 };
 
 if (process.env.NODE_ENV !== "test") Object.freeze(QueryService);

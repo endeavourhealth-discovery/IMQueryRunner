@@ -1,8 +1,5 @@
-import type {
-  SimpleMap,
-  TermCode,
-  ConceptContextMap,
-} from "vue-library/interfaces";
+import type { ConceptContextMap, SimpleMap, TermCode } from "vue-library/interfaces";
+
 const API_URL = `${useRuntimeConfig().public.imapiUrl}concept/protected`;
 
 const ConceptService = {
@@ -10,9 +7,9 @@ const ConceptService = {
     return await $fetch<SimpleMap[]>(API_URL + "/matchedFrom", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
-        iri: iri,
+        iri: iri
       },
-      method: "GET",
+      method: "GET"
     });
   },
 
@@ -20,34 +17,27 @@ const ConceptService = {
     return await $fetch<SimpleMap[]>(API_URL + "/matchedTo", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
-        iri: iri,
+        iri: iri
       },
-      method: "GET",
+      method: "GET"
     });
   },
 
-  async getEntityTermCodes(
-    sessionId: string,
-    iri: string,
-    includeInactive?: boolean,
-  ): Promise<TermCode[]> {
+  async getEntityTermCodes(sessionId: string, iri: string, includeInactive?: boolean): Promise<TermCode[]> {
     return await $fetch<TermCode[]>(API_URL + "/termCode", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri, includeInactive: includeInactive },
-      method: "GET",
+      method: "GET"
     });
   },
 
-  async getContextMaps(
-    sessionId: string,
-    conceptIri: string,
-  ): Promise<ConceptContextMap[]> {
+  async getContextMaps(sessionId: string, conceptIri: string): Promise<ConceptContextMap[]> {
     return await $fetch<ConceptContextMap[]>(API_URL + "/conceptContextMaps", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: conceptIri },
-      method: "GET",
+      method: "GET"
     });
-  },
+  }
 };
 if (process.env.NODE_ENV !== "test") Object.freeze(ConceptService);
 

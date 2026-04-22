@@ -5,8 +5,8 @@ export default defineEventHandler(async (event): Promise<void> => {
 
   await $fetch<string>(`${EndSecHost}/api/${EndSecApp}/authn/logout`, {
     query: {
-      sessionId: sessionId,
-    },
+      sessionId: sessionId
+    }
   });
   setCookie(event, "session_id", "", { httpOnly: true, maxAge: 0 });
   return;

@@ -19,14 +19,10 @@
         @blur="editing = false"
         @mouseover="selected?.iri != 'any'"
         :pt="{
-          root: { autocomplete: allowBrowserAutocomplete ? 'on' : 'off' },
+          root: { autocomplete: allowBrowserAutocomplete ? 'on' : 'off' }
         }"
       />
-      <i
-        v-if="editing"
-        class="fa fa-times-circle clear-icon"
-        @mousedown.prevent="clearSearch()"
-      ></i>
+      <i v-if="editing" class="fa fa-times-circle clear-icon" @mousedown.prevent="clearSearch()"></i>
     </IconField>
     <Button
       class="search-button px-2"
@@ -36,32 +32,15 @@
       icon="fa-solid fa-magnifying-glass"
       label="Advanced"
     />
-    <Popover
-      ref="resultsOP"
-      :breakpoints="{ '960px': '75vw', '640px': '100vw' }"
-      :style="{ width: '450px' }"
-      appendTo="body"
-    >
+    <Popover ref="resultsOP" :breakpoints="{ '960px': '75vw', '640px': '100vw' }" :style="{ width: '450px' }" appendTo="body">
       <div v-if="searchLoading" class="loading-container">
         <ProgressSpinner />
       </div>
       <div v-else class="results-container" :tabindex="0">
-        <Listbox
-          v-if="results?.entities"
-          v-model="listBoxSelected"
-          :options="results.entities"
-        >
+        <Listbox v-if="results?.entities" v-model="listBoxSelected" :options="results.entities">
           <template #option="slotProps">
-            <div
-              class="listbox-item"
-              @mouseover="slotProps.option.iri != 'any'"
-              @click="onListBoxOptionClick(slotProps.option)"
-            >
-              <span>{{
-                slotProps.option.bestMatch
-                  ? slotProps.option.bestMatch
-                  : slotProps.option.name
-              }}</span>
+            <div class="listbox-item" @mouseover="slotProps.option.iri != 'any'" @click="onListBoxOptionClick(slotProps.option)">
+              <span>{{ slotProps.option.bestMatch ? slotProps.option.bestMatch : slotProps.option.name }}</span>
             </div>
           </template>
         </Listbox>
@@ -69,10 +48,8 @@
 
         <div class="advanced-search-container">
           <small>
-            Showing {{ results?.entities?.length ? 1 : 0 }}-{{
-              results?.entities?.length ? results.entities.length : 0
-            }}
-            of {{ results?.count ? results.count : 0 }} results
+            Showing {{ results?.entities?.length ? 1 : 0 }}-{{ results?.entities?.length ? results.entities.length : 0 }} of
+            {{ results?.count ? results.count : 0 }} results
           </small>
         </div>
       </div>
@@ -91,40 +68,26 @@
       class="dialog w-full md:w-[30rem]"
     ></Tree>
     <template #footer>
-      <Button
-        class="m-1"
-        label="Cancel"
-        variant="outlined"
-        @click="showDialog = false"
-      />
-      <Button
-        class="m-1"
-        label="Select"
-        :disabled="!isQuery"
-        @click="setSelectedQuery"
-        autofocus
-      />
+      <Button class="m-1" label="Cancel" variant="outlined" @click="showDialog = false" />
+      <Button class="m-1" label="Select" :disabled="!isQuery" @click="setSelectedQuery" autofocus />
     </template>
   </Dialog>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, nextTick, onBeforeUnmount } from "vue";
-import {
-  type SearchResponse,
-  type SearchResultSummary,
-  type QueryRequest,
-  type TTIriRef,
-} from "vue-library/interfaces";
-import { IM, TextSearchStyle } from "vue-library/enums";
-import { cloneDeep, debounce, isEqual } from "lodash-es";
 import { useAutocompleteRegistry } from "~/composables/useAutocompleteRegistry";
-import type { TreeNode } from "primevue/treenode";
 import EntityService from "~/services/EntityService";
 import QueryService from "~/services/QueryService";
 
-const { registerAutocomplete, unregisterAutocomplete } =
-  useAutocompleteRegistry();
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+
+import { IM, TextSearchStyle } from "vue-library/enums";
+import { type QueryRequest, type SearchResponse, type SearchResultSummary, type TTIriRef } from "vue-library/interfaces";
+
+import { cloneDeep, debounce, isEqual } from "lodash-es";
+import type { TreeNode } from "primevue/treenode";
+
+const { registerAutocomplete, unregisterAutocomplete } = useAutocompleteRegistry();
 
 interface Props {
   selected?: SearchResultSummary;
@@ -141,7 +104,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   rootEntities: () => [] as string[],
-  allowBrowserAutocomplete: false,
+  allowBrowserAutocomplete: false
 });
 
 const emit = defineEmits<{
@@ -177,9 +140,7 @@ watch(
     if (!isEqual(newValue, oldValue)) {
       searchLoading.value = true;
       if (newValue && (newValue.name || newValue.bestMatch)) {
-        searchText.value = newValue.bestMatch
-          ? newValue.bestMatch
-          : newValue.name!;
+        searchText.value = newValue.bestMatch ? newValue.bestMatch : newValue.name!;
         selectedLocal.value = newValue;
       } else {
         searchText.value = "";
@@ -187,7 +148,7 @@ watch(
       }
       searchLoading.value = false;
     }
-  },
+  }
 );
 
 watch(
@@ -196,7 +157,7 @@ watch(
     if (newValue !== oldValue) {
     }
   },
-  { deep: true },
+  { deep: true }
 );
 
 watch(
@@ -209,10 +170,10 @@ watch(
       emit("update:selected", newValue);
     }
   },
-  { deep: true },
+  { deep: true }
 );
 
-watch(searchText, (newValue) => {
+watch(searchText, newValue => {
   if (!newValue) {
     selectedLocal.value = undefined;
   }
@@ -228,9 +189,8 @@ onMounted(async () => {
     registerAutocomplete({
       element: autocompleteRoot.value,
       reset: () => {
-        searchText.value =
-          props.selected && props.selected.name ? props.selected.name : "";
-      },
+        searchText.value = props.selected && props.selected.name ? props.selected.name : "";
+      }
     });
   }
   searchLoading.value = false;
@@ -248,8 +208,7 @@ function handleGlobalFocus(event: FocusEvent) {
   if (!root) return;
   const target = event.target as Node;
   if (!root.contains(target)) {
-    if (props.selected && props.selected.name)
-      searchText.value = props.selected.name;
+    if (props.selected && props.selected.name) searchText.value = props.selected.name;
     else searchText.value = "";
   }
 }
@@ -273,9 +232,7 @@ async function advancedSearch() {
 
 async function getInitialTreeEntities() {
   loading.value = true;
-  const retrievedEntities = await EntityService.getEntityChildren(
-    "http://endhealth.info/im#Q_Queries",
-  );
+  const retrievedEntities = await EntityService.getEntityChildren("http://endhealth.info/im#Q_Queries");
   for (const entity of retrievedEntities) {
     const type = entity.type as TTIriRef[];
     entities.value.push({
@@ -284,24 +241,22 @@ async function getInitialTreeEntities() {
       data: type[0]!.iri,
       icon: "fa-solid fa-folder",
       children: [],
-      loading: false,
+      loading: false
     });
     if (entity.hasChildren) {
-      const retrievedChildEntities = await EntityService.getEntityChildren(
-        entity.iri,
-      );
+      const retrievedChildEntities = await EntityService.getEntityChildren(entity.iri);
       for (const childEntity of retrievedChildEntities) {
         let icon = "fa-magnifying-glass";
         if (childEntity.hasChildren) icon = "fa-folder";
         const childType = childEntity.type as TTIriRef[];
-        const found = entities.value.find((e) => e.key === entity.iri);
+        const found = entities.value.find(e => e.key === entity.iri);
         found.children.push({
           key: childEntity.iri,
           label: childEntity.name,
           data: childType[0]!.iri,
           icon: "fa-solid " + icon,
           children: [],
-          loading: false,
+          loading: false
         });
       }
     }
@@ -311,14 +266,9 @@ async function getInitialTreeEntities() {
 
 const onNodeExpand = async (node: any) => {
   for (const child in node.children) {
-    if (
-      node.children[child].children.length === 0 &&
-      node.children[child].icon === "fa-solid fa-folder"
-    ) {
+    if (node.children[child].children.length === 0 && node.children[child].icon === "fa-solid fa-folder") {
       node.children[child].loading = true;
-      const retrievedEntities = await EntityService.getEntityChildren(
-        node.children[child].key,
-      );
+      const retrievedEntities = await EntityService.getEntityChildren(node.children[child].key);
       let children = [];
       for (const entity of retrievedEntities) {
         let icon = "fa-magnifying-glass";
@@ -330,7 +280,7 @@ const onNodeExpand = async (node: any) => {
           data: type[0]!.iri,
           icon: "fa-solid " + icon,
           children: [],
-          loading: false,
+          loading: false
         });
       }
       node.children[child].children = children;
@@ -350,7 +300,7 @@ function setSelectedQuery() {
     scheme: { iri: "" } as TTIriRef,
     status: { iri: "" } as TTIriRef,
     type: [] as TTIriRef[],
-    name: selectedQuery.value?.label,
+    name: selectedQuery.value?.label
   } as SearchResultSummary;
   showDialog.value = false;
 }
@@ -381,17 +331,13 @@ async function onEnter(event: KeyboardEvent) {
 function select(event: KeyboardEvent) {
   if (results.value?.entities && results.value?.entities.length)
     if (event.key === "ArrowDown") {
-      if (selectedIndex.value < results.value!.entities!.length - 1)
-        listBoxSelected.value =
-          results.value?.entities?.[++selectedIndex.value];
+      if (selectedIndex.value < results.value!.entities!.length - 1) listBoxSelected.value = results.value?.entities?.[++selectedIndex.value];
       else {
         selectedIndex.value = 0;
         listBoxSelected.value = results.value?.entities?.[selectedIndex.value];
       }
     } else if (event.key === "ArrowUp") {
-      if (selectedIndex.value > 0)
-        listBoxSelected.value =
-          results.value?.entities?.[--selectedIndex.value];
+      if (selectedIndex.value > 0) listBoxSelected.value = results.value?.entities?.[--selectedIndex.value];
       else {
         selectedIndex.value = results.value!.entities!.length - 1;
         listBoxSelected.value = results.value?.entities?.[selectedIndex.value];

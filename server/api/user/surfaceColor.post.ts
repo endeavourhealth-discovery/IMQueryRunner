@@ -1,5 +1,6 @@
-import * as z from "zod";
 import { PrimeVueColors } from "vue-library/enums";
+
+import * as z from "zod";
 
 const bodySchema = z.enum(PrimeVueColors);
 
@@ -7,9 +8,7 @@ defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Update user surface color",
-    parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
-    ],
+    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
@@ -17,12 +16,12 @@ defineRouteMeta({
           schema: {
             type: "string",
             description: "Surface color",
-            enum: Object.values(PrimeVueColors),
-          },
-        },
-      },
-    },
-  },
+            enum: Object.values(PrimeVueColors)
+          }
+        }
+      }
+    }
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

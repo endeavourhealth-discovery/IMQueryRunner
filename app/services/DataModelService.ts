@@ -1,40 +1,33 @@
-import type {
-  TTIriRef,
-  NodeShape,
-  PropertyDisplay,
-  UIProperty,
-} from "vue-library/interfaces";
+import type { NodeShape, PropertyDisplay, TTIriRef, UIProperty } from "vue-library/interfaces";
+
 const API_URL = "api/imapi/dataModel";
 
 const DataModelService = {
-  async getDataModelProperties(
-    iri: string,
-    pathsOnly?: boolean,
-  ): Promise<NodeShape> {
+  async getDataModelProperties(iri: string, pathsOnly?: boolean): Promise<NodeShape> {
     return await $fetch<NodeShape>(API_URL + "/dataModelProperties", {
       params: {
         iri: iri,
-        ...(pathsOnly !== undefined && { pathsOnly: pathsOnly }),
+        ...(pathsOnly !== undefined && { pathsOnly: pathsOnly })
       },
-      method: "GET",
+      method: "GET"
     });
   },
 
   async getDataModelsFromProperty(propIri: string): Promise<TTIriRef[]> {
     return await $fetch<TTIriRef[]>(API_URL + "/dataModels", {
       params: {
-        propIri: propIri,
+        propIri: propIri
       },
-      method: "GET",
+      method: "GET"
     });
   },
 
   async getPropertiesDisplay(iri: string): Promise<PropertyDisplay[]> {
     return await $fetch<PropertyDisplay[]>(API_URL + "/propertiesDisplay", {
       params: { iri: iri },
-      method: "GET",
+      method: "GET"
     });
-  },
+  }
 };
 if (process.env.NODE_ENV !== "test") Object.freeze(DataModelService);
 

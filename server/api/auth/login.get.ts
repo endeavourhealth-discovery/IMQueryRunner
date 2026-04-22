@@ -1,11 +1,13 @@
-import { PermissionSchema, type User } from "vue-library/models";
-import * as z from "zod";
 import { getIp } from "~~/server/helpers/getIp";
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
 
+import { PermissionSchema, type User } from "vue-library/models";
+
+import * as z from "zod";
+
 const loginSchema = z.object({
   code: z.string(),
-  state: z.string(),
+  state: z.string()
 });
 
 export default defineEventHandler(async (event): Promise<User> => {
@@ -22,12 +24,12 @@ export default defineEventHandler(async (event): Promise<User> => {
     headers: { "x-client-ip": clientIp },
     query: {
       code: loginParams.code,
-      state: loginParams.state,
-    },
+      state: loginParams.state
+    }
   });
   setCookie(event, "session_id", sessionId, {
     httpOnly: true,
-    maxAge: 60 * 60 * 24 * 30,
+    maxAge: 60 * 60 * 24 * 30
   });
   return user;
 });

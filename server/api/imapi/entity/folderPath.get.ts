@@ -1,9 +1,10 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import EntityService from "~~/server/services/EntityService";
 
+import * as z from "zod";
+
 const paramSchema = z.object({
-  iri: z.string(),
+  iri: z.string()
 });
 
 defineRouteMeta({
@@ -15,10 +16,10 @@ defineRouteMeta({
       {
         name: "iri",
         description: "Folder iri",
-        in: "query",
-      },
-    ],
-  },
+        in: "query"
+      }
+    ]
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

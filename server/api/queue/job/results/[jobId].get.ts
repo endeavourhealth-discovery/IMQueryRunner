@@ -1,25 +1,26 @@
-import * as z from "zod";
-import { postgresDb } from "~~/server/db/postgres";
-import { eq } from "drizzle-orm";
-import { jobTable } from "~~/server/db/postgres/schema";
 import { mysqlDb } from "~~/server/db/mysql";
+import { postgresDb } from "~~/server/db/postgres";
+import { jobTable } from "~~/server/db/postgres/schema";
+
+import { eq } from "drizzle-orm";
 import { sql } from "drizzle-orm";
+import * as z from "zod";
 
 const paramSchema = z.object({
-  jobId: z.string(),
+  jobId: z.string()
 });
 
 const querySchema = z.object({
   page: z.coerce.number().default(1),
-  size: z.coerce.number().default(25),
+  size: z.coerce.number().default(25)
 });
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
   const { page, size } = await getValidatedQuery(event, querySchema.parse);
 
   const job = await postgresDb.query.jobTable.findFirst({
-    where: eq(jobTable.dbid, jobId),
+    where: eq(jobTable.dbid, jobId)
   });
 
   if (!job) {
@@ -40,6 +41,6 @@ export default defineEventHandler(async (event) => {
   return {
     result: dataRows,
     totalCount: total,
-    page: page,
+    page: page
   };
 });

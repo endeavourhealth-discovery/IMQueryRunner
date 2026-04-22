@@ -1,5 +1,6 @@
-import * as z from "zod";
 import { RecentActivityItemSchema } from "vue-library/models";
+
+import * as z from "zod";
 
 const bodySchema = z.array(RecentActivityItemSchema);
 
@@ -7,9 +8,7 @@ defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Update user preset theme",
-    parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
-    ],
+    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
@@ -19,13 +18,13 @@ defineRouteMeta({
             items: {
               type: "string",
               description: "Recent activity items",
-              enum: Object.values(RecentActivityItemSchema),
-            },
-          },
-        },
-      },
-    },
-  },
+              enum: Object.values(RecentActivityItemSchema)
+            }
+          }
+        }
+      }
+    }
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

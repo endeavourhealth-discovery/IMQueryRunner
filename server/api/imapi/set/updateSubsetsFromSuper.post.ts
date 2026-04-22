@@ -1,6 +1,7 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import SetService from "~~/server/services/SetService";
+
+import * as z from "zod";
 
 const bodySchema = z.any();
 
@@ -8,21 +9,19 @@ defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Update subsets from super",
-    parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
-    ],
+    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
         "application/json": {
           schema: {
             type: "object",
-            summary: "Entity",
-          },
-        },
-      },
-    },
-  },
+            summary: "Entity"
+          }
+        }
+      }
+    }
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

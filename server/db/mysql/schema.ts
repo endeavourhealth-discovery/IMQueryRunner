@@ -1,20 +1,5 @@
-import {
-  mysqlTable,
-  primaryKey,
-  bigint,
-  datetime,
-  int,
-  tinyint,
-  boolean,
-  decimal,
-  index,
-  unique,
-  varchar,
-  text,
-  date,
-  double,
-} from "drizzle-orm/mysql-core";
 import { sql } from "drizzle-orm";
+import { bigint, boolean, date, datetime, decimal, double, index, int, mysqlTable, primaryKey, text, tinyint, unique, varchar } from "drizzle-orm/mysql-core";
 
 export const allergyIntolerance = mysqlTable(
   "allergy_intolerance",
@@ -26,18 +11,16 @@ export const allergyIntolerance = mysqlTable(
     encounterId: bigint("encounter_id", { mode: "number" }),
     practitionerId: bigint("practitioner_id", { mode: "number" }),
     clinicalEffectiveDate: datetime("clinical_effective_date", {
-      mode: "string",
+      mode: "string"
     }),
     datePrecisionConceptId: int("date_precision_concept_id"),
     isReview: tinyint("is_review").notNull(),
     coreConceptId: int("core_concept_id"),
     nonCoreConceptId: int("non_core_concept_id"),
     ageAtEvent: decimal("age_at_event", { precision: 5, scale: 2 }),
-    dateRecorded: datetime("date_recorded", { mode: "string" }),
+    dateRecorded: datetime("date_recorded", { mode: "string" })
   },
-  (table) => [
-    primaryKey({ columns: [table.id], name: "allergy_intolerance_id" }),
-  ],
+  table => [primaryKey({ columns: [table.id], name: "allergy_intolerance_id" })]
 );
 
 export const concept = mysqlTable(
@@ -54,14 +37,14 @@ export const concept = mysqlTable(
     useCount: bigint("use_count", { mode: "number" }).notNull(),
     updated: datetime({ mode: "string" })
       .default(sql`(CURRENT_TIMESTAMP)`)
-      .notNull(),
+      .notNull()
   },
-  (table) => [
+  table => [
     index("concept_draft").on(table.draft),
     primaryKey({ columns: [table.dbid], name: "concept_dbid" }),
     unique("concept_id_uq").on(table.id),
-    unique("concept_scheme_code_idx").on(table.scheme, table.code),
-  ],
+    unique("concept_scheme_code_idx").on(table.scheme, table.code)
+  ]
 );
 
 export const conceptMap = mysqlTable(
@@ -73,12 +56,9 @@ export const conceptMap = mysqlTable(
       .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),
     id: int().autoincrement().notNull(),
-    deleted: tinyint().default(0).notNull(),
+    deleted: tinyint().default(0).notNull()
   },
-  (table) => [
-    primaryKey({ columns: [table.id], name: "concept_map_id" }),
-    unique("concept_map_uq").on(table.legacy, table.deleted, table.updated),
-  ],
+  table => [primaryKey({ columns: [table.id], name: "concept_map_id" }), unique("concept_map_uq").on(table.legacy, table.deleted, table.updated)]
 );
 
 export const conceptSetMember = mysqlTable(
@@ -88,13 +68,13 @@ export const conceptSetMember = mysqlTable(
     set: varchar({ length: 512 }).notNull(),
     member: varchar({ length: 512 }).notNull(),
     im1Id: varchar({ length: 150 }).notNull(),
-    self: boolean().default(false).notNull(),
+    self: boolean().default(false).notNull()
   },
-  (table) => [
+  table => [
     index("idx_set_self").on(table.set, table.self),
     index("idx_csm").on(table.im1Id, table.self),
-    primaryKey({ columns: [table.id], name: "concept_set_member_id" }),
-  ],
+    primaryKey({ columns: [table.id], name: "concept_set_member_id" })
+  ]
 );
 
 export const encounter = mysqlTable(
@@ -107,12 +87,12 @@ export const encounter = mysqlTable(
     practitionerId: bigint("practitioner_id", { mode: "number" }),
     appointmentId: bigint("appointment_id", { mode: "number" }),
     clinicalEffectiveDate: datetime("clinical_effective_date", {
-      mode: "string",
+      mode: "string"
     }),
     datePrecisionConceptId: int("date_precision_concept_id"),
     episodeOfCareId: bigint("episode_of_care_id", { mode: "number" }),
     serviceProviderOrganizationId: bigint("service_provider_organization_id", {
-      mode: "number",
+      mode: "number"
     }),
     coreConceptId: int("core_concept_id"),
     nonCoreConceptId: int("non_core_concept_id"),
@@ -122,9 +102,9 @@ export const encounter = mysqlTable(
     admissionMethod: varchar("admission_method", { length: 40 }),
     endDate: datetime("end_date", { mode: "string" }),
     institutionLocationId: text("institution_location_id"),
-    dateRecorded: datetime("date_recorded", { mode: "string" }),
+    dateRecorded: datetime("date_recorded", { mode: "string" })
   },
-  (table) => [primaryKey({ columns: [table.id], name: "encounter_id" })],
+  table => [primaryKey({ columns: [table.id], name: "encounter_id" })]
 );
 
 export const episodeOfCare = mysqlTable(
@@ -141,10 +121,10 @@ export const episodeOfCare = mysqlTable(
     // you can use { mode: 'date' }, if you want to have Date as type for this column
     dateRegisteredEnd: date("date_registered_end", { mode: "string" }),
     usualGpPractitionerId: bigint("usual_gp_practitioner_id", {
-      mode: "number",
-    }),
+      mode: "number"
+    })
   },
-  (table) => [primaryKey({ columns: [table.id], name: "episode_of_care_id" })],
+  table => [primaryKey({ columns: [table.id], name: "episode_of_care_id" })]
 );
 
 export const medicationOrder = mysqlTable(
@@ -157,7 +137,7 @@ export const medicationOrder = mysqlTable(
     encounterId: bigint("encounter_id", { mode: "number" }),
     practitionerId: bigint("practitioner_id", { mode: "number" }),
     clinicalEffectiveDate: datetime("clinical_effective_date", {
-      mode: "string",
+      mode: "string"
     }),
     datePrecisionConceptId: int("date_precision_concept_id"),
     dose: varchar({ length: 1000 }),
@@ -166,16 +146,16 @@ export const medicationOrder = mysqlTable(
     durationDays: int("duration_days"),
     estimatedCost: double("estimated_cost"),
     medicationStatementId: bigint("medication_statement_id", {
-      mode: "number",
+      mode: "number"
     }),
     coreConceptId: int("core_concept_id"),
     nonCoreConceptId: int("non_core_concept_id"),
     bnfReference: varchar("bnf_reference", { length: 6 }),
     ageAtEvent: decimal("age_at_event", { precision: 5, scale: 2 }),
     issueMethod: text("issue_method"),
-    dateRecorded: datetime("date_recorded", { mode: "string" }),
+    dateRecorded: datetime("date_recorded", { mode: "string" })
   },
-  (table) => [primaryKey({ columns: [table.id], name: "medication_order_id" })],
+  table => [primaryKey({ columns: [table.id], name: "medication_order_id" })]
 );
 
 export const medicationStatement = mysqlTable(
@@ -188,7 +168,7 @@ export const medicationStatement = mysqlTable(
     encounterId: bigint("encounter_id", { mode: "number" }),
     practitionerId: bigint("practitioner_id", { mode: "number" }),
     clinicalEffectiveDate: datetime("clinical_effective_date", {
-      mode: "string",
+      mode: "string"
     }),
     datePrecisionConceptId: int("date_precision_concept_id"),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
@@ -202,11 +182,9 @@ export const medicationStatement = mysqlTable(
     bnfReference: varchar("bnf_reference", { length: 6 }),
     ageAtEvent: decimal("age_at_event", { precision: 5, scale: 2 }),
     issueMethod: text("issue_method"),
-    dateRecorded: datetime("date_recorded", { mode: "string" }),
+    dateRecorded: datetime("date_recorded", { mode: "string" })
   },
-  (table) => [
-    primaryKey({ columns: [table.id], name: "medication_statement_id" }),
-  ],
+  table => [primaryKey({ columns: [table.id], name: "medication_statement_id" })]
 );
 
 export const observation = mysqlTable(
@@ -219,7 +197,7 @@ export const observation = mysqlTable(
     encounterId: bigint("encounter_id", { mode: "number" }),
     practitionerId: bigint("practitioner_id", { mode: "number" }),
     clinicalEffectiveDate: datetime("clinical_effective_date", {
-      mode: "string",
+      mode: "string"
     }),
     datePrecisionConceptId: int("date_precision_concept_id"),
     resultValue: double("result_value"),
@@ -238,16 +216,9 @@ export const observation = mysqlTable(
     ageAtEvent: decimal("age_at_event", { precision: 5, scale: 2 }),
     episodicityConceptId: int("episodicity_concept_id"),
     isPrimary: tinyint("is_primary"),
-    dateRecorded: datetime("date_recorded", { mode: "string" }),
+    dateRecorded: datetime("date_recorded", { mode: "string" })
   },
-  (table) => [
-    index("idx_obs").on(
-      table.coreConceptId,
-      table.clinicalEffectiveDate,
-      table.patientId,
-    ),
-    primaryKey({ columns: [table.id], name: "observation_id" }),
-  ],
+  table => [index("idx_obs").on(table.coreConceptId, table.clinicalEffectiveDate, table.patientId), primaryKey({ columns: [table.id], name: "observation_id" })]
 );
 
 export const patient = mysqlTable(
@@ -267,12 +238,9 @@ export const patient = mysqlTable(
     dateOfDeath: date("date_of_death", { mode: "string" }),
     currentAddressId: bigint("current_address_id", { mode: "number" }),
     ethnicCodeConceptId: int("ethnic_code_concept_id"),
-    registeredPracticeOrganizationId: bigint(
-      "registered_practice_organization_id",
-      { mode: "number" },
-    ),
+    registeredPracticeOrganizationId: bigint("registered_practice_organization_id", { mode: "number" })
   },
-  (table) => [primaryKey({ columns: [table.id], name: "patient_id" })],
+  table => [primaryKey({ columns: [table.id], name: "patient_id" })]
 );
 
 export const patientAddress = mysqlTable(
@@ -299,9 +267,9 @@ export const patientAddress = mysqlTable(
     msoa2011Code: varchar("msoa_2011_code", { length: 9 }),
     wardCode: varchar("ward_code", { length: 9 }),
     localAuthorityCode: varchar("local_authority_code", { length: 9 }),
-    townsendDeprivationIndex: double("townsend_deprivation_index"),
+    townsendDeprivationIndex: double("townsend_deprivation_index")
   },
-  (table) => [primaryKey({ columns: [table.id], name: "patient_address_id" })],
+  table => [primaryKey({ columns: [table.id], name: "patient_address_id" })]
 );
 
 export const patientContact = mysqlTable(
@@ -317,9 +285,9 @@ export const patientContact = mysqlTable(
     startDate: date("start_date", { mode: "string" }),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
     endDate: date("end_date", { mode: "string" }),
-    value: varchar({ length: 255 }),
+    value: varchar({ length: 255 })
   },
-  (table) => [primaryKey({ columns: [table.id], name: "patient_contact_id" })],
+  table => [primaryKey({ columns: [table.id], name: "patient_contact_id" })]
 );
 
 export const practitioner = mysqlTable(
@@ -330,9 +298,9 @@ export const practitioner = mysqlTable(
     name: varchar({ length: 1024 }),
     roleCode: varchar("role_code", { length: 50 }),
     roleDesc: varchar("role_desc", { length: 255 }),
-    gmcCode: varchar("gmc_code", { length: 50 }),
+    gmcCode: varchar("gmc_code", { length: 50 })
   },
-  (table) => [primaryKey({ columns: [table.id], name: "practitioner_id" })],
+  table => [primaryKey({ columns: [table.id], name: "practitioner_id" })]
 );
 
 export const smallPat = mysqlTable("small_pat", {
@@ -350,8 +318,5 @@ export const smallPat = mysqlTable("small_pat", {
   dateOfDeath: date("date_of_death", { mode: "string" }),
   currentAddressId: bigint("current_address_id", { mode: "number" }),
   ethnicCodeConceptId: int("ethnic_code_concept_id"),
-  registeredPracticeOrganizationId: bigint(
-    "registered_practice_organization_id",
-    { mode: "number" },
-  ),
+  registeredPracticeOrganizationId: bigint("registered_practice_organization_id", { mode: "number" })
 });

@@ -45,6 +45,7 @@ Cohort queries and most dataset queries are already being converted to SQL.
 ## Testing
 
 Test all APIs for the following actions:
+
 - Add queries to the queue using API endpoints
 - Retrieve job status
 - Get query results

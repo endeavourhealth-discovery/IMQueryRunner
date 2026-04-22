@@ -1,10 +1,11 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import DataModelService from "~~/server/services/DataModelService";
+
+import * as z from "zod";
 
 const paramSchema = z.object({
   iris: z.string(),
-  valueType: z.string(),
+  valueType: z.string()
 });
 
 defineRouteMeta({
@@ -16,22 +17,18 @@ defineRouteMeta({
       {
         name: "iris",
         description: "Iris of the data models in comma separated string",
-        in: "query",
+        in: "query"
       },
       {
         name: "valueType",
         description: "Value type required by properties",
-        in: "query",
-      },
-    ],
-  },
+        in: "query"
+      }
+    ]
+  }
 });
 export default defineEventHandler(async (event): Promise<any> => {
   const sessionId = getCookie(event, "session_id")!;
   const { iris, valueType } = await getQueryParams(event, paramSchema.parse);
-  return await DataModelService.getDataModelPropertiesWithValueType(
-    sessionId,
-    iris.split(","),
-    valueType,
-  );
+  return await DataModelService.getDataModelPropertiesWithValueType(sessionId, iris.split(","), valueType);
 });

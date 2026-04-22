@@ -1,20 +1,19 @@
-import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
-import { pgJobInsert, postgresDb } from "~~/server/db/postgres";
-import { jobTable } from "~~/server/db/postgres/schema";
-import { type QueryRequest } from "vue-library/interfaces";
 import { JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
-import { v4 } from "uuid";
+import { pgJobInsert, postgresDb } from "~~/server/db/postgres";
+import { jobTable } from "~~/server/db/postgres/schema";
+import { sendMessage } from "~~/server/rabbitmq/rabbitmq";
 import QueryService from "~~/server/services/QueryService";
 
-export default defineEventHandler(async (event) => {
+import { type QueryRequest } from "vue-library/interfaces";
+
+import { v4 } from "uuid";
+
+export default defineEventHandler(async event => {
   const sessionId = getCookie(event, "session_id");
   const user = await globalThis.apiGuard.getUser(event);
   const queryRequest: QueryRequest = await readBody(event);
-  const getQueryRequestForSQL = await QueryService.getQueryRequestForSQL(
-    sessionId!,
-    queryRequest,
-  );
+  const getQueryRequestForSQL = await QueryService.getQueryRequestForSQL(sessionId!, queryRequest);
   const hash = hashQueryRequest(getQueryRequestForSQL);
   try {
     await QueryService.generateQuerySQLfromQuery(sessionId!, queryRequest);
@@ -29,7 +28,7 @@ export default defineEventHandler(async (event) => {
     queryType: getQueryRequestForSQL.query.queryType,
     status: JobStatus.QUEUED,
     userId: user!.id,
-    queueDate: new Date().toISOString(),
+    queueDate: new Date().toISOString()
   } as Job;
   await postgresDb.insert(jobTable).values(pgJobInsert.parse(queryTask));
   await sendMessage(user!.id, queryTask);

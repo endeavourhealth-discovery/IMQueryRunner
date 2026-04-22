@@ -1,10 +1,11 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import * as z from "zod";
 import DataModelService from "~~/server/services/DataModelService";
+
+import * as z from "zod";
 
 const paramSchema = z.object({
   dmIri: z.string(),
-  propIri: z.string(),
+  propIri: z.string()
 });
 
 defineRouteMeta({
@@ -14,9 +15,9 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
       { name: "dmIri", description: "Iri of the data model", in: "query" },
-      { name: "propiri", description: "Iri of the data model", in: "query" },
-    ],
-  },
+      { name: "propiri", description: "Iri of the data model", in: "query" }
+    ]
+  }
 });
 export default defineEventHandler(async (event): Promise<any> => {
   const sessionId = getCookie(event, "session_id")!;

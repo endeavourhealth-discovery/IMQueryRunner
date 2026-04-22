@@ -1,5 +1,6 @@
-import * as z from "zod";
 import { PrimeVuePresetThemes } from "vue-library/enums";
+
+import * as z from "zod";
 
 const bodySchema = z.boolean();
 
@@ -7,21 +8,19 @@ defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Update user dark mode",
-    parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
-    ],
+    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
         "application/json": {
           schema: {
             type: "boolean",
-            summary: "Dark mode",
-          },
-        },
-      },
-    },
-  },
+            summary: "Dark mode"
+          }
+        }
+      }
+    }
+  }
 });
 
 export default defineEventHandler(async (event): Promise<any> => {

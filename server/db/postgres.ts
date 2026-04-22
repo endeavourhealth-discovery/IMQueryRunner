@@ -1,6 +1,7 @@
 import { drizzle } from "drizzle-orm/node-postgres";
-import * as schema from "./postgres/schema";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+
+import * as schema from "./postgres/schema";
 import { jobTable } from "./postgres/schema";
 
 if (!process.env.POSTGRES_URL) {
