@@ -15,7 +15,8 @@
     "drizzle-pull-mysql": "npx drizzle-kit pull --config=server/db/mysql.drizzle.ts",
     "format": "prettier --write \"{app,docs,enums,models,server,shared,types,tests}/**/*.{js,ts,vue,json,css,scss,md}\"",
     "format:check": "prettier --write \"{app,docs,enums,models,server,shared,types,tests}/**/*.{js,ts,vue,json,css,scss,md}\"",
-    "prepare": "husky"
+    "prepare": "husky",
+    "preinstall": "pnpm add endeavourhealth-discovery/VueLibrary"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.896.0",
