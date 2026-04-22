@@ -1,4 +1,5 @@
-import type { User } from "~~/models/User";
+import type { User } from "vue-library/models";
+
 import { defineStore } from "pinia";
 
 export const useUserStore = defineStore("user", () => {
@@ -6,7 +7,7 @@ export const useUserStore = defineStore("user", () => {
   const isLoggedIn = computed(() => user.value != null);
 
   function hasRole(roles: string[]): boolean {
-    return roles.some((r) => user.value?.roles.includes(r));
+    return roles.some(r => user.value?.roles.includes(r));
   }
   function setUser(u: User | null) {
     user.value = u;
@@ -16,6 +17,6 @@ export const useUserStore = defineStore("user", () => {
     user,
     isLoggedIn,
     hasRole,
-    setUser,
+    setUser
   };
 });

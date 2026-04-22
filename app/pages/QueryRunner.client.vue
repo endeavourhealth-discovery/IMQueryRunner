@@ -1,23 +1,10 @@
 <template>
   <div class="flex-auto overflow-auto">
     <div class="h-[calc(100% - 3.5rem)] overflow-auto">
-      <div
-        class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
-      >
+      <div class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)">
         <div class="flex gap-2 m-2">
-          <Button
-            class="flex"
-            severity="secondary"
-            icon="fa-solid fa-arrows-rotate"
-            label="Refresh"
-            @click="refresh"
-          />
-          <Button
-            class="flex"
-            icon="fa-solid fa-magnifying-glass"
-            label="Run a query"
-            @click="runQuery"
-          />
+          <Button class="flex" severity="secondary" icon="fa-solid fa-arrows-rotate" label="Refresh" @click="refresh" />
+          <Button class="flex" icon="fa-solid fa-magnifying-glass" label="Run a query" @click="runQuery" />
         </div>
         <DataTable
           :value="jobs"
@@ -29,12 +16,7 @@
           @page="onPage($event)"
           :lazy="true"
           :totalRecords="totalCount"
-          :rows-per-page-options="[
-            rowsOriginal,
-            rowsOriginal * 2,
-            rowsOriginal * 4,
-            rowsOriginal * 8,
-          ]"
+          :rows-per-page-options="[rowsOriginal, rowsOriginal * 2, rowsOriginal * 4, rowsOriginal * 8]"
           :loading="searchLoading"
           :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
         >
@@ -42,34 +24,23 @@
           <Column field="jobName" header="Job name"></Column>
           <Column>
             <template #body="{ data }: { data: Job }">
-              <Button
-                :disabled="!data.queryRequest.argument.length"
-                label="View arguments"
-                @click="viewArgumentDisplay(data.queryRequest.argument)"
-              />
+              <Button :disabled="!data.queryRequest.argument.length" label="View arguments" @click="viewArgumentDisplay(data.queryRequest.argument)" />
             </template>
           </Column>
           <Column v-if="adminView" field="userId" header="User"></Column>
           <Column field="queuedAt" header="Queued">
             <template #body="{ data }: { data: Job }">
-              <span>{{
-                  data.queueDate ? getDisplayDateTime(data.queueDate) : "-"
-                }}</span>
+              <span>{{ data.queueDate ? getDisplayDateTime(data.queueDate) : "-" }}</span>
             </template>
           </Column>
           <Column field="stoppedAt" header="Finished">
             <template #body="{ data }: { data: Job }">
-              <span>{{
-                  data.finishDate ? getDisplayDateTime(data.finishDate) : "-"
-                }}</span>
+              <span>{{ data.finishDate ? getDisplayDateTime(data.finishDate) : "-" }}</span>
             </template>
           </Column>
           <Column field="status" header="Status">
             <template #body="{ data }: { data: Job }">
-              <Tag
-                :severity="data.status ? getStatusSeverity(data.status) : '-'"
-                :value="data.status"
-              />
+              <Tag :severity="data.status ? getStatusSeverity(data.status) : '-'" :value="data.status" />
             </template>
           </Column>
           <Column>
@@ -87,37 +58,36 @@
         </DataTable>
       </div>
     </div>
-    <ArgumentDisplayDialog
-      :arguments="currentArguments"
-      :show-footer-buttons="false"
-      v-model:showDialog="showArgumentDisplay"
-    />
+    <ArgumentDisplayDialog :arguments="currentArguments" :show-footer-buttons="false" v-model:showDialog="showArgumentDisplay" />
   </div>
 </template>
 
 <script setup lang="ts">
-import type {Job} from "~~/models";
-import {JobStatus} from "~~/enums";
-import {onMounted, ref} from "vue";
-import type {Ref} from "vue";
-import type {Argument} from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
-import {io} from "socket.io-client";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
-import {useUserStore} from "~/stores/useUserStore";
+import { useUserStore } from "~/stores/useUserStore";
+import { JobStatus } from "~~/enums";
+import type { Job } from "~~/models";
+
+import { onMounted, ref } from "vue";
+import type { Ref } from "vue";
+
+import type { Argument } from "vue-library/interfaces";
+
+import { io } from "socket.io-client";
 
 definePageMeta({
   requiresAuth: true,
-  requiresRole: ["EXECUTOR", "ADMIN"],
+  requiresRole: ["EXECUTOR", "ADMIN"]
 });
 
-const {user} = useUserStore();
+const { user } = useUserStore();
 const confirm = useConfirm();
 
 const socket = io({
   extraHeaders: {
-    authorization: `bearer ${user?.id}`,
-  },
+    authorization: `bearer ${user?.id}`
+  }
 });
 
 const jobs: Ref<Job[]> = ref([]);
@@ -137,7 +107,7 @@ const adminView = false; //TODO: determine admin view based on user role and pre
 onMounted(async () => {
   loading.value = true;
   loading.value = false;
-  socket.emit("joinRoom", "test-room", user?.userName);
+  socket.emit("joinRoom", "test-room", user?.username);
   socket.on("message", function (data) {
     alert(data);
   });
@@ -154,8 +124,8 @@ async function initSearch() {
     query: {
       userId: user?.id,
       page: page.value,
-      size: rows.value,
-    },
+      size: rows.value
+    }
   });
   if (results.data.value) {
     totalCount.value = results.data.value.totalCount;
@@ -173,16 +143,13 @@ async function initSearch() {
 
 async function refresh() {
   searchLoading.value = true;
-  const foundJobs = await $fetch<{ totalCount: number; result: Job[] }>(
-    "/api/queue",
-    {
-      query: {
-        userId: user?.id,
-        page: page.value,
-        size: rows.value,
-      },
-    },
-  );
+  const foundJobs = await $fetch<{ totalCount: number; result: Job[] }>("/api/queue", {
+    query: {
+      userId: user?.id,
+      page: page.value,
+      size: rows.value
+    }
+  });
   if (foundJobs) {
     totalCount.value = foundJobs.totalCount;
     jobs.value = foundJobs.result;
@@ -194,9 +161,7 @@ async function refresh() {
   searchLoading.value = false;
 }
 
-function getStatusSeverity(
-  status: JobStatus,
-): "secondary" | "success" | "info" | "warn" | "danger" | "contrast" {
+function getStatusSeverity(status: JobStatus): "secondary" | "success" | "info" | "warn" | "danger" | "contrast" {
   switch (status) {
     case JobStatus.QUEUED:
       return "warn";
@@ -223,20 +188,18 @@ async function goToQuery(queryIri: string) {
     message: "Are you sure you want to navigate away from this page?",
     header: "Navigate",
     acceptProps: {
-      label: "Proceed",
+      label: "Proceed"
     },
     rejectProps: {
       label: "Cancel",
       severity: "secondary",
-      outlined: true,
+      outlined: true
     },
     accept: async () => {
       const config = useRuntimeConfig();
-      const encoded = `${config.public.imDirectoryUrl!}#/directory/folder/${encodeURIComponent(
-        queryIri,
-      )}`;
-      await navigateTo(encoded, {external: true});
-    },
+      const encoded = `${config.public.imDirectoryUrl!}#/directory/folder/${encodeURIComponent(queryIri)}`;
+      await navigateTo(encoded, { external: true });
+    }
   });
 }
 
@@ -256,7 +219,7 @@ function runQuery() {
 
 async function deleteJob(jobId: string) {
   await $fetch(`/api/queue/job/${jobId}`, {
-    method: "delete",
+    method: "delete"
   });
   await refresh();
 }
@@ -266,13 +229,13 @@ async function requeueJob(jobId: string) {
   if (found)
     await $fetch("/api/queue/job/add", {
       method: "post",
-      body: found.queryRequest,
+      body: found.queryRequest
     });
   await refresh();
 }
 
 function getById(jobId: string): Job | undefined {
-  return jobs.value.find((item) => item.dbid === jobId);
+  return jobs.value.find(item => item.dbid === jobId);
 }
 
 async function onPage(event: any) {
@@ -283,33 +246,21 @@ async function onPage(event: any) {
 }
 
 function scrollToTop() {
-  const scrollArea = document.getElementsByClassName(
-    "p-datatable-scrollable-table",
-  )[0] as HTMLElement;
-  scrollArea?.scrollIntoView({block: "start", behavior: "smooth"});
+  const scrollArea = document.getElementsByClassName("p-datatable-scrollable-table")[0] as HTMLElement;
+  scrollArea?.scrollIntoView({ block: "start", behavior: "smooth" });
 }
 
 function getDisplayDateTime(date: string) {
   const d = new Date(date);
   return (
-    d.getUTCDate() +
-    "/" +
-    (d.getUTCMonth() + 1) +
-    "/" +
-    d.getUTCFullYear() +
-    " " +
-    d.getUTCHours() +
-    ":" +
-    d.getUTCMinutes() +
-    ":" +
-    d.getUTCMilliseconds()
+    d.getUTCDate() + "/" + (d.getUTCMonth() + 1) + "/" + d.getUTCFullYear() + " " + d.getUTCHours() + ":" + d.getUTCMinutes() + ":" + d.getUTCMilliseconds()
   );
 }
 
 function onConnect() {
   websocketIsConnected.value = true;
   transport.value = socket.io.engine.transport.name;
-  socket.io.engine.on("upgrade", (rawTransport) => {
+  socket.io.engine.on("upgrade", rawTransport => {
     transport.value = rawTransport.name;
   });
 }
@@ -323,7 +274,7 @@ onBeforeUnmount(() => {
   socket.disconnect();
 });
 
-socket.on("queueUpdate", (value) => {
+socket.on("queueUpdate", value => {
   jobs.value = value;
 });
 </script>

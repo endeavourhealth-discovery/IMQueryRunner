@@ -8,9 +8,7 @@
       data-testid="view-query-button"
     />
     <Button
-      v-if="
-        job.status && [JobStatus.QUEUED, JobStatus.RUNNING].includes(job.status)
-      "
+      v-if="job.status && [JobStatus.QUEUED, JobStatus.RUNNING].includes(job.status)"
       icon="fa-duotone fa-solid fa-ban"
       severity="danger"
       class="p-button-rounded p-button-text activity-row-button"
@@ -19,12 +17,7 @@
       data-testid="cancel-query-button"
     />
     <Button
-      v-if="
-        job.status &&
-        [JobStatus.COMPLETED, JobStatus.CANCELLED, JobStatus.ERRORED].includes(
-          job.status,
-        )
-      "
+      v-if="job.status && [JobStatus.COMPLETED, JobStatus.CANCELLED, JobStatus.ERRORED].includes(job.status)"
       icon="fa-duotone fa-solid fa-repeat"
       severity="warn"
       class="p-button-rounded p-button-text activity-row-button"
@@ -57,12 +50,7 @@
       data-testid="delete-query-button"
     />
   </div>
-  <Dialog
-    v-model:visible="showErrorDialog"
-    modal
-    maximizable
-    header="Error details"
-  >
+  <Dialog v-model:visible="showErrorDialog" modal maximizable header="Error details">
     <div>{{ job.error }}</div>
     <template #footer>
       <div class="im-dialog-footer">
@@ -77,8 +65,10 @@
 <script setup lang="ts">
 import { JobStatus } from "@@/enums";
 import type { Job } from "~~/models";
-import { useConfirm } from "primevue/useconfirm";
+
 import { ref } from "vue";
+
+import { useConfirm } from "primevue/useconfirm";
 
 interface Props {
   job: Job;
@@ -87,11 +77,11 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits({
-  goToQuery: (_payload) => true,
-  cancelQuery: (_payload) => true,
-  viewQueryResults: (_payload) => true,
-  deleteQuery: (_payload) => true,
-  requeueQuery: (_payload) => true,
+  goToQuery: _payload => true,
+  cancelQuery: _payload => true,
+  viewQueryResults: _payload => true,
+  deleteQuery: _payload => true,
+  requeueQuery: _payload => true
 });
 
 const confirm = useConfirm();
@@ -104,46 +94,42 @@ function goToQuery() {
 
 function cancelQuery() {
   confirm.require({
-    message:
-      "Are you sure you want to cancel query '" + props.job.jobName + "'?",
+    message: "Are you sure you want to cancel query '" + props.job.jobName + "'?",
     header: "Confirm cancellation",
     icon: "pi pi-exclamation-triangle",
     rejectProps: {
       label: "No",
       severity: "secondary",
-      outlined: true,
+      outlined: true
     },
     acceptProps: {
-      label: "Yes",
+      label: "Yes"
     },
     accept: () => emit("cancelQuery", props.job.dbid),
-    reject: () => confirm.close(),
+    reject: () => confirm.close()
   });
 }
 
 function deleteQuery() {
   confirm.require({
-    message:
-      "Are you sure you want to delete query '" +
-      props.job.jobName +
-      "' from the queue?",
+    message: "Are you sure you want to delete query '" + props.job.jobName + "' from the queue?",
     header: "Confirm cancellation",
     icon: "pi pi-exclamation-triangle",
     rejectProps: {
       label: "No",
       severity: "secondary",
-      outlined: true,
+      outlined: true
     },
     acceptProps: {
-      label: "Yes",
+      label: "Yes"
     },
     accept: () => emit("deleteQuery", props.job.dbid),
-    reject: () => confirm.close(),
+    reject: () => confirm.close()
   });
 }
 
 async function viewQueryResults() {
-  await navigateTo({ path: `/results/${props.job.dbid}` })
+  await navigateTo({ path: `/results/${props.job.dbid}` });
 }
 
 function requeueQuery() {

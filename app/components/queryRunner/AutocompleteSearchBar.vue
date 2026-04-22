@@ -1,7 +1,7 @@
 <template>
   <div class="search-container" ref="autocompleteRoot">
     <IconField class="autocomplete-search" iconPosition="right">
-<!--
+      <!--
       <InputIcon v-if="!searchLoading && !listening" class="pi pi-microphone mic" :class="{ listening }" @click="toggleListen" />
 -->
       <InputText
@@ -18,12 +18,14 @@
         @focus="handleFocus"
         @blur="editing = false"
         @mouseover="selected?.iri != 'any'"
-        :pt="{ root: { autocomplete: allowBrowserAutocomplete ? 'on' : 'off' } }"
+        :pt="{
+          root: { autocomplete: allowBrowserAutocomplete ? 'on' : 'off' }
+        }"
       />
       <i v-if="editing" class="fa fa-times-circle clear-icon" @mousedown.prevent="clearSearch()"></i>
     </IconField>
     <Button
-        class="search-button px-2"
+      class="search-button px-2"
       :disabled="disabled"
       @click="advancedSearch"
       data-testid="autocomplete-search-button"
@@ -37,11 +39,7 @@
       <div v-else class="results-container" :tabindex="0">
         <Listbox v-if="results?.entities" v-model="listBoxSelected" :options="results.entities">
           <template #option="slotProps">
-            <div
-              class="listbox-item"
-              @mouseover="slotProps.option.iri != 'any'"
-              @click="onListBoxOptionClick(slotProps.option)"
-            >
+            <div class="listbox-item" @mouseover="slotProps.option.iri != 'any'" @click="onListBoxOptionClick(slotProps.option)">
               <span>{{ slotProps.option.bestMatch ? slotProps.option.bestMatch : slotProps.option.name }}</span>
             </div>
           </template>
@@ -58,7 +56,17 @@
     </Popover>
   </div>
   <Dialog v-model:visible="showDialog" modal :closable="false">
-    <Tree v-model:expandedKeys="expandedKeys" v-model:selectionKeys="selectedKeys" selectionMode="single" @nodeSelect="onNodeSelect" :loading="loading" loadingMode="icon" :value="entities" @nodeExpand="onNodeExpand" class="dialog w-full md:w-[30rem]"></Tree>
+    <Tree
+      v-model:expandedKeys="expandedKeys"
+      v-model:selectionKeys="selectedKeys"
+      selectionMode="single"
+      @nodeSelect="onNodeSelect"
+      :loading="loading"
+      loadingMode="icon"
+      :value="entities"
+      @nodeExpand="onNodeExpand"
+      class="dialog w-full md:w-[30rem]"
+    ></Tree>
     <template #footer>
       <Button class="m-1" label="Cancel" variant="outlined" @click="showDialog = false" />
       <Button class="m-1" label="Select" :disabled="!isQuery" @click="setSelectedQuery" autofocus />
@@ -67,21 +75,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch, nextTick, onBeforeUnmount } from "vue";
-import {
-  type SearchResponse,
-  type SearchResultSummary,
-  type QueryRequest,
-  TextSearchStyle,
-  type TTIriRef, IM
-} from "~~/models/AutoGen";
-import {cloneDeep, debounce, isEqual} from "lodash-es";
-import {useAutocompleteRegistry} from "~/composables/useAutocompleteRegistry";
-import type {TreeNode} from "primevue/treenode";
-import {useIMAPI} from "~/composables/useIMAPI";
+import { useAutocompleteRegistry } from "~/composables/useAutocompleteRegistry";
+import EntityService from "~/services/EntityService";
+import QueryService from "~/services/QueryService";
+
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+
+import { IM, TextSearchStyle } from "vue-library/enums";
+import { type QueryRequest, type SearchResponse, type SearchResultSummary, type TTIriRef } from "vue-library/interfaces";
+
+import { cloneDeep, debounce, isEqual } from "lodash-es";
+import type { TreeNode } from "primevue/treenode";
 
 const { registerAutocomplete, unregisterAutocomplete } = useAutocompleteRegistry();
-const imapi = useIMAPI();
 
 interface Props {
   selected?: SearchResultSummary;
@@ -96,7 +102,10 @@ interface Props {
   validEntityQuery?: QueryRequest;
 }
 
-const props = withDefaults(defineProps<Props>(), { rootEntities: () => [] as string[], allowBrowserAutocomplete: false });
+const props = withDefaults(defineProps<Props>(), {
+  rootEntities: () => [] as string[],
+  allowBrowserAutocomplete: false
+});
 
 const emit = defineEmits<{
   "update:selected": [payload: SearchResultSummary | undefined];
@@ -143,12 +152,12 @@ watch(
 );
 
 watch(
-    selectedKeys,
-    (newValue, oldValue) => {
-      if (newValue !== oldValue) {
-      }
-    },
-    { deep: true }
+  selectedKeys,
+  (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+    }
+  },
+  { deep: true }
 );
 
 watch(
@@ -185,7 +194,7 @@ onMounted(async () => {
     });
   }
   searchLoading.value = false;
-  await getInitialTreeEntities()
+  await getInitialTreeEntities();
 });
 
 onBeforeUnmount(() => {
@@ -223,32 +232,32 @@ async function advancedSearch() {
 
 async function getInitialTreeEntities() {
   loading.value = true;
-  const retrievedEntities = await imapi.getEntityChildren("http://endhealth.info/im#Q_Queries");
-  for (const entity in retrievedEntities) {
-    entities.value.push(
-        { key: retrievedEntities[entity].iri,
-          label: retrievedEntities[entity].name,
-          data: retrievedEntities[entity].type[0].iri,
-          icon: 'fa-solid fa-folder',
+  const retrievedEntities = await EntityService.getEntityChildren("http://endhealth.info/im#Q_Queries");
+  for (const entity of retrievedEntities) {
+    const type = entity.type as TTIriRef[];
+    entities.value.push({
+      key: entity.iri,
+      label: entity.name,
+      data: type[0]!.iri,
+      icon: "fa-solid fa-folder",
+      children: [],
+      loading: false
+    });
+    if (entity.hasChildren) {
+      const retrievedChildEntities = await EntityService.getEntityChildren(entity.iri);
+      for (const childEntity of retrievedChildEntities) {
+        let icon = "fa-magnifying-glass";
+        if (childEntity.hasChildren) icon = "fa-folder";
+        const childType = childEntity.type as TTIriRef[];
+        const found = entities.value.find(e => e.key === entity.iri);
+        found.children.push({
+          key: childEntity.iri,
+          label: childEntity.name,
+          data: childType[0]!.iri,
+          icon: "fa-solid " + icon,
           children: [],
           loading: false
-        }
-    )
-    if (retrievedEntities[entity].hasChildren) {
-      const retrievedChildEntities = await imapi.getEntityChildren(retrievedEntities[entity].iri);
-      for (const childEntity in retrievedChildEntities) {
-        let icon = 'fa-magnifying-glass'
-        if (retrievedChildEntities[childEntity].hasChildren) icon = 'fa-folder';
-        entities.value[parseInt(entity)].children.push(
-            {
-              key: retrievedChildEntities[childEntity].iri,
-              label: retrievedChildEntities[childEntity].name,
-              data: retrievedChildEntities[childEntity].type[0].iri,
-              icon: 'fa-solid ' + icon,
-              children: [],
-              loading: false
-            }
-        )
+        });
       }
     }
   }
@@ -256,27 +265,28 @@ async function getInitialTreeEntities() {
 }
 
 const onNodeExpand = async (node: any) => {
- for (const child in node.children) {
-   if (node.children[child].children.length === 0 && node.children[child].icon === 'fa-solid fa-folder') {
-     node.children[child].loading = true;
-     const retrievedEntities = await imapi.getEntityChildren(node.children[child].key);
-     let children = [];
-     for (const entity in retrievedEntities) {
-       let icon = 'fa-magnifying-glass'
-       if (retrievedEntities[entity].hasChildren) icon = 'fa-folder';
-       children.push({
-         key: retrievedEntities[entity].iri,
-         label: retrievedEntities[entity].name,
-         data: retrievedEntities[entity].type[0].iri,
-         icon: 'fa-solid ' + icon,
-         children: [],
-         loading: false
-       })
-     }
-     node.children[child].children = children;
-     node.children[child].loading = false;
-   }
- }
+  for (const child in node.children) {
+    if (node.children[child].children.length === 0 && node.children[child].icon === "fa-solid fa-folder") {
+      node.children[child].loading = true;
+      const retrievedEntities = await EntityService.getEntityChildren(node.children[child].key);
+      let children = [];
+      for (const entity of retrievedEntities) {
+        let icon = "fa-magnifying-glass";
+        if (entity.hasChildren) icon = "fa-folder";
+        const type = entity.type as TTIriRef[];
+        children.push({
+          key: entity.iri,
+          label: entity.name,
+          data: type[0]!.iri,
+          icon: "fa-solid " + icon,
+          children: [],
+          loading: false
+        });
+      }
+      node.children[child].children = children;
+      node.children[child].loading = false;
+    }
+  }
 };
 
 function onNodeSelect(node: TreeNode) {
@@ -287,8 +297,8 @@ function onNodeSelect(node: TreeNode) {
 function setSelectedQuery() {
   selectedLocal.value = {
     iri: selectedQuery.value?.key,
-    scheme: {iri: ""} as TTIriRef,
-    status: {iri: ""} as TTIriRef,
+    scheme: { iri: "" } as TTIriRef,
+    status: { iri: "" } as TTIriRef,
     type: [] as TTIriRef[],
     name: selectedQuery.value?.label
   } as SearchResultSummary;
@@ -349,7 +359,7 @@ async function search() {
       imQueryCopy.textSearch = searchText.value;
       imQueryCopy.page = { pageNumber: 1, pageSize: 10 };
       imQueryCopy.textSearchStyle = TextSearchStyle.autocomplete;
-      const response = await imapi.queryIMSearch(imQueryCopy);
+      const response = await QueryService.queryIMSearch(imQueryCopy);
       searchLoading.value = false;
       return response;
     }

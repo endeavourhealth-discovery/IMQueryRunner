@@ -2,47 +2,47 @@
   <div>
     <div class="flex gap-2 m-2">
       <div class="m-2">
-        <Button icon="fa-solid fa-arrow-left" label="Back to queue" severity="secondary" @click="backToQueue"/>
+        <Button icon="fa-solid fa-arrow-left" label="Back to queue" severity="secondary" @click="backToQueue" />
       </div>
     </div>
     <div class="m-2">
       <span class="m-2">Find a query:</span>
-      <AutocompleteSearchBar v-model:selected="selected" :im-query="request" :search-placeholder="'Search queries'"/>
+      <AutocompleteSearchBar v-model:selected="selected" :im-query="request" :search-placeholder="'Search queries'" />
     </div>
     <div>
-      <ArgumentDisplay v-if="selected && args?.length"
-                       :arguments="args"
-                       :showFooterButtons="false"
-                       :editArguments="true"
-                       @hide-dialog="showDialog = false"
-                       @arguments-completed="passArguments"
+      <ArgumentDisplay
+        v-if="selected && args?.length"
+        :arguments="args"
+        :showFooterButtons="false"
+        :editArguments="true"
+        @hide-dialog="showDialog = false"
+        @arguments-completed="passArguments"
       />
     </div>
     <div class="m-2">
-      <Button icon="fa-solid fa-play" label="Add to queue" :disabled="selected === undefined"
-              @click="showDialog = true"/>
+      <Button icon="fa-solid fa-play" label="Add to queue" :disabled="selected === undefined" @click="showDialog = true" />
     </div>
     <Dialog v-model:visible="showDialog" :closable="false" modal>
-      Run query <span class="font-bold">{{ selected?.name }}</span>?
+      Run query <span class="font-bold">{{ selected?.name }}</span
+      >?
       <template #footer>
-        <Button class="m-1" label="Cancel" variant="outlined" @click="showDialog = false" autofocus/>
-        <Button class="m-1" label="Select" @click="runQuery" autofocus/>
+        <Button class="m-1" label="Cancel" variant="outlined" @click="showDialog = false" autofocus />
+        <Button class="m-1" label="Select" @click="runQuery" autofocus />
       </template>
     </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import AutocompleteSearchBar from "~/components/queryRunner/AutocompleteSearchBar.vue";
-import {
-  type Argument,
-  type ArgumentReference,
-  type QueryRequest,
-  type SearchResultSummary,
-} from "~~/models/AutoGen";
-import {watch} from "vue";
-import {cloneDeep} from "lodash-es";
 import ArgumentDisplay from "~/components/queryRunner/ArgumentDisplay.vue";
+import AutocompleteSearchBar from "~/components/queryRunner/AutocompleteSearchBar.vue";
+import QueryService from "~/services/QueryService";
+
+import { watch } from "vue";
+
+import { type Argument, type ArgumentReference, type QueryRequest, type SearchResultSummary } from "vue-library/interfaces";
+
+import { cloneDeep } from "lodash-es";
 
 interface ArgumentSelection extends ArgumentReference {
   valueData?: any;
@@ -59,19 +59,17 @@ const request: any = {
           iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
           is: [
             {
-              iri: "http://endhealth.info/im#Query",
-            },
-          ],
-        },
-      ],
-    },
-  },
+              iri: "http://endhealth.info/im#Query"
+            }
+          ]
+        }
+      ]
+    }
+  }
 };
 
 const showDialog = ref(false);
 const missingArgs = ref(true);
-
-const imapi = useIMAPI();
 
 watch(
   selected,
@@ -81,7 +79,7 @@ watch(
       getArguments();
     }
   },
-  {deep: true}
+  { deep: true }
 );
 
 watch(
@@ -95,7 +93,7 @@ watch(
       }
     }
   },
-  {deep: true}
+  { deep: true }
 );
 
 function passArguments(args: Argument[], runOnConfirm: boolean) {
@@ -108,19 +106,21 @@ async function runQuery() {
     method: "post",
     body: {
       query: {
-        iri: selected.value?.iri,
+        iri: selected.value?.iri
       },
       argument: completedArguments.value
-    } as QueryRequest,
+    } as QueryRequest
   });
   showDialog.value = false;
   backToQueue();
 }
 
 async function getArguments() {
-  const query = await imapi.getQueryFromIri(selected.value!.iri);
+  const query = await QueryService.getQueryFromIri(selected.value!.iri);
   query.iri = selected.value!.iri;
-  args.value = await imapi.findRequestMissingArguments({query: query} as QueryRequest);
+  args.value = await QueryService.findMissingArguments({
+    query: query
+  } as QueryRequest);
   missingArgs.value = !!args.value.length;
 }
 

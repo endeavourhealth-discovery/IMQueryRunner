@@ -1,13 +1,4 @@
-import {
-  pgSchema,
-  uuid,
-  varchar,
-  jsonb,
-  timestamp,
-  integer,
-  text,
-  bigint,
-} from "drizzle-orm/pg-core";
+import { bigint, integer, jsonb, pgSchema, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 const queryRunner = pgSchema("query_runner");
 
@@ -23,5 +14,5 @@ export const jobTable = queryRunner.table("job", {
   finishDate: timestamp("finish_date", { precision: 3, mode: "string" }),
   pid: integer("pid"),
   status: text("status").notNull(),
-  error: text("error"),
+  error: text("error")
 });

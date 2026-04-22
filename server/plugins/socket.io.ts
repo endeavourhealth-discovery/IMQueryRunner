@@ -1,20 +1,20 @@
-import type { NitroApp } from "nitropack";
-import { Server as Engine } from "engine.io";
-import { defineEventHandler } from "h3";
-import { Server } from "socket.io";
 import Logger from "#shared/logger";
 
+import { Server as Engine } from "engine.io";
+import { defineEventHandler } from "h3";
+import type { NitroApp } from "nitropack";
+import { Server } from "socket.io";
+
 export default defineNitroPlugin((nitroApp: NitroApp) => {
-  const LOG = Logger("server/plugins/socket")
+  const LOG = Logger("server/plugins/socket");
   const engine = new Engine();
   const io = new Server();
 
   globalThis.io = io;
   io.bind(engine);
 
-  io.on("connection", (socket) => {
-    socket.on("disconnect", () => {
-    });
+  io.on("connection", socket => {
+    socket.on("disconnect", () => {});
 
     socket.on("hello", () => {
       LOG.debug(`============= hello ${socket.id} ============`);
@@ -30,7 +30,7 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
         from_id: user.id,
         from_name: user.name,
         system: true,
-        content: `${user.name ?? user.id} left the room`,
+        content: `${user.name ?? user.id} left the room`
       });
     });
 
@@ -58,8 +58,8 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
             peer._internal.nodeReq.socket,
             peer.websocket
           );
-        },
-      },
+        }
+      }
     })
   );
 });
