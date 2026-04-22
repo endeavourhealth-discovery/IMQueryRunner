@@ -1,25 +1,21 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import SetService from "~~/server/services/SetService";
 
-const bodySchema = z
-  .object({
-    ownRow: z.boolean().default(false),
-    format: z.string(),
-    options: z.object({
-      setIri: z.string(),
-      schemes: z.array(z.string()).prefault([]),
-      includeIM1id: z.boolean().default(false),
-      subsumptions: z.array(z.string()).prefault([]),
-      includeDefinition: z.boolean().default(false),
-      includeCore: z.boolean().default(false),
-      includeLegacy: z.boolean().default(false),
-      includeSubsets: z.boolean().default(false),
-    }),
-  })
-  .openapi({
-    description: "Set export request",
-  });
+const bodySchema = z.object({
+  ownRow: z.boolean().default(false),
+  format: z.string(),
+  options: z.object({
+    setIri: z.string(),
+    schemes: z.array(z.string()).prefault([]),
+    includeIM1id: z.boolean().default(false),
+    subsumptions: z.array(z.string()).prefault([]),
+    includeDefinition: z.boolean().default(false),
+    includeCore: z.boolean().default(false),
+    includeLegacy: z.boolean().default(false),
+    includeSubsets: z.boolean().default(false),
+  }),
+});
 
 defineRouteMeta({
   openAPI: {
@@ -28,6 +24,66 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            summary: "Set export request",
+            properties: {
+              ownRow: {
+                type: "boolean",
+                default: false,
+              },
+              format: {
+                type: "string",
+              },
+              options: {
+                type: "object",
+                properties: {
+                  setIri: {
+                    type: "string",
+                  },
+                  schemes: {
+                    type: "array",
+                    items: { type: "string" },
+                    default: [],
+                  },
+                  includeIM1id: {
+                    type: "boolean",
+                    default: false,
+                  },
+                  subsumptions: {
+                    type: "array",
+                    items: { type: "string" },
+                    default: [],
+                  },
+                  includeDefinition: {
+                    type: "boolean",
+                    default: false,
+                  },
+                  includeCore: {
+                    type: "boolean",
+                    default: false,
+                  },
+                  includeLegacy: {
+                    type: "boolean",
+                    default: false,
+                  },
+                  includeSubsets: {
+                    type: "boolean",
+                    default: false,
+                  },
+                },
+                required: ["setIri"],
+              },
+            },
+            required: ["format", "options"],
+          },
+        },
+      },
+    },
   },
 });
 

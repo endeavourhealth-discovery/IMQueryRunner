@@ -1,9 +1,7 @@
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import { PrimeVuePresetThemes } from "vue-library/enums";
 
-const bodySchema = z.array(z.string()).openapi({
-  description: "Organisations list",
-});
+const bodySchema = z.array(z.string());
 
 defineRouteMeta({
   openAPI: {
@@ -12,6 +10,21 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "array",
+            summary: "Organisations list",
+            items: {
+              type: "string",
+              description: "Organisation iri",
+            },
+          },
+        },
+      },
+    },
   },
 });
 

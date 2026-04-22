@@ -1,16 +1,12 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import QueryService from "~~/server/services/QueryService";
 import { DisplayMode } from "vue-library/enums";
 
-const bodySchema = z
-  .object({
-    query: z.any(),
-    displayMode: z.enum(DisplayMode),
-  })
-  .openapi({
-    description: "Get query display from a query",
-  });
+const bodySchema = z.object({
+  query: z.any(),
+  displayMode: z.enum(DisplayMode),
+});
 
 defineRouteMeta({
   openAPI: {
@@ -19,6 +15,29 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            summary: "Get query display from a query",
+            properties: {
+              query: {
+                type: "object",
+                description: "Query to get display for",
+              },
+              displayMode: {
+                type: "string",
+                description: "Iri of the folder",
+                enum: Object.values(DisplayMode),
+              },
+            },
+            required: ["query", "displayMode"],
+          },
+        },
+      },
+    },
   },
 });
 

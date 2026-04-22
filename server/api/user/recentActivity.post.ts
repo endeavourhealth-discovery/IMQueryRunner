@@ -1,4 +1,4 @@
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import { RecentActivityItemSchema } from "vue-library/models";
 
 const bodySchema = z.array(RecentActivityItemSchema);
@@ -15,12 +15,11 @@ defineRouteMeta({
       content: {
         "application/json": {
           schema: {
-            type: "object",
-            properties: {
-              iri: {
-                type: "string",
-              },
-              dateTime: { type: "string", format: "date-time" },
+            type: "array",
+            items: {
+              type: "string",
+              description: "Recent activity items",
+              enum: Object.values(RecentActivityItemSchema),
             },
           },
         },

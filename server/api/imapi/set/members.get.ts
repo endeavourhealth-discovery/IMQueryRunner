@@ -1,5 +1,5 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import SetService from "~~/server/services/SetService";
 
 const paramSchema = z.object({

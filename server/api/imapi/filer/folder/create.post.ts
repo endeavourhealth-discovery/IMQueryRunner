@@ -1,15 +1,11 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import FilerService from "~~/server/services/FilerService";
 
-const bodySchema = z
-  .object({
-    container: z.string(),
-    name: z.string(),
-  })
-  .openapi({
-    description: "Create a new folder in the information model hierarchy",
-  });
+const bodySchema = z.object({
+  container: z.string(),
+  name: z.string(),
+});
 
 defineRouteMeta({
   openAPI: {
@@ -18,6 +14,28 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            summary: "Create a new folder in the information model hierarchy",
+            properties: {
+              container: {
+                type: "string",
+                description: "Iri of new folder",
+              },
+              name: {
+                type: "string",
+                description: "Name of the new folder",
+              },
+            },
+            required: ["container", "name"],
+          },
+        },
+      },
+    },
   },
 });
 

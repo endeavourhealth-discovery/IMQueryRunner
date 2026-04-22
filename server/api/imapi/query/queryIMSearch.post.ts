@@ -1,11 +1,8 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import QueryService from "~~/server/services/QueryService";
 
-const bodySchema = z.any().openapi({
-  description:
-    "Search the information model using a query returning a search response",
-});
+const bodySchema = z.any();
 
 defineRouteMeta({
   openAPI: {
@@ -14,6 +11,18 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            summary:
+              "Search the information model using a query returning a search response",
+          },
+        },
+      },
+    },
   },
 });
 

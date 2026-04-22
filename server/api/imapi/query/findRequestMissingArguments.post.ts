@@ -1,10 +1,8 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import QueryService from "~~/server/services/QueryService";
 
-const bodySchema = z.any().openapi({
-  description: "Query request",
-});
+const bodySchema = z.any();
 
 defineRouteMeta({
   openAPI: {
@@ -13,6 +11,17 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            summary: "Query request",
+          },
+        },
+      },
+    },
   },
 });
 

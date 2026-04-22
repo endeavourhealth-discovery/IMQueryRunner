@@ -1,15 +1,11 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import FilerService from "~~/server/services/FilerService";
 import { NAMESPACE } from "vue-library/enums";
 
-const bodySchema = z
-  .object({
-    document: z.any(),
-  })
-  .openapi({
-    description: "File a document of entities in the information model",
-  });
+const bodySchema = z.object({
+  document: z.any(),
+});
 
 defineRouteMeta({
   openAPI: {
@@ -18,6 +14,25 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            summary: "File a document of entities in the information model",
+            properties: {
+              document: {
+                type: "object",
+                description: "Document",
+                additionalProperties: true,
+              },
+            },
+            required: ["document"],
+          },
+        },
+      },
+    },
   },
 });
 

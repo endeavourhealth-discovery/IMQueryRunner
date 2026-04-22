@@ -1,16 +1,11 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import EntityService from "~~/server/services/EntityService";
 
-const bodySchema = z
-  .object({
-    validationIri: z.string(),
-    entity: z.any(),
-  })
-  .openapi({
-    description:
-      "Validation request with validation iri and entity to be validated",
-  });
+const bodySchema = z.object({
+  validationIri: z.string(),
+  entity: z.any(),
+});
 
 defineRouteMeta({
   openAPI: {
@@ -19,6 +14,30 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            summary:
+              "Validation request with validation iri and entity to be validated",
+            properties: {
+              validationIri: {
+                type: "string",
+                description: "IRI used for validation",
+              },
+              entity: {
+                type: "object",
+                description: "Entity payload to be validated (any shape)",
+                additionalProperties: true,
+              },
+            },
+            required: ["validationIri", "entity"],
+          },
+        },
+      },
+    },
   },
 });
 

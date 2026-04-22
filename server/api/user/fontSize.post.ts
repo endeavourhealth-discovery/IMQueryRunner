@@ -1,9 +1,7 @@
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import { FontSize } from "vue-library/enums";
 
-const bodySchema = z.enum(FontSize).openapi({
-  description: "Font size",
-});
+const bodySchema = z.enum(FontSize);
 
 defineRouteMeta({
   openAPI: {
@@ -12,6 +10,18 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "string",
+            summary: "Font size",
+            enum: Object.values(FontSize),
+          },
+        },
+      },
+    },
   },
 });
 

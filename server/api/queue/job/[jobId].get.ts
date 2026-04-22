@@ -1,4 +1,4 @@
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import { postgresDb } from "~~/server/db/postgres";
 import { eq } from "drizzle-orm";
 import { jobTable } from "~~/server/db/postgres/schema";

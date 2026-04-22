@@ -1,4 +1,4 @@
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 
 export const queryRunRequestSchema = z.object({
   query_id: z.string(),

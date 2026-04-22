@@ -1,9 +1,7 @@
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import { PrimeVueColors } from "vue-library/enums";
 
-const bodySchema = z.enum(PrimeVueColors).openapi({
-  description: "Primevue color",
-});
+const bodySchema = z.enum(PrimeVueColors);
 
 defineRouteMeta({
   openAPI: {
@@ -12,6 +10,18 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "string",
+            description: "Surface color",
+            enum: Object.values(PrimeVueColors),
+          },
+        },
+      },
+    },
   },
 });
 

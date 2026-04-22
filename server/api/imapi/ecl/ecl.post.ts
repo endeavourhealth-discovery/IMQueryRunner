@@ -1,12 +1,10 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import EclService from "~~/server/services/EclService";
 
-const bodySchema = z
-  .object({
-    query: z.any(),
-  })
-  .openapi({ description: "Query to convert to ecl" });
+const bodySchema = z.object({
+  query: z.any(),
+});
 
 defineRouteMeta({
   openAPI: {
@@ -15,6 +13,14 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: { type: "object", summary: "Query to convert to ecl" },
+        },
+      },
+    },
   },
 });
 

@@ -1,5 +1,5 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import QueryService from "~~/server/services/QueryService";
 import { DisplayMode } from "vue-library/enums";
 

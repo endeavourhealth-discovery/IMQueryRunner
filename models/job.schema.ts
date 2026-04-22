@@ -1,4 +1,4 @@
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import { JobStatus } from "~~/enums";
 
 export const jobSchema = z.object({

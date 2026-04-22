@@ -1,12 +1,10 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import EclService from "~~/server/services/EclService";
 
-const bodySchema = z
-  .object({
-    eclSearchRequest: z.any(),
-  })
-  .openapi({ description: "Request containing the ecl for searching" });
+const bodySchema = z.object({
+  eclSearchRequest: z.any(),
+});
 
 defineRouteMeta({
   openAPI: {
@@ -15,6 +13,17 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            summary: "Request containing the ecl for searching",
+          },
+        },
+      },
+    },
   },
 });
 

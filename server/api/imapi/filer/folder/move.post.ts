@@ -1,18 +1,13 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import EntityService from "~~/server/services/EntityService";
 import FilerService from "~~/server/services/FilerService";
 
-const bodySchema = z
-  .object({
-    entity: z.string(),
-    oldFolder: z.string(),
-    newFolder: z.string(),
-  })
-  .openapi({
-    description:
-      "Move folder to a new location in the information model hierarchy",
-  });
+const bodySchema = z.object({
+  entity: z.string(),
+  oldFolder: z.string(),
+  newFolder: z.string(),
+});
 
 defineRouteMeta({
   openAPI: {
@@ -21,6 +16,32 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            summary: "Create a new folder in the information model hierarchy",
+            properties: {
+              entity: {
+                type: "string",
+                description: "Iri of moving entity",
+              },
+              oldFolder: {
+                type: "string",
+                description: "Name of the old folder",
+              },
+              newFolder: {
+                type: "string",
+                description: "Name of the old folder",
+              },
+            },
+            required: ["entity", "oldFolder", "newFolder"],
+          },
+        },
+      },
+    },
   },
 });
 

@@ -1,15 +1,11 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import EntityService from "~~/server/services/EntityService";
 
-const bodySchema = z
-  .object({
-    typeIris: z.array(z.string()),
-    predicates: z.array(z.string()),
-  })
-  .openapi({
-    description: "Request allowing for multiple getPartial requests at once",
-  });
+const bodySchema = z.object({
+  typeIris: z.array(z.string()),
+  predicates: z.array(z.string()),
+});
 
 defineRouteMeta({
   openAPI: {
@@ -18,6 +14,35 @@ defineRouteMeta({
     parameters: [
       { name: "session_id", description: "User session id", in: "cookie" },
     ],
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            summary:
+              "Request allowing for multiple getPartial requests at once",
+            properties: {
+              typeIris: {
+                type: "array",
+                items: {
+                  type: "string",
+                },
+                description: "List of type IRIs",
+              },
+              predicates: {
+                type: "array",
+                items: {
+                  type: "string",
+                },
+                description: "List of predicates to retrieve",
+              },
+            },
+            required: ["typeIris", "predicates"],
+          },
+        },
+      },
+    },
   },
 });
 

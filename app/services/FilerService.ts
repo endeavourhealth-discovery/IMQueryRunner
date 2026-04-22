@@ -20,7 +20,7 @@ const FilerService = {
   },
 
   async addToFolder(entity: string, folder: string): Promise<void> {
-    return await $fetch(API_URL + "/folder/add", {
+    return await $fetch<void>(API_URL + "/folder/add", {
       params: {
         entity,
         folder,
@@ -30,7 +30,7 @@ const FilerService = {
   },
 
   async createFolder(container: string, name: string): Promise<string> {
-    return await $fetch(API_URL + "/folder/create", {
+    return await $fetch<string>(API_URL + "/folder/create", {
       params: {
         container: container,
         name: name,

@@ -1,4 +1,4 @@
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 
 export const filterOptionsSchema = z.object({
   types: z.array(z.string()),

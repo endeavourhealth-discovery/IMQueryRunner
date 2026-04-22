@@ -1,5 +1,5 @@
 import { PermissionSchema } from "vue-library/models";
-import { z } from "~~/shared/zod";
+import * as z from "zod";
 import { getIp } from "~~/server/helpers/getIp";
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
 
