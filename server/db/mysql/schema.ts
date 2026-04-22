@@ -93,14 +93,15 @@ export const queryResultTable = mysqlTable(
 );
 
 export const datasetResultsTable = mysqlTable("dataset`.`dataset_results", {
-  cohortEntityId: int("cohort_entity_id").notNull(),
+  queryResultId: int("query_result_id").notNull(),
+  entityId: int("entity_id").notNull(),
   columnGroup: varchar("column_group", { length: 255 }).notNull(),
   json: json("json").notNull(),
 });
 
 export const cohortResultsTable = mysqlTable("dataset`.`cohort_results", {
   queryResultId: int("query_result_id").notNull(),
-  entityId: int("cohort_id").notNull(),
+  entityId: int("entity_id").notNull(),
 });
 
 export const allergyIntolerance = mysqlTable(

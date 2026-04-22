@@ -73,6 +73,8 @@ import { useUserStore } from "~/stores/useUserStore";
 
 interface Props {
   jobId: string | string[] | undefined;
+  queryIri: string | string[] | undefined;
+  queryType: string | string[] | undefined;
 }
 
 const props = defineProps<Props>();
@@ -94,9 +96,9 @@ onMounted(async () => {
 });
 
 async function getQueryResults() {
-  if (props.jobId) {
+  if (props.jobId && props.queryIri && props.queryType) {
     const value = await $fetch<{ totalCount: number; result: any[] }>(
-      `/api/queue/job/results/${props.jobId}`,
+      `/api/queue/job/results/${props.jobId}/${props.queryType}/${encodeURIComponent(props.queryIri as string)}`,
       {
         query: {
           userId: user?.id,

@@ -12,6 +12,7 @@ import {
   updateWithEndTime,
 } from "../helpers/mysqlHelper";
 import { queryResultTable } from "../db/mysql/schema";
+import { and, eq } from "drizzle-orm";
 
 export async function executeQuery(
   sessionId: string,
@@ -154,10 +155,12 @@ export async function getQueryResultIdIfExists(
   iri: string,
 ): Promise<number> {
   const result = await mysqlDb.query.queryResultTable.findFirst({
-    where: (queryResultTable, { eq }) =>
-      eq(queryResultTable.id, resultSetId) &&
-      eq(queryResultTable.version, hashCodeVersion) &&
-      eq(queryResultTable.queryIri, iri),
+    where: (queryResultTable) =>
+      and(
+        eq(queryResultTable.id, resultSetId),
+        eq(queryResultTable.version, hashCodeVersion),
+        eq(queryResultTable.queryIri, iri),
+      ),
   });
   console.log(
     `Cache context check (${!!result}): ${resultSetId} with hash: ${hashCodeVersion}, iri: ${iri}.`,

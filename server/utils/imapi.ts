@@ -1,8 +1,8 @@
-import type {
-  ArgumentReference,
-  Query,
-  QueryRequest,
-  SearchResponse,
+import {
+  type ArgumentReference,
+  type Query,
+  type QueryRequest,
+  type SearchResponse,
 } from "~~/models/AutoGen";
 import type { SubQueryDependency } from "~~/models/SubQueryDependency";
 
