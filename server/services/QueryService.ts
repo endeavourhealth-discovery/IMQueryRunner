@@ -15,7 +15,7 @@ import type {
   TTEntity
 } from "vue-library/interfaces";
 
-const API_URL = `${useRuntimeConfig().public.imapiUrl}/protected/query`;
+const API_URL = `${useRuntimeConfig().public.imapiUrl}query/protected`;
 
 const QueryService = {
   async getQuerySql(sessionId: string, queryRequest: QueryRequest): Promise<string> {
@@ -166,7 +166,7 @@ const QueryService = {
   },
 
   async findMissingArguments(sessionId: string, queryRequest: QueryRequest): Promise<ArgumentReference[]> {
-    return $fetch<ArgumentReference[]>(API_URL + "/public/findRequestMissingArguments", {
+    return $fetch<ArgumentReference[]>(API_URL + "/findRequestMissingArguments", {
       headers: { cookie: `session_id=${sessionId}` },
       body: queryRequest,
       method: "POST"

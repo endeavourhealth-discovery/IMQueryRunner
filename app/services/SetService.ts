@@ -10,17 +10,8 @@ const SetService = {
     });
   },
 
-  async IMV1(conceptIri: string, raw?: boolean): Promise<Blob> {
-    return await $fetch<Blob>(API_URL + "/protected/export", {
-      params: { iri: conceptIri },
-      responseType: "blob",
-      ignoreResponseError: raw,
-      method: "GET"
-    });
-  },
-
   async getMembers(iri: string, entailments: boolean, pageIndex: number, pageSize: number, controller?: AbortController): Promise<Pageable<Node>> {
-    return await $fetch<Pageable<Node>>(API_URL + "/protected/members", {
+    return await $fetch<Pageable<Node>>(API_URL + "/members", {
       params: {
         iri: iri,
         entailments: entailments,
@@ -38,14 +29,14 @@ const SetService = {
       page: pageIndex,
       size: pageSize
     } as ECLQueryRequest;
-    return await $fetch<Pageable<Node>>(API_URL + "/protected/membersFromQuery", {
+    return await $fetch<Pageable<Node>>(API_URL + "/membersFromQuery", {
       body: request,
       method: "POST"
     });
   },
 
   async getSubsets(iri: string): Promise<TTIriRef[]> {
-    return await $fetch<TTIriRef[]>(API_URL + "/protected/subsets", {
+    return await $fetch<TTIriRef[]>(API_URL + "/subsets", {
       params: {
         iri: iri
       },
@@ -54,7 +45,7 @@ const SetService = {
   },
 
   async getFullExportSet(setRequest: SetExportRequest, raw?: boolean): Promise<Blob> {
-    return await $fetch<Blob>(API_URL + "/protected/setExport", {
+    return await $fetch<Blob>(API_URL + "/setExport", {
       body: setRequest,
       responseType: "blob",
       ignoreResponseError: raw,
@@ -63,7 +54,7 @@ const SetService = {
   },
 
   async getSetComparison(iriA?: string, iriB?: string): Promise<SetDiffObject> {
-    return await $fetch<SetDiffObject>(API_URL + "/protected/setDiff", {
+    return await $fetch<SetDiffObject>(API_URL + "/setDiff", {
       params: {
         setIriA: iriA,
         setIriB: iriB

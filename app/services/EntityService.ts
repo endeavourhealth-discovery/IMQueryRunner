@@ -25,19 +25,19 @@ const EntityService = {
   // ============================ PUBLIC ============================
 
   async getNamespaces(): Promise<Namespace[]> {
-    return await $fetch<Namespace[]>(API_URL + "/public/namespaces", {
+    return await $fetch<Namespace[]>(API_URL + "/namespaces", {
       method: "GET"
     });
   },
 
   async getFilterOptions(): Promise<FilterOptions> {
-    return await $fetch<FilterOptions>(API_URL + "/public/filterOptions", {
+    return await $fetch<FilterOptions>(API_URL + "/filterOptions", {
       method: "GET"
     });
   },
 
   async getFilterDefaultOptions(): Promise<FilterOptions> {
-    return await $fetch<FilterOptions>(API_URL + "/public/filterDefaults", {
+    return await $fetch<FilterOptions>(API_URL + "/filterDefaults", {
       method: "GET"
     });
   },
@@ -45,7 +45,7 @@ const EntityService = {
   // ============================ PROTECTED ============================
 
   async getPartialEntity(iri: string, predicates: string[]): Promise<ExtendedTTEntity> {
-    return await $fetch<ExtendedTTEntity>(API_URL + "/protected/partial", {
+    return await $fetch<ExtendedTTEntity>(API_URL + "/partial", {
       params: {
         iri: iri,
         predicates: predicates.join(",")
@@ -55,7 +55,7 @@ const EntityService = {
   },
 
   async getPartialEntities(typeIris: string[], predicates: string[]): Promise<ExtendedTTEntity[]> {
-    return await $fetch<ExtendedTTEntity[]>(API_URL + "/protected/partials", {
+    return await $fetch<ExtendedTTEntity[]>(API_URL + "/partials", {
       body: {
         iris: [...new Set(typeIris)].join(","),
         predicates: [...new Set(predicates)].join(",")
@@ -65,7 +65,7 @@ const EntityService = {
   },
 
   async getPartialEntityBundle(iri: string, predicates: string[]): Promise<TTBundle> {
-    return await $fetch<TTBundle>(API_URL + "/protected/partialBundle", {
+    return await $fetch<TTBundle>(API_URL + "/partialBundle", {
       params: {
         iri: iri,
         predicates: predicates.join(",")
@@ -75,7 +75,7 @@ const EntityService = {
   },
 
   async getEntityChildren(iri: string, filters?: FiltersAsIris, controller?: AbortController): Promise<ExtendedEntityReferenceNode[]> {
-    return await $fetch<ExtendedEntityReferenceNode[]>(API_URL + "/protected/children", {
+    return await $fetch<ExtendedEntityReferenceNode[]>(API_URL + "/children", {
       params: { iri: iri, schemeIris: filters?.schemes.join(",") },
       signal: controller?.signal,
       method: "GET"
@@ -83,14 +83,14 @@ const EntityService = {
   },
 
   async getEntityAsEntityReferenceNode(iri: string): Promise<ExtendedEntityReferenceNode> {
-    return await $fetch<ExtendedEntityReferenceNode>(API_URL + "/protected/asEntityReferenceNode", {
+    return await $fetch<ExtendedEntityReferenceNode>(API_URL + "/asEntityReferenceNode", {
       params: { iri: iri },
       method: "GET"
     });
   },
 
   async getAsEntityReferenceNodes(iris: string[]): Promise<ExtendedEntityReferenceNode[]> {
-    return await $fetch<ExtendedEntityReferenceNode[]>(API_URL + "/protected/asEntityReferenceNodes", {
+    return await $fetch<ExtendedEntityReferenceNode[]>(API_URL + "/asEntityReferenceNodes", {
       params: { iris: iris.join(",") },
       method: "GET"
     });
@@ -114,7 +114,7 @@ const EntityService = {
       currentPage: number;
       pageSize: number;
       result: ExtendedTTEntity[];
-    }>(API_URL + "/protected/childrenPaged", {
+    }>(API_URL + "/childrenPaged", {
       params: {
         iri: iri,
         page: pageIndex,
@@ -135,7 +135,7 @@ const EntityService = {
     filters?: FiltersAsIris,
     controller?: AbortController
   ): Promise<Pageable<TTIriRef>> {
-    return await $fetch<Pageable<TTIriRef>>(API_URL + "/protected/partialAndTotalCount", {
+    return await $fetch<Pageable<TTIriRef>>(API_URL + "/partialAndTotalCount", {
       params: {
         iri: iri,
         predicate: predicate,
@@ -149,7 +149,7 @@ const EntityService = {
   },
 
   async downloadEntity(iri: string): Promise<Blob> {
-    return await useApi<Blob>(API_URL + "/protected/downloadEntity", {
+    return await useApi<Blob>(API_URL + "/downloadEntity", {
       params: { iri: iri },
       responseType: "blob",
       raw: true,
@@ -158,14 +158,14 @@ const EntityService = {
   },
 
   async getEntityParents(iri: string, filters?: FiltersAsIris): Promise<ExtendedEntityReferenceNode[]> {
-    return await $fetch<ExtendedEntityReferenceNode[]>(API_URL + "/protected/parents", {
+    return await $fetch<ExtendedEntityReferenceNode[]>(API_URL + "/parents", {
       params: { iri: iri, schemeIris: filters?.schemes.join(",") },
       method: "GET"
     });
   },
 
   async getEntityUsages(iri: string, pageIndex: number, pageSize: number): Promise<ExtendedTTEntity[]> {
-    return await $fetch<ExtendedTTEntity[]>(API_URL + "/protected/usages", {
+    return await $fetch<ExtendedTTEntity[]>(API_URL + "/usages", {
       params: {
         iri: iri,
         page: pageIndex,
@@ -176,7 +176,7 @@ const EntityService = {
   },
 
   async getUsagesTotalRecords(iri: string): Promise<number> {
-    return await $fetch<number>(API_URL + "/protected/usagesTotalRecords", {
+    return await $fetch<number>(API_URL + "/usagesTotalRecords", {
       params: {
         iri: iri
       },
@@ -185,21 +185,21 @@ const EntityService = {
   },
 
   async entityExists(iri: string): Promise<boolean> {
-    return await $fetch<boolean>(API_URL + "/protected/entityExists", {
+    return await $fetch<boolean>(API_URL + "/entityExists", {
       params: { iri: iri },
       method: "GET"
     });
   },
 
   async getEntitySummary(iri: string): Promise<SearchResultSummary> {
-    return await $fetch<SearchResultSummary>(API_URL + "/protected/summary", {
+    return await $fetch<SearchResultSummary>(API_URL + "/summary", {
       params: { iri: iri },
       method: "GET"
     });
   },
 
   async downloadSearchResults(downloadSettings: DownloadByQueryOptions): Promise<Blob> {
-    return await useApi<Blob>(API_URL + "/protected/downloadSearchResults", {
+    return await useApi<Blob>(API_URL + "/downloadSearchResults", {
       body: downloadSettings,
       responseType: "blob",
       raw: true,
@@ -208,42 +208,42 @@ const EntityService = {
   },
 
   async getFolderPath(iri: string): Promise<TTIriRef[]> {
-    return await $fetch<TTIriRef[]>(API_URL + "/protected/folderPath", {
+    return await $fetch<TTIriRef[]>(API_URL + "/folderPath", {
       params: { iri: iri },
       method: "GET"
     });
   },
 
   async getPathBetweenNodes(descendant: string, ancestor: string): Promise<TTIriRef[]> {
-    return await $fetch<TTIriRef[]>(API_URL + "/protected/shortestParentHierarchy", {
+    return await $fetch<TTIriRef[]>(API_URL + "/shortestParentHierarchy", {
       params: { descendant: descendant, ancestor: ancestor },
       method: "GET"
     });
   },
 
   async getEntityByPredicateExclusions(iri: string, predicates: string[]): Promise<ExtendedTTEntity> {
-    return await $fetch<ExtendedTTEntity>(API_URL + "/protected/entityByPredicateExclusions", {
+    return await $fetch<ExtendedTTEntity>(API_URL + "/entityByPredicateExclusions", {
       params: { iri: iri, predicates: predicates.join(",") },
       method: "GET"
     });
   },
 
   async getBundleByPredicateExclusions(iri: string, predicates: string[], graph?: string): Promise<TTBundle> {
-    return await $fetch<TTBundle>(API_URL + "/protected/bundleByPredicateExclusions", {
+    return await $fetch<TTBundle>(API_URL + "/bundleByPredicateExclusions", {
       params: { iri: iri, predicates: predicates.join(","), graph: graph },
       method: "GET"
     });
   },
 
   async getEntityDetailsDisplay(iri: string): Promise<TreeNode[]> {
-    return await $fetch<TreeNode[]>(API_URL + "/protected/detailsDisplay", {
+    return await $fetch<TreeNode[]>(API_URL + "/detailsDisplay", {
       params: { iri: iri },
       method: "GET"
     });
   },
 
   async loadMoreDetailsDisplay(iri: string, predicate: string, pageIndex: number, pageSize: number): Promise<TreeNode[]> {
-    return await $fetch<TreeNode[]>(API_URL + "/protected/detailsDisplayLoadMore", {
+    return await $fetch<TreeNode[]>(API_URL + "/detailsDisplayLoadMore", {
       params: {
         iri: iri,
         predicate: predicate,
@@ -255,28 +255,28 @@ const EntityService = {
   },
 
   async checkValidation(validationIri: string, data: EntityValidationRequest): Promise<{ valid: boolean; message: string | undefined }> {
-    return await $fetch<{ valid: boolean; message: string | undefined }>(API_URL + "/protected/validate", {
+    return await $fetch<{ valid: boolean; message: string | undefined }>(API_URL + "/validate", {
       body: { validationIri: validationIri, entity: data },
       method: "POST"
     });
   },
 
   async getEntityGraph(iri: string): Promise<OrganizationChartNode> {
-    return await $fetch<OrganizationChartNode>(API_URL + "/protected/graph", {
+    return await $fetch<OrganizationChartNode>(API_URL + "/graph", {
       params: { iri: iri },
       method: "GET"
     });
   },
 
   async getProvHistory(iri: string): Promise<ExtendedTTEntity[]> {
-    return await $fetch<ExtendedTTEntity[]>(API_URL + "/protected/history", {
+    return await $fetch<ExtendedTTEntity[]>(API_URL + "/history", {
       params: { iri: iri },
       method: "GET"
     });
   },
 
   async getAllowableChildTypes(iri: string): Promise<ExtendedTTEntity[]> {
-    return await $fetch<ExtendedTTEntity[]>(API_URL + "/protected/allowableChildTypes", {
+    return await $fetch<ExtendedTTEntity[]>(API_URL + "/allowableChildTypes", {
       params: { iri: iri },
       method: "GET"
     });
