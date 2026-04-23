@@ -1,32 +1,24 @@
 import { JobStatus } from "~~/enums";
-import { type Job } from "~~/models/job.schema";
-import { mysqlDb } from "../db/mysql";
-import {
-  indicatorResultTable,
-  jobTable,
-  queryResultSetTable,
-  queryResultTable,
-} from "../db/mysql/schema";
-import { eq } from "drizzle-orm";
-import { type QueryResultSet } from "~~/models/queryResultSet.schema";
-import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 import { type JobRequest } from "~~/models/JobRequest";
-import { IMQType, type QueryRequest } from "~~/models/AutoGen";
-import { type QueryResult } from "~~/models/queryResult.schema";
 import { type IndicatorResult } from "~~/models/indicatorResult.schema";
+import { type Job } from "~~/models/job.schema";
+import { type QueryResult } from "~~/models/queryResult.schema";
+import { type QueryResultSet } from "~~/models/queryResultSet.schema";
+
+import { IMQType, type QueryRequest } from "vue-library";
+
+import { eq } from "drizzle-orm";
+import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";
+
+import { mysqlDb } from "../db/mysql";
+import { indicatorResultTable, jobTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
+import QueryService from "../services/QueryService";
 import { resolveArgs } from "../utils/executeQuery";
 
-export async function createJobEntry(
-  jobRequest: JobRequest,
-  sessionId: string,
-  userId: string,
-): Promise<Job> {
+export async function createJobEntry(jobRequest: JobRequest, sessionId: string, userId: string): Promise<Job> {
   const queryRequestsForSql = [];
   for (const queryRequest of jobRequest.queryRequests) {
-    const getQueryRequestForSQL = await imapi.getQueryRequestForSQL(
-      sessionId!,
-      queryRequest,
-    );
+    const getQueryRequestForSQL = await QueryService.getQueryRequestForSQL(sessionId!, queryRequest);
     resolveArgs(getQueryRequestForSQL);
     queryRequestsForSql.push(getQueryRequestForSQL);
   }
@@ -40,19 +32,18 @@ export async function createJobEntry(
     userId: userId,
     queueDate: now,
     status: JobStatus.QUEUED,
-    error: null,
+    error: null
   } as Job;
 
   const result = await mysqlDb.insert(jobTable).values(queryJob);
-  if (!result?.[0]?.insertId)
-    throw new Error("Failed to insert job into database");
+  if (!result?.[0]?.insertId) throw new Error("Failed to insert job into database");
   queryJob.id = result[0].insertId;
   return queryJob;
 }
 
 export async function getJobById(jobId: number): Promise<Job> {
   const job = await mysqlDb.query.jobTable.findFirst({
-    where: eq(jobTable.id, jobId),
+    where: eq(jobTable.id, jobId)
   });
   if (!job) {
     throw new Error("Could not find job with id: " + jobId);
@@ -60,14 +51,10 @@ export async function getJobById(jobId: number): Promise<Job> {
   return job;
 }
 
-export async function updateJobStatus(
-  jobId: number,
-  jobStatus: JobStatus,
-  error: string | null = null,
-) {
+export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error: string | null = null) {
   const now = getNow();
   const set = {
-    status: jobStatus,
+    status: jobStatus
   } as Job;
   switch (jobStatus) {
     case JobStatus.RUNNING:
@@ -88,10 +75,7 @@ export async function updateJobStatus(
   await mysqlDb.update(jobTable).set(set).where(eq(jobTable.id, jobId));
 }
 
-export async function createResultSetEntry(
-  queryRequest: any,
-  job: Job,
-): Promise<QueryResultSet> {
+export async function createResultSetEntry(queryRequest: any, job: Job): Promise<QueryResultSet> {
   const queryResultSet = {
     startOfDaySnapshot: queryRequest.startOfDaySnapshot ? 1 : 0,
     persistent: queryRequest.persistent ? 1 : 0,
@@ -101,29 +85,17 @@ export async function createResultSetEntry(
     jobId: job.id,
     queryIri: queryRequest.query.iri,
     searchDate: queryRequest?.searchDate as any,
-    achievementDate: queryRequest?.achievementDate as any,
+    achievementDate: queryRequest?.achievementDate as any
   } as QueryResultSet;
 
-  const result = await mysqlDb
-    .insert(queryResultSetTable)
-    .values(queryResultSet);
+  const result = await mysqlDb.insert(queryResultSetTable).values(queryResultSet);
   const queryResultSetId = result?.[0]?.insertId;
   queryResultSet.id = queryResultSetId!;
-  console.log(
-    "Inserted query result set with id:",
-    queryResultSet.id,
-    "for job id:",
-    job.id,
-  );
+  console.log("Inserted query result set with id:", queryResultSet.id, "for job id:", job.id);
   return queryResultSet;
 }
 
-export async function createQueryResultEntry(
-  queryRequest: QueryRequest,
-  queryResultSet: QueryResultSet,
-  hashCodeVersion: number,
-  indicatorId?: number,
-) {
+export async function createQueryResultEntry(queryRequest: QueryRequest, queryResultSet: QueryResultSet, hashCodeVersion: number, indicatorId?: number) {
   switch (queryRequest.query.queryType) {
     case IMQType.COHORT:
     case IMQType.DATASET:
@@ -133,60 +105,41 @@ export async function createQueryResultEntry(
         useStartOfDaySnapshot: queryResultSet.useStartOfDaySnapshot,
         startTime: getNow(),
         queryIri: queryRequest.query.iri,
-        searchDate: queryResultSet.searchDate
-          ? new Date(queryResultSet.searchDate)
-          : null,
-        achievementDate: queryResultSet.achievementDate
-          ? new Date(queryResultSet.achievementDate)
-          : null,
+        searchDate: queryResultSet.searchDate ? new Date(queryResultSet.searchDate) : null,
+        achievementDate: queryResultSet.achievementDate ? new Date(queryResultSet.achievementDate) : null,
         indicatorResultId: indicatorId,
         queryResultSetId: queryResultSet.id,
-        version: hashCodeVersion,
+        version: hashCodeVersion
       } as QueryResult;
       const result = await mysqlDb.insert(queryResultTable).values(queryResult);
       return result?.[0]?.insertId;
 
     default:
-      throw new Error(
-        "Unsupported query type: " + queryRequest.query.queryType,
-      );
+      throw new Error("Unsupported query type: " + queryRequest.query.queryType);
   }
 }
 
-export async function createIndicatorResultEntry(
-  queryRequest: QueryRequest,
-  queryResultSet: QueryResultSet,
-  hashCodeVersion: number,
-) {
+export async function createIndicatorResultEntry(queryRequest: QueryRequest, queryResultSet: QueryResultSet, hashCodeVersion: number) {
   const indicatorResult = {
     startOfDaySnapshot: queryResultSet.startOfDaySnapshot,
     persistent: queryResultSet.persistent,
     useStartOfDaySnapshot: queryResultSet.useStartOfDaySnapshot,
     startTime: getNow(),
     queryIri: queryRequest.query.iri,
-    searchDate: queryResultSet.searchDate
-      ? new Date(queryResultSet.searchDate)
-      : null,
-    achievementDate: queryResultSet.achievementDate
-      ? new Date(queryResultSet.achievementDate)
-      : null,
+    searchDate: queryResultSet.searchDate ? new Date(queryResultSet.searchDate) : null,
+    achievementDate: queryResultSet.achievementDate ? new Date(queryResultSet.achievementDate) : null,
     queryResultSetId: queryResultSet.id,
-    version: hashCodeVersion,
+    version: hashCodeVersion
   } as IndicatorResult;
-  const result = await mysqlDb
-    .insert(indicatorResultTable)
-    .values(indicatorResult);
+  const result = await mysqlDb.insert(indicatorResultTable).values(indicatorResult);
   return result?.[0]?.insertId;
 }
 
-export async function updateWithEndTime(
-  id: number,
-  table: MySqlTableWithColumns<any>,
-) {
+export async function updateWithEndTime(id: number, table: MySqlTableWithColumns<any>) {
   await mysqlDb
     .update(table)
     .set({
-      endTime: getNow(),
+      endTime: getNow()
     })
     .where(eq(table.id, id));
 }

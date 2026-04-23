@@ -1,23 +1,18 @@
 import { JobStatus } from "~~/enums";
-import {
-  executeQuery,
-  getIndicatorSubQueryRequests,
-  getValidatedSQL,
-} from "../utils/executeQuery";
 import type { Job } from "~~/models/job.schema";
+
+import { IMQType } from "vue-library";
+import { type QueryRequest } from "vue-library/interfaces";
 import type { User } from "vue-library/models";
+
+import { Connection } from "rabbitmq-client";
+
 import { indicatorResultTable, queryResultSetTable } from "../db/mysql/schema";
-import {
-  createIndicatorResultEntry,
-  createResultSetEntry,
-  getJobById,
-  updateJobStatus,
-  updateWithEndTime,
-} from "../helpers/mysqlHelper";
-import { IMQType, type QueryRequest } from "vue-library/interfaces";
+import { createIndicatorResultEntry, createResultSetEntry, getJobById, updateJobStatus, updateWithEndTime } from "../helpers/mysqlHelper";
+import { executeQuery, getIndicatorSubQueryRequests, getValidatedSQL } from "../utils/executeQuery";
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
-rabbit.on("error", err => {});
+rabbit.on("error", (err: Error) => {});
 rabbit.on("connection", () => {});
 
 let sessionId: string | undefined = undefined;
@@ -51,7 +46,7 @@ const sub = rabbit.createConsumer(
       }
     ]
   },
-  async (msg) => {
+  async (msg: any) => {
     const session = await getSession();
     const job = await getJobById(Number(msg.messageId!));
     if (job && JobStatus.CANCELLED === job.status) {
@@ -64,15 +59,8 @@ const sub = rabbit.createConsumer(
       const queriesToRun: { sql: string; queryRequest: QueryRequest }[] = [];
       let indicatorId: null | number = null;
       if (queryRequest.query.queryType === IMQType.INDICATOR) {
-        indicatorId = await createIndicatorResultEntry(
-          queryRequest,
-          queryResultSet,
-          hashQueryRequest(queryRequest),
-        );
-        queriesToRun.push.apply(
-          queriesToRun,
-          await getIndicatorSubQueryRequests(session, queryRequest, job.id),
-        );
+        indicatorId = await createIndicatorResultEntry(queryRequest, queryResultSet, hashQueryRequest(queryRequest));
+        queriesToRun.push.apply(queriesToRun, await getIndicatorSubQueryRequests(session, queryRequest, job.id));
       } else {
         queriesToRun.push({ sql, queryRequest });
       }
@@ -80,12 +68,7 @@ const sub = rabbit.createConsumer(
       console.log("Queries to run:", queriesToRun.length);
       for (const { sql, queryRequest } of queriesToRun) {
         try {
-          await executeQuery(
-            await getSession(),
-            sql,
-            queryRequest,
-            queryResultSet,
-          );
+          await executeQuery(await getSession(), sql, queryRequest, queryResultSet);
           await updateWithEndTime(queryResultSet.id!, queryResultSetTable);
         } catch (err) {
           await updateJobStatus(job.id, JobStatus.ERRORED, JSON.stringify(err));
@@ -97,10 +80,10 @@ const sub = rabbit.createConsumer(
       }
     }
     await updateJobStatus(job.id, JobStatus.COMPLETED);
-  },
+  }
 );
 
-sub.on("error", err => {});
+sub.on("error", (err: Error) => {});
 
 const pub = rabbit.createPublisher({
   confirm: true,

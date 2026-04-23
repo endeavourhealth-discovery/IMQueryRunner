@@ -37,9 +37,11 @@
 import ArgumentDisplay from "~/components/queryRunner/ArgumentDisplay.vue";
 import AutocompleteSearchBar from "~/components/queryRunner/AutocompleteSearchBar.vue";
 import QueryService from "~/services/QueryService";
+import type { JobRequest } from "~~/models";
 
 import { watch } from "vue";
 
+import { IM, RDF } from "vue-library";
 import { type Argument, type ArgumentReference, type QueryRequest, type SearchResultSummary } from "vue-library/interfaces";
 
 import { cloneDeep } from "lodash-es";
@@ -59,16 +61,16 @@ const request: any = {
           iri: RDF.TYPE,
           is: [
             {
-              iri: IM.QUERY,
+              iri: IM.QUERY
             },
             {
-              iri: IM.INDICATOR,
-            },
-          ],
-        },
-      ],
-    },
-  },
+              iri: IM.INDICATOR
+            }
+          ]
+        }
+      ]
+    }
+  }
 };
 
 const showDialog = ref(false);
@@ -79,15 +81,13 @@ watch(
   (newValue, oldValue) => {
     if (newValue !== oldValue && newValue) {
       args.value = [];
-      const index = selected.value?.type.findIndex(
-        (tp) => tp.iri === IM.INDICATOR,
-      );
+      const index = selected.value?.type.findIndex(tp => tp.iri === IM.INDICATOR);
       if (index === -1) {
         getArguments();
       }
     }
   },
-  { deep: true },
+  { deep: true }
 );
 
 watch(
@@ -101,7 +101,7 @@ watch(
       }
     }
   },
-  { deep: true },
+  { deep: true }
 );
 
 function passArguments(args: Argument[], runOnConfirm: boolean) {
@@ -114,17 +114,17 @@ async function runQuery() {
     queryRequests: [
       {
         query: {
-          iri: selected.value?.iri,
+          iri: selected.value?.iri
         },
-        argument: completedArguments.value,
-      },
-    ],
+        argument: completedArguments.value
+      }
+    ]
   } as JobRequest;
   console.log("Running query with arguments:", jobRequest);
 
   await $fetch("/api/queue/job/add", {
     method: "post",
-    body: jobRequest,
+    body: jobRequest
   });
   showDialog.value = false;
   backToQueue();

@@ -18,6 +18,13 @@ import type {
 const API_URL = `${useRuntimeConfig().public.imapiUrl}/protected/query`;
 
 const QueryService = {
+  async getQuerySql(sessionId: string, queryRequest: QueryRequest): Promise<string> {
+    return (await $fetch<string>(API_URL + "/sql", {
+      headers: { cookie: `session_id=${sessionId}` },
+      body: queryRequest,
+      method: "POST"
+    })) as any;
+  },
   async queryIM(sessionId: string, query: QueryRequest): Promise<QueryResponse> {
     return await $fetch<QueryResponse>(API_URL + "/queryIM", {
       headers: { cookie: `session_id=${sessionId}` },
@@ -182,11 +189,12 @@ const QueryService = {
     });
   },
 
-  async getSubqueryIris(sessionId: string, queryIri: string): Promise<SubQueryDependency[]> {
+  async getSubqueryIris(sessionId: string, queryIri: string, isIndicator: boolean = false): Promise<SubQueryDependency[]> {
     return await $fetch<SubQueryDependency[]>(`${useRuntimeConfig().public.imapiUrl}query/protected/subQueries`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
-        queryIri: queryIri
+        queryIri: queryIri,
+        isIndicator: isIndicator
       },
       method: "get"
     });

@@ -71,7 +71,7 @@ import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
 import { useUserStore } from "~/stores/useUserStore";
 import { JobStatus } from "~~/enums";
-import type { Job } from "~~/models";
+import type { Job, JobRequest } from "~~/models";
 
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
@@ -237,18 +237,18 @@ async function requeueJob(jobId: string) {
   if (found) {
     const jobRequest = {
       jobName: "Requeued " + (found?.jobName || "Requeued Job"),
-      queryRequests: found?.queryRequests,
+      queryRequests: found?.queryRequests
     } as JobRequest;
     await $fetch("/api/queue/job/add", {
       method: "post",
-      body: jobRequest,
+      body: jobRequest
     });
   }
   await refresh();
 }
 
 function getById(jobId: string): Job | undefined {
-  return jobs.value.find((item) => item.id === Number(jobId));
+  return jobs.value.find(item => item.id === Number(jobId));
 }
 
 async function onPage(event: any) {
