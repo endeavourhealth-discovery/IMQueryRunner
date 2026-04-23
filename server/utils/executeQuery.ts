@@ -1,3 +1,5 @@
+import { type Argument, type QueryRequest, type SubQueryDependency } from "vue-library/interfaces";
+
 import murmurhash from "murmurhash";
 import { type ResultSetHeader } from "mysql2";
 import { IMQType, type Argument, type QueryRequest } from "~~/models/AutoGen";
@@ -114,7 +116,7 @@ export function resolveArgs(queryRequest: QueryRequest) {
   if (!queryRequest.argument) queryRequest.argument = [];
   const defaultDates = ["$searchDate", "$achievementDate"];
   for (const date of defaultDates) {
-    const hasDate = queryRequest.argument.find((arg) => arg.parameter === date);
+    const hasDate = queryRequest.argument.find(arg => arg.parameter === date);
     if (!hasDate)
       queryRequest.argument.push({
         parameter: date,
@@ -262,22 +264,13 @@ async function runSubQueries(
     }
 }
 
-async function getResolvedSql(
-  sql: string,
-  queryRequest: QueryRequest,
-  queryIrisToHashCodes: { [key: string]: number },
-) {
+async function getResolvedSql(sql: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }) {
   if (queryRequest.argument) {
     for (const arg of queryRequest.argument) {
-      if (arg.valueData && arg.parameter)
-        sql = sql.replaceAll(arg.parameter, `'${arg.valueData}'`);
-      else if (arg.valueIri && arg.parameter)
-        sql = sql.replaceAll(arg.parameter, `'${arg.valueIri.iri}'`);
+      if (arg.valueData && arg.parameter) sql = sql.replaceAll(arg.parameter, `'${arg.valueData}'`);
+      else if (arg.valueIri && arg.parameter) sql = sql.replaceAll(arg.parameter, `'${arg.valueIri.iri}'`);
       else if (arg.valueIriList && arg.parameter) {
-        sql = sql.replaceAll(
-          arg.parameter,
-          getIriLine(arg.valueIriList.map((v) => v.iri)),
-        );
+        sql = sql.replaceAll(arg.parameter, getIriLine(arg.valueIriList.map(v => v.iri)));
       }
     }
   }

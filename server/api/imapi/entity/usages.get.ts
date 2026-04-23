@@ -1,0 +1,37 @@
+import { getQueryParams } from "~~/server/helpers/getQueryParams";
+import EntityService from "~~/server/services/EntityService";
+
+import * as z from "zod";
+
+const paramSchema = z.object({
+  iri: z.string(),
+  page: z.number(),
+  size: z.number()
+});
+
+defineRouteMeta({
+  openAPI: {
+    tags: ["query"],
+    description: "Get entity usages",
+    parameters: [
+      { name: "session_id", description: "User session id", in: "cookie" },
+      {
+        name: "iri",
+        description: "Entity iri",
+        in: "query"
+      },
+      {
+        name: "page",
+        description: "Page size",
+        in: "query"
+      },
+      { name: "size", description: "Page size", in: "query" }
+    ]
+  }
+});
+
+export default defineEventHandler(async (event): Promise<any> => {
+  const sessionId = getCookie(event, "session_id")!;
+  const { iri, page, size } = await getQueryParams(event, paramSchema.parse);
+  return await EntityService.getEntityUsages(sessionId, iri, page, size);
+});

@@ -1,15 +1,9 @@
 <template>
   <div class="flex-auto overflow-auto">
     <div class="h-[calc(100% - 3.5rem)] overflow-auto">
-      <div
-        class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
-      >
+      <div class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)">
         <div class="m-2">
-          <Button
-            icon="fa-solid fa-arrow-left"
-            label="Back to queue"
-            @click="backToQueue"
-          />
+          <Button icon="fa-solid fa-arrow-left" label="Back to queue" @click="backToQueue" />
         </div>
         <DataTable
           ref="dt"
@@ -23,29 +17,17 @@
           @page="onPage($event)"
           :lazy="true"
           :total-records="totalCount"
-          :rows-per-page-options="[
-            originalSize,
-            originalSize * 2,
-            originalSize * 4,
-            originalSize * 8,
-          ]"
+          :rows-per-page-options="[originalSize, originalSize * 2, originalSize * 4, originalSize * 8]"
           :loading="loading"
           :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
         >
           <template #header>
             <div class="flex flex-wrap items-center justify-between gap-2">
-              <span class="text-xl font-bold"
-                >Total results: {{ totalCount }}</span
-              >
+              <span class="text-xl font-bold">Total results: {{ totalCount }}</span>
             </div>
           </template>
           <template #empty>None</template>
-          <Column
-            v-for="col of columns"
-            :key="col.field"
-            :field="col.field"
-            :header="col.header"
-          ></Column>
+          <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
         </DataTable>
       </div>
       <div class="im-dialog-footer">
@@ -66,10 +48,12 @@
 </template>
 
 <script setup lang="ts">
-import { isArray } from "lodash-es";
+import { useUserStore } from "~/stores/useUserStore";
+
 import type { Ref } from "vue";
 import { onMounted, ref } from "vue";
-import { useUserStore } from "~/stores/useUserStore";
+
+import { isArray } from "lodash-es";
 
 interface Props {
   jobId: string | string[] | undefined;
@@ -116,14 +100,11 @@ async function getQueryResults() {
 
 async function getTotalQueryResults() {
   if (props.jobId) {
-    const value = await $fetch<{ result: any[] }>(
-      `/api/queue/job/results/total/${props.jobId}`,
-      {
-        query: {
-          userId: user?.id,
-        },
-      },
-    );
+    const value = await $fetch<{ result: any[] }>(`/api/queue/job/results/total/${props.jobId}`, {
+      query: {
+        userId: user?.id
+      }
+    });
     if (value && isArray(value.result)) {
       totalResults.value = value.result;
     }
@@ -132,8 +113,7 @@ async function getTotalQueryResults() {
 
 function formatResultsForTable() {
   for (const key of Object.keys(queryResults.value[0])) {
-    if (key !== "hashcode")
-      columns.value.push({ field: key, header: key.replace("_", " ") });
+    if (key !== "hashcode") columns.value.push({ field: key, header: key.replace("_", " ") });
   }
 }
 
@@ -143,14 +123,14 @@ async function downloadQueryResults() {
   const headers = Object.keys(totalResults.value[0]);
   const csv = [
     headers.join(","),
-    ...totalResults.value.map((row) =>
+    ...totalResults.value.map(row =>
       headers
-        .map((field) => {
+        .map(field => {
           const value = row[field] ?? "";
           return `"${String(value).replace(/"/g, '""')}"`;
         })
-        .join(","),
-    ),
+        .join(",")
+    )
   ].join("\n");
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });

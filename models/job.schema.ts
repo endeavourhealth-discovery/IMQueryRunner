@@ -1,5 +1,6 @@
-import { z } from "zod";
 import { JobStatus } from "~~/enums";
+
+import * as z from "zod";
 
 export const jobSchema = z.object({
   id: z.number().int(),
@@ -13,6 +14,6 @@ export const jobSchema = z.object({
   runDate: z.string(),
   finishDate: z.string().nullable().optional(),
   status: z.enum(JobStatus),
-  error: z.any().optional(),
+  error: z.any().optional()
 });
 export type Job = z.infer<typeof jobSchema>;

@@ -2,34 +2,18 @@
   <DataTable :value="argumentList" :lazy="true" :loading="loading">
     <template #empty>None</template>
     <Column field="parameter" header="Parameter">
-      <template #body="{ data }">{{
-          formatArgumentDisplayName(data)
-        }}
-      </template>
+      <template #body="{ data }">{{ formatArgumentDisplayName(data) }} </template>
     </Column>
     <Column field="parameter" header="Raw Parameter"></Column>
-    <Column
-      v-if="includeIri"
-      field="referenceIri.iri"
-      header="Reference Iri"
-    ></Column>
+    <Column v-if="includeIri" field="referenceIri.iri" header="Reference Iri"></Column>
     <Column field="valueData" header="Value">
       <template #body="{ data }">
         <div class="argument-selector-content">
           <div v-if="editArguments && data.dataType && [XSD.STRING].includes(data.dataType?.iri)">
-            <InputText
-              type="text"
-              v-model="data.valueData"
-              data-testid="property-value-input"
-            />
+            <InputText type="text" v-model="data.valueData" data-testid="property-value-input" />
           </div>
           <div v-if="editArguments && data.dataType && [XSD.BOOLEAN].includes(data.dataType.iri)">
-            <Select
-              :options="booleanOptions"
-              optionLabel="name"
-              optionValue="value"
-              v-model="data.valueData"
-            />
+            <Select :options="booleanOptions" optionLabel="name" optionValue="value" v-model="data.valueData" />
           </div>
           <div v-if="editArguments && data.dataType && [IM.DATE, IM.DATE_TIME, IM.TIME].includes(data.dataType.iri)">
             <DatePicker
@@ -37,7 +21,8 @@
               :showTime="IM.DATE_TIME === data.dataType.iri"
               :timeOnly="IM.TIME === data.dataType.iri"
               dateFormat="yy/mm/dd"
-              showIcon iconDisplay="input"
+              showIcon
+              iconDisplay="input"
               updateModelType="string"
             />
           </div>
@@ -47,22 +32,19 @@
     </Column>
   </DataTable>
   <div v-if="showFooterButtons" class="button-container">
-    <Button label="Back" @click="resetArguments()" severity="secondary"/>
-    <Button
-      label="Confirm"
-      @click="confirmArguments"
-      :loading="submitting"
-      :disabled="!allArgumentsValid"
-    />
+    <Button label="Back" @click="resetArguments()" severity="secondary" />
+    <Button label="Confirm" @click="confirmArguments" :loading="submitting" :disabled="!allArgumentsValid" />
   </div>
 </template>
 
 <script setup lang="ts">
-import type {Argument, ArgumentReference} from "~~/models/AutoGen";
+import { watch } from "vue";
+
+import { IM, XSD } from "vue-library/enums";
+import { type Argument, type ArgumentReference } from "vue-library/interfaces";
+
+import { cloneDeep } from "lodash-es";
 import Column from "primevue/column";
-import {IM, XSD} from "~~/models/AutoGen";
-import {cloneDeep} from "lodash-es";
-import {watch} from "vue";
 
 interface Props {
   arguments: ArgumentReference[] | undefined;
@@ -82,17 +64,15 @@ const emit = defineEmits<{
 }>();
 
 const showDialog = defineModel<boolean>("showDialog");
-const allArgumentsValid: ComputedRef<boolean> = computed(() =>
-  argumentList.value!.every((as) => as.valueData)
-);
+const allArgumentsValid: ComputedRef<boolean> = computed(() => argumentList.value!.every(as => as.valueData));
 
 const loading = ref(false);
 const includeIri = ref(false);
 const argumentList = ref<ArgumentSelection[] | undefined>([]);
 const submitting = ref(false);
 const booleanOptions = ref([
-  {name: "true", value: true},
-  {name: "false", value: false},
+  { name: "true", value: true },
+  { name: "false", value: false }
 ]);
 
 onMounted(() => {
@@ -110,7 +90,7 @@ onMounted(() => {
 
 watch(
   () => cloneDeep(argumentList.value),
-  (newValue) => {
+  newValue => {
     if (newValue) {
       confirmArguments();
     }
@@ -137,7 +117,7 @@ function confirmArguments() {
     const completedArguments: Argument[] = [];
     if (argumentList.value) {
       for (const argSelect of argumentList.value) {
-        const newArg: Argument = {parameter: argSelect.parameter};
+        const newArg: Argument = { parameter: argSelect.parameter };
         switch (argSelect.dataType?.iri) {
           case XSD.STRING:
           case XSD.BOOLEAN:

@@ -1,4 +1,3 @@
-import { Connection } from "rabbitmq-client";
 import { JobStatus } from "~~/enums";
 import {
   executeQuery,
@@ -6,7 +5,7 @@ import {
   getValidatedSQL,
 } from "../utils/executeQuery";
 import type { Job } from "~~/models/job.schema";
-import type { User } from "~~/models/User";
+import type { User } from "vue-library/models";
 import { indicatorResultTable, queryResultSetTable } from "../db/mysql/schema";
 import {
   createIndicatorResultEntry,
@@ -15,27 +14,24 @@ import {
   updateJobStatus,
   updateWithEndTime,
 } from "../helpers/mysqlHelper";
-import { IMQType, type QueryRequest } from "~~/models/AutoGen";
+import { IMQType, type QueryRequest } from "vue-library/interfaces";
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
-rabbit.on("error", (err) => {});
+rabbit.on("error", err => {});
 rabbit.on("connection", () => {});
 
 let sessionId: string | undefined = undefined;
 async function getSession() {
   if (!sessionId) {
-    const response = await $fetch<{ sessionId: string; user: User }>(
-      "/api/auth/machineLogin",
-      {
-        query: {
-          clientId: process.env.CLIENT_ID,
-          clientSecret: process.env.CLIENT_SECRET,
-        },
-        headers: {
-          "X-IGNORE-IP": "true",
-        },
+    const response = await $fetch<{ sessionId: string; user: User }>("/api/auth/machineLogin", {
+      query: {
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET
       },
-    );
+      headers: {
+        "X-IGNORE-IP": "true"
+      }
+    });
     sessionId = response.sessionId;
   }
   return sessionId;
@@ -51,9 +47,9 @@ const sub = rabbit.createConsumer(
       {
         exchange: "query_runner",
         routingKey: "query.execute.#",
-        queue: "query.execute",
-      },
-    ],
+        queue: "query.execute"
+      }
+    ]
   },
   async (msg) => {
     const session = await getSession();
@@ -104,12 +100,12 @@ const sub = rabbit.createConsumer(
   },
 );
 
-sub.on("error", (err) => {});
+sub.on("error", err => {});
 
 const pub = rabbit.createPublisher({
   confirm: true,
   maxAttempts: 2,
-  exchanges: [{ exchange: "query_runner", type: "topic", durable: true }],
+  exchanges: [{ exchange: "query_runner", type: "topic", durable: true }]
 });
 
 export async function sendMessage(userId: string, message: Job) {
@@ -118,9 +114,9 @@ export async function sendMessage(userId: string, message: Job) {
       messageId: "" + message.id,
       exchange: "query_runner",
       routingKey: "query.execute." + userId,
-      durable: true,
+      durable: true
     },
-    JSON.stringify(message),
+    JSON.stringify(message)
   );
   return message.id;
 }

@@ -1,23 +1,21 @@
-import z from "zod";
-import { and, desc, eq, lte, SQL } from "drizzle-orm";
 import Logger from "#shared/logger";
+
+import { SQL, and, desc, eq, lte } from "drizzle-orm";
+import * as z from "zod";
 import { mysqlDb } from "~~/server/db/mysql";
 import { jobTable } from "~~/server/db/mysql/schema";
 
 const querySchema = z.object({
   page: z.coerce.number().default(1),
   size: z.coerce.number().default(25),
-  date: z.iso.date().optional(),
+  date: z.iso.date().optional()
 });
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const LOG = Logger("api/queue/user");
   const user = await globalThis.apiGuard.getUser(event);
 
-  const { page, size, date } = await getValidatedQuery(
-    event,
-    querySchema.parse,
-  );
+  const { page, size, date } = await getValidatedQuery(event, querySchema.parse);
 
   const userId = user!.id;
 
@@ -47,6 +45,6 @@ export default defineEventHandler(async (event) => {
   return {
     result: items,
     totalCount,
-    page: page,
+    page: page
   };
 });

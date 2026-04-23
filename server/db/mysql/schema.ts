@@ -144,8 +144,9 @@ export const concept = mysqlTable(
       .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),
   },
-  (table) => [
+  table => [
     index("concept_draft").on(table.draft),
+    primaryKey({ columns: [table.dbid], name: "concept_dbid" }),
     primaryKey({ columns: [table.dbid], name: "concept_dbid" }),
     unique("concept_id_uq").on(table.id),
     unique("concept_scheme_code_idx").on(table.scheme, table.code),
@@ -160,8 +161,11 @@ export const conceptMap = mysqlTable(
     updated: datetime({ mode: "string" })
       .default(sql`(CURRENT_TIMESTAMP)`)
       .notNull(),
+    updated: datetime({ mode: "string" })
+      .default(sql`(CURRENT_TIMESTAMP)`)
+      .notNull(),
     id: int().autoincrement().notNull(),
-    deleted: tinyint().default(0).notNull(),
+    deleted: tinyint().default(0).notNull()
   },
   (table) => [
     primaryKey({ columns: [table.id], name: "concept_map_id" }),
@@ -176,9 +180,9 @@ export const conceptSetMember = mysqlTable(
     set: varchar({ length: 512 }).notNull(),
     member: varchar({ length: 512 }).notNull(),
     im1Id: varchar({ length: 150 }).notNull(),
-    self: boolean().default(false).notNull(),
+    self: boolean().default(false).notNull()
   },
-  (table) => [
+  table => [
     index("idx_set_self").on(table.set, table.self),
     index("idx_csm").on(table.im1Id, table.self),
     primaryKey({ columns: [table.id], name: "concept_set_member_id" }),
@@ -209,6 +213,7 @@ export const encounter = mysqlTable(
     subType: text("sub_type"),
     admissionMethod: varchar("admission_method", { length: 40 }),
     endDate: datetime("end_date", { mode: "string" }),
+    endDate: datetime("end_date", { mode: "string" }),
     institutionLocationId: text("institution_location_id"),
     dateRecorded: datetime("date_recorded", { mode: "string" }),
   },
@@ -225,6 +230,7 @@ export const episodeOfCare = mysqlTable(
     registrationTypeConceptId: int("registration_type_concept_id"),
     registrationStatusConceptId: int("registration_status_concept_id"),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
+    dateRegistered: date("date_registered", { mode: "string" }),
     dateRegistered: date("date_registered", { mode: "string" }),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
     dateRegisteredEnd: date("date_registered_end", { mode: "string" }),
@@ -281,6 +287,7 @@ export const medicationStatement = mysqlTable(
     datePrecisionConceptId: int("date_precision_concept_id"),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
     cancellationDate: date("cancellation_date", { mode: "string" }),
+    cancellationDate: date("cancellation_date", { mode: "string" }),
     dose: varchar({ length: 1000 }),
     quantityValue: double("quantity_value"),
     quantityUnit: varchar("quantity_unit", { length: 255 }),
@@ -314,11 +321,13 @@ export const observation = mysqlTable(
     resultValueUnits: varchar("result_value_units", { length: 50 }),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
     resultDate: date("result_date", { mode: "string" }),
+    resultDate: date("result_date", { mode: "string" }),
     resultText: text("result_text"),
     resultConceptId: int("result_concept_id"),
     isProblem: tinyint("is_problem").notNull(),
     isReview: tinyint("is_review").notNull(),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
+    problemEndDate: date("problem_end_date", { mode: "string" }),
     problemEndDate: date("problem_end_date", { mode: "string" }),
     parentObservationId: bigint("parent_observation_id", { mode: "number" }),
     coreConceptId: int("core_concept_id"),
@@ -351,7 +360,9 @@ export const patient = mysqlTable(
     nhsNumber: varchar("nhs_number", { length: 255 }),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
     dateOfBirth: date("date_of_birth", { mode: "string" }),
+    dateOfBirth: date("date_of_birth", { mode: "string" }),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
+    dateOfDeath: date("date_of_death", { mode: "string" }),
     dateOfDeath: date("date_of_death", { mode: "string" }),
     currentAddressId: bigint("current_address_id", { mode: "number" }),
     ethnicCodeConceptId: int("ethnic_code_concept_id"),
@@ -379,7 +390,9 @@ export const patientAddress = mysqlTable(
     useConceptId: int("use_concept_id").notNull(),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
     startDate: date("start_date", { mode: "string" }),
+    startDate: date("start_date", { mode: "string" }),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
+    endDate: date("end_date", { mode: "string" }),
     endDate: date("end_date", { mode: "string" }),
     lsoa2001Code: varchar("lsoa_2001_code", { length: 9 }),
     lsoa2011Code: varchar("lsoa_2011_code", { length: 9 }),
@@ -387,7 +400,7 @@ export const patientAddress = mysqlTable(
     msoa2011Code: varchar("msoa_2011_code", { length: 9 }),
     wardCode: varchar("ward_code", { length: 9 }),
     localAuthorityCode: varchar("local_authority_code", { length: 9 }),
-    townsendDeprivationIndex: double("townsend_deprivation_index"),
+    townsendDeprivationIndex: double("townsend_deprivation_index")
   },
   (table) => [primaryKey({ columns: [table.id], name: "patient_address_id" })],
 );
@@ -402,6 +415,7 @@ export const patientContact = mysqlTable(
     useConceptId: int("use_concept_id"),
     typeConceptId: int("type_concept_id"),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
+    startDate: date("start_date", { mode: "string" }),
     startDate: date("start_date", { mode: "string" }),
     // you can use { mode: 'date' }, if you want to have Date as type for this column
     endDate: date("end_date", { mode: "string" }),
@@ -418,7 +432,7 @@ export const practitioner = mysqlTable(
     name: varchar({ length: 1024 }),
     roleCode: varchar("role_code", { length: 50 }),
     roleDesc: varchar("role_desc", { length: 255 }),
-    gmcCode: varchar("gmc_code", { length: 50 }),
+    gmcCode: varchar("gmc_code", { length: 50 })
   },
   (table) => [primaryKey({ columns: [table.id], name: "practitioner_id" })],
 );
@@ -434,7 +448,9 @@ export const smallPat = mysqlTable("compass.small_pat", {
   nhsNumber: varchar("nhs_number", { length: 255 }),
   // you can use { mode: 'date' }, if you want to have Date as type for this column
   dateOfBirth: date("date_of_birth", { mode: "string" }),
+  dateOfBirth: date("date_of_birth", { mode: "string" }),
   // you can use { mode: 'date' }, if you want to have Date as type for this column
+  dateOfDeath: date("date_of_death", { mode: "string" }),
   dateOfDeath: date("date_of_death", { mode: "string" }),
   currentAddressId: bigint("current_address_id", { mode: "number" }),
   ethnicCodeConceptId: int("ethnic_code_concept_id"),
@@ -443,3 +459,4 @@ export const smallPat = mysqlTable("compass.small_pat", {
     { mode: "number" },
   ),
 });
+
