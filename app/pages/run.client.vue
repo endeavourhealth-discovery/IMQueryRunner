@@ -37,9 +37,11 @@
 import ArgumentDisplay from "~/components/queryRunner/ArgumentDisplay.vue";
 import AutocompleteSearchBar from "~/components/queryRunner/AutocompleteSearchBar.vue";
 import QueryService from "~/services/QueryService";
+import type { JobRequest } from "~~/models";
 
 import { watch } from "vue";
 
+import { IM, RDF } from "vue-library";
 import { type Argument, type ArgumentReference, type QueryRequest, type SearchResultSummary } from "vue-library/interfaces";
 
 import { cloneDeep } from "lodash-es";
@@ -56,10 +58,13 @@ const request: any = {
     where: {
       and: [
         {
-          iri: "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+          iri: RDF.TYPE,
           is: [
             {
-              iri: "http://endhealth.info/im#Query"
+              iri: IM.QUERY
+            },
+            {
+              iri: IM.INDICATOR
             }
           ]
         }
@@ -76,7 +81,10 @@ watch(
   (newValue, oldValue) => {
     if (newValue !== oldValue && newValue) {
       args.value = [];
-      getArguments();
+      const index = selected.value?.type.findIndex(tp => tp.iri === IM.INDICATOR);
+      if (index === -1) {
+        getArguments();
+      }
     }
   },
   { deep: true }
@@ -102,14 +110,21 @@ function passArguments(args: Argument[], runOnConfirm: boolean) {
 }
 
 async function runQuery() {
+  const jobRequest = {
+    queryRequests: [
+      {
+        query: {
+          iri: selected.value?.iri
+        },
+        argument: completedArguments.value
+      }
+    ]
+  } as JobRequest;
+  console.log("Running query with arguments:", jobRequest);
+
   await $fetch("/api/queue/job/add", {
     method: "post",
-    body: {
-      query: {
-        iri: selected.value?.iri
-      },
-      argument: completedArguments.value
-    } as QueryRequest
+    body: jobRequest
   });
   showDialog.value = false;
   backToQueue();

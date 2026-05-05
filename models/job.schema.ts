@@ -3,18 +3,17 @@ import { JobStatus } from "~~/enums";
 import * as z from "zod";
 
 export const jobSchema = z.object({
-  dbid: z.uuid(),
+  id: z.number().int(),
   jobName: z.string(),
-  queryRequest: z.any(),
-  queryHash: z.string(),
-  queryType: z.string(),
-  userId: z.uuid(),
-  queueDate: z.string().optional(),
-  runDate: z.string().optional(),
-  finishDate: z.string().optional(),
-  pid: z.number().optional(),
+  queryRequests: z.array(z.any()),
+  startOfDaySnapshot: z.number().int(),
+  persistent: z.number().int(),
+  useStartOfDaySnapshot: z.number().int(),
+  userId: z.string(),
+  queueDate: z.string(),
+  runDate: z.string(),
+  finishDate: z.string().nullable().optional(),
   status: z.enum(JobStatus),
   error: z.any().optional()
 });
-
 export type Job = z.infer<typeof jobSchema>;

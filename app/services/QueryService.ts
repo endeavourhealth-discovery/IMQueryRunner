@@ -14,7 +14,7 @@ import type {
   TTEntity
 } from "vue-library/interfaces";
 
-const API_URL = "api/impai/query";
+const API_URL = "api/imapi/query";
 
 const QueryService = {
   async queryIM(query: QueryRequest, controller?: AbortController, raw: boolean = false): Promise<QueryResponse> {

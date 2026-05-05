@@ -57,6 +57,8 @@ import { isArray } from "lodash-es";
 
 interface Props {
   jobId: string | string[] | undefined;
+  queryIri: string | string[] | undefined;
+  queryType: string | string[] | undefined;
 }
 
 const props = defineProps<Props>();
@@ -78,14 +80,17 @@ onMounted(async () => {
 });
 
 async function getQueryResults() {
-  if (props.jobId) {
-    const value = await $fetch<{ totalCount: number; result: any[] }>(`/api/queue/job/results/${props.jobId}`, {
-      query: {
-        userId: user?.id,
-        page: page.value,
-        size: rows.value
-      }
-    });
+  if (props.jobId && props.queryIri && props.queryType) {
+    const value = await $fetch<{ totalCount: number; result: any[] }>(
+      `/api/queue/job/results/${props.jobId}/${props.queryType}/${encodeURIComponent(props.queryIri as string)}`,
+      {
+        query: {
+          userId: user?.id,
+          page: page.value,
+          size: rows.value,
+        },
+      },
+    );
     if (value && isArray(value.result)) {
       totalCount.value = value.totalCount;
       queryResults.value = value.result;

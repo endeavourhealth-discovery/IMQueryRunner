@@ -1,9 +1,9 @@
 import Logger from "#shared/logger";
-import { pgJobSelect, postgresDb } from "~~/server/db/postgres";
-import { jobTable } from "~~/server/db/postgres/schema";
 
 import { SQL, and, desc, eq, lte } from "drizzle-orm";
 import * as z from "zod";
+import { mysqlDb } from "~~/server/db/mysql";
+import { jobTable } from "~~/server/db/mysql/schema";
 
 const querySchema = z.object({
   page: z.coerce.number().default(1),
@@ -19,7 +19,10 @@ export default defineEventHandler(async event => {
 
   const userId = user!.id;
 
-  const totalCount = await postgresDb.$count(jobTable, eq(jobTable.userId, userId));
+  const totalCount = await mysqlDb.$count(
+    jobTable,
+    eq(jobTable.userId, userId),
+  );
 
   const filters: SQL[] = [];
   // if (user?.groups.includes("Endeavour/Admin")) // Admins can see all jobs, so no userId filter is added
@@ -27,7 +30,7 @@ export default defineEventHandler(async event => {
 
   if (date) filters.push(lte(jobTable.queueDate, date));
 
-  let qry = postgresDb
+  let qry = mysqlDb
     .select()
     .from(jobTable)
     .where(and(...filters))
@@ -37,7 +40,7 @@ export default defineEventHandler(async event => {
 
   const rs = await qry.execute();
 
-  const items = rs.map(row => pgJobSelect.parse(row));
+  const items = rs;
 
   return {
     result: items,
