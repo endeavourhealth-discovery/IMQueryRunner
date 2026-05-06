@@ -1,19 +1,18 @@
 import { JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
-import { postgresDb } from "~~/server/db/postgres";
-import { jobTable } from "~~/server/db/postgres/schema";
 
-import type { QueryRequest } from "vue-library/interfaces";
-import type { User } from "vue-library/models";
+import { IMQType } from "@endeavour/vue-library";
+import { type QueryRequest } from "@endeavour/vue-library/interfaces";
+import type { User } from "@endeavour/vue-library/models";
 
-import { eq } from "drizzle-orm";
 import { Connection } from "rabbitmq-client";
 
-import QueryService from "../services/QueryService";
-import { executeQuery } from "../utils/executeQuery";
+import { indicatorResultTable, queryResultSetTable } from "../db/mysql/schema";
+import { createIndicatorResultEntry, createResultSetEntry, getJobById, updateJobStatus, updateWithEndTime } from "../helpers/mysqlHelper";
+import { executeQuery, getIndicatorSubQueryRequests, getValidatedSQL } from "../utils/executeQuery";
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
-rabbit.on("error", err => {});
+rabbit.on("error", (err: Error) => {});
 rabbit.on("connection", () => {});
 
 let sessionId: string | undefined = undefined;
@@ -47,67 +46,44 @@ const sub = rabbit.createConsumer(
       }
     ]
   },
-  async msg => {
-    const id = msg.messageId!;
-    const job = await postgresDb.query.jobTable.findFirst({
-      where: eq(jobTable.dbid, id)
-    });
+  async (msg: any) => {
+    const session = await getSession();
+    const job = await getJobById(Number(msg.messageId!));
     if (job && JobStatus.CANCELLED === job.status) {
       throw new Error("Item is cancelled. Query rejected.");
     }
-    if (!job) {
-      throw new Error("Could not find job with id: " + id);
-    }
+    await updateJobStatus(job.id, JobStatus.RUNNING);
+    for (const queryRequest of job.queryRequests) {
+      const sql = await getValidatedSQL(queryRequest, session, job.id);
+      const queryResultSet = await createResultSetEntry(queryRequest, job);
+      const queriesToRun: { sql: string; queryRequest: QueryRequest }[] = [];
+      let indicatorId: null | number = null;
+      if (queryRequest.query.queryType === IMQType.INDICATOR) {
+        indicatorId = await createIndicatorResultEntry(queryRequest, queryResultSet, hashQueryRequest(queryRequest));
+        queriesToRun.push.apply(queriesToRun, await getIndicatorSubQueryRequests(session, queryRequest, job.id));
+      } else {
+        queriesToRun.push({ sql, queryRequest });
+      }
 
-    await postgresDb
-      .update(jobTable)
-      .set({
-        status: JobStatus.RUNNING,
-        runDate: new Date().toISOString()
-      })
-      .where(eq(jobTable.dbid, id));
-    const parsedJob = JSON.parse(msg.body);
-    const queryRequest: QueryRequest = parsedJob.queryRequest;
-    let sql: string | undefined = await QueryService.generateQuerySQLfromQuery(await getSession(), queryRequest).catch(async err => {
-      console.error(err);
-      await postgresDb
-        .update(jobTable)
-        .set({
-          status: JobStatus.ERRORED,
-          error: JSON.stringify(err),
-          finishDate: new Date().toISOString()
-        })
-        .where(eq(jobTable.dbid, id));
-      return undefined;
-    });
-    if (!sql) {
-      throw new Error("Could generate SQL for job with id: " + id);
+      console.log("Queries to run:", queriesToRun.length);
+      for (const { sql, queryRequest } of queriesToRun) {
+        try {
+          await executeQuery(await getSession(), sql, queryRequest, queryResultSet);
+          await updateWithEndTime(queryResultSet.id!, queryResultSetTable);
+        } catch (err) {
+          await updateJobStatus(job.id, JobStatus.ERRORED, JSON.stringify(err));
+          return;
+        }
+      }
+      if (indicatorId) {
+        await updateWithEndTime(indicatorId, indicatorResultTable);
+      }
     }
-
-    try {
-      const { insertId, hashCode } = await executeQuery(await getSession(), sql, queryRequest);
-      await postgresDb
-        .update(jobTable)
-        .set({
-          pid: insertId,
-          status: JobStatus.COMPLETED,
-          finishDate: new Date().toISOString()
-        })
-        .where(eq(jobTable.dbid, id));
-    } catch (err) {
-      await postgresDb
-        .update(jobTable)
-        .set({
-          status: JobStatus.ERRORED,
-          error: JSON.stringify(err),
-          finishDate: new Date().toISOString()
-        })
-        .where(eq(jobTable.dbid, id));
-    }
+    await updateJobStatus(job.id, JobStatus.COMPLETED);
   }
 );
 
-sub.on("error", err => {});
+sub.on("error", (err: Error) => {});
 
 const pub = rabbit.createPublisher({
   confirm: true,
@@ -118,14 +94,14 @@ const pub = rabbit.createPublisher({
 export async function sendMessage(userId: string, message: Job) {
   await pub.send(
     {
-      messageId: message.dbid,
+      messageId: "" + message.id,
       exchange: "query_runner",
       routingKey: "query.execute." + userId,
       durable: true
     },
     JSON.stringify(message)
   );
-  return message.dbid;
+  return message.id;
 }
 
 async function onShutdown() {

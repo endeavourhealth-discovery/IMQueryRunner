@@ -1,6 +1,6 @@
 import type { EndSecUI } from "~~/shared/EndSecUI";
 
-import type { User } from "vue-library/models";
+import type { User } from "@endeavour/vue-library/models";
 
 import { FetchError } from "ofetch";
 

@@ -1,5 +1,5 @@
-import { DisplayMode } from "vue-library/enums";
-import { isArrayHasLength, isObjectHasKeys } from "vue-library/helpers";
+import { DisplayMode } from "@endeavour/vue-library/enums";
+import { isArrayHasLength, isObjectHasKeys } from "@endeavour/vue-library/helpers";
 import type {
   ArgumentReference,
   IMLLanguage,
@@ -13,11 +13,18 @@ import type {
   SearchResponse,
   SubQueryDependency,
   TTEntity
-} from "vue-library/interfaces";
+} from "@endeavour/vue-library/interfaces";
 
-const API_URL = `${useRuntimeConfig().public.imapiUrl}/protected/query`;
+const API_URL = `${useRuntimeConfig().public.imapiUrl}query/protected`;
 
 const QueryService = {
+  async getQuerySql(sessionId: string, queryRequest: QueryRequest): Promise<string> {
+    return (await $fetch<string>(API_URL + "/sql", {
+      headers: { cookie: `session_id=${sessionId}` },
+      body: queryRequest,
+      method: "POST"
+    })) as any;
+  },
   async queryIM(sessionId: string, query: QueryRequest): Promise<QueryResponse> {
     return await $fetch<QueryResponse>(API_URL + "/queryIM", {
       headers: { cookie: `session_id=${sessionId}` },
@@ -159,7 +166,7 @@ const QueryService = {
   },
 
   async findMissingArguments(sessionId: string, queryRequest: QueryRequest): Promise<ArgumentReference[]> {
-    return $fetch<ArgumentReference[]>(API_URL + "/public/findRequestMissingArguments", {
+    return $fetch<ArgumentReference[]>(API_URL + "/findRequestMissingArguments", {
       headers: { cookie: `session_id=${sessionId}` },
       body: queryRequest,
       method: "POST"
@@ -182,11 +189,12 @@ const QueryService = {
     });
   },
 
-  async getSubqueryIris(sessionId: string, queryIri: string): Promise<SubQueryDependency[]> {
+  async getSubqueryIris(sessionId: string, queryIri: string, isIndicator: boolean = false): Promise<SubQueryDependency[]> {
     return await $fetch<SubQueryDependency[]>(`${useRuntimeConfig().public.imapiUrl}query/protected/subQueries`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
-        queryIri: queryIri
+        queryIri: queryIri,
+        isIndicator: isIndicator
       },
       method: "get"
     });

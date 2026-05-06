@@ -24,7 +24,11 @@
           <Column field="jobName" header="Job name"></Column>
           <Column>
             <template #body="{ data }: { data: Job }">
-              <Button :disabled="!data.queryRequest.argument.length" label="View arguments" @click="viewArgumentDisplay(data.queryRequest.argument)" />
+              <!-- <Button
+                :disabled="!data.queryDefinition.argument.length"
+                label="View arguments"
+                @click="viewArgumentDisplay(data.queryDefinition.argument)"
+              /> -->
             </template>
           </Column>
           <Column v-if="adminView" field="userId" header="User"></Column>
@@ -67,12 +71,12 @@ import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
 import { useUserStore } from "~/stores/useUserStore";
 import { JobStatus } from "~~/enums";
-import type { Job } from "~~/models";
+import type { Job, JobRequest } from "~~/models";
 
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
 
-import type { Argument } from "vue-library/interfaces";
+import type { Argument } from "@endeavour/vue-library/interfaces";
 
 import { io } from "socket.io-client";
 
@@ -179,7 +183,7 @@ function getStatusSeverity(status: JobStatus): "secondary" | "success" | "info" 
 }
 
 async function cancelJob(jobId: string) {
-  await $fetch(`/api/queue/job/cancel/${jobId}`);
+  await $fetch(`/api/queue/job/stop/${jobId}`);
   await refresh();
 }
 
@@ -226,16 +230,25 @@ async function deleteJob(jobId: string) {
 
 async function requeueJob(jobId: string) {
   const found = getById(jobId);
-  if (found)
+  if (!found) {
+    console.error("Job not found for requeueing:", jobId);
+    return;
+  }
+  if (found) {
+    const jobRequest = {
+      jobName: "Requeued " + (found?.jobName || "Requeued Job"),
+      queryRequests: found?.queryRequests
+    } as JobRequest;
     await $fetch("/api/queue/job/add", {
       method: "post",
-      body: found.queryRequest
+      body: jobRequest
     });
+  }
   await refresh();
 }
 
 function getById(jobId: string): Job | undefined {
-  return jobs.value.find(item => item.dbid === jobId);
+  return jobs.value.find(item => item.id === Number(jobId));
 }
 
 async function onPage(event: any) {

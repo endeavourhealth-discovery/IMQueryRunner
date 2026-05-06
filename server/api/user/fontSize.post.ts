@@ -1,4 +1,4 @@
-import { FontSize } from "vue-library/enums";
+import { FontSize } from "@endeavour/vue-library/enums";
 
 import * as z from "zod";
 

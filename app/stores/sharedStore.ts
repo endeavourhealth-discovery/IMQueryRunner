@@ -1,6 +1,6 @@
 import { ref } from "vue";
 
-import { localStorageWithExpiry } from "vue-library";
+import { localStorageWithExpiry } from "@endeavour/vue-library";
 
 import { defineStore } from "pinia";
 

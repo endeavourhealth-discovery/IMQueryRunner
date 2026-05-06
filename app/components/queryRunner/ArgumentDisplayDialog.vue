@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { type Argument, type ArgumentReference } from "vue-library/interfaces";
+import { type Argument, type ArgumentReference } from "@endeavour/vue-library/interfaces";
 
 import ArgumentDisplay from "@/components/queryRunner/ArgumentDisplay.vue";
 

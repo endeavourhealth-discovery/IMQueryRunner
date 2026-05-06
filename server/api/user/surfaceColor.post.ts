@@ -1,4 +1,4 @@
-import { PrimeVueColors } from "vue-library/enums";
+import { PrimeVueColors } from "@endeavour/vue-library/enums";
 
 import * as z from "zod";
 

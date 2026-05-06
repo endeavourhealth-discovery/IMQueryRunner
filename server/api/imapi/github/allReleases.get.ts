@@ -1,7 +1,7 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
 import GithubService from "~~/server/services/GithubService";
 
-import { REPO } from "vue-library/enums";
+import { REPO } from "@endeavour/vue-library/enums";
 
 import * as z from "zod";
 

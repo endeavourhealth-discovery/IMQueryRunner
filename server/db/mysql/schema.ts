@@ -1,8 +1,113 @@
+import { JobStatus } from "~~/enums/JobStatus";
+
+import { type QueryRequest } from "@endeavour/vue-library";
+
 import { sql } from "drizzle-orm";
-import { bigint, boolean, date, datetime, decimal, double, index, int, mysqlTable, primaryKey, text, tinyint, unique, varchar } from "drizzle-orm/mysql-core";
+import {
+  bigint,
+  boolean,
+  date,
+  datetime,
+  decimal,
+  double,
+  index,
+  int,
+  json,
+  mysqlTable,
+  primaryKey,
+  text,
+  tinyint,
+  unique,
+  varchar
+} from "drizzle-orm/mysql-core";
+
+export const jobTable = mysqlTable(
+  "dataset`.`job",
+  {
+    id: int("id").autoincrement().notNull(),
+    jobName: varchar("job_name", { length: 255 }).notNull(),
+    queryRequests: json("query_requests").$type<QueryRequest[]>().notNull(),
+    startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
+    persistent: tinyint("persistent").notNull(),
+    useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
+    userId: varchar("user_id", { length: 45 }).notNull(),
+    queueDate: datetime("queue_date", { mode: "string" }).notNull(),
+    runDate: datetime("run_date", { mode: "string" }).notNull(),
+    finishDate: datetime("finish_date", { mode: "string" }),
+    status: varchar("status", { length: 45 }).$type<JobStatus>().notNull(),
+    error: json("error")
+  },
+  table => [primaryKey({ columns: [table.id], name: "id" })]
+);
+
+export const queryResultSetTable = mysqlTable(
+  "dataset`.`query_result_set",
+  {
+    id: int("id").autoincrement().notNull(),
+    startTime: datetime("start_time", { mode: "string" }).notNull(),
+    endTime: datetime("end_time", { mode: "string" }),
+    startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
+    persistent: tinyint("persistent").notNull(),
+    useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
+    queryIri: varchar("query_iri", { length: 255 }).notNull(),
+    searchDate: date("search_date", { mode: "string" }),
+    achievementDate: date("achievement_date", { mode: "string" }),
+    jobId: int("job_id").notNull()
+  },
+  table => [primaryKey({ columns: [table.id], name: "id" })]
+);
+
+export const indicatorResultTable = mysqlTable(
+  "dataset`.`indicator_result",
+  {
+    id: int("id").autoincrement().notNull(),
+    queryIri: varchar("query_iri", { length: 255 }).notNull(),
+    queryResultSetId: int("query_result_set_id"),
+    searchDate: date("search_date"),
+    achievementDate: date("achievement_date"),
+    startTime: datetime("start_time", { mode: "string" }),
+    endTime: datetime("end_time", { mode: "string" }),
+    startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
+    persistent: tinyint("persistent").notNull(),
+    useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
+    version: int("version").notNull()
+  },
+  table => [primaryKey({ columns: [table.id], name: "id" })]
+);
+
+export const queryResultTable = mysqlTable(
+  "dataset`.`query_result",
+  {
+    id: int("id").autoincrement().notNull(),
+    queryIri: varchar("query_iri", { length: 255 }).notNull(),
+    queryResultSetId: int("query_result_set_id"),
+    indicatorResultId: int("indicator_result_id"),
+    searchDate: date("search_date"),
+    achievementDate: date("achievement_date"),
+    startTime: datetime("start_time", { mode: "string" }),
+    endTime: datetime("end_time", { mode: "string" }),
+    startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
+    persistent: tinyint("persistent").notNull(),
+    useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
+    version: int("version").notNull()
+  },
+  table => [primaryKey({ columns: [table.id], name: "id" })]
+);
+
+export const datasetResultsTable = mysqlTable("dataset`.`dataset_results", {
+  queryResultId: int("query_result_id").notNull(),
+  entityId: int("entity_id").notNull(),
+  columnGroup: varchar("column_group", { length: 255 }).notNull(),
+  json: json("json").notNull()
+});
+
+export const cohortResultsTable = mysqlTable("dataset`.`cohort_results", {
+  queryResultId: int("query_result_id").notNull(),
+  entityId: int("entity_id").notNull()
+});
 
 export const allergyIntolerance = mysqlTable(
-  "allergy_intolerance",
+  "compass.allergy_intolerance",
   {
     id: bigint({ mode: "number" }).notNull(),
     organizationId: bigint("organization_id", { mode: "number" }).notNull(),
@@ -24,7 +129,7 @@ export const allergyIntolerance = mysqlTable(
 );
 
 export const concept = mysqlTable(
-  "concept",
+  "compass.concept",
   {
     dbid: int().autoincrement().notNull(),
     document: int().notNull(),
@@ -42,13 +147,14 @@ export const concept = mysqlTable(
   table => [
     index("concept_draft").on(table.draft),
     primaryKey({ columns: [table.dbid], name: "concept_dbid" }),
+    primaryKey({ columns: [table.dbid], name: "concept_dbid" }),
     unique("concept_id_uq").on(table.id),
     unique("concept_scheme_code_idx").on(table.scheme, table.code)
   ]
 );
 
 export const conceptMap = mysqlTable(
-  "concept_map",
+  "compass.concept_map",
   {
     legacy: int().notNull(),
     core: int().notNull(),
@@ -62,7 +168,7 @@ export const conceptMap = mysqlTable(
 );
 
 export const conceptSetMember = mysqlTable(
-  "concept_set_member",
+  "compass.concept_set_member",
   {
     id: int().autoincrement().notNull(),
     set: varchar({ length: 512 }).notNull(),
@@ -78,7 +184,7 @@ export const conceptSetMember = mysqlTable(
 );
 
 export const encounter = mysqlTable(
-  "encounter",
+  "compass.encounter",
   {
     id: bigint({ mode: "number" }).notNull(),
     organizationId: bigint("organization_id", { mode: "number" }).notNull(),
@@ -108,7 +214,7 @@ export const encounter = mysqlTable(
 );
 
 export const episodeOfCare = mysqlTable(
-  "episode_of_care",
+  "compass.episode_of_care",
   {
     id: bigint({ mode: "number" }).notNull(),
     organizationId: bigint("organization_id", { mode: "number" }).notNull(),
@@ -128,7 +234,7 @@ export const episodeOfCare = mysqlTable(
 );
 
 export const medicationOrder = mysqlTable(
-  "medication_order",
+  "compass.medication_order",
   {
     id: bigint({ mode: "number" }).notNull(),
     organizationId: bigint("organization_id", { mode: "number" }).notNull(),
@@ -159,7 +265,7 @@ export const medicationOrder = mysqlTable(
 );
 
 export const medicationStatement = mysqlTable(
-  "medication_statement",
+  "compass.medication_statement",
   {
     id: bigint({ mode: "number" }).notNull(),
     organizationId: bigint("organization_id", { mode: "number" }).notNull(),
@@ -188,7 +294,7 @@ export const medicationStatement = mysqlTable(
 );
 
 export const observation = mysqlTable(
-  "observation",
+  "compass.observation",
   {
     id: bigint({ mode: "number" }).notNull(),
     organizationId: bigint("organization_id", { mode: "number" }).notNull(),
@@ -222,7 +328,7 @@ export const observation = mysqlTable(
 );
 
 export const patient = mysqlTable(
-  "patient",
+  "compass.patient",
   {
     id: bigint({ mode: "number" }).notNull(),
     organizationId: bigint("organization_id", { mode: "number" }).notNull(),
@@ -244,7 +350,7 @@ export const patient = mysqlTable(
 );
 
 export const patientAddress = mysqlTable(
-  "patient_address",
+  "compass.patient_address",
   {
     id: bigint({ mode: "number" }).notNull(),
     organizationId: bigint("organization_id", { mode: "number" }).notNull(),
@@ -273,7 +379,7 @@ export const patientAddress = mysqlTable(
 );
 
 export const patientContact = mysqlTable(
-  "patient_contact",
+  "compass.patient_contact",
   {
     id: bigint({ mode: "number" }).notNull(),
     organizationId: bigint("organization_id", { mode: "number" }).notNull(),
@@ -291,7 +397,7 @@ export const patientContact = mysqlTable(
 );
 
 export const practitioner = mysqlTable(
-  "practitioner",
+  "compass.practitioner",
   {
     id: bigint({ mode: "number" }).notNull(),
     organizationId: bigint("organization_id", { mode: "number" }).notNull(),
@@ -303,7 +409,7 @@ export const practitioner = mysqlTable(
   table => [primaryKey({ columns: [table.id], name: "practitioner_id" })]
 );
 
-export const smallPat = mysqlTable("small_pat", {
+export const smallPat = mysqlTable("compass.small_pat", {
   id: bigint({ mode: "number" }).notNull(),
   organizationId: bigint("organization_id", { mode: "number" }).notNull(),
   personId: bigint("person_id", { mode: "number" }).notNull(),

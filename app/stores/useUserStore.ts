@@ -1,4 +1,4 @@
-import type { User } from "vue-library/models";
+import type { User } from "@endeavour/vue-library/models";
 
 import { defineStore } from "pinia";
 

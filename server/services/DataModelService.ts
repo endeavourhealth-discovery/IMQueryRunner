@@ -1,4 +1,4 @@
-import type { NodeShape, PropertyDisplay, TTIriRef, UIProperty } from "vue-library/interfaces";
+import type { NodeShape, PropertyDisplay, TTIriRef, UIProperty } from "@endeavour/vue-library/interfaces";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}dataModel/protected`;
 

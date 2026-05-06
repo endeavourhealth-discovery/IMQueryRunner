@@ -1,4 +1,4 @@
-import { IM } from "vue-library/enums";
+import { IM } from "@endeavour/vue-library/enums";
 import type {
   DownloadByQueryOptions,
   EntityValidationRequest,
@@ -11,7 +11,7 @@ import type {
   SearchResultSummary,
   TTBundle,
   TTIriRef
-} from "vue-library/interfaces";
+} from "@endeavour/vue-library/interfaces";
 
 import type { OrganizationChartNode } from "primevue";
 

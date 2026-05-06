@@ -37,10 +37,12 @@
       v-if="job.status === JobStatus.COMPLETED"
       icon="fa-duotone fa-solid fa-list"
       class="p-button-rounded p-button-text p-button-plain activity-row-button"
-      @click="viewQueryResults"
+      @click="openViewResultsMenuItems"
       v-tooltip.left="'View results'"
       data-testid="view-query-results-button"
     />
+    <Menu ref="viewResultsMenu" id="view-results-menu" :model="viewResultsMenuItems" :popup="true" />
+
     <Button
       icon="fa-duotone fa-solid fa-trash"
       severity="danger"
@@ -87,9 +89,26 @@ const emit = defineEmits({
 const confirm = useConfirm();
 
 const showErrorDialog = ref(false);
+const viewResultsMenuItems: Ref<any[]> = ref([]);
+const viewResultsMenu = ref();
+
+function openViewResultsMenuItems(event: MouseEvent): void {
+  for (const queryRequest of props.job.queryRequests) {
+    const item = {
+      label: `View results for "${queryRequest.query.iri}"`,
+      icon: "fa-duotone fa-solid fa-table-list",
+      command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType),
+      visible: false
+    };
+    item.visible = true;
+    viewResultsMenuItems.value.push(item);
+  }
+
+  viewResultsMenu.value.toggle(event);
+}
 
 function goToQuery() {
-  emit("goToQuery", props.job.queryRequest.query.iri);
+  // emit("goToQuery", props.job.queryIri);
 }
 
 function cancelQuery() {
@@ -105,7 +124,7 @@ function cancelQuery() {
     acceptProps: {
       label: "Yes"
     },
-    accept: () => emit("cancelQuery", props.job.dbid),
+    accept: () => emit("cancelQuery", props.job.id),
     reject: () => confirm.close()
   });
 }
@@ -123,17 +142,19 @@ function deleteQuery() {
     acceptProps: {
       label: "Yes"
     },
-    accept: () => emit("deleteQuery", props.job.dbid),
+    accept: () => emit("deleteQuery", props.job.id),
     reject: () => confirm.close()
   });
 }
 
-async function viewQueryResults() {
-  await navigateTo({ path: `/results/${props.job.dbid}` });
+async function viewQueryResults(queryIri: string, queryType: string) {
+  await navigateTo({
+    path: `/results/${props.job.id}/${queryType}/${queryIri}`
+  });
 }
 
 function requeueQuery() {
-  emit("requeueQuery", props.job.dbid);
+  emit("requeueQuery", props.job.id);
 }
 
 function showErrorDetails() {}

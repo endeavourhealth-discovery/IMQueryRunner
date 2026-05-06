@@ -1,7 +1,7 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
 import FilerService from "~~/server/services/FilerService";
 
-import { NAMESPACE } from "vue-library/enums";
+import { NAMESPACE } from "@endeavour/vue-library/enums";
 
 import * as z from "zod";
 

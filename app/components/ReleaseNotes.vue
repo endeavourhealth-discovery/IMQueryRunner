@@ -55,9 +55,9 @@ import GithubService from "~/services/GithubService";
 
 import { type Ref, nextTick, onMounted, ref } from "vue";
 
-import { REPO } from "vue-library";
-import { isObjectHasKeys } from "vue-library/helpers";
-import type { GithubRelease } from "vue-library/interfaces";
+import { REPO } from "@endeavour/vue-library";
+import { isObjectHasKeys } from "@endeavour/vue-library/helpers";
+import type { GithubRelease } from "@endeavour/vue-library/interfaces";
 
 import { sanitizeUrl } from "@braintree/sanitize-url";
 
