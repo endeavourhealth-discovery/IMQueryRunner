@@ -7,6 +7,8 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "test:unit": "vitest",
+    "test:e2e": "gauge run --verbose",
+    "test:e2e:ci": "cross-env headless_chrome=true screenshot_on_failure=true gauge run",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -14,8 +16,7 @@
     "drizzle-pull-mysql": "npx drizzle-kit pull --config=server/db/mysql.drizzle.ts",
     "format": "prettier --write \"{app,docs,enums,models,server,shared,types,tests}/**/*.{js,ts,vue,json,css,scss,md}\"",
     "format:check": "prettier --write \"{app,docs,enums,models,server,shared,types,tests}/**/*.{js,ts,vue,json,css,scss,md}\"",
-    "prepare": "husky",
-    "preinstall": "pnpm add endeavourhealth-discovery/VueLibrary"
+    "prepare": "husky"
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.896.0",
@@ -67,11 +68,14 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "typescript": "^5.9.2",
     "vitest": "^4.0.16",
-    "vue-tsc": "^3.1.0"
+    "vue-tsc": "^3.1.0",
+    "cross-env": "10.1.0",
+    "@playwright/test": "1.57.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "vue-library"
+      "vue-library",
+      "@getgauge/cli"
     ]
   },
   "lint-staged": {
