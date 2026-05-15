@@ -13,7 +13,7 @@ const paramSchema = z.object({
 export default defineEventHandler(async event => {
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
   const item = await mysqlDb.query.jobTable.findFirst({
-    where: eq(jobTable.id, Number(jobId)),
+    where: eq(jobTable.id, Number(jobId))
   });
   const now = getNow();
 
@@ -22,7 +22,7 @@ export default defineEventHandler(async event => {
       .update(jobTable)
       .set({
         status: JobStatus.CANCELLED,
-        finishDate: now,
+        finishDate: now
       })
       .where(eq(jobTable.id, item.id));
   } else if (item?.status === JobStatus.RUNNING) {
@@ -44,7 +44,7 @@ export default defineEventHandler(async event => {
       .update(jobTable)
       .set({
         status: JobStatus.CANCELLED,
-        finishDate: now,
+        finishDate: now
       })
       .where(eq(jobTable.id, item.id));
   } else {

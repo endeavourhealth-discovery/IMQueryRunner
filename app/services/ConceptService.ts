@@ -1,4 +1,4 @@
-import type { ConceptContextMap, SimpleMap, TermCode } from "vue-library/interfaces";
+import type { ConceptContextMap, SimpleMap, TermCode } from "@endeavour/vue-library/interfaces";
 
 const API_URL = "api/imapi/concept";
 

@@ -1,9 +1,9 @@
 import Logger from "#shared/logger";
+import { mysqlDb } from "~~/server/db/mysql";
+import { jobTable } from "~~/server/db/mysql/schema";
 
 import { SQL, and, desc, eq, lte } from "drizzle-orm";
 import * as z from "zod";
-import { mysqlDb } from "~~/server/db/mysql";
-import { jobTable } from "~~/server/db/mysql/schema";
 
 const querySchema = z.object({
   page: z.coerce.number().default(1),
@@ -19,10 +19,7 @@ export default defineEventHandler(async event => {
 
   const userId = user!.id;
 
-  const totalCount = await mysqlDb.$count(
-    jobTable,
-    eq(jobTable.userId, userId),
-  );
+  const totalCount = await mysqlDb.$count(jobTable, eq(jobTable.userId, userId));
 
   const filters: SQL[] = [];
   // if (user?.groups.includes("Endeavour/Admin")) // Admins can see all jobs, so no userId filter is added

@@ -12,6 +12,6 @@ export const queryResultSchema = z.object({
   startOfDaySnapshot: z.number().int(),
   persistent: z.number().int(),
   useStartOfDaySnapshot: z.number().int(),
-  version: z.number().int(),
+  version: z.number().int()
 });
 export type QueryResult = z.infer<typeof queryResultSchema>;

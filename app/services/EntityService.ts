@@ -1,4 +1,4 @@
-import { IM, RDFS } from "vue-library/enums";
+import { IM, RDFS } from "@endeavour/vue-library/enums";
 import type {
   DownloadByQueryOptions,
   EditRequest,
@@ -14,7 +14,7 @@ import type {
   TTBundle,
   TTIriRef,
   ValidatedEntity
-} from "vue-library/interfaces";
+} from "@endeavour/vue-library/interfaces";
 
 import { type OrganizationChartNode } from "primevue/organizationchart";
 import type { TreeNode } from "primevue/treenode";

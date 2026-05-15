@@ -1,6 +1,6 @@
 import { getIp } from "~~/server/helpers/getIp";
 
-import { PermissionSchema, type User, UserSchema } from "vue-library/models";
+import { PermissionSchema, type User, UserSchema } from "@endeavour/vue-library/models";
 
 export default defineEventHandler(async (event): Promise<User> => {
   const sessionId = getCookie(event, "session_id");

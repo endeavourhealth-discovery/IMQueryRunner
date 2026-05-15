@@ -81,8 +81,8 @@ import QueryService from "~/services/QueryService";
 
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
-import { IM, TextSearchStyle } from "vue-library/enums";
-import { type QueryRequest, type SearchResponse, type SearchResultSummary, type TTIriRef } from "vue-library/interfaces";
+import { IM, TextSearchStyle } from "@endeavour/vue-library/enums";
+import { type QueryRequest, type SearchResponse, type SearchResultSummary, type TTIriRef } from "@endeavour/vue-library/interfaces";
 
 import { cloneDeep, debounce, isEqual } from "lodash-es";
 import type { TreeNode } from "primevue/treenode";

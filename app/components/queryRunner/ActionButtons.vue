@@ -41,12 +41,7 @@
       v-tooltip.left="'View results'"
       data-testid="view-query-results-button"
     />
-    <Menu
-      ref="viewResultsMenu"
-      id="view-results-menu"
-      :model="viewResultsMenuItems"
-      :popup="true"
-    />
+    <Menu ref="viewResultsMenu" id="view-results-menu" :model="viewResultsMenuItems" :popup="true" />
 
     <Button
       icon="fa-duotone fa-solid fa-trash"
@@ -102,12 +97,8 @@ function openViewResultsMenuItems(event: MouseEvent): void {
     const item = {
       label: `View results for "${queryRequest.query.iri}"`,
       icon: "fa-duotone fa-solid fa-table-list",
-      command: () =>
-        viewQueryResults(
-          encodeURIComponent(queryRequest.query.iri),
-          queryRequest.query.queryType,
-        ),
-      visible: false,
+      command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType),
+      visible: false
     };
     item.visible = true;
     viewResultsMenuItems.value.push(item);
@@ -158,7 +149,7 @@ function deleteQuery() {
 
 async function viewQueryResults(queryIri: string, queryType: string) {
   await navigateTo({
-    path: `/results/${props.job.id}/${queryType}/${queryIri}`,
+    path: `/results/${props.job.id}/${queryType}/${queryIri}`
   });
 }
 

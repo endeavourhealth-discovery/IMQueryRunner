@@ -1,8 +1,8 @@
 import { JobStatus } from "~~/enums";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
-import { IMQType } from "vue-library";
-import { type Argument, type QueryRequest, type SubQueryDependency } from "vue-library/interfaces";
+import { IMQType } from "@endeavour/vue-library";
+import { type Argument, type QueryRequest, type SubQueryDependency } from "@endeavour/vue-library/interfaces";
 
 import { and, eq } from "drizzle-orm";
 import murmurhash from "murmurhash";

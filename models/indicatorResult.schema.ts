@@ -11,6 +11,6 @@ export const indicatorResultSchema = z.object({
   startOfDaySnapshot: z.number().int(),
   persistent: z.number().int(),
   useStartOfDaySnapshot: z.number().int(),
-  version: z.number().int(),
+  version: z.number().int()
 });
 export type IndicatorResult = z.infer<typeof indicatorResultSchema>;

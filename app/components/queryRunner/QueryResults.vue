@@ -48,10 +48,10 @@
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from "~/stores/useUserStore";
-
 import type { Ref } from "vue";
 import { onMounted, ref } from "vue";
+
+import { useUserStore } from "@endeavour/vue-library/stores";
 
 import { isArray } from "lodash-es";
 
@@ -62,7 +62,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const { user } = useUserStore();
+const { currentUser } = useUserStore();
 
 const loading = ref(false);
 const downloadLoading = ref(false);
@@ -85,11 +85,11 @@ async function getQueryResults() {
       `/api/queue/job/results/${props.jobId}/${props.queryType}/${encodeURIComponent(props.queryIri as string)}`,
       {
         query: {
-          userId: user?.id,
+          userId: currentUser?.id,
           page: page.value,
-          size: rows.value,
-        },
-      },
+          size: rows.value
+        }
+      }
     );
     if (value && isArray(value.result)) {
       totalCount.value = value.totalCount;
@@ -102,7 +102,7 @@ async function getTotalQueryResults() {
   if (props.jobId) {
     const value = await $fetch<{ result: any[] }>(`/api/queue/job/results/total/${props.jobId}`, {
       query: {
-        userId: user?.id
+        userId: currentUser?.id
       }
     });
     if (value && isArray(value.result)) {
