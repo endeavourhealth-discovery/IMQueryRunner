@@ -3,7 +3,9 @@
     <DevBanner v-if="isDevMode && showDevBanner" />
     <ReleaseBannerBar v-if="showReleaseBanner" :latestRelease="latestRelease" />
     <Header />
-    <slot />
+    <main class="flex-1 flex flex-col">
+      <slot />
+    </main>
     <Footer />
   </div>
 </template>
