@@ -1,6 +1,7 @@
 import type { EndSecUI } from "~~/shared/EndSecUI";
 
 import type { User } from "@endeavour/vue-library/models";
+import { useUserStore } from "@endeavour/vue-library/stores";
 
 import { FetchError } from "ofetch";
 
@@ -25,7 +26,7 @@ export default defineNuxtPlugin(nuxtApp => {
         query: { code: code, state: state },
         headers: headers
       });
-      useUserStore().setUser(response);
+      useUserStore().updateCurrentUser(response);
     },
 
     getUser: async (): Promise<User> => {
@@ -43,7 +44,7 @@ export default defineNuxtPlugin(nuxtApp => {
 
     logout: async (): Promise<void> => {
       await $fetch("/api/auth/logout");
-      useUserStore().setUser(null);
+      useUserStore().updateCurrentUser(undefined);
       reloadNuxtApp();
     },
 

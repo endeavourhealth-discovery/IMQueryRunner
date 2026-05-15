@@ -4,6 +4,7 @@
     <ReleaseBannerBar v-if="showReleaseBanner" :latestRelease="latestRelease" />
     <Header />
     <slot />
+    <Footer />
   </div>
 </template>
 
@@ -15,12 +16,13 @@ import { type GithubRelease, REPO } from "@endeavour/vue-library";
 import semver from "semver";
 
 import DevBanner from "./DevBanner.vue";
+import Footer from "./Footer.vue";
 import ReleaseBannerBar from "./ReleaseBannerBar.vue";
 
 const sharedStore = useSharedStore();
 
-const showReleaseBanner: ComputedRef<boolean> = computed(() => sharedStore.showReleaseBanner);
-const showDevBanner: ComputedRef<boolean> = computed(() => sharedStore.showDevBanner);
+const showReleaseBanner: ComputedRef<boolean | null> = computed(() => sharedStore.showReleaseBanner);
+const showDevBanner: ComputedRef<boolean | null> = computed(() => sharedStore.showDevBanner);
 const isDevMode: ComputedRef<boolean> = computed(() => sharedStore.isDevMode);
 
 const latestRelease: Ref<GithubRelease | undefined> = ref();

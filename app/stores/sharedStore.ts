@@ -6,8 +6,25 @@ import { defineStore } from "pinia";
 
 export const useSharedStore = defineStore("shared", () => {
   const showReleaseNotes = ref<boolean>(false);
-  const showReleaseBanner = ref<boolean>(import.meta.client ? (localStorageWithExpiry.getItem("showQRReleaseBanner") === "true" ? true : false) : false);
-  const showDevBanner = ref<boolean>(import.meta.client ? (localStorageWithExpiry.getItem("showQRDevBanner") === "true" ? true : false) : false);
+  const showReleaseBanner = ref<boolean | null>(
+    import.meta.client
+      ? localStorageWithExpiry.getItem("showQRReleaseBanner") === "true"
+        ? true
+        : localStorageWithExpiry.getItem("showQRReleaseBanner") === "false"
+          ? false
+          : null
+      : null
+  );
+  const showDevBanner = ref<boolean | null>(
+    import.meta.client
+      ? localStorageWithExpiry.getItem("showQRDevBanner") === "true"
+        ? true
+        : localStorageWithExpiry.getItem("showQRDevBanner") === "false"
+          ? false
+          : null
+      : null
+  );
+  const showCookieConsent = ref<boolean>(false);
   const isDevMode = ref<boolean>(true);
 
   function updateShowReleaseNotes(bool: boolean) {
@@ -28,6 +45,10 @@ export const useSharedStore = defineStore("shared", () => {
     }
   }
 
+  function updateShowCookieConsent(bool: boolean) {
+    showCookieConsent.value = bool;
+  }
+
   function updateIsDevMode(devMode: boolean) {
     isDevMode.value = devMode;
   }
@@ -37,9 +58,11 @@ export const useSharedStore = defineStore("shared", () => {
     showDevBanner,
     showReleaseBanner,
     showReleaseNotes,
+    showCookieConsent,
     updateIsDevMode,
     updateShowDevBanner,
     updateShowReleaseBanner,
-    updateShowReleaseNotes
+    updateShowReleaseNotes,
+    updateShowCookieConsent
   };
 });

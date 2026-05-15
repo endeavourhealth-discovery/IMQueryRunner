@@ -16,7 +16,7 @@ importers:
         version: 7.1.2
       '@endeavour/vue-library':
         specifier: github:endeavourhealth-discovery/VueLibrary
-        version: https://codeload.github.com/endeavourhealth-discovery/VueLibrary/tar.gz/7d2d88ccac5077ae250aa57343a858d7e4c2969d(@primeuix/themes@2.0.3)(axios@1.13.6)(fuse.js@7.1.0)(pinia@3.0.4(typescript@5.9.2)(vue@3.5.32(typescript@5.9.2)))(primevue@4.5.5(vue@3.5.32(typescript@5.9.2)))(typescript-logging@2.2.0)(vue-router@5.0.4(@vue/compiler-sfc@3.5.32)(pinia@3.0.4(typescript@5.9.2)(vue@3.5.32(typescript@5.9.2)))(vue@3.5.32(typescript@5.9.2)))(vue@3.5.32(typescript@5.9.2))
+        version: https://codeload.github.com/endeavourhealth-discovery/VueLibrary/tar.gz/a7e8d4c19c2f98a3070782ae82e8b43ac22df646(@primeuix/themes@2.0.3)(axios@1.13.6)(fuse.js@7.1.0)(pinia@3.0.4(typescript@5.9.2)(vue@3.5.32(typescript@5.9.2)))(primevue@4.5.5(vue@3.5.32(typescript@5.9.2)))(typescript-logging@2.2.0)(vue-router@5.0.4(@vue/compiler-sfc@3.5.32)(pinia@3.0.4(typescript@5.9.2)(vue@3.5.32(typescript@5.9.2)))(vue@3.5.32(typescript@5.9.2)))(vue@3.5.32(typescript@5.9.2))
       '@pinia/nuxt':
         specifier: 0.11.2
         version: 0.11.2(magicast@0.3.5)(pinia@3.0.4(typescript@5.9.2)(vue@3.5.32(typescript@5.9.2)))
@@ -434,9 +434,9 @@ packages:
   '@emnapi/wasi-threads@1.1.0':
     resolution: {integrity: sha512-WI0DdZ8xFSbgMjR1sFsKABJ/C5OnRrjT06JXbZKexJGrDuPTzZdDYfFlsgcCXCyf+suG5QU2e/y1Wo2V/OapLQ==}
 
-  '@endeavour/vue-library@https://codeload.github.com/endeavourhealth-discovery/VueLibrary/tar.gz/7d2d88ccac5077ae250aa57343a858d7e4c2969d':
-    resolution: {tarball: https://codeload.github.com/endeavourhealth-discovery/VueLibrary/tar.gz/7d2d88ccac5077ae250aa57343a858d7e4c2969d}
-    version: 0.1.0
+  '@endeavour/vue-library@https://codeload.github.com/endeavourhealth-discovery/VueLibrary/tar.gz/a7e8d4c19c2f98a3070782ae82e8b43ac22df646':
+    resolution: {tarball: https://codeload.github.com/endeavourhealth-discovery/VueLibrary/tar.gz/a7e8d4c19c2f98a3070782ae82e8b43ac22df646}
+    version: 0.2.1
     peerDependencies:
       '@primeuix/themes': 2.0.3
       pinia: 3.0.4
@@ -6015,7 +6015,7 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@endeavour/vue-library@https://codeload.github.com/endeavourhealth-discovery/VueLibrary/tar.gz/7d2d88ccac5077ae250aa57343a858d7e4c2969d(@primeuix/themes@2.0.3)(axios@1.13.6)(fuse.js@7.1.0)(pinia@3.0.4(typescript@5.9.2)(vue@3.5.32(typescript@5.9.2)))(primevue@4.5.5(vue@3.5.32(typescript@5.9.2)))(typescript-logging@2.2.0)(vue-router@5.0.4(@vue/compiler-sfc@3.5.32)(pinia@3.0.4(typescript@5.9.2)(vue@3.5.32(typescript@5.9.2)))(vue@3.5.32(typescript@5.9.2)))(vue@3.5.32(typescript@5.9.2))':
+  '@endeavour/vue-library@https://codeload.github.com/endeavourhealth-discovery/VueLibrary/tar.gz/a7e8d4c19c2f98a3070782ae82e8b43ac22df646(@primeuix/themes@2.0.3)(axios@1.13.6)(fuse.js@7.1.0)(pinia@3.0.4(typescript@5.9.2)(vue@3.5.32(typescript@5.9.2)))(primevue@4.5.5(vue@3.5.32(typescript@5.9.2)))(typescript-logging@2.2.0)(vue-router@5.0.4(@vue/compiler-sfc@3.5.32)(pinia@3.0.4(typescript@5.9.2)(vue@3.5.32(typescript@5.9.2)))(vue@3.5.32(typescript@5.9.2)))(vue@3.5.32(typescript@5.9.2))':
     dependencies:
       '@primeuix/themes': 2.0.3
       '@vueuse/core': 14.2.1(vue@3.5.32(typescript@5.9.2))

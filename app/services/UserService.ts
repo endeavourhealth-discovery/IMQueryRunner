@@ -2,27 +2,24 @@ import { PrimeVueColors, PrimeVuePresetThemes } from "@endeavour/vue-library/enu
 import type { NamespacePermissionJava, RecentActivityItemDto } from "@endeavour/vue-library/interfaces";
 import { type User } from "@endeavour/vue-library/models";
 
-const API_URL = "api/imapi/user";
+const API_URL = "api/user";
 
 const UserService = {
   async updateUserPreset(preset: PrimeVuePresetThemes): Promise<User> {
     return await $fetch<User>(API_URL + "/preset", {
       body: preset,
-      headers: { "Content-Type": "text/plain" },
       method: "POST"
     });
   },
   async updateUserPrimaryColor(color: PrimeVueColors): Promise<User> {
     return await $fetch<User>(API_URL + "/primaryColor", {
       body: color,
-      headers: { "Content-Type": "text/plain" },
       method: "POST"
     });
   },
   async updateUserSurfaceColor(color: PrimeVueColors): Promise<User> {
     return await $fetch<User>(API_URL + "/surfaceColor", {
       body: color,
-      headers: { "Content-Type": "text/plain" },
       method: "POST"
     });
   },
@@ -35,7 +32,6 @@ const UserService = {
   async updateUserFontSize(fontSize: string): Promise<User> {
     return await $fetch<User>(API_URL + "/fontSize", {
       body: fontSize,
-      headers: { "Content-Type": "text/plain" },
       method: "POST"
     });
   },
