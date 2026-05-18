@@ -74,7 +74,14 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@endeavour/vue-library"
+      "@endeavour/vue-library",
+      "@getgauge/cli",
+      "@parcel/watcher",
+      "@prisma/client",
+      "@prisma/engines",
+      "@tailwindcss/oxide",
+      "esbuild",
+      "prisma"
     ]
   },
   "lint-staged": {
