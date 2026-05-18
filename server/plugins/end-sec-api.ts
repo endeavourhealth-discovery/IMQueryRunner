@@ -1,7 +1,7 @@
 import type { EndSecApi } from "~~/shared/EndSecApi";
 
-import { NAMESPACE, Resource, UserRole } from "vue-library/enums";
-import type { User } from "vue-library/models";
+import { NAMESPACE, Resource, UserRole } from "@endeavour/vue-library/enums";
+import type { User } from "@endeavour/vue-library/models";
 
 import { EventHandlerRequest, H3Event } from "h3";
 import type { NitroApp } from "nitropack";

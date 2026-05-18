@@ -1,7 +1,7 @@
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
 import QueryService from "~~/server/services/QueryService";
 
-import { DisplayMode } from "vue-library/enums";
+import { DisplayMode } from "@endeavour/vue-library/enums";
 
 defineRouteMeta({
   openAPI: {

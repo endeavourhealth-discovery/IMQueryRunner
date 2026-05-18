@@ -1,4 +1,4 @@
-import { PrimeVuePresetThemes } from "vue-library/enums";
+import { PrimeVuePresetThemes } from "@endeavour/vue-library/enums";
 
 import * as z from "zod";
 

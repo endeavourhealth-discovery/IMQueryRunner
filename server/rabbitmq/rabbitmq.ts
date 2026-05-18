@@ -1,9 +1,9 @@
 import { JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
 
-import { IMQType } from "vue-library";
-import { type QueryRequest } from "vue-library/interfaces";
-import type { User } from "vue-library/models";
+import { IMQType } from "@endeavour/vue-library";
+import { type QueryRequest } from "@endeavour/vue-library/interfaces";
+import type { User } from "@endeavour/vue-library/models";
 
 import { Connection } from "rabbitmq-client";
 

@@ -1,4 +1,4 @@
-import type { ECLQueryRequest, Query, SearchResponse } from "vue-library/interfaces";
+import type { ECLQueryRequest, Query, SearchResponse } from "@endeavour/vue-library/interfaces";
 
 const API_URL = +"api/imapi/ecl";
 

@@ -1,8 +1,8 @@
-import { PrimeVuePresetThemes } from "vue-library/enums";
+import { PrimeVuePresetThemes } from "@endeavour/vue-library/enums";
 
 import * as z from "zod";
 
-const bodySchema = z.boolean();
+const bodySchema = z.object({ bool: z.boolean() });
 
 defineRouteMeta({
   openAPI: {
@@ -14,8 +14,13 @@ defineRouteMeta({
       content: {
         "application/json": {
           schema: {
-            type: "boolean",
-            summary: "Dark mode"
+            type: "object",
+            summary: "Dark mode",
+            properties: {
+              bool: {
+                type: "boolean"
+              }
+            }
           }
         }
       }
@@ -26,6 +31,6 @@ defineRouteMeta({
 export default defineEventHandler(async (event): Promise<any> => {
   const darkMode = await readValidatedBody(event, bodySchema.parse);
   const user = await globalThis.apiGuard.getUser(event);
-  user.darkMode = darkMode;
+  user.darkMode = darkMode.bool;
   return await globalThis.apiGuard.updateUser(event, user);
 });

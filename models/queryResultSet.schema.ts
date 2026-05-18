@@ -1,5 +1,6 @@
-import { z } from "zod";
 import { JobStatus } from "~~/enums";
+
+import { z } from "zod";
 
 export const queryResultSetSchema = z.object({
   id: z.number().int().optional(),
@@ -12,6 +13,6 @@ export const queryResultSetSchema = z.object({
   queryIri: z.string(),
   searchDate: z.string().optional(),
   achievementDate: z.string().optional(),
-  jobId: z.number().int(),
+  jobId: z.number().int()
 });
 export type QueryResultSet = z.infer<typeof queryResultSetSchema>;

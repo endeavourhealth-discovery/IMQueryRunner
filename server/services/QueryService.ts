@@ -1,5 +1,5 @@
-import { DisplayMode } from "vue-library/enums";
-import { isArrayHasLength, isObjectHasKeys } from "vue-library/helpers";
+import { DisplayMode } from "@endeavour/vue-library/enums";
+import { isArrayHasLength, isObjectHasKeys } from "@endeavour/vue-library/helpers";
 import type {
   ArgumentReference,
   IMLLanguage,
@@ -13,7 +13,7 @@ import type {
   SearchResponse,
   SubQueryDependency,
   TTEntity
-} from "vue-library/interfaces";
+} from "@endeavour/vue-library/interfaces";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}query/protected`;
 
