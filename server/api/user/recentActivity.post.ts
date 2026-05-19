@@ -1,4 +1,4 @@
-import { RecentActivityItemSchema } from "vue-library/models";
+import { RecentActivityItemSchema } from "@endeavour/vue-library/models";
 
 import * as z from "zod";
 

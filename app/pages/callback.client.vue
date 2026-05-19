@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useUserStore } from "~/stores/useUserStore";
+import { useUserStore } from "@endeavour/vue-library";
 
 import { useRoute } from "vue-router";
 

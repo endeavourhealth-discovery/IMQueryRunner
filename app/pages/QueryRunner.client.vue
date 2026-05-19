@@ -69,14 +69,14 @@
 <script setup lang="ts">
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
-import { useUserStore } from "~/stores/useUserStore";
 import { JobStatus } from "~~/enums";
 import type { Job, JobRequest } from "~~/models";
 
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
 
-import type { Argument } from "vue-library/interfaces";
+import { useUserStore } from "@endeavour/vue-library";
+import type { Argument } from "@endeavour/vue-library/interfaces";
 
 import { io } from "socket.io-client";
 
@@ -85,12 +85,12 @@ definePageMeta({
   requiresRole: ["EXECUTOR", "ADMIN"]
 });
 
-const { user } = useUserStore();
+const { currentUser } = useUserStore();
 const confirm = useConfirm();
 
 const socket = io({
   extraHeaders: {
-    authorization: `bearer ${user?.id}`
+    authorization: `bearer ${currentUser?.id}`
   }
 });
 
@@ -111,7 +111,7 @@ const adminView = false; //TODO: determine admin view based on user role and pre
 onMounted(async () => {
   loading.value = true;
   loading.value = false;
-  socket.emit("joinRoom", "test-room", user?.username);
+  socket.emit("joinRoom", "test-room", currentUser?.username);
   socket.on("message", function (data) {
     alert(data);
   });
@@ -126,7 +126,7 @@ async function initSearch() {
     result: Job[];
   }>("/api/queue", {
     query: {
-      userId: user?.id,
+      userId: currentUser?.id,
       page: page.value,
       size: rows.value
     }
@@ -149,7 +149,7 @@ async function refresh() {
   searchLoading.value = true;
   const foundJobs = await $fetch<{ totalCount: number; result: Job[] }>("/api/queue", {
     query: {
-      userId: user?.id,
+      userId: currentUser?.id,
       page: page.value,
       size: rows.value
     }

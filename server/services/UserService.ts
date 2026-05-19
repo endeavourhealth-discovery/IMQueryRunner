@@ -1,6 +1,6 @@
-import { PrimeVueColors, PrimeVuePresetThemes } from "vue-library/enums";
-import type { NamespacePermissionJava, RecentActivityItemDto } from "vue-library/interfaces";
-import { User } from "vue-library/models";
+import { PrimeVueColors, PrimeVuePresetThemes } from "@endeavour/vue-library/enums";
+import type { NamespacePermissionJava, RecentActivityItemDto } from "@endeavour/vue-library/interfaces";
+import { User } from "@endeavour/vue-library/models";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}user/private`;
 

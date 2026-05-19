@@ -1,4 +1,4 @@
-import type { QueryRequest } from "vue-library";
+import type { QueryRequest } from "@endeavour/vue-library";
 
 export interface JobRequest {
   jobName: string;
