@@ -3,4 +3,5 @@ allowBuilds:
   "@getgauge/cli@1.6.22": true,
   "@parcel/watcher@2.5.1": true,
   "@tailwindcss/oxide@4.1.13": true,
-  "esbuild@0.25.10": true,
+  "esbuild@0.25.10": true
+minimumReleaseAge: 0
