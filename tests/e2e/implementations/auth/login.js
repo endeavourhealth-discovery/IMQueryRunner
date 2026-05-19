@@ -2,7 +2,7 @@
 
 const { expect } = require("@playwright/test");
 const assert = require("node:assert");
-const { pw } = require("../playwright");
+const { pw } = require("../../playwright");
 
 step("Click <text>", async text => {
   await pw.page.click(`button >> text=${text}`);
