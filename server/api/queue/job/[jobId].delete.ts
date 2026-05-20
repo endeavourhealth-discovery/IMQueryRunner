@@ -1,8 +1,8 @@
-import { mysqlDb } from "~~/server/db/mysql";
-import { jobTable } from "~~/server/db/mysql/schema";
-
 import { eq } from "drizzle-orm";
 import * as z from "zod";
+
+import { mysqlDb } from "../../../db/mysql";
+import { jobTable } from "../../../db/mysql/schema";
 
 const paramSchema = z.object({
   jobId: z.string()
@@ -11,9 +11,11 @@ const paramSchema = z.object({
 export default defineEventHandler(async event => {
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
   console.log("Deleting job with ID:", jobId);
-  const item = await mysqlDb.query.jobTable.findFirst({
-    where: eq(jobTable.id, Number(jobId))
-  });
+  const items = await mysqlDb
+    .select()
+    .from(jobTable)
+    .where(eq(jobTable.id, Number(jobId)));
+  const item = items[0];
   if (item) {
     await mysqlDb.delete(jobTable).where(eq(jobTable.id, item.id));
   } else {

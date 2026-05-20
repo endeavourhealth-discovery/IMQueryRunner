@@ -1,5 +1,5 @@
 import { mysqlDb } from "~~/server/db/mysql";
-import { cohortResultsTable, datasetResultsTable } from "~~/server/db/mysql/schema";
+import { cohortResultsTable, datasetResultsTable, indicatorResultTable, queryResultSetTable, queryResultTable } from "~~/server/db/mysql/schema";
 
 import { IMQType } from "@endeavour/vue-library";
 
@@ -23,9 +23,11 @@ export default defineEventHandler(async event => {
   const decodedQueryIri = decodeURIComponent(queryIri);
   // TODO: Refactor to use a single query with joins instead of multiple queries
 
-  const queryResultSet = await mysqlDb.query.queryResultSetTable.findFirst({
-    where: q => and(eq(q.jobId, Number(jobId)), eq(q.queryIri, decodedQueryIri))
-  });
+  const queryResultSetRows = await mysqlDb
+    .select()
+    .from(queryResultSetTable)
+    .where(and(eq(queryResultSetTable.jobId, Number(jobId)), eq(queryResultSetTable.queryIri, decodedQueryIri)));
+  const queryResultSet = queryResultSetRows[0];
   if (!queryResultSet) {
     throw createError("Query result set not found");
   }
@@ -39,15 +41,19 @@ export default defineEventHandler(async event => {
   };
 
   if (queryType === IMQType.INDICATOR) {
-    const indicatorResult = await mysqlDb.query.indicatorResultTable.findFirst({
-      where: q => and(eq(q.queryIri, decodedQueryIri), eq(q.queryResultSetId, queryResultSet.id))
-    });
+    const indicatorResultRows = await mysqlDb
+      .select()
+      .from(indicatorResultTable)
+      .where(and(eq(indicatorResultTable.queryIri, decodedQueryIri), eq(indicatorResultTable.queryResultSetId, queryResultSet.id)));
+    const indicatorResult = indicatorResultRows[0];
     // TODO: return indicator results - get sql from imapi
     return returnObject;
   } else {
-    const queryResult = await mysqlDb.query.queryResultTable.findFirst({
-      where: q => and(eq(q.queryIri, decodedQueryIri), eq(q.queryResultSetId, queryResultSet.id))
-    });
+    const queryResultRows = await mysqlDb
+      .select()
+      .from(queryResultTable)
+      .where(and(eq(queryResultTable.queryIri, decodedQueryIri), eq(queryResultTable.queryResultSetId, queryResultSet.id)));
+    const queryResult = queryResultRows[0];
 
     if (!queryResult) {
       throw createError("Query result not found");
@@ -55,22 +61,14 @@ export default defineEventHandler(async event => {
 
     if (queryType === IMQType.COHORT) {
       const whereClause = eq(cohortResultsTable.queryResultId, queryResult.id);
-      const cohortResults = await mysqlDb.query.cohortResultsTable.findMany({
-        where: whereClause,
-        limit,
-        offset
-      });
+      const cohortResults = await mysqlDb.select().from(cohortResultsTable).where(whereClause).limit(limit).offset(offset);
       const totalResult = await mysqlDb.select({ count: count() }).from(cohortResultsTable).where(whereClause);
       const totalCount = totalResult[0]?.count ?? 0;
       returnObject.result = cohortResults;
       returnObject.totalCount = totalCount;
     } else if (queryType === IMQType.DATASET) {
       const whereClause = eq(datasetResultsTable.queryResultId, queryResult.id);
-      const datasetResults = await mysqlDb.query.datasetResultsTable.findMany({
-        where: whereClause,
-        limit,
-        offset
-      });
+      const datasetResults = await mysqlDb.select().from(datasetResultsTable).where(whereClause).limit(limit).offset(offset);
       const totalResult = await mysqlDb.select({ count: count() }).from(datasetResultsTable).where(whereClause);
       const totalCount = totalResult[0]?.count ?? 0;
       returnObject.result = datasetResults;

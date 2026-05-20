@@ -1,8 +1,2 @@
-onlyBuiltDependencies:
-  - "@getgauge/cli"
-  - "@parcel/watcher"
-  - "@prisma/client"
-  - "@prisma/engines"
-  - "@tailwindcss/oxide"
-  - esbuild
-  - prisma
+minimumReleaseAge: 0
+dangerouslyAllowAllBuilds: true
