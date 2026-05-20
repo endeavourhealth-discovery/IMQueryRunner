@@ -12,9 +12,11 @@ const paramSchema = z.object({
 
 export default defineEventHandler(async event => {
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
-  const item = await mysqlDb.query.jobTable.findFirst({
-    where: eq(jobTable.id, Number(jobId))
-  });
+  const items = await mysqlDb
+    .select()
+    .from(jobTable)
+    .where(eq(jobTable.id, Number(jobId)));
+  const item = items[0];
   const now = getNow();
 
   if (item?.status === JobStatus.QUEUED) {

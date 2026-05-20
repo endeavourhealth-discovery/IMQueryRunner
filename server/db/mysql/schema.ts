@@ -37,7 +37,7 @@ export const jobTable = mysqlTable(
     status: varchar("status", { length: 45 }).$type<JobStatus>().notNull(),
     error: json("error")
   },
-  table => [primaryKey({ columns: [table.id], name: "id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const queryResultSetTable = mysqlTable(
@@ -54,7 +54,7 @@ export const queryResultSetTable = mysqlTable(
     achievementDate: date("achievement_date", { mode: "string" }),
     jobId: int("job_id").notNull()
   },
-  table => [primaryKey({ columns: [table.id], name: "id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const indicatorResultTable = mysqlTable(
@@ -72,7 +72,7 @@ export const indicatorResultTable = mysqlTable(
     useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
     version: int("version").notNull()
   },
-  table => [primaryKey({ columns: [table.id], name: "id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const queryResultTable = mysqlTable(
@@ -91,7 +91,7 @@ export const queryResultTable = mysqlTable(
     useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
     version: int("version").notNull()
   },
-  table => [primaryKey({ columns: [table.id], name: "id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const datasetResultsTable = mysqlTable("dataset`.`dataset_results", {
@@ -125,7 +125,7 @@ export const allergyIntolerance = mysqlTable(
     ageAtEvent: decimal("age_at_event", { precision: 5, scale: 2 }),
     dateRecorded: datetime("date_recorded", { mode: "string" })
   },
-  table => [primaryKey({ columns: [table.id], name: "allergy_intolerance_id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const concept = mysqlTable(
@@ -146,8 +146,7 @@ export const concept = mysqlTable(
   },
   table => [
     index("concept_draft").on(table.draft),
-    primaryKey({ columns: [table.dbid], name: "concept_dbid" }),
-    primaryKey({ columns: [table.dbid], name: "concept_dbid" }),
+    primaryKey(table.dbid),
     unique("concept_id_uq").on(table.id),
     unique("concept_scheme_code_idx").on(table.scheme, table.code)
   ]
@@ -164,7 +163,7 @@ export const conceptMap = mysqlTable(
     id: int().autoincrement().notNull(),
     deleted: tinyint().default(0).notNull()
   },
-  table => [primaryKey({ columns: [table.id], name: "concept_map_id" }), unique("concept_map_uq").on(table.legacy, table.deleted, table.updated)]
+  table => [primaryKey(table.id), unique("concept_map_uq").on(table.legacy, table.deleted, table.updated)]
 );
 
 export const conceptSetMember = mysqlTable(
@@ -176,11 +175,7 @@ export const conceptSetMember = mysqlTable(
     im1Id: varchar({ length: 150 }).notNull(),
     self: boolean().default(false).notNull()
   },
-  table => [
-    index("idx_set_self").on(table.set, table.self),
-    index("idx_csm").on(table.im1Id, table.self),
-    primaryKey({ columns: [table.id], name: "concept_set_member_id" })
-  ]
+  table => [index("idx_set_self").on(table.set, table.self), index("idx_csm").on(table.im1Id, table.self), primaryKey(table.id)]
 );
 
 export const encounter = mysqlTable(
@@ -210,7 +205,7 @@ export const encounter = mysqlTable(
     institutionLocationId: text("institution_location_id"),
     dateRecorded: datetime("date_recorded", { mode: "string" })
   },
-  table => [primaryKey({ columns: [table.id], name: "encounter_id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const episodeOfCare = mysqlTable(
@@ -230,7 +225,7 @@ export const episodeOfCare = mysqlTable(
       mode: "number"
     })
   },
-  table => [primaryKey({ columns: [table.id], name: "episode_of_care_id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const medicationOrder = mysqlTable(
@@ -261,7 +256,7 @@ export const medicationOrder = mysqlTable(
     issueMethod: text("issue_method"),
     dateRecorded: datetime("date_recorded", { mode: "string" })
   },
-  table => [primaryKey({ columns: [table.id], name: "medication_order_id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const medicationStatement = mysqlTable(
@@ -290,7 +285,7 @@ export const medicationStatement = mysqlTable(
     issueMethod: text("issue_method"),
     dateRecorded: datetime("date_recorded", { mode: "string" })
   },
-  table => [primaryKey({ columns: [table.id], name: "medication_statement_id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const observation = mysqlTable(
@@ -324,7 +319,7 @@ export const observation = mysqlTable(
     isPrimary: tinyint("is_primary"),
     dateRecorded: datetime("date_recorded", { mode: "string" })
   },
-  table => [index("idx_obs").on(table.coreConceptId, table.clinicalEffectiveDate, table.patientId), primaryKey({ columns: [table.id], name: "observation_id" })]
+  table => [index("idx_obs").on(table.coreConceptId, table.clinicalEffectiveDate, table.patientId), primaryKey(table.id)]
 );
 
 export const patient = mysqlTable(
@@ -346,7 +341,7 @@ export const patient = mysqlTable(
     ethnicCodeConceptId: int("ethnic_code_concept_id"),
     registeredPracticeOrganizationId: bigint("registered_practice_organization_id", { mode: "number" })
   },
-  table => [primaryKey({ columns: [table.id], name: "patient_id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const patientAddress = mysqlTable(
@@ -375,7 +370,7 @@ export const patientAddress = mysqlTable(
     localAuthorityCode: varchar("local_authority_code", { length: 9 }),
     townsendDeprivationIndex: double("townsend_deprivation_index")
   },
-  table => [primaryKey({ columns: [table.id], name: "patient_address_id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const patientContact = mysqlTable(
@@ -393,7 +388,7 @@ export const patientContact = mysqlTable(
     endDate: date("end_date", { mode: "string" }),
     value: varchar({ length: 255 })
   },
-  table => [primaryKey({ columns: [table.id], name: "patient_contact_id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const practitioner = mysqlTable(
@@ -406,7 +401,7 @@ export const practitioner = mysqlTable(
     roleDesc: varchar("role_desc", { length: 255 }),
     gmcCode: varchar("gmc_code", { length: 50 })
   },
-  table => [primaryKey({ columns: [table.id], name: "practitioner_id" })]
+  table => [primaryKey(table.id)]
 );
 
 export const smallPat = mysqlTable("compass.small_pat", {

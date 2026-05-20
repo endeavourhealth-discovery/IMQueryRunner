@@ -112,9 +112,11 @@ function hashArgument(argument: Argument): string {
 }
 
 export async function getQueryResultIdIfExists(resultSetId: number, hashCodeVersion: number, iri: string): Promise<number> {
-  const result = await mysqlDb.query.queryResultTable.findFirst({
-    where: queryResultTable => and(eq(queryResultTable.id, resultSetId), eq(queryResultTable.version, hashCodeVersion), eq(queryResultTable.queryIri, iri))
-  });
+  const results = await mysqlDb
+    .select()
+    .from(queryResultTable)
+    .where(and(eq(queryResultTable.id, resultSetId), eq(queryResultTable.version, hashCodeVersion), eq(queryResultTable.queryIri, iri)));
+  const result = results[0];
   console.log(`Cache context check (${!!result}): ${resultSetId} with hash: ${hashCodeVersion}, iri: ${iri}.`);
   return result ? result.id! : -1;
 }
