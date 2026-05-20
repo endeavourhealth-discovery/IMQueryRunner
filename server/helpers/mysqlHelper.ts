@@ -42,9 +42,8 @@ export async function createJobEntry(jobRequest: JobRequest, sessionId: string, 
 }
 
 export async function getJobById(jobId: number): Promise<Job> {
-  const job = await mysqlDb.query.jobTable.findFirst({
-    where: eq(jobTable.id, jobId)
-  });
+  const jobs = await mysqlDb.select().from(jobTable).where(eq(jobTable.id, jobId));
+  const job = jobs[0];
   if (!job) {
     throw new Error("Could not find job with id: " + jobId);
   }
