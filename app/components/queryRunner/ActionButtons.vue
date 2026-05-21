@@ -101,7 +101,7 @@ function openViewResultsMenuItems(event: MouseEvent): void {
       visible: false
     };
     item.visible = true;
-    viewResultsMenuItems.value.push(item);
+    if (!viewResultsMenuItems.value.length) viewResultsMenuItems.value.push(item);
   }
 
   viewResultsMenu.value.toggle(event);

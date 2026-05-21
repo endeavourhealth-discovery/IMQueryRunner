@@ -6,5 +6,5 @@ This specification describes the login functionality of IMQueryRunner.
 
 ## Can login
 * Login
-  * routes to IMQueryRunner
-  * user is logged in
+* routes to IMQueryRunner
+* user is logged in

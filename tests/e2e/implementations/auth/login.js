@@ -2,18 +2,14 @@
 
 const { expect } = require("@playwright/test");
 const assert = require("node:assert");
-const { pw } = require("../../playwright");
+const { pw } = require("../playwright");
 
 step("Click <text>", async text => {
   await pw.page.click(`button >> text=${text}`);
 });
 
-step("routes to casdoor", async () => {
-  await pw.page.waitForSelector(".login-form");
-});
-
-step("routes to IMQuerRunner", async () => {
-  await pw.page.waitForSelector("#topbar");
+step("routes to IMQueryRunner", async () => {
+  await pw.page.waitForSelector("#header-start");
 });
 
 step("user is logged in", async () => {
@@ -21,5 +17,5 @@ step("user is logged in", async () => {
   await pw.page.click('[data-testid="account-menu-logged-in"]');
   const menu = await pw.page.locator("#account-menu");
   const content = await menu.textContent();
-  assert(content.includes("My account"));
+  assert(content.includes("My Account"));
 });
