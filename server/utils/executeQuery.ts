@@ -44,7 +44,7 @@ export async function executeCohortQuery(resolvedSql: string, queryRequest: Quer
     await updateWithEndTime(queryResultId, queryResultTable);
   } catch (err) {
     console.error("Error executing query:", queryRequest.query.iri);
-    console.error("Error executing SQL:", err);
+    console.error("Error executing SQL");
     throw err;
   }
 }
