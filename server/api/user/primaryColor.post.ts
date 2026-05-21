@@ -2,7 +2,7 @@ import { PrimeVueColors } from "@endeavour/vue-library/enums";
 
 import * as z from "zod";
 
-const bodySchema = z.enum(PrimeVueColors);
+const bodySchema = z.object({ color: z.enum(PrimeVueColors) });
 
 defineRouteMeta({
   openAPI: {
@@ -14,9 +14,14 @@ defineRouteMeta({
       content: {
         "application/json": {
           schema: {
-            type: "string",
-            summary: "Primevue color",
-            enum: Object.values(PrimeVueColors)
+            type: "object",
+            properties: {
+              color: {
+                type: "string",
+                summary: "Primevue color",
+                enum: Object.values(PrimeVueColors)
+              }
+            }
           }
         }
       }
@@ -25,8 +30,8 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event): Promise<any> => {
-  const color = await readValidatedBody(event, bodySchema.parse);
+  const body = await readValidatedBody(event, bodySchema.parse);
   const user = await globalThis.apiGuard.getUser(event);
-  user.primaryColor = color;
+  user.primaryColor = body.color;
   return await globalThis.apiGuard.updateUser(event, user);
 });
