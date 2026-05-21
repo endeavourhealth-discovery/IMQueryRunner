@@ -89,7 +89,7 @@ onMounted(async () => {
     userStore.getAllFromUserDatabase();
     await setThemeOptions();
     if (currentFontSize.value) await changeFontSize(currentFontSize.value);
-    await setShowReleaseBanner();
+    // await setShowReleaseBanner();
   }
   initialLoadComplete.value = true;
 });
