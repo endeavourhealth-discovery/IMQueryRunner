@@ -2,7 +2,7 @@ import { FontSize } from "@endeavour/vue-library/enums";
 
 import * as z from "zod";
 
-const bodySchema = z.enum(FontSize);
+const bodySchema = z.object({ fontSize: z.enum(FontSize) });
 
 defineRouteMeta({
   openAPI: {
@@ -14,9 +14,14 @@ defineRouteMeta({
       content: {
         "application/json": {
           schema: {
-            type: "string",
+            type: "object",
             summary: "Font size",
-            enum: Object.values(FontSize)
+            properties: {
+              fontSize: {
+                type: "string",
+                enum: Object.values(FontSize)
+              }
+            }
           }
         }
       }
@@ -25,8 +30,8 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event): Promise<any> => {
-  const fontSize = await readValidatedBody(event, bodySchema.parse);
+  const body = await readValidatedBody(event, bodySchema.parse);
   const user = await globalThis.apiGuard.getUser(event);
-  user.fontSize = fontSize;
+  user.fontSize = body.fontSize;
   return await globalThis.apiGuard.updateUser(event, user);
 });

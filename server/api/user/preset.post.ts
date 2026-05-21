@@ -2,7 +2,7 @@ import { PrimeVuePresetThemes } from "@endeavour/vue-library/enums";
 
 import * as z from "zod";
 
-const bodySchema = z.enum(PrimeVuePresetThemes);
+const bodySchema = z.object({ theme: z.enum(PrimeVuePresetThemes) });
 
 defineRouteMeta({
   openAPI: {
@@ -14,9 +14,14 @@ defineRouteMeta({
       content: {
         "application/json": {
           schema: {
-            type: "string",
-            summary: "Primevue preset theme",
-            enum: Object.values(PrimeVuePresetThemes)
+            type: "object",
+            properties: {
+              theme: {
+                type: "string",
+                summary: "Primevue preset theme",
+                enum: Object.values(PrimeVuePresetThemes)
+              }
+            }
           }
         }
       }
@@ -25,8 +30,8 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event): Promise<any> => {
-  const preset = await readValidatedBody(event, bodySchema.parse);
+  const body = await readValidatedBody(event, bodySchema.parse);
   const user = await globalThis.apiGuard.getUser(event);
-  user.theme = preset;
+  user.theme = body.theme;
   return await globalThis.apiGuard.updateUser(event, user);
 });
