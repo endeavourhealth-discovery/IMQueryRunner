@@ -44,12 +44,12 @@ step("Login", async () => {
   await pw.page.fill('input[placeholder="Password"]', password);
   await pw.page.click("button >> text=Sign In");
 
-  pw.page.locator("button").filter({ hasText: "cypress" }).click();
+  //dev login loop
+  //pw.page.locator("button").filter({ hasText: "cypress" }).click();
 
   await pw.page.waitForTimeout(5000);
   await pw.page.waitForSelector('[data-testid="accept-all-cookies"]', { state: "visible" });
   await pw.page.click('[data-testid="accept-all-cookies"]');
-  //await pw.page.waitForSelector('[data-testid="accept-all-cookies"]', { state: "hidden" });
 });
 
 step("Goto route <route>", async route => {
