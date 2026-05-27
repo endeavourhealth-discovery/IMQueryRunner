@@ -39,7 +39,7 @@ const sharedStore = useSharedStore();
 const currentVersion: Ref<undefined | string> = ref();
 
 onMounted(async () => {
-  await getCurrentVersion();
+  // await getCurrentVersion();
 });
 
 async function getCurrentVersion() {

@@ -7,19 +7,19 @@ const API_URL = "api/user";
 const UserService = {
   async updateUserPreset(preset: PrimeVuePresetThemes): Promise<User> {
     return await $fetch<User>(API_URL + "/preset", {
-      body: preset,
+      body: { theme: preset },
       method: "POST"
     });
   },
   async updateUserPrimaryColor(color: PrimeVueColors): Promise<User> {
     return await $fetch<User>(API_URL + "/primaryColor", {
-      body: color,
+      body: { color: color },
       method: "POST"
     });
   },
   async updateUserSurfaceColor(color: PrimeVueColors): Promise<User> {
     return await $fetch<User>(API_URL + "/surfaceColor", {
-      body: color,
+      body: { color: color },
       method: "POST"
     });
   },
@@ -31,7 +31,7 @@ const UserService = {
   },
   async updateUserFontSize(fontSize: string): Promise<User> {
     return await $fetch<User>(API_URL + "/fontSize", {
-      body: fontSize,
+      body: { fontSize: fontSize },
       method: "POST"
     });
   },

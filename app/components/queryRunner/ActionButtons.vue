@@ -93,6 +93,7 @@ const viewResultsMenuItems: Ref<any[]> = ref([]);
 const viewResultsMenu = ref();
 
 function openViewResultsMenuItems(event: MouseEvent): void {
+  viewResultsMenuItems.value = [];
   for (const queryRequest of props.job.queryRequests) {
     const item = {
       label: `View results for "${queryRequest.query.iri}"`,

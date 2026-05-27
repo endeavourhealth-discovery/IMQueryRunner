@@ -63,9 +63,20 @@ export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error
       set.finishDate = now;
       break;
     case JobStatus.ERRORED:
-      console.error("Error executing query for job ID:", jobId, error);
       set.finishDate = now;
-      set.error = error;
+
+      if (error) {
+        const parsedError = JSON.parse(error);
+        const savedError = {
+          message: parsedError.cause.message,
+          query: parsedError.query?.toString().replace("\\n", "  ")
+        };
+        console.error("Error executing query for job ID:", jobId, parsedError.cause?.sqlMessage);
+        set.error = savedError;
+      } else {
+        console.error("Error executing query for job ID:", jobId, error);
+        set.error = error;
+      }
       break;
 
     default:
