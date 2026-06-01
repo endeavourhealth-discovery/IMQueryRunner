@@ -66,12 +66,21 @@ export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error
       set.finishDate = now;
 
       if (error) {
-        const parsedError = JSON.parse(error);
-        const savedError = {
-          message: parsedError.cause.message,
-          query: parsedError.query?.toString().replace("\\n", "  ")
+        let savedError = {
+          message: error,
+          query: "<UNKNOWN>"
         };
-        console.error("Error executing query for job ID:", jobId, parsedError.cause?.sqlMessage);
+        try {
+          const parsedError = JSON.parse(error);
+          savedError = {
+            message: parsedError.cause.message,
+            query: parsedError.query?.toString().replace(String.raw`\n`, "  ")
+          };
+        } catch (e) {
+          console.warn("Could not parse error\n", e);
+        }
+
+        console.error("Error executing query for job ID:", jobId, savedError.message);
         set.error = savedError;
       } else {
         console.error("Error executing query for job ID:", jobId, error);
