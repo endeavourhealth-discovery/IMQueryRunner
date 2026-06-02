@@ -1,13 +1,13 @@
-# Run QueriesThis specification describes the query running functionality of IMQueryRunner.
+# Run Queries
 
-## Test Cases
+This specification describes the query running functionality of IMQueryRunner.
 
-### Setup
+## Setup
 * Open IMQueryRunner
 * Login
 
 
-### Run Registered GMS
+## Run Registered GMS
 * Click "Run a query" button
 * Search for "Patients registered for GMS services on the reference date" and select
 * Click "Add to queue" button
@@ -19,7 +19,7 @@
 * Click "Back to queue" button
 
 
-### Run Unresolved Diabetes
+## Run Unresolved Diabetes
 * Click "Run a query" button
 * Search for "Patient having unresolved Diabetes code" and select
 * Click "Add to queue" button
@@ -31,7 +31,7 @@
 * Click "Back to queue" button
 
 
-### Run DM017
+## Run DM017
 * Click "Run a query" button
 * Search for "DM017 - Patients aged 17 or over on the diabetes register" and select
 * Click "Add to queue" button
@@ -43,7 +43,7 @@
 * Click "Back to queue" button
 
 
-### Run DM017
+## Run DM017
 * Click "Run a query" button
 * Search for "Data set for Diabetes mental health screen achieved" and select
 * Click "Add to queue" button
