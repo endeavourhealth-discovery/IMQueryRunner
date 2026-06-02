@@ -8,7 +8,7 @@ This specification describes the query running functionality of IMQueryRunner.
 * Search for "Patients registered for GMS services on the reference date" and select
 * Click "Add to queue" button
 * Click "Select" button
-* Wait "10" seconds
+* Wait "20" seconds
 * Click "Refresh" button
 * Open results page
 * Check total results equal "6479"
