@@ -102,6 +102,6 @@ step("Search for <text> and select", async text => {
   await pw.page.waitForTimeout(2000);
 });
 
-step("Wait", async () => {
-  await pw.page.waitForTimeout(4000);
+step("Wait <time> seconds", async time => {
+  await pw.page.waitForTimeout(Number.parseInt(time) * 1000);
 });
