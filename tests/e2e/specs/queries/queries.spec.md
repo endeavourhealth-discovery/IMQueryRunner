@@ -43,7 +43,7 @@ This specification describes the query running functionality of IMQueryRunner.
 * Click "Back to queue" button
 
 
-## Run DM017
+## Run Diabetes & Mental Health
 * Click "Run a query" button
 * Search for "Data set for Diabetes mental health screen achieved" and select
 * Click "Add to queue" button
