@@ -71,7 +71,7 @@ const sub = rabbit.createConsumer(
           await executeQuery(await getSession(), sql, queryRequest, queryResultSet);
           await updateWithEndTime(queryResultSet.id!, queryResultSetTable);
         } catch (err) {
-          await updateJobStatus(job.id, JobStatus.ERRORED, JSON.stringify(err));
+          await updateJobStatus(job.id, JobStatus.ERRORED, err);
           return;
         }
       }
