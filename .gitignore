@@ -1,9 +1,13 @@
+# Gauge - metadata dir
+.gauge
+
 # Nuxt dev/build outputs
 .output
 .data
 .nuxt
 .nitro
 .cache
+.vscode
 dist
 
 # Node dependencies
@@ -29,3 +33,10 @@ logs
 # prisma
 prisma/generated/
 prisma/migrations/
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/

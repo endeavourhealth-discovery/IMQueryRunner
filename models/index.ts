@@ -1,4 +1,7 @@
-import type { QueueItem } from "./QueueItem";
-import type { User } from "./User";
+import type { JobRequest } from "./JobRequest";
+import type { IndicatorResult } from "./indicatorResult.schema";
+import type { Job } from "./job.schema";
+import type { QueryResult } from "./queryResult.schema";
+import type { QueryResultSet } from "./queryResultSet.schema";
 
-export type { QueueItem, User };
+export type { Job, JobRequest, QueryResult, QueryResultSet, IndicatorResult };

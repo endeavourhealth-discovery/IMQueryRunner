@@ -1,1 +1,74 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.my-app-dark, .my-app-dark *));
+
+html {
+  font-family:
+    "Inter var",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif,
+    "Apple Color Emoji",
+    "Segoe UI Emoji",
+    "Segoe UI Symbol";
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-size: 14px;
+}
+
+body {
+  margin: 0px;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: var(--ground-background);
+  font-weight: normal;
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:root {
+  --hyperlink-blue: #2196f3;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  body {
+    @apply text-base sm:text-sm md:text-base lg:text-lg xl:text-xl;
+  }
+
+  h1 {
+    @apply text-3xl;
+    @apply font-bold;
+    @apply my-2;
+  }
+
+  h2 {
+    @apply text-2xl;
+    @apply font-bold;
+    @apply my-2;
+  }
+
+  h3 {
+    @apply text-xl;
+    @apply font-semibold;
+    @apply my-2;
+  }
+
+  h4 {
+    @apply text-lg;
+    @apply font-semibold;
+    @apply my-1;
+  }
+
+  p {
+    @apply my-1;
+  }
+}

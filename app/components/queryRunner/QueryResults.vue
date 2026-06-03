@@ -1,54 +1,40 @@
 <template>
-  <Dialog
-    v-model:visible="showDialog"
-    modal
-    maximizable
-    header="Query Results"
-    :style="{
-      width: '90vw',
-      height: '90vh',
-      minWidth: '90vw',
-      minHeight: '90vh',
-    }"
-    class="query-results-dialog"
-  >
-    <div class="query-results-dialog-content">
-      <DataTable
-        :value="queryResults"
-        :paginator="true"
-        :rows="size"
-        :scrollable="true"
-        scroll-height="flex"
-        :autoLayout="true"
-        @page="onPage($event)"
-        :lazy="true"
-        :total-records="totalCount"
-        :rows-per-page-options="[
-          originalSize,
-          originalSize * 2,
-          originalSize * 4,
-          originalSize * 8,
-        ]"
-        :loading="loading"
-        :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
-      >
-        <template #header>
-          <div class="flex flex-wrap items-center justify-between gap-2">
-            <span class="text-xl font-bold"
-              >Total results: {{ totalCount }}</span
-            >
-          </div>
-        </template>
-        <template #empty>None</template>
-        <Column field="id" header="Patient ID"></Column>
-      </DataTable>
-    </div>
-    <template #footer>
+  <div class="flex-auto overflow-auto">
+    <div class="h-[calc(100% - 3.5rem)] overflow-auto">
+      <div class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)">
+        <div class="m-2">
+          <Button icon="fa-solid fa-arrow-left" label="Back to queue" @click="backToQueue" />
+        </div>
+        <DataTable
+          ref="dt"
+          :size="'small'"
+          :value="queryResults"
+          :paginator="true"
+          :rows="rows"
+          :scrollable="true"
+          scroll-height="600px"
+          :autoLayout="true"
+          @page="onPage($event)"
+          :lazy="true"
+          :total-records="totalCount"
+          :rows-per-page-options="[originalSize, originalSize * 2, originalSize * 4, originalSize * 8]"
+          :loading="loading"
+          :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
+        >
+          <template #header>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xl font-bold">Total results: {{ totalCount }}</span>
+            </div>
+          </template>
+          <template #empty>None</template>
+          <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
+        </DataTable>
+      </div>
       <div class="im-dialog-footer">
         <div class="button-footer">
-          <Button label="Close" @click="closeDialog" text />
           <Button
-            :disabled="!queryItem"
+            class="m-2"
+            :disabled="!queryResults.length"
             data-testid="query-results-download"
             label="Download"
             :loading="downloadLoading"
@@ -57,64 +43,117 @@
           />
         </div>
       </div>
-    </template>
-  </Dialog>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import type { QueueItem } from "@@/models";
-import { cloneDeep, isArray } from "lodash-es";
-import { onMounted, ref, watch } from "vue";
 import type { Ref } from "vue";
+import { onMounted, ref } from "vue";
+
+import { useUserStore } from "@endeavour/vue-library/stores";
+
+import { isArray } from "lodash-es";
 
 interface Props {
-  queryItem: QueueItem | undefined;
+  jobId: string | string[] | undefined;
+  queryIri: string | string[] | undefined;
+  queryType: string | string[] | undefined;
 }
 
 const props = defineProps<Props>();
-
-const showDialog = defineModel<boolean>("showDialog");
+const { currentUser } = useUserStore();
 
 const loading = ref(false);
 const downloadLoading = ref(false);
-const queryResults: Ref<{ id: string }[]> = ref([]);
-const pageNumber = ref(1);
-const size = ref(25);
+const queryResults: Ref<any[]> = ref([]);
+const totalResults: Ref<any[]> = ref([]);
+const page = ref(1);
+const rows = ref(25);
 const originalSize = ref(25);
 const totalCount = ref();
+const columns: Ref<any[]> = ref([]);
 
-function closeDialog() {
-  showDialog.value = false;
-}
+onMounted(async () => {
+  await getQueryResults();
+  formatResultsForTable();
+});
 
-async function downloadQueryResults() {
-  if (props.queryItem?.queryRequest) {
-    const request = cloneDeep(props.queryItem.queryRequest);
-    // request.page = { pageNumber: pageNumber.value, pageSize: size.value }; //TODO: fix paging mechanism
-    const results = useFetch("/api/query/results", {
-      method: "get",
-      body: request,
-    });
-    if (results.data.value && isArray(results.data.value)) {
-      totalCount.value = results.data.value.length; //TODO: replace with actual count
-      queryResults.value = results.data.value.map((id) => ({ id }));
+async function getQueryResults() {
+  if (props.jobId && props.queryIri && props.queryType) {
+    const value = await $fetch<{ totalCount: number; result: any[] }>(
+      `/api/queue/job/results/${props.jobId}/${props.queryType}/${encodeURIComponent(props.queryIri as string)}`,
+      {
+        query: {
+          userId: currentUser?.id,
+          page: page.value,
+          size: rows.value
+        }
+      }
+    );
+    if (value && isArray(value.result)) {
+      totalCount.value = value.totalCount;
+      queryResults.value = value.result;
     }
   }
 }
 
-async function onPage(event: any) {
-  pageNumber.value = event.page;
-  size.value = event.rows;
-  await downloadQueryResults();
+async function getTotalQueryResults() {
+  if (props.jobId) {
+    const value = await $fetch<{ result: any[] }>(`/api/queue/job/results/total/${props.jobId}`, {
+      query: {
+        userId: currentUser?.id
+      }
+    });
+    if (value && isArray(value.result)) {
+      totalResults.value = value.result;
+    }
+  }
 }
 
-watch(showDialog, async (newValue, oldValue) => {
-  if (newValue && totalCount.value === undefined) await downloadQueryResults();
-});
+function formatResultsForTable() {
+  for (const key of Object.keys(queryResults.value[0])) {
+    if (key !== "hashcode") columns.value.push({ field: key, header: key.replace("_", " ") });
+  }
+}
 
-onMounted(async () => {
-  await downloadQueryResults();
-});
+async function downloadQueryResults() {
+  await getTotalQueryResults();
+
+  const headers = Object.keys(totalResults.value[0]);
+  const csv = [
+    headers.join(","),
+    ...totalResults.value.map(row =>
+      headers
+        .map(field => {
+          const value = row[field] ?? "";
+          return `"${String(value).replace(/"/g, '""')}"`;
+        })
+        .join(",")
+    )
+  ].join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", props.jobId!.toString());
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+async function onPage(event: any) {
+  page.value = ++event.page;
+  rows.value = event.rows;
+  await getQueryResults();
+}
+
+function backToQueue() {
+  navigateTo("/");
+}
 </script>
 
 <style scoped></style>

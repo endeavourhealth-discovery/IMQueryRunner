@@ -1,107 +1,107 @@
+import { JobStatus } from "~~/enums";
+import type { Job } from "~~/models/job.schema";
+
+import { IMQType } from "@endeavour/vue-library";
+import { type QueryRequest } from "@endeavour/vue-library/interfaces";
+import type { User } from "@endeavour/vue-library/models";
+
 import { Connection } from "rabbitmq-client";
-import { PrismaClient as PostgresPrismaClient } from "@@/prisma/generated/postgres";
-import { PrismaClient as MYSQLPrismaClient } from "~~/prisma/generated/mysql";
-import { QueueItemStatus } from "~~/enums";
-import { QueryRequest } from "~~/models/AutoGen";
-import { $fetch } from "ofetch";
-import hash from "object-hash";
 
-const postgresPrisma = new PostgresPrismaClient();
-const mysqlPrisma = new MYSQLPrismaClient();
-
-const resultsMap: Map<string, string[]> = new Map();
+import { indicatorResultTable, queryResultSetTable } from "../db/mysql/schema";
+import { createIndicatorResultEntry, createResultSetEntry, getJobById, updateJobStatus, updateWithEndTime } from "../helpers/mysqlHelper";
+import { executeQuery, getIndicatorSubQueryRequests, getValidatedSQL } from "../utils/executeQuery";
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
-rabbit.on("error", (err) => {
-  console.log("RabbitMQ connection error", err);
-});
-rabbit.on("connection", () => {
-  console.log("Connection successfully (re)established");
-});
+rabbit.on("error", (err: Error) => {});
+rabbit.on("connection", () => {});
+
+let sessionId: string | undefined = undefined;
+async function getSession() {
+  if (!sessionId) {
+    const response = await $fetch<{ sessionId: string; user: User }>("/api/auth/machineLogin", {
+      query: {
+        clientId: process.env.CLIENT_ID,
+        clientSecret: process.env.CLIENT_SECRET
+      },
+      headers: {
+        "X-IGNORE-IP": "true"
+      }
+    });
+    sessionId = response.sessionId;
+  }
+  return sessionId;
+}
 
 const sub = rabbit.createConsumer(
   {
     queue: "query.execute",
     queueOptions: { durable: true },
-    exchanges: [{ exchange: "query_runner", type: "topic" }],
+    requeue: false,
+    exchanges: [{ exchange: "query_runner", type: "topic", durable: true }],
     queueBindings: [
       {
         exchange: "query_runner",
         routingKey: "query.execute.#",
-        queue: "query.execute",
-      },
-    ],
+        queue: "query.execute"
+      }
+    ]
   },
-  async (msg) => {
-    const id = msg.messageId;
-    const queueItem = msg.body;
-    const entry = await postgresPrisma.queueItem.findFirst({
-      where: { id: { equals: id } },
-    });
-    if (entry && QueueItemStatus.CANCELLED === entry.status) {
+  async (msg: any) => {
+    const session = await getSession();
+    const job = await getJobById(Number(msg.messageId!));
+    if (job && JobStatus.CANCELLED === job.status) {
       throw new Error("Item is cancelled. Query rejected.");
     }
-    if (!entry) {
-      throw new Error("Could not find entry with id: " + id);
+    await updateJobStatus(job.id, JobStatus.RUNNING);
+    for (const queryRequest of job.queryRequests) {
+      const sql = await getValidatedSQL(queryRequest, session, job.id);
+      const queryResultSet = await createResultSetEntry(queryRequest, job);
+      const queriesToRun: { sql: string; queryRequest: QueryRequest }[] = [];
+      let indicatorId: null | number = null;
+      if (queryRequest.query.queryType === IMQType.INDICATOR) {
+        indicatorId = await createIndicatorResultEntry(queryRequest, queryResultSet, hashQueryRequest(queryRequest));
+        queriesToRun.push.apply(queriesToRun, await getIndicatorSubQueryRequests(session, queryRequest, job.id));
+      } else {
+        queriesToRun.push({ sql, queryRequest });
+      }
+
+      console.log("Queries to run:", queriesToRun.length);
+      for (const { sql, queryRequest } of queriesToRun) {
+        try {
+          await executeQuery(await getSession(), sql, queryRequest, queryResultSet);
+          await updateWithEndTime(queryResultSet.id!, queryResultSetTable);
+        } catch (err) {
+          await updateJobStatus(job.id, JobStatus.ERRORED, JSON.stringify(err));
+          return;
+        }
+      }
+      if (indicatorId) {
+        await updateWithEndTime(indicatorId, indicatorResultTable);
+      }
     }
-    await postgresPrisma.queueItem.update({
-      where: { id: id },
-      data: { status: QueueItemStatus.RUNNING, started_at: new Date() },
-    });
-    const queryRequest: QueryRequest = JSON.parse(queueItem);
-    const sql = await $fetch(process.env.IMAPI_URL! + "query/public/sql", {
-      body: queryRequest,
-      method: "post",
-    }).catch(async (err) => {
-      await postgresPrisma.queueItem.update({
-        where: { id: id },
-        data: {
-          status: QueueItemStatus.ERRORED,
-          error: JSON.stringify(err),
-          killed_at: new Date(),
-        },
-      });
-    });
-    if (sql && typeof sql === "string") {
-      const requestHash = hash(queryRequest);
-      const queryResults: string[] = await mysqlPrisma.$queryRawUnsafe(sql);
-      resultsMap.set(requestHash, queryResults);
-      mysqlPrisma.$executeRaw`
-        CREATE TABLE IF NOT EXISTS ${requestHash} (
-          id BIGINT NOT NULL,
-          PRIMARY KEY(id)
-        )
-      `;
-      await mysqlPrisma.$queryRaw`
-        INSERT INTO ${requestHash} (id) VALUES ${queryResults}
-      `;
-      await postgresPrisma.queueItem.update({
-        where: { id: id },
-        data: { status: QueueItemStatus.COMPLETED, finished_at: new Date() },
-      });
-    }
+    await updateJobStatus(job.id, JobStatus.COMPLETED);
   }
 );
 
-sub.on("error", (err) => {
-  console.log("consumer error (query.execute)", err);
-});
+sub.on("error", (err: Error) => {});
 
 const pub = rabbit.createPublisher({
   confirm: true,
   maxAttempts: 2,
-  exchanges: [{ exchange: "query_runner", type: "topic" }],
+  exchanges: [{ exchange: "query_runner", type: "topic", durable: true }]
 });
 
-export async function sendMessage(userId: string, message: any) {
+export async function sendMessage(userId: string, message: Job) {
   await pub.send(
-    { exchange: "query_runner", routingKey: "query.execute." + userId },
-    message
+    {
+      messageId: "" + message.id,
+      exchange: "query_runner",
+      routingKey: "query.execute." + userId,
+      durable: true
+    },
+    JSON.stringify(message)
   );
-}
-
-export function getCachedResults(requestHash: string) {
-  if (resultsMap.has(requestHash)) return resultsMap.get(requestHash);
+  return message.id;
 }
 
 async function onShutdown() {

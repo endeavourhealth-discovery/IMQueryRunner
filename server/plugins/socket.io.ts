@@ -1,43 +1,41 @@
-import type { NitroApp } from "nitropack";
+import Logger from "#shared/logger";
+
 import { Server as Engine } from "engine.io";
-import { Server } from "socket.io";
 import { defineEventHandler } from "h3";
+import type { NitroApp } from "nitropack";
+import { Server } from "socket.io";
 
 export default defineNitroPlugin((nitroApp: NitroApp) => {
+  const LOG = Logger("server/plugins/socket");
   const engine = new Engine();
   const io = new Server();
 
+  globalThis.io = io;
   io.bind(engine);
 
-  io.on("connection", (socket) => {
-    console.log("socket connected", socket.id);
-    socket.on("disconnect", () => {
-      console.log("socket disconnected", socket.id);
+  io.on("connection", socket => {
+    socket.on("disconnect", () => {});
+
+    socket.on("hello", () => {
+      LOG.debug(`============= hello ${socket.id} ============`);
     });
 
     socket.on("joinRoom", (room, user) => {
       socket.join(room);
-      io.to(room).emit("join", {
-        from_id: user.id,
-        from_name: user.name,
-        system: true,
-        content: `${user.name ?? user.id} joined the room`,
-      });
     });
 
     socket.on("leaveRoom", (room, user) => {
       socket.leave(room);
-      io.to(room).emit("leave", {
+      socket.to(room).emit("leave", {
         from_id: user.id,
         from_name: user.name,
         system: true,
-        content: `${user.name ?? user.id} left the room`,
+        content: `${user.name ?? user.id} left the room`
       });
     });
 
     socket.on("message", (room, message) => {
-      console.log(`[Socket.io] message received to room ${room}`);
-      io.to(room).emit("message", message);
+      socket.to(room).emit("message", message);
     });
   });
 
@@ -60,8 +58,8 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
             peer._internal.nodeReq.socket,
             peer.websocket
           );
-        },
-      },
+        }
+      }
     })
   );
 });

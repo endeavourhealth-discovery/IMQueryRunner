@@ -1,12 +1,13 @@
 <template>
   <div class="flex-auto overflow-auto">
     <div class="h-[calc(100% - 3.5rem)] overflow-auto">
-      <div
-        class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)"
-      >
-        <div><Button label="Refresh" @click="refresh" /></div>
+      <div class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)">
+        <div class="flex gap-2 m-2">
+          <Button class="flex" severity="secondary" icon="fa-solid fa-arrows-rotate" label="Refresh" @click="refresh" />
+          <Button class="flex" icon="fa-solid fa-magnifying-glass" label="Run a query" @click="runQuery" />
+        </div>
         <DataTable
-          :value="queryQueueItems"
+          :value="jobs"
           :paginator="true"
           :rows="rows"
           :scrollable="true"
@@ -15,238 +16,264 @@
           @page="onPage($event)"
           :lazy="true"
           :totalRecords="totalCount"
-          :rows-per-page-options="[
-            rowsOriginal,
-            rowsOriginal * 2,
-            rowsOriginal * 4,
-            rowsOriginal * 8,
-          ]"
+          :rows-per-page-options="[rowsOriginal, rowsOriginal * 2, rowsOriginal * 4, rowsOriginal * 8]"
           :loading="searchLoading"
           :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
         >
           <template #empty>None</template>
-          <Column field="id" header="ID"></Column>
-          <Column field="queryIri" header="Iri"></Column>
-          <Column field="queryName" header="Query name"></Column>
-          <Column field="userName" header="User"></Column>
-          <Column field="queuedAt" header="Queued at">
-            <template #body="slotProps">
-              <span>{{
-                slotProps.data.queuedAt ? slotProps.data.queuedAt : "-"
-              }}</span>
+          <Column field="jobName" header="Job name"></Column>
+          <Column>
+            <template #body="{ data }: { data: Job }">
+              <!-- <Button
+                :disabled="!data.queryDefinition.argument.length"
+                label="View arguments"
+                @click="viewArgumentDisplay(data.queryDefinition.argument)"
+              /> -->
             </template>
           </Column>
-          <Column field="startedAt" header="Started at">
-            <template #body="slotProps">
-              <span>{{
-                slotProps.data.startedAt ? slotProps.data.startedAt : "-"
-              }}</span>
+          <Column v-if="adminView" field="userId" header="User"></Column>
+          <Column field="queuedAt" header="Queued">
+            <template #body="{ data }: { data: Job }">
+              <span>{{ data.queueDate ? getDisplayDateTime(data.queueDate) : "-" }}</span>
             </template>
           </Column>
-          <Column field="finishedAt" header="Finished at">
-            <template #body="slotProps">
-              <span>{{
-                slotProps.data.finishedAt ? slotProps.data.finishedAt : "-"
-              }}</span>
-            </template>
-          </Column>
-          <Column field="killedAt" header="Killed at">
-            <template #body="slotProps">
-              <span>{{
-                slotProps.data.killedAt ? slotProps.data.killedAt : "-"
-              }}</span>
+          <Column field="stoppedAt" header="Finished">
+            <template #body="{ data }: { data: Job }">
+              <span>{{ data.finishDate ? getDisplayDateTime(data.finishDate) : "-" }}</span>
             </template>
           </Column>
           <Column field="status" header="Status">
-            <template #body="slotProps">
-              <Tag
-                :severity="getStatusSeverity(slotProps.data.status)"
-                :value="slotProps.data.status"
-              />
+            <template #body="{ data }: { data: Job }">
+              <Tag :severity="data.status ? getStatusSeverity(data.status) : '-'" :value="data.status" />
             </template>
           </Column>
           <Column>
             <template #body="slotProps">
               <ActionButtons
-                :queryQueueItem="slotProps.data"
-                @cancel-query="cancelQuery"
+                :job="slotProps.data"
+                @cancel-query="cancelJob"
                 @go-to-query="goToQuery"
                 @view-query-results="viewQueryResults"
-                @delete-query="deleteQuery"
-                @requeue-query="requeueQuery"
+                @delete-query="deleteJob"
+                @requeue-query="requeueJob"
               />
             </template>
           </Column>
         </DataTable>
       </div>
     </div>
-    <QueryResults
-      :queryItem="selectedQuery"
-      v-model:showDialog="showQueryResults"
-    />
+    <ArgumentDisplayDialog :arguments="currentArguments" :show-footer-buttons="false" v-model:showDialog="showArgumentDisplay" />
   </div>
 </template>
 
 <script setup lang="ts">
-import type { QueueItem } from "~~/models";
-import { QueueItemStatus } from "~~/enums";
-import { computed, onMounted, ref } from "vue";
-import type { Ref } from "vue";
-import type { QueryRequest } from "~~/models/AutoGen";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
-import QueryResults from "~/components/queryRunner/QueryResults.vue";
-import { io } from "socket.io-client";
-import { useUserStore } from "~/stores/userStore";
+import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
+import { JobStatus } from "~~/enums";
+import type { Job, JobRequest } from "~~/models";
 
-const userStore = useUserStore();
-const currentUser = computed(() => userStore.currentUser);
-const socket = io({
-  extraHeaders: {
-    authorization: currentUser.value ? `bearer ${currentUser.value.token}` : "",
-  },
+import { onMounted, ref } from "vue";
+import type { Ref } from "vue";
+
+import { useUserStore } from "@endeavour/vue-library";
+import type { Argument } from "@endeavour/vue-library/interfaces";
+
+import { io } from "socket.io-client";
+
+definePageMeta({
+  requiresAuth: true,
+  requiresRole: ["EXECUTOR", "ADMIN"]
 });
 
-if (socket.connected) {
-  onConnect();
-}
+const { currentUser } = useUserStore();
+const confirm = useConfirm();
 
-const queryQueueItems: Ref<QueueItem[]> = ref([]);
+const socket = io({
+  extraHeaders: {
+    authorization: `bearer ${currentUser?.id}`
+  }
+});
+
+const jobs: Ref<Job[]> = ref([]);
 const loading = ref(true);
 const searchLoading = ref(false);
 const totalCount = ref(0);
 const page = ref(1);
 const rows = ref(25);
 const rowsOriginal = ref(25);
-const selectedQuery: Ref<QueueItem | undefined> = ref();
+const selectedQuery: Ref<Job | undefined> = ref();
 const showQueryResults = ref(false);
 const websocketIsConnected = ref(false);
 const transport = ref("N/A");
-
-await init();
-
-async function init() {
+const showArgumentDisplay = ref(false);
+const currentArguments: Ref<Argument[]> = ref([]);
+const adminView = false; //TODO: determine admin view based on user role and preference
+onMounted(async () => {
   loading.value = true;
-  await initSearch();
   loading.value = false;
-}
+  socket.emit("joinRoom", "test-room", currentUser?.username);
+  socket.on("message", function (data) {
+    alert(data);
+  });
+  socket.emit("hello");
+  await initSearch();
+});
 
 async function initSearch() {
   searchLoading.value = true;
-  const results = await useFetch<{ totalCount: number; result: QueueItem[] }>(
-    "/api/queue/user/",
-    {
-      query: {
-        userId: currentUser.value?.id,
-        page: page.value,
-        size: rows.value,
-      },
+  const results = await useFetch<{
+    totalCount: number;
+    result: Job[];
+  }>("/api/queue", {
+    query: {
+      userId: currentUser?.id,
+      page: page.value,
+      size: rows.value
     }
-  );
+  });
   if (results.data.value) {
     totalCount.value = results.data.value.totalCount;
-    queryQueueItems.value = results.data.value.result.sort((a, b) => {
-      if (!a.queuedAt) return 1;
-      if (!b.queuedAt) return -1;
-      return new Date(b.queuedAt).getTime() - new Date(a.queuedAt).getTime();
+    jobs.value = results.data.value.result.sort((a, b) => {
+      if (!a.queueDate) return 1;
+      if (!b.queueDate) return -1;
+      return new Date(b.queueDate).getTime() - new Date(a.queueDate).getTime();
     });
   } else {
     totalCount.value = 0;
-    queryQueueItems.value = [];
+    jobs.value = [];
   }
   searchLoading.value = false;
 }
 
 async function refresh() {
   searchLoading.value = true;
-  const results = await $fetch<{ totalCount: number; result: QueueItem[] }>(
-    "/api/queue/user/",
-    {
-      query: {
-        userId: currentUser.value?.id,
-        page: page.value,
-        size: rows.value,
-      },
+  const foundJobs = await $fetch<{ totalCount: number; result: Job[] }>("/api/queue", {
+    query: {
+      userId: currentUser?.id,
+      page: page.value,
+      size: rows.value
     }
-  );
-  if (results) {
-    totalCount.value = results.totalCount;
-    queryQueueItems.value = results.result.sort((a, b) => {
-      if (!a.queuedAt) return 1;
-      if (!b.queuedAt) return -1;
-      return new Date(b.queuedAt).getTime() - new Date(a.queuedAt).getTime();
-    });
+  });
+  if (foundJobs) {
+    totalCount.value = foundJobs.totalCount;
+    jobs.value = foundJobs.result;
   } else {
     totalCount.value = 0;
-    queryQueueItems.value = [];
+    jobs.value = [];
   }
+
   searchLoading.value = false;
 }
 
-function getStatusSeverity(
-  status: QueueItemStatus
-): "secondary" | "success" | "info" | "warn" | "danger" | "contrast" {
+function getStatusSeverity(status: JobStatus): "secondary" | "success" | "info" | "warn" | "danger" | "contrast" {
   switch (status) {
-    case QueueItemStatus.QUEUED:
+    case JobStatus.QUEUED:
       return "warn";
-    case QueueItemStatus.RUNNING:
+    case JobStatus.RUNNING:
       return "info";
-    case QueueItemStatus.COMPLETED:
+    case JobStatus.COMPLETED:
       return "success";
-    case QueueItemStatus.ERRORED:
+    case JobStatus.ERRORED:
       return "danger";
-    case QueueItemStatus.CANCELLED:
+    case JobStatus.CANCELLED:
       return "contrast";
     default:
       return "info";
   }
 }
 
-async function cancelQuery(queryId: string) {
-  await useFetch("/api/queue/query/cancel", { params: { queueId: queryId } });
-  await init();
+async function cancelJob(jobId: string) {
+  await $fetch(`/api/queue/job/stop/${jobId}`);
+  await refresh();
 }
 
-function goToQuery(queryIri: string) {}
+async function goToQuery(queryIri: string) {
+  confirm.require({
+    message: "Are you sure you want to navigate away from this page?",
+    header: "Navigate",
+    acceptProps: {
+      label: "Proceed"
+    },
+    rejectProps: {
+      label: "Cancel",
+      severity: "secondary",
+      outlined: true
+    },
+    accept: async () => {
+      const config = useRuntimeConfig();
+      const encoded = `${config.public.imDirectoryUrl!}#/directory/folder/${encodeURIComponent(queryIri)}`;
+      await navigateTo(encoded, { external: true });
+    }
+  });
+}
 
-async function viewQueryResults(queryItem: QueueItem) {
+async function viewQueryResults(queryItem: Job) {
   selectedQuery.value = queryItem;
   showQueryResults.value = true;
 }
 
-async function deleteQuery(queryId: string) {
-  await useFetch("/api/queue/query/delete", { params: { queueId: queryId } });
-  await init();
+async function viewArgumentDisplay(args: Argument[]) {
+  currentArguments.value = args;
+  showArgumentDisplay.value = true;
 }
 
-async function requeueQuery(queryId: string) {
-  const found = getById(queryId);
-  if (found)
-    await useFetch("/api/queue/query/requeue", { method: "post", body: found });
-  await init();
+function runQuery() {
+  navigateTo("/run");
 }
 
-function getById(queryId: string): QueueItem | undefined {
-  return queryQueueItems.value.find((item) => item.id === queryId);
+async function deleteJob(jobId: string) {
+  await $fetch(`/api/queue/job/${jobId}`, {
+    method: "delete"
+  });
+  await refresh();
+}
+
+async function requeueJob(jobId: string) {
+  const found = getById(jobId);
+  if (!found) {
+    console.error("Job not found for requeueing:", jobId);
+    return;
+  }
+  if (found) {
+    const jobRequest = {
+      jobName: "Requeued " + (found?.jobName || "Requeued Job"),
+      queryRequests: found?.queryRequests
+    } as JobRequest;
+    await $fetch("/api/queue/job/add", {
+      method: "post",
+      body: jobRequest
+    });
+  }
+  await refresh();
+}
+
+function getById(jobId: string): Job | undefined {
+  return jobs.value.find(item => item.id === Number(jobId));
 }
 
 async function onPage(event: any) {
-  page.value = event.page;
+  page.value = ++event.page;
   rows.value = event.rows;
   await refresh();
   scrollToTop();
 }
 
 function scrollToTop() {
-  const scrollArea = document.getElementsByClassName(
-    "p-datatable-scrollable-table"
-  )[0] as HTMLElement;
+  const scrollArea = document.getElementsByClassName("p-datatable-scrollable-table")[0] as HTMLElement;
   scrollArea?.scrollIntoView({ block: "start", behavior: "smooth" });
+}
+
+function getDisplayDateTime(date: string) {
+  const d = new Date(date);
+  return (
+    d.getUTCDate() + "/" + (d.getUTCMonth() + 1) + "/" + d.getUTCFullYear() + " " + d.getUTCHours() + ":" + d.getUTCMinutes() + ":" + d.getUTCMilliseconds()
+  );
 }
 
 function onConnect() {
   websocketIsConnected.value = true;
   transport.value = socket.io.engine.transport.name;
-  socket.io.engine.on("upgrade", (rawTransport) => {
+  socket.io.engine.on("upgrade", rawTransport => {
     transport.value = rawTransport.name;
   });
 }
@@ -256,16 +283,12 @@ function onDisconnect() {
   transport.value = "N/A";
 }
 
-socket.on("connect", onConnect);
-socket.on("disconnect", onDisconnect);
-
 onBeforeUnmount(() => {
-  socket.off("connect", onConnect);
-  socket.off("disconnect", onDisconnect);
+  socket.disconnect();
 });
 
-socket.on("queueUpdate", (value) => {
-  queryQueueItems.value = value;
+socket.on("queueUpdate", value => {
+  jobs.value = value;
 });
 </script>
 
