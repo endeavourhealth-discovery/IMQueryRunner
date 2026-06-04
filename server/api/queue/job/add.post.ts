@@ -12,9 +12,9 @@ export default defineEventHandler(async event => {
   console.log("Received job request with tasks:", jobRequest?.queryRequests?.length);
   const queryJob = await createJobEntry(jobRequest, sessionId!, user!.id);
   try {
-    await sendMessage(user!.id, queryJob);
+    await sendMessage(user.id, queryJob);
   } catch (err) {
-    await updateJobStatus(queryJob.id!, JobStatus.ERRORED, "Failed to queue job for execution: " + String(err));
+    await updateJobStatus(queryJob.id, JobStatus.ERRORED, err);
     return;
   }
   console.log("Job queued with id:", queryJob.id);

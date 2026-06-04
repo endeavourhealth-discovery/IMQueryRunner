@@ -210,8 +210,7 @@ function getIriLine(stringIris: string[]): string {
 
 export async function getValidatedSQL(queryRequest: QueryRequest, sessionId: string, jobId: number): Promise<string> {
   let sql: string | undefined = await QueryService.getQuerySql(sessionId, queryRequest).catch(async (err: Error) => {
-    console.error(err);
-    await updateJobStatus(jobId, JobStatus.ERRORED, JSON.stringify(err));
+    await updateJobStatus(jobId, JobStatus.ERRORED, err);
     return undefined;
   });
   if (!sql) {
