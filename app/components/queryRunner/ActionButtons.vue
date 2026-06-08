@@ -53,7 +53,12 @@
     />
   </div>
   <Dialog v-model:visible="showErrorDialog" modal maximizable header="Error details">
-    <div>{{ job.error }}</div>
+    <div v-if="job.error.cause">
+      <div>SQL query: {{ job.error.cause.sql }}</div>
+      <div>SQL Message: {{ job.error.cause.sqlMessage }}</div>
+    </div>
+
+    <div v-else>{{ job.error }}</div>
     <template #footer>
       <div class="im-dialog-footer">
         <div class="button-footer">

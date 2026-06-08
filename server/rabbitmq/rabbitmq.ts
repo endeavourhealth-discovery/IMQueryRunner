@@ -36,6 +36,8 @@ const sub = rabbit.createConsumer(
   {
     queue: "query.execute",
     queueOptions: { durable: true },
+    qos: { prefetchCount: 1 },
+    concurrency: 1,
     requeue: false,
     exchanges: [{ exchange: "query_runner", type: "topic", durable: true }],
     queueBindings: [
