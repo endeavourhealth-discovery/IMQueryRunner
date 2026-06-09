@@ -24,7 +24,7 @@ export async function createJobEntry(jobRequest: JobRequest, sessionId: string, 
   }
   const now = getNow();
   const queryJob = {
-    jobName: jobRequest.jobName || "Unnamed Job",
+    jobName: jobRequest.jobName || queryRequestsForSql[0]?.query?.name || "Unnamed Job",
     queryRequests: queryRequestsForSql,
     startOfDaySnapshot: jobRequest.startOfDaySnapshot ? 1 : 0,
     persistent: jobRequest.persistent ? 1 : 0,
@@ -50,7 +50,7 @@ export async function getJobById(jobId: number): Promise<Job> {
   return job;
 }
 
-export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error: string | null = null) {
+export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error: any = null) {
   const now = getNow();
   const set = {
     status: jobStatus
@@ -64,28 +64,9 @@ export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error
       break;
     case JobStatus.ERRORED:
       set.finishDate = now;
-
-      if (error) {
-        let savedError = {
-          message: error,
-          query: "<UNKNOWN>"
-        };
-        try {
-          const parsedError = JSON.parse(error);
-          savedError = {
-            message: parsedError.cause.message,
-            query: parsedError.query?.toString().replace(String.raw`\n`, "  ")
-          };
-        } catch (e) {
-          console.warn("Could not parse error\n", e);
-        }
-
-        console.error("Error executing query for job ID:", jobId, savedError.message);
-        set.error = savedError;
-      } else {
-        console.error("Error executing query for job ID:", jobId, error);
-        set.error = error;
-      }
+      set.error = error;
+      console.error(`Error executing query for job ID: ${jobId}`);
+      console.error(error);
       break;
 
     default:
