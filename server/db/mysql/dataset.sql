@@ -2,19 +2,6 @@ DROP SCHEMA dataset;
 CREATE SCHEMA dataset;
 USE dataset;
 
-CREATE TABLE concept (
-	im1Dbid BIGINT,
-    code VARCHAR(100),
-    label VARCHAR(255),
-    iri VARCHAR(100)
-);
-
-CREATE TABLE concept_tct (
-	parent_iri VARCHAR(100),
-    childDbId BIGINT,
-    self BIT(1)
-);
-
 CREATE TABLE job  (
 	id BIGINT AUTO_INCREMENT PRIMARY KEY,
 	job_name VARCHAR(255),
