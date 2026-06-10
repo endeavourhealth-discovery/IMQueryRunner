@@ -1,6 +1,13 @@
-DROP SCHEMA dataset;
-CREATE SCHEMA dataset;
+-- DROP SCHEMA dataset;
+-- CREATE SCHEMA dataset;
 USE dataset;
+
+DROP TABLE IF EXISTS dataset.cohort_results;
+DROP TABLE IF EXISTS dataset.dataset_results;
+DROP TABLE IF EXISTS dataset.query_result;
+DROP TABLE IF EXISTS dataset.indicator_result;
+DROP TABLE IF EXISTS dataset.query_result_set;
+DROP TABLE IF EXISTS dataset.job;
 
 CREATE TABLE job  (
 	id BIGINT AUTO_INCREMENT PRIMARY KEY,
