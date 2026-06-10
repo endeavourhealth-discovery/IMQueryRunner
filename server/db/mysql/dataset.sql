@@ -1,19 +1,13 @@
-DROP SCHEMA dataset;
-CREATE SCHEMA dataset;
+-- DROP SCHEMA dataset;
+-- CREATE SCHEMA dataset;
 USE dataset;
 
-CREATE TABLE concept (
-	im1Dbid BIGINT,
-    code VARCHAR(100),
-    label VARCHAR(255),
-    iri VARCHAR(100)
-);
-
-CREATE TABLE concept_tct (
-	parent_iri VARCHAR(100),
-    childDbId BIGINT,
-    self BIT(1)
-);
+DROP TABLE IF EXISTS dataset.cohort_results;
+DROP TABLE IF EXISTS dataset.dataset_results;
+DROP TABLE IF EXISTS dataset.query_result;
+DROP TABLE IF EXISTS dataset.indicator_result;
+DROP TABLE IF EXISTS dataset.query_result_set;
+DROP TABLE IF EXISTS dataset.job;
 
 CREATE TABLE job  (
 	id BIGINT AUTO_INCREMENT PRIMARY KEY,
