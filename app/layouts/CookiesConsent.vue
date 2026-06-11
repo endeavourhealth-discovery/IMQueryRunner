@@ -1,7 +1,6 @@
 <template>
   <Drawer
     id="cookies-sidebar"
-    :autoZIndex="false"
     :blockScroll="true"
     :dismissable="false"
     :modal="true"
