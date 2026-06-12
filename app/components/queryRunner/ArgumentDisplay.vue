@@ -9,13 +9,16 @@
     <Column field="valueData" header="Value">
       <template #body="{ data }">
         <div class="argument-selector-content">
-          <div v-if="editArguments && data.dataType && [XSD.STRING].includes(data.dataType?.iri)">
+          <div v-if="editArguments && data.parameter === '$organisationId'">
+            <OrganisationSelect v-model="data.valueDataList" />
+          </div>
+          <div v-else-if="editArguments && data.dataType && [XSD.STRING].includes(data.dataType?.iri)">
             <InputText type="text" v-model="data.valueData" data-testid="property-value-input" />
           </div>
-          <div v-if="editArguments && data.dataType && [XSD.BOOLEAN].includes(data.dataType.iri)">
+          <div v-else-if="editArguments && data.dataType && [XSD.BOOLEAN].includes(data.dataType.iri)">
             <Select :options="booleanOptions" optionLabel="name" optionValue="value" v-model="data.valueData" />
           </div>
-          <div v-if="editArguments && data.dataType && [IM.DATE, IM.DATE_TIME, IM.TIME].includes(data.dataType.iri)">
+          <div v-else-if="editArguments && data.dataType && [IM.DATE, IM.DATE_TIME, IM.TIME].includes(data.dataType.iri)">
             <DatePicker
               v-model="data.valueData"
               :showTime="IM.DATE_TIME === data.dataType.iri"
@@ -26,7 +29,7 @@
               updateModelType="string"
             />
           </div>
-          <div v-else>{{ data.valueData }}</div>
+          <div v-else>{{ data.valueData ?? data.valueDataList }}</div>
         </div>
       </template>
     </Column>
@@ -38,6 +41,8 @@
 </template>
 
 <script setup lang="ts">
+import OrganisationSelect from "~/components/queryRunner/OrganisationSelect.vue";
+
 import { watch } from "vue";
 
 import { IM, XSD } from "@endeavour/vue-library/enums";
@@ -55,6 +60,7 @@ interface Props {
 
 interface ArgumentSelection extends ArgumentReference {
   valueData?: any;
+  valueDataList?: string[];
 }
 
 const props = defineProps<Props>();
@@ -64,8 +70,12 @@ const emit = defineEmits<{
 }>();
 
 const showDialog = defineModel<boolean>("showDialog");
-const allArgumentsValid: ComputedRef<boolean> = computed(() => argumentList.value!.every(as => as.valueData));
-
+const allArgumentsValid: ComputedRef<boolean> = computed(() =>
+  argumentList.value!.every(as => {
+    if (as.parameter === "$organisationId") return as.valueDataList && as.valueDataList.length > 0;
+    return !!as.valueData;
+  })
+);
 const loading = ref(false);
 const includeIri = ref(false);
 const argumentList = ref<ArgumentSelection[] | undefined>([]);
@@ -118,20 +128,25 @@ function confirmArguments() {
     if (argumentList.value) {
       for (const argSelect of argumentList.value) {
         const newArg: Argument = { parameter: argSelect.parameter };
-        switch (argSelect.dataType?.iri) {
-          case XSD.STRING:
-          case XSD.BOOLEAN:
-          case IM.DATE:
-          case IM.DATE_TIME:
-          case IM.TIME:
-            newArg.valueData = argSelect.valueData;
-            newArg.dataType = argSelect.dataType;
-            break;
+
+        if (argSelect.parameter === "$organisationId") {
+          newArg.valueDataList = Array.from(new Set(argSelect.valueDataList));
+        } else {
+          switch (argSelect.dataType?.iri) {
+            case XSD.STRING:
+            case XSD.BOOLEAN:
+            case IM.DATE:
+            case IM.DATE_TIME:
+            case IM.TIME:
+              newArg.valueData = argSelect.valueData;
+              newArg.dataType = argSelect.dataType;
+              break;
+          }
         }
         completedArguments.push(newArg);
       }
     }
-    emit("argumentsCompleted", completedArguments, props.runOnConfirm);
+    emit("argumentsCompleted", completedArguments, props.runOnConfirm ?? false);
     submitting.value = false;
   }
 }

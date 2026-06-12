@@ -188,9 +188,8 @@ async function getResolvedSql(sql: string, queryRequest: QueryRequest, queryIris
     for (const arg of queryRequest.argument) {
       if (arg.valueData && arg.parameter) sql = sql.replaceAll(arg.parameter, `'${arg.valueData}'`);
       else if (arg.valueIri && arg.parameter) sql = sql.replaceAll(arg.parameter, `'${arg.valueIri.iri}'`);
-      else if (arg.valueIriList && arg.parameter) {
-        sql = sql.replaceAll(arg.parameter, getIriLine(arg.valueIriList.map(v => v.iri)));
-      }
+      else if (arg.valueIriList && arg.parameter) sql = sql.replaceAll(arg.parameter, getIriLine(arg.valueIriList.map(v => v.iri)));
+      else if (arg.valueDataList && arg.parameter) sql = sql.replaceAll(arg.parameter, arg.valueDataList.map(v => `'${v}'`).join(", "));
     }
   }
   if (Object.keys(queryIrisToHashCodes).length > 0) {
