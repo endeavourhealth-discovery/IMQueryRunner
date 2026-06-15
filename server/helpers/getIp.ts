@@ -8,10 +8,7 @@ export function getIp(event: H3Event) {
   }
   const ip = getRequestIP(event, { xForwardedFor: true });
   if (!ip) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: "IP address not available"
-    });
+    return "0.0.0.0";
   }
   return normaliseIp(ip);
 }

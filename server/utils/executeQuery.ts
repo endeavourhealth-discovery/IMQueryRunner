@@ -39,6 +39,7 @@ export async function executeQuery(sessionId: string, sql: string, queryRequest:
 }
 
 export async function executeCohortQuery(resolvedSql: string, queryRequest: QueryRequest, queryResultId: number) {
+  // DEBUG: console.log("Executing cohort query:", resolvedSql);
   try {
     await mysqlDb.execute<ResultSetHeader>(resolvedSql);
     await updateWithEndTime(queryResultId, queryResultTable);
@@ -195,9 +196,8 @@ async function getResolvedSql(sql: string, queryRequest: QueryRequest, queryIris
     for (const arg of queryRequest.argument) {
       if (arg.valueData && arg.parameter) sql = sql.replaceAll(arg.parameter, `'${arg.valueData}'`);
       else if (arg.valueIri && arg.parameter) sql = sql.replaceAll(arg.parameter, `'${arg.valueIri.iri}'`);
-      else if (arg.valueIriList && arg.parameter) {
-        sql = sql.replaceAll(arg.parameter, getIriLine(arg.valueIriList.map(v => v.iri)));
-      }
+      else if (arg.valueIriList && arg.parameter) sql = sql.replaceAll(arg.parameter, getIriLine(arg.valueIriList.map(v => v.iri)));
+      else if (arg.valueDataList && arg.parameter) sql = sql.replaceAll(arg.parameter, `(${arg.valueDataList.map(v => `'${v}'`).join(", ")})`);
     }
   }
   if (Object.keys(queryIrisToHashCodes).length > 0) {
@@ -217,8 +217,7 @@ function getIriLine(stringIris: string[]): string {
 
 export async function getValidatedSQL(queryRequest: QueryRequest, sessionId: string, jobId: number): Promise<string> {
   let sql: string | undefined = await QueryService.getQuerySql(sessionId, queryRequest).catch(async (err: Error) => {
-    console.error(err);
-    await updateJobStatus(jobId, JobStatus.ERRORED, JSON.stringify(err));
+    await updateJobStatus(jobId, JobStatus.ERRORED, err);
     return undefined;
   });
   if (!sql) {

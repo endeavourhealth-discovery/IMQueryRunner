@@ -36,6 +36,8 @@ const sub = rabbit.createConsumer(
   {
     queue: "query.execute",
     queueOptions: { durable: true },
+    qos: { prefetchCount: 1 },
+    concurrency: 1,
     requeue: false,
     exchanges: [{ exchange: "query_runner", type: "topic", durable: true }],
     queueBindings: [
@@ -71,7 +73,7 @@ const sub = rabbit.createConsumer(
           await executeQuery(await getSession(), sql, queryRequest, queryResultSet);
           await updateWithEndTime(queryResultSet.id!, queryResultSetTable);
         } catch (err) {
-          await updateJobStatus(job.id, JobStatus.ERRORED, JSON.stringify(err));
+          await updateJobStatus(job.id, JobStatus.ERRORED, err);
           return;
         }
       }

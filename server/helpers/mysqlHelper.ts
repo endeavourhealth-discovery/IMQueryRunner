@@ -24,7 +24,7 @@ export async function createJobEntry(jobRequest: JobRequest, sessionId: string, 
   }
   const now = getNow();
   const queryJob = {
-    jobName: jobRequest.jobName || "Unnamed Job",
+    jobName: jobRequest.jobName || queryRequestsForSql[0]?.query?.name || "Unnamed Job",
     queryRequests: queryRequestsForSql,
     startOfDaySnapshot: jobRequest.startOfDaySnapshot ? 1 : 0,
     persistent: jobRequest.persistent ? 1 : 0,
@@ -50,7 +50,7 @@ export async function getJobById(jobId: number): Promise<Job> {
   return job;
 }
 
-export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error: string | null = null) {
+export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error: any = null) {
   const now = getNow();
   const set = {
     status: jobStatus

@@ -352,3 +352,13 @@ export const smallPat = compass.table("small_pat", {
   ethnicCodeConceptId: int("ethnic_code_concept_id"),
   registeredPracticeOrganizationId: bigint("registered_practice_organization_id", { mode: "number" })
 });
+
+export const organization = compass.table("organization", {
+  id: bigint({ mode: "number" }).notNull().primaryKey(),
+  odsCode: varchar("ods_code", { length: 50 }),
+  name: varchar("name", { length: 255 }),
+  typeCode: varchar("type_code", { length: 50 }),
+  typeDesc: varchar("type_desc", { length: 255 }),
+  postcode: varchar("postcode", { length: 10 }),
+  parentOrganizationId: bigint("parent_organization_id", { mode: "number" })
+});
