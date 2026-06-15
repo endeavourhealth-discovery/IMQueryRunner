@@ -59,6 +59,9 @@ export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error
     case JobStatus.RUNNING:
       set.runDate = now;
       break;
+    case JobStatus.CANCELLED:
+      set.finishDate = now;
+      break;
     case JobStatus.COMPLETED:
       set.finishDate = now;
       break;
@@ -71,8 +74,13 @@ export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error
           message: parsedError.cause.message,
           query: parsedError.query?.toString().replace("\\n", "  ")
         };
-        console.error("Error executing query for job ID:", jobId, parsedError.cause?.sqlMessage);
         set.error = savedError;
+        if (parsedError.cause?.sqlMessage === "Query execution was interrupted") {
+          set.status = JobStatus.CANCELLED;
+          console.info(parsedError.cause?.sqlMessage, `(Job ID: ${jobId} CANCELLED)`);
+        } else {
+          console.error("Error executing query for job ID:", jobId, parsedError.cause?.sqlMessage);
+        }
       } else {
         console.error("Error executing query for job ID:", jobId, error);
         set.error = error;

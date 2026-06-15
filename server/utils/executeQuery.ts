@@ -42,10 +42,13 @@ export async function executeCohortQuery(resolvedSql: string, queryRequest: Quer
   try {
     await mysqlDb.execute<ResultSetHeader>(resolvedSql);
     await updateWithEndTime(queryResultId, queryResultTable);
-  } catch (err) {
-    console.error("Error executing query:", queryRequest.query.iri);
-    console.error("Error executing SQL");
-    throw err;
+  } catch (err: any) {
+    if (err instanceof Error && err.cause instanceof Error) {
+      if (err.cause.message && err.cause.message === "Query execution was interrupted") throw err;
+    } else {
+      console.error("Error executing query:", queryRequest.query.iri);
+      throw err;
+    }
   }
 }
 
@@ -56,8 +59,12 @@ export async function executeDatasetQuery(resolvedSql: string, queryResultId: nu
     try {
       await mysqlDb.execute<ResultSetHeader>(sqlPart);
     } catch (err: any) {
-      console.error("Error executing SQL part:", err.cause || err.message || err);
-      throw err;
+      if (err instanceof Error && err.cause instanceof Error) {
+        if (err.cause.message && err.cause.message === "Query execution was interrupted") throw err;
+      } else {
+        console.error("Error executing SQL part:", err.cause || err.message || err);
+        throw err;
+      }
     }
   }
   await updateWithEndTime(queryResultId, queryResultTable);
