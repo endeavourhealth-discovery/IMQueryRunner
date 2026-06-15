@@ -67,26 +67,18 @@ export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error
       break;
     case JobStatus.ERRORED:
       set.finishDate = now;
-
+      set.error = error;
       if (error) {
         const parsedError = JSON.parse(error);
-        const savedError = {
-          message: parsedError.cause.message,
-          query: parsedError.query?.toString().replace("\\n", "  ")
-        };
-        set.error = savedError;
         if (parsedError.cause?.sqlMessage === "Query execution was interrupted") {
           set.status = JobStatus.CANCELLED;
           console.info(parsedError.cause?.sqlMessage, `(Job ID: ${jobId} CANCELLED)`);
         } else {
-          console.error("Error executing query for job ID:", jobId, parsedError.cause?.sqlMessage);
+          console.error(`Error executing query for job ID: ${jobId}`);
+          console.error(error);
         }
-      } else {
-        console.error("Error executing query for job ID:", jobId, error);
-        set.error = error;
       }
       break;
-
     default:
       throw new Error(`Invalid job status: ${jobStatus}`);
   }
