@@ -15,6 +15,6 @@ export default defineEventHandler(async () => {
     id: row.id,
     odsCode: row.odsCode,
     name: row.name,
-    label: `${row.odsCode} - ${row.name}`
+    label: `${row.name} - ${row.odsCode}`
   }));
 });
