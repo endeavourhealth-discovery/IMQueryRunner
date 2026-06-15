@@ -75,7 +75,8 @@ export const datasetResultsTable = dataset.table("dataset_results", {
 
 export const cohortResultsTable = dataset.table("cohort_results", {
   queryResultId: int("query_result_id").notNull(),
-  entityId: int("entity_id").notNull()
+  entityId: int("entity_id").notNull(),
+  entityOrgId: int("entity_org_id").notNull()
 });
 
 export const allergyIntolerance = compass.table("allergy_intolerance", {
