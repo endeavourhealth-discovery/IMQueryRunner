@@ -92,8 +92,8 @@ CREATE TABLE
     dataset_results (
         query_result_id BIGINT,
         entity_id BIGINT,
-        entity_org_id BIGINT,
         column_group VARCHAR(255),
         `json` JSON,
+		entity_org_id BIGINT,
         FOREIGN KEY (query_result_id) REFERENCES query_result (id)
     );

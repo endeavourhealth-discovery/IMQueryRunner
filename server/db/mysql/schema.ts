@@ -70,7 +70,8 @@ export const datasetResultsTable = dataset.table("dataset_results", {
   queryResultId: int("query_result_id").notNull(),
   entityId: int("entity_id").notNull(),
   columnGroup: varchar("column_group", { length: 255 }).notNull(),
-  json: json("json").notNull()
+  json: json("json").notNull(),
+  entityOrgId: int("entity_org_id").notNull()
 });
 
 export const cohortResultsTable = dataset.table("cohort_results", {
