@@ -26,7 +26,7 @@ for (const file of files) {
 }
 
 if (violations.length) {
-  console.error('\nLocal VueLibrary must be unlinked before committing. Please use \'pnpm unlink\' and/or remove all link: and file: references from:\n');
+  console.error('\nLocal VueLibrary must be unlinked before committing. Please use \'pnpm unlink\' and/or unlink manually and check:\n');
   for (const f of files) console.error(' - ' + f);
   console.error('');
   process.exit(1);
