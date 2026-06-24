@@ -5,6 +5,16 @@
         <div class="m-2">
           <Button icon="fa-solid fa-arrow-left" label="Back to queue" @click="backToQueue" />
         </div>
+        <div v-if="executedSql" class="m-2">
+          <Panel header="Executed SQL" :toggleable="true" :collapsed="true">
+            <div class="relative">
+              <pre class="cursor-pointer overflow-auto rounded bg-gray-900 p-4 text-sm text-green-400" title="Click to copy" @click="copyToClipboard">{{
+                executedSql
+              }}</pre>
+              <span v-if="copied" class="absolute right-2 top-2 rounded bg-green-600 px-2 py-1 text-xs text-white">Copied!</span>
+            </div>
+          </Panel>
+        </div>
         <DataTable
           ref="dt"
           :size="'small'"
@@ -73,9 +83,10 @@ const rows = ref(25);
 const originalSize = ref(25);
 const totalCount = ref();
 const columns: Ref<any[]> = ref([]);
+const executedSql = ref<string | null>(null);
 
 onMounted(async () => {
-  await getQueryResults();
+  await Promise.all([getQueryResults(), getExecutedSql()]);
   formatResultsForTable();
 });
 
@@ -153,6 +164,26 @@ async function onPage(event: any) {
 
 function backToQueue() {
   navigateTo("/");
+}
+
+async function getExecutedSql() {
+  if (props.jobId && props.queryIri) {
+    const value = await $fetch<{ executedSQL: string | null }>(
+      `/api/queue/job/sql/${props.jobId}/${props.queryType}/${encodeURIComponent(props.queryIri as string)}`
+    );
+    if (value?.executedSQL) {
+      executedSql.value = value.executedSQL;
+    }
+  }
+}
+
+const copied = ref(false);
+
+async function copyToClipboard() {
+  if (!executedSql.value) return;
+  await navigator.clipboard.writeText(executedSql.value);
+  copied.value = true;
+  setTimeout(() => (copied.value = false), 2000);
 }
 </script>
 

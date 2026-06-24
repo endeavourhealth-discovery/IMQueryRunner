@@ -63,6 +63,7 @@ export const queryResultTable = dataset.table("query_result", {
   startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
   persistent: tinyint("persistent").notNull(),
   useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
+  executedSQL: text("executed_sql"),
   version: int("version").notNull()
 });
 
