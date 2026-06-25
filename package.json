@@ -77,15 +77,6 @@
     "vitest": "^4.0.16",
     "vue-tsc": "^3.1.0"
   },
-  "pnpm": {
-    "minimumReleaseAge": 0,
-    "onlyBuiltDependencies": [
-      "@getgauge/cli",
-      "@parcel/watcher",
-      "esbuild"
-    ],
-    "overrides": {}
-  },
   "lint-staged": {
     "{app,docs,enums,models,server,shared,types,tests}/**/*.{js,ts,vue,json,css,scss,md}": "prettier --write"
   }
