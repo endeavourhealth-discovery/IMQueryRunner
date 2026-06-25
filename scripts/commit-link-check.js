@@ -3,7 +3,7 @@ import { execSync } from "node:child_process";
 const files = execSync("git diff --cached --name-only --diff-filter=ACMR", { encoding: "utf8" }).split("\n").filter(Boolean);
 
 for (const file of files) {
-  if (file !== "package.json" && file !== "pnpm-lock.yaml") continue;
+  if (file !== "pnpm-workspace.yaml" && file !== "pnpm-lock.yaml") continue;
 
   const content = execSync(`git show :${file}`, { encoding: "utf8" });
 
