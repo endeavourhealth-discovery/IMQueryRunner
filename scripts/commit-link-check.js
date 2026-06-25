@@ -9,7 +9,7 @@ for (const file of files) {
 
   if (content.includes('@endeavour/vue-library') && content.includes("link:../VueLibrary")) {
     console.error(
-      "\nLocal VueLibrary must be unlinked before committing.\nPlease use 'pnpm unlink' before committing either package.json or pnpm-lock.yaml.\n"
+      "\nLocal VueLibrary must be unlinked before committing.\nPlease use 'pnpm unlink' OR manually remove overrides from pnpm-workspace.yaml and run pnpm install before committing.\n"
     );
     process.exit(1);
   }
