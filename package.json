@@ -22,7 +22,7 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.896.0",
     "@braintree/sanitize-url": "^7.1.2",
-    "@endeavour/vue-library": "1.0.3",
+    "@endeavour/vue-library": "1.0.4",
     "@pinia/nuxt": "0.11.2",
     "@primeuix/themes": "^2.0.3",
     "@tailwindcss/vite": "^4.1.13",
