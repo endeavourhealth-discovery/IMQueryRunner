@@ -83,7 +83,9 @@
       "@parcel/watcher",
       "esbuild"
     ],
-    "overrides": {}
+    "overrides": {
+      "@endeavour/vue-library": "link:../VueLibrary"
+    }
   },
   "lint-staged": {
     "{app,docs,enums,models,server,shared,types,tests}/**/*.{js,ts,vue,json,css,scss,md}": "prettier --write"
