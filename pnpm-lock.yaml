@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@endeavour/vue-library': link:../VueLibrary
+
 importers:
 
   .:
@@ -15,8 +18,8 @@ importers:
         specifier: ^7.1.2
         version: 7.1.2
       '@endeavour/vue-library':
-        specifier: 1.0.4
-        version: 1.0.4(@primeuix/themes@2.0.3)(axios@1.16.1)(fuse.js@7.3.0)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.34(typescript@5.9.3)))(primevue@4.5.5(vue@3.5.34(typescript@5.9.3)))(typescript-logging@2.2.0)(vue-router@5.0.7(@vue/compiler-sfc@3.5.34)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.34(typescript@5.9.3)))(vue@3.5.34(typescript@5.9.3)))(vue@3.5.34(typescript@5.9.3))
+        specifier: link:../VueLibrary
+        version: link:../VueLibrary
       '@pinia/nuxt':
         specifier: 0.11.2
         version: 0.11.2(magicast@0.5.3)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.34(typescript@5.9.3)))
@@ -526,15 +529,6 @@ packages:
 
   '@emnapi/wasi-threads@1.2.1':
     resolution: {integrity: sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==}
-
-  '@endeavour/vue-library@1.0.4':
-    resolution: {integrity: sha512-F4/P9wW86vE44qU1mRGEfUQlipBhqmTAJgKd5L9IBAqmO6qVQ5/GGLwdLo0bU0HOuNXzIBh38xC4Pi3t8YQsyw==}
-    peerDependencies:
-      '@primeuix/themes': 2.0.3
-      pinia: 3.0.4
-      primevue: 4.5.5
-      vue: 3.5.32
-      vue-router: 5.0.4
 
   '@epic-web/invariant@1.0.0':
     resolution: {integrity: sha512-lrTPqgvfFQtR/eY/qkIzp98OGdNJu0m5ji3q/nJI8v3SXkRKEnWiOxMmbvcSoAIzv/cGiuvRy57k4suKQSAdwA==}
@@ -2159,9 +2153,6 @@ packages:
   '@types/semver@7.7.1':
     resolution: {integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==}
 
-  '@types/web-bluetooth@0.0.21':
-    resolution: {integrity: sha512-oIQLCGWtcFZy2JW77j9k8nHzAOpqMHLQejDA48XXMWH6tjCQHz5RCFz1bzsmROyL6PUm+LLnUiI4BCn221inxA==}
-
   '@types/ws@8.18.1':
     resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
@@ -2310,61 +2301,6 @@ packages:
 
   '@vue/shared@3.5.34':
     resolution: {integrity: sha512-24uqU4OIiX29ryC3MeWid/Xf2fa2EFRUVLb77nRhk+UrTVrh/XiGtFAFmJBAtBRbjwNdsPRP+jj/OL27Eg1NDA==}
-
-  '@vueuse/core@14.2.1':
-    resolution: {integrity: sha512-3vwDzV+GDUNpdegRY6kzpLm4Igptq+GA0QkJ3W61Iv27YWwW/ufSlOfgQIpN6FZRMG0mkaz4gglJRtq5SeJyIQ==}
-    peerDependencies:
-      vue: ^3.5.0
-
-  '@vueuse/integrations@14.2.1':
-    resolution: {integrity: sha512-2LIUpBi/67PoXJGqSDQUF0pgQWpNHh7beiA+KG2AbybcNm+pTGWT6oPGlBgUoDWmYwfeQqM/uzOHqcILpKL7nA==}
-    peerDependencies:
-      async-validator: ^4
-      axios: ^1
-      change-case: ^5
-      drauu: ^0.4
-      focus-trap: ^7 || ^8
-      fuse.js: ^7
-      idb-keyval: ^6
-      jwt-decode: ^4
-      nprogress: ^0.2
-      qrcode: ^1.5
-      sortablejs: ^1
-      universal-cookie: ^7 || ^8
-      vue: ^3.5.0
-    peerDependenciesMeta:
-      async-validator:
-        optional: true
-      axios:
-        optional: true
-      change-case:
-        optional: true
-      drauu:
-        optional: true
-      focus-trap:
-        optional: true
-      fuse.js:
-        optional: true
-      idb-keyval:
-        optional: true
-      jwt-decode:
-        optional: true
-      nprogress:
-        optional: true
-      qrcode:
-        optional: true
-      sortablejs:
-        optional: true
-      universal-cookie:
-        optional: true
-
-  '@vueuse/metadata@14.2.1':
-    resolution: {integrity: sha512-1ButlVtj5Sb/HDtIy1HFr1VqCP4G6Ypqt5MAo0lCgjokrk2mvQKsK2uuy0vqu/Ks+sHfuHo0B9Y9jn9xKdjZsw==}
-
-  '@vueuse/shared@14.2.1':
-    resolution: {integrity: sha512-shTJncjV9JTI4oVNyF1FQonetYAiTBd+Qj7cY89SWbXSkx7gyhrgtEdF2ZAVWS1S3SHlaROO6F2IesJxQEkZBw==}
-    peerDependencies:
-      vue: ^3.5.0
 
   abbrev@3.0.1:
     resolution: {integrity: sha512-AO2ac6pjRB3SJmGJo+v5/aK6Omggp6fsLrs6wN9bd35ulu4cCwaAU9+7ZhXjeqHVkaHThLuzH0nZr0YpCDhygg==}
@@ -3402,9 +3338,6 @@ packages:
     resolution: {integrity: sha512-QrJia2qDf5BB/V6HYlDTs0I0lBahyjLzpGQg3KT7FnCdTonAyPy2RtY802m2k4ALx6Dp752f82WsOczEVr3l6Q==}
     engines: {node: '>=20'}
 
-  google-palette@1.1.1:
-    resolution: {integrity: sha512-yZiM5oLl8lCZzf06IMOGdDkxqvCMd9HNFcCiOMqWgGGiGzC22vWBVhKJNvykXXbeC0NAElNH97jA/y0bq6TCrA==}
-
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
     engines: {node: '>= 0.4'}
@@ -3803,9 +3736,6 @@ packages:
   local-pkg@1.2.0:
     resolution: {integrity: sha512-U16tFsiwNEac4GuqQ/SmG3ayjPIT1YKmiFeH4x9NaHTZwYbSqmEhf9POmzJu6NdUDDVjaE7n1WQQLjymYYFx+Q==}
     engines: {node: '>=14'}
-
-  lodash-es@4.17.23:
-    resolution: {integrity: sha512-kVI48u3PZr38HdYz98UmfPnXl2DXrpdctLrFLCd3kOx1xUkOmpFPx7gCWWM5MPkL/fD8zb+Ph0QzjGFs4+hHWg==}
 
   lodash-es@4.18.1:
     resolution: {integrity: sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==}
@@ -5071,14 +5001,6 @@ packages:
   type-level-regexp@0.1.17:
     resolution: {integrity: sha512-wTk4DH3cxwk196uGLK/E9pE45aLfeKJacKmcEgEOA/q5dnPGNxXt0cfYdFxb57L+sEpf1oJH4Dnx/pnRcku9jg==}
 
-  typescript-logging-log4ts-style@2.2.0:
-    resolution: {integrity: sha512-NP8uoFVoNJkhH6iOM1Y8+/RVFoSPCxLe/kgdxQ0uJNhUJh4CLp7CuMIh/njC9mzK0wdq2DgSJcmlzkqnRXx1Eg==}
-    peerDependencies:
-      typescript-logging: ~2.2.0
-
-  typescript-logging@2.2.0:
-    resolution: {integrity: sha512-mPKFGAgGJmeCqrzA6B64Lqoz6vLPtxa8yCd7sWAnfrz9opuNlxqW57VxjtEOL0OOoQeTdc/kBjGUh8sieBXa8A==}
-
   typescript@5.9.3:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
     engines: {node: '>=14.17'}
@@ -5244,10 +5166,6 @@ packages:
 
   uuid@11.1.1:
     resolution: {integrity: sha512-vIYxrBCC/N/K+Js3qSN88go7kIfNPssr/hHCesKCQNAjmgvYS2oqr69kIufEG+O4+PfezOH4EbIeHCfFov8ZgQ==}
-    hasBin: true
-
-  uuid@13.0.0:
-    resolution: {integrity: sha512-XQegIaBTVUjSHliKqcnFqYypAd4S+WCYt5NIeRs6w/UAry7z8Y9j5ZwRRL4kzq9U3sD6v+85er9FvkEaBpji2w==}
     hasBin: true
 
   vary@1.1.2:
@@ -6133,36 +6051,6 @@ snapshots:
     dependencies:
       tslib: 2.8.1
     optional: true
-
-  '@endeavour/vue-library@1.0.4(@primeuix/themes@2.0.3)(axios@1.16.1)(fuse.js@7.3.0)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.34(typescript@5.9.3)))(primevue@4.5.5(vue@3.5.34(typescript@5.9.3)))(typescript-logging@2.2.0)(vue-router@5.0.7(@vue/compiler-sfc@3.5.34)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.34(typescript@5.9.3)))(vue@3.5.34(typescript@5.9.3)))(vue@3.5.34(typescript@5.9.3))':
-    dependencies:
-      '@primeuix/themes': 2.0.3
-      '@vueuse/core': 14.2.1(vue@3.5.34(typescript@5.9.3))
-      '@vueuse/integrations': 14.2.1(axios@1.16.1)(fuse.js@7.3.0)(vue@3.5.34(typescript@5.9.3))
-      google-palette: 1.1.1
-      lodash-es: 4.17.23
-      pinia: 3.0.4(typescript@5.9.3)(vue@3.5.34(typescript@5.9.3))
-      primevue: 4.5.5(vue@3.5.34(typescript@5.9.3))
-      sass: 1.99.0
-      typescript-logging-log4ts-style: 2.2.0(typescript-logging@2.2.0)
-      uuid: 13.0.0
-      vue: 3.5.34(typescript@5.9.3)
-      vue-router: 5.0.7(@vue/compiler-sfc@3.5.34)(pinia@3.0.4(typescript@5.9.3)(vue@3.5.34(typescript@5.9.3)))(vue@3.5.34(typescript@5.9.3))
-      zod: 4.3.6
-    transitivePeerDependencies:
-      - async-validator
-      - axios
-      - change-case
-      - drauu
-      - focus-trap
-      - fuse.js
-      - idb-keyval
-      - jwt-decode
-      - nprogress
-      - qrcode
-      - sortablejs
-      - typescript-logging
-      - universal-cookie
 
   '@epic-web/invariant@1.0.0': {}
 
@@ -7505,8 +7393,6 @@ snapshots:
 
   '@types/semver@7.7.1': {}
 
-  '@types/web-bluetooth@0.0.21': {}
-
   '@types/ws@8.18.1':
     dependencies:
       '@types/node': 25.9.1
@@ -7754,28 +7640,6 @@ snapshots:
       vue: 3.5.34(typescript@5.9.3)
 
   '@vue/shared@3.5.34': {}
-
-  '@vueuse/core@14.2.1(vue@3.5.34(typescript@5.9.3))':
-    dependencies:
-      '@types/web-bluetooth': 0.0.21
-      '@vueuse/metadata': 14.2.1
-      '@vueuse/shared': 14.2.1(vue@3.5.34(typescript@5.9.3))
-      vue: 3.5.34(typescript@5.9.3)
-
-  '@vueuse/integrations@14.2.1(axios@1.16.1)(fuse.js@7.3.0)(vue@3.5.34(typescript@5.9.3))':
-    dependencies:
-      '@vueuse/core': 14.2.1(vue@3.5.34(typescript@5.9.3))
-      '@vueuse/shared': 14.2.1(vue@3.5.34(typescript@5.9.3))
-      vue: 3.5.34(typescript@5.9.3)
-    optionalDependencies:
-      axios: 1.16.1
-      fuse.js: 7.3.0
-
-  '@vueuse/metadata@14.2.1': {}
-
-  '@vueuse/shared@14.2.1(vue@3.5.34(typescript@5.9.3))':
-    dependencies:
-      vue: 3.5.34(typescript@5.9.3)
 
   abbrev@3.0.1: {}
 
@@ -8757,8 +8621,6 @@ snapshots:
       slash: 5.1.0
       unicorn-magic: 0.4.0
 
-  google-palette@1.1.1: {}
-
   gopd@1.2.0: {}
 
   graceful-fs@4.2.11: {}
@@ -8848,7 +8710,8 @@ snapshots:
 
   image-meta@0.2.2: {}
 
-  immutable@5.1.5: {}
+  immutable@5.1.5:
+    optional: true
 
   impound@1.1.5:
     dependencies:
@@ -9149,8 +9012,6 @@ snapshots:
       mlly: 1.8.2
       pkg-types: 2.3.1
       quansync: 1.0.0
-
-  lodash-es@4.17.23: {}
 
   lodash-es@4.18.1: {}
 
@@ -10251,6 +10112,7 @@ snapshots:
       source-map-js: 1.2.1
     optionalDependencies:
       '@parcel/watcher': 2.5.6
+    optional: true
 
   sax@1.6.0: {}
 
@@ -10636,12 +10498,6 @@ snapshots:
 
   type-level-regexp@0.1.17: {}
 
-  typescript-logging-log4ts-style@2.2.0(typescript-logging@2.2.0):
-    dependencies:
-      typescript-logging: 2.2.0
-
-  typescript-logging@2.2.0: {}
-
   typescript@5.9.3: {}
 
   ufo@1.6.4: {}
@@ -10784,8 +10640,6 @@ snapshots:
   util-deprecate@1.0.2: {}
 
   uuid@11.1.1: {}
-
-  uuid@13.0.0: {}
 
   vary@1.1.2: {}
 
