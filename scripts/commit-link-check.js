@@ -1,27 +1,20 @@
-#!/usr/bin/env node
+import { execSync } from "node:child_process";
 
-import fs from "node:fs";
-
-const files = ["package.json", "pnpm-lock.yaml"];
-
-let foundMatch = false;
+const files = execSync("git diff --cached --name-only --diff-filter=ACMR", { encoding: "utf8" }).split("\n").filter(Boolean);
 
 for (const file of files) {
-  if (!fs.existsSync(file)) continue;
+  if (file !== "package.json" && file !== "pnpm-lock.yaml") continue;
 
-  const content = fs.readFileSync(file, { encoding: "utf8" });
+  const content = execSync(`git show :${file}`, {
+    encoding: "utf8"
+  });
 
-  if (/["@]endeavour\/vue-library"\s*:\s*"?(?:file|link):/.test(content)) {
-    foundMatch = true;
-    break;
+  if (content.includes('"@endeavour/vue-library"') && content.includes("link:../VueLibrary")) {
+    console.error(
+      "\nLocal VueLibrary must be unlinked before committing.\nPlease use 'pnpm unlink' before committing either package.json or pnpm-lock.yaml.\n"
+    );
+    process.exit(1);
   }
-}
-
-if (foundMatch) {
-  console.error(
-    "\nLocal VueLibrary must be unlinked before committing.\nPlease use 'pnpm unlink' and/or make sure link: or file: overrides are removed from package.json before running 'pnpm install'.\n"
-  );
-  process.exit(1);
 }
 
 process.exit(0);

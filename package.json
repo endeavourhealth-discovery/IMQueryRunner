@@ -84,7 +84,6 @@
       "esbuild"
     ],
     "overrides": {
-      "@endeavour/vue-library": "link:../VueLibrary"
     }
   },
   "lint-staged": {
