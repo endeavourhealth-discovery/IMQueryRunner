@@ -1,24 +1,27 @@
-import { execSync } from "node:child_process";
+#!/usr/bin/env node
 
-const filesToCheck = ["package.json", "pnpm-lock.yaml"];
+import fs from "node:fs";
 
-for (const file of filesToCheck) {
-  try {
-    // Get the staged version of the file from the index
-    const content = execSync(`git show :${file}`, {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    });
+const files = ["package.json", "pnpm-lock.yaml"];
 
-    if (
-      /['"]@endeavour\/vue-library['"]\s*:\s*(?:file|link):/.test(content)
-    ) {
-      console.error(
-        `\n${file} contains a local @endeavour/vue-library dependency.\n`
-      );
-      process.exit(1);
-    }
-  } catch {
-    // File is not in the index (not tracked/staged), skip it
+let foundMatch = false;
+
+for (const file of files) {
+  if (!fs.existsSync(file)) continue;
+
+  const content = fs.readFileSync(file, { encoding: "utf8" });
+
+  if (/["@]endeavour\/vue-library"\s*:\s*"?(?:file|link):/.test(content)) {
+    foundMatch = true;
+    break;
   }
 }
+
+if (foundMatch) {
+  console.error(
+    "\nLocal VueLibrary must be unlinked before committing.\nPlease use 'pnpm unlink' and/or make sure link: or file: overrides are removed from package.json before running 'pnpm install'.\n"
+  );
+  process.exit(1);
+}
+
+process.exit(0);
