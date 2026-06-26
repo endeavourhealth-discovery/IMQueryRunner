@@ -154,6 +154,15 @@ export async function updateWithEndTime(id: number, table: MySqlTableWithColumns
     .where(eq(table.id, id));
 }
 
+export async function updateWithSQL(id: number, table: MySqlTableWithColumns<any>, sql: string) {
+  await mysqlDb
+    .update(table)
+    .set({
+      executedSQL: sql
+    })
+    .where(eq(table.id, id));
+}
+
 export function getToday() {
   return new Date().toISOString().slice(0, 10);
 }

@@ -10,7 +10,7 @@ import { type ResultSetHeader } from "mysql2";
 
 import { mysqlDb } from "../db/mysql";
 import { queryResultTable } from "../db/mysql/schema";
-import { createQueryResultEntry, getToday, updateJobStatus, updateWithEndTime } from "../helpers/mysqlHelper";
+import { createQueryResultEntry, getToday, updateJobStatus, updateWithEndTime, updateWithSQL } from "../helpers/mysqlHelper";
 import QueryService from "../services/QueryService";
 
 export async function executeQuery(sessionId: string, sql: string, queryRequest: QueryRequest, queryResultSet: QueryResultSet) {
@@ -43,6 +43,7 @@ export async function executeCohortQuery(resolvedSql: string, queryRequest: Quer
   try {
     await mysqlDb.execute<ResultSetHeader>(resolvedSql);
     await updateWithEndTime(queryResultId, queryResultTable);
+    await updateWithSQL(queryResultId, queryResultTable, resolvedSql);
   } catch (err: any) {
     if (err instanceof Error && err.cause instanceof Error) {
       if (err.cause.message && err.cause.message === "Query execution was interrupted") throw err;
@@ -68,6 +69,7 @@ export async function executeDatasetQuery(resolvedSql: string, queryResultId: nu
       }
     }
   }
+  await updateWithSQL(queryResultId, queryResultTable, resolvedSql);
   await updateWithEndTime(queryResultId, queryResultTable);
 }
 
