@@ -12,6 +12,9 @@
           <div v-if="editArguments && data.parameter === '$organisationId'">
             <OrganisationSelect v-model="data.valueDataList" />
           </div>
+          <div v-else-if="editArguments && data.parameter === '$patientId'">
+            <PatientFilter v-model="data.valueDataList" />
+          </div>
           <div v-else-if="editArguments && data.dataType && [XSD.STRING].includes(data.dataType?.iri)">
             <InputText type="text" v-model="data.valueData" data-testid="property-value-input" />
           </div>
@@ -51,6 +54,8 @@ import { type Argument, type ArgumentReference } from "@endeavour/vue-library/in
 import { cloneDeep } from "lodash-es";
 import Column from "primevue/column";
 
+import PatientFilter from "./PatientFilter.vue";
+
 interface Props {
   arguments: ArgumentReference[] | undefined;
   runOnConfirm?: boolean;
@@ -72,7 +77,7 @@ const emit = defineEmits<{
 const showDialog = defineModel<boolean>("showDialog");
 const allArgumentsValid: ComputedRef<boolean> = computed(() =>
   argumentList.value!.every(as => {
-    if (as.parameter === "$organisationId") return as.valueDataList && as.valueDataList.length > 0;
+    if (as.parameter === "$organisationId" || as.parameter === "$patientId") return as.valueDataList && as.valueDataList.length > 0;
     return !!as.valueData;
   })
 );
@@ -123,30 +128,45 @@ function resetArguments() {
 
 function confirmArguments() {
   submitting.value = true;
-  if (allArgumentsValid.value) {
+  try {
     const completedArguments: Argument[] = [];
-    if (argumentList.value) {
-      for (const argSelect of argumentList.value) {
-        const newArg: Argument = { parameter: argSelect.parameter };
-
-        if (argSelect.parameter === "$organisationId") {
-          newArg.valueDataList = Array.from(new Set(argSelect.valueDataList));
-        } else {
-          switch (argSelect.dataType?.iri) {
-            case XSD.STRING:
-            case XSD.BOOLEAN:
-            case IM.DATE:
-            case IM.DATE_TIME:
-            case IM.TIME:
-              newArg.valueData = argSelect.valueData;
-              newArg.dataType = argSelect.dataType;
-              break;
-          }
+    for (const argSelect of argumentList.value ?? []) {
+      if (!argSelect.parameter) continue;
+      const newArg: Argument = { parameter: argSelect.parameter };
+      if (["$organisationId", "$patientId"].includes(argSelect.parameter)) {
+        const cleanedList = (argSelect.valueDataList ?? []).map(value => value?.toString().trim()).filter((value): value is string => !!value);
+        const uniqueList = Array.from(new Set(cleanedList));
+        if (uniqueList.length > 0) {
+          newArg.valueDataList = uniqueList;
+          completedArguments.push(newArg);
         }
-        completedArguments.push(newArg);
+        continue;
+      }
+      switch (argSelect.dataType?.iri) {
+        case XSD.STRING:
+        case XSD.BOOLEAN:
+        case IM.DATE:
+        case IM.DATE_TIME:
+        case IM.TIME:
+          if (argSelect.valueData !== undefined && argSelect.valueData !== null && argSelect.valueData !== "") {
+            newArg.valueData = argSelect.valueData;
+            newArg.dataType = argSelect.dataType;
+            completedArguments.push(newArg);
+          }
+          break;
+        default:
+          if (argSelect.valueData !== undefined && argSelect.valueData !== null && argSelect.valueData !== "") {
+            newArg.valueData = argSelect.valueData;
+            if (argSelect.dataType) {
+              newArg.dataType = argSelect.dataType;
+            }
+            completedArguments.push(newArg);
+          }
+          break;
       }
     }
     emit("argumentsCompleted", completedArguments, props.runOnConfirm ?? false);
+  } finally {
     submitting.value = false;
   }
 }

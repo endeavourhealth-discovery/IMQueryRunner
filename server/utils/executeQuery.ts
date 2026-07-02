@@ -43,7 +43,6 @@ export async function executeCohortQuery(resolvedSql: string, queryRequest: Quer
   try {
     await mysqlDb.execute<ResultSetHeader>(resolvedSql);
     await updateWithEndTime(queryResultId, queryResultTable);
-    await updateWithSQL(queryResultId, queryResultTable, resolvedSql);
   } catch (err: any) {
     if (err instanceof Error && err.cause instanceof Error) {
       if (err.cause.message && err.cause.message === "Query execution was interrupted") throw err;
@@ -52,6 +51,7 @@ export async function executeCohortQuery(resolvedSql: string, queryRequest: Quer
       throw err;
     }
   }
+  await updateWithSQL(queryResultId, queryResultTable, resolvedSql);
 }
 
 export async function executeDatasetQuery(resolvedSql: string, queryResultId: number) {

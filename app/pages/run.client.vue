@@ -136,7 +136,7 @@ async function getArguments() {
   args.value = await QueryService.findMissingArguments({
     query: query
   } as QueryRequest);
-  args.value = [{ parameter: "$organisationId" } as ArgumentSelection];
+  args.value = [{ parameter: "$organisationId" } as ArgumentSelection, { parameter: "$patientId" } as ArgumentSelection];
   missingArgs.value = !!args.value.length;
 }
 

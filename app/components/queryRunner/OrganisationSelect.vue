@@ -15,7 +15,6 @@
 <script setup lang="ts">
 const props = defineProps<{
   modelValue: string | string[] | undefined;
-  multiple?: boolean;
 }>();
 
 const emit = defineEmits<{
