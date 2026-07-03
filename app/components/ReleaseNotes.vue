@@ -57,7 +57,7 @@ import { type Ref, nextTick, onMounted, ref } from "vue";
 
 import { REPO } from "@endeavour/vue-library";
 import { isObjectHasKeys } from "@endeavour/vue-library/helpers";
-import type { GithubRelease } from "@endeavour/vue-library/interfaces";
+import type { GithubRelease } from "@endeavour/vue-library/models";
 
 import { sanitizeUrl } from "@braintree/sanitize-url";
 
