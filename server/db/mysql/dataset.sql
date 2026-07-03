@@ -98,3 +98,13 @@ CREATE TABLE
 		entity_org_id BIGINT,
         FOREIGN KEY (query_result_id) REFERENCES query_result (id)
     );
+
+-- Indexes
+-- ALTER TABLE dataset.cohort_results DROP INDEX idx_cohort_query_entity;
+-- CREATE UNIQUE INDEX idx_cohort_query_entity ON dataset.cohort_results (query_result_id, entity_id);
+
+-- ALTER TABLE compass.episode_of_care DROP INDEX idx_registration_type_concept_id;
+-- CREATE INDEX idx_registration_type_concept_id ON compass.episode_of_care(registration_type_concept_id);
+
+-- ALTER TABLE compass.patient DROP INDEX idx_date_of_birth;
+-- CREATE INDEX idx_date_of_birth ON compass.patient(date_of_birth);
