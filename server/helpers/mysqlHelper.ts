@@ -67,17 +67,17 @@ export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error
       break;
     case JobStatus.ERRORED:
       set.finishDate = now;
-      set.error = error;
-      if (error) {
-        const parsedError = JSON.parse(error);
-        if (parsedError.cause?.sqlMessage === "Query execution was interrupted") {
-          set.status = JobStatus.CANCELLED;
-          console.info(parsedError.cause?.sqlMessage, `(Job ID: ${jobId} CANCELLED)`);
-        } else {
-          console.error(`Error executing query for job ID: ${jobId}`);
-          console.error(error);
-        }
-      }
+      set.error =
+        error instanceof Error
+          ? {
+              name: error.name,
+              message: error.message,
+              stack: error.stack,
+              cause: (error as any).cause ?? null
+            }
+          : typeof error === "string"
+            ? { message: error }
+            : (error as any);
       break;
     default:
       throw new Error(`Invalid job status: ${jobStatus}`);

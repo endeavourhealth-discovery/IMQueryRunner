@@ -39,38 +39,40 @@ export async function executeQuery(sessionId: string, sql: string, queryRequest:
 }
 
 export async function executeCohortQuery(resolvedSql: string, queryRequest: QueryRequest, queryResultId: number) {
-  // DEBUG: console.log("Executing cohort query:", resolvedSql);
   try {
-    await mysqlDb.execute<ResultSetHeader>(resolvedSql);
+    await mysqlDb.execute(resolvedSql);
     await updateWithEndTime(queryResultId, queryResultTable);
-  } catch (err: any) {
-    if (err instanceof Error && err.cause instanceof Error) {
-      if (err.cause.message && err.cause.message === "Query execution was interrupted") throw err;
-    } else {
-      console.error("Error executing query:", queryRequest.query.iri);
-      throw err;
-    }
+  } catch (err) {
+    console.error("Error executing query:", queryRequest.query.iri, err);
+    throw err;
+  } finally {
+    await updateWithSQL(queryResultId, queryResultTable, resolvedSql);
   }
-  await updateWithSQL(queryResultId, queryResultTable, resolvedSql);
 }
 
 export async function executeDatasetQuery(resolvedSql: string, queryResultId: number) {
-  const sqlParts = resolvedSql.split("----------------------------------------");
+  const sqlParts = resolvedSql
+    .split("----------------------------------------")
+    .map(part => part.trim())
+    .filter(Boolean);
+
   console.log("Dataset parts to run:", sqlParts.length);
-  for (const sqlPart of sqlParts) {
-    try {
-      await mysqlDb.execute<ResultSetHeader>(sqlPart);
-    } catch (err: any) {
-      if (err instanceof Error && err.cause instanceof Error) {
-        if (err.cause.message && err.cause.message === "Query execution was interrupted") throw err;
-      } else {
-        console.error("Error executing SQL part:", err.cause || err.message || err);
-        throw err;
-      }
+
+  let lastSql = resolvedSql;
+
+  try {
+    for (const sqlPart of sqlParts) {
+      lastSql = sqlPart;
+      await mysqlDb.execute(sqlPart);
     }
+
+    await updateWithEndTime(queryResultId, queryResultTable);
+  } catch (err) {
+    console.error("Error executing SQL part:", lastSql, err);
+    throw err;
+  } finally {
+    await updateWithSQL(queryResultId, queryResultTable, lastSql || resolvedSql);
   }
-  await updateWithSQL(queryResultId, queryResultTable, resolvedSql);
-  await updateWithEndTime(queryResultId, queryResultTable);
 }
 
 export function hashQueryRequest(queryRequest: QueryRequest): number {
@@ -218,16 +220,12 @@ function getIriLine(stringIris: string[]): string {
 }
 
 export async function getValidatedSQL(queryRequest: QueryRequest, sessionId: string, jobId: number): Promise<string> {
-  let sql: string | undefined = await QueryService.getQuerySql(sessionId, queryRequest).catch(async (err: Error) => {
-    await updateJobStatus(jobId, JobStatus.ERRORED, err);
-    return undefined;
-  });
+  const sql = await QueryService.getQuerySql(sessionId, queryRequest);
   if (!sql) {
-    throw new Error("Could generate SQL for query: " + queryRequest?.query?.iri + ", for job: " + jobId);
+    throw new Error("Could not generate SQL for query: " + queryRequest?.query?.iri + ", for job: " + jobId);
   }
   return sql;
 }
-
 export async function getIndicatorSubQueryRequests(
   session: string,
   queryRequest: QueryRequest,
