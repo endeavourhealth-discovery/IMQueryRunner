@@ -12,7 +12,7 @@ import type {
   Return,
   SearchResponse,
   TTEntity
-} from "@endeavour/vue-library/interfaces";
+} from "@endeavour/vue-library/models";
 
 const API_URL = "api/imapi/query";
 

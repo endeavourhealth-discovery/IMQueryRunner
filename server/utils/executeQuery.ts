@@ -1,8 +1,8 @@
 import { JobStatus } from "~~/enums";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
-import { IMQType } from "@endeavour/vue-library";
-import { type Argument, type QueryRequest, type SubQueryDependency } from "@endeavour/vue-library/interfaces";
+import { IMQType, QueryRequestSchema } from "@endeavour/vue-library";
+import { type Argument, type QueryRequest, type SubQueryDependency } from "@endeavour/vue-library/models";
 
 import { and, eq } from "drizzle-orm";
 import murmurhash from "murmurhash";
@@ -14,7 +14,7 @@ import { createQueryResultEntry, getToday, updateJobStatus, updateWithEndTime, u
 import QueryService from "../services/QueryService";
 
 export async function executeQuery(sessionId: string, sql: string, queryRequest: QueryRequest, queryResultSet: QueryResultSet) {
-  if (!queryRequest.query.iri) throw new Error("Query IRI is required for execution");
+  if (!queryRequest.query?.iri) throw new Error("Query IRI is required for execution");
   const queryIrisToQueryResultIds = {} as { [key: string]: number };
   const hashCodeVersion = hashQueryRequest(queryRequest);
   const existingQueryResultId = await getQueryResultIdIfExists(queryResultSet.id!, hashCodeVersion, queryRequest.query.iri);
@@ -34,7 +34,7 @@ export async function executeQuery(sessionId: string, sql: string, queryRequest:
       await executeCohortQuery(resolvedSql, queryRequest, queryResultId);
       break;
     default:
-      throw new Error("Unsupported query type: " + queryRequest.query.queryType);
+      throw new Error("Unsupported query type: " + queryRequest.query?.queryType);
   }
 }
 
@@ -43,7 +43,7 @@ export async function executeCohortQuery(resolvedSql: string, queryRequest: Quer
     await mysqlDb.execute(resolvedSql);
     await updateWithEndTime(queryResultId, queryResultTable);
   } catch (err) {
-    console.error("Error executing query:", queryRequest.query.iri, err);
+    console.error("Error executing query:", queryRequest.query?.iri, err);
     throw err;
   } finally {
     await updateWithSQL(queryResultId, queryResultTable, resolvedSql);
@@ -80,7 +80,7 @@ export function hashQueryRequest(queryRequest: QueryRequest): number {
   for (const arg of queryRequest.argument!) {
     argHash += hashArgument(arg);
   }
-  if (queryRequest.query.iri) argHash += queryRequest.query.iri;
+  if (queryRequest.query?.iri) argHash += queryRequest.query.iri;
   return murmurhash.v3(argHash);
 }
 
@@ -167,27 +167,33 @@ export async function isCached(hashCode: number, iri: string): Promise<boolean> 
 }
 
 async function runSubQueries(sessionId: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }, queryResultSet: QueryResultSet) {
-  const subQueries = await QueryService.getSubqueryIris(sessionId, queryRequest.query.iri!);
+  if (!queryRequest.query?.iri) throw new Error("Query iri is required");
+  const subQueries = await QueryService.getSubqueryIris(sessionId, queryRequest.query?.iri);
   console.log("Subqueries to run:", subQueries.length);
   if (subQueries.length)
     for (const subQuery of subQueries) {
       try {
-        const subQueryRequest = await QueryService.getQueryRequestForSQL(sessionId, {
-          query: { iri: subQuery.iri },
-          argument: queryRequest.argument
-        } as QueryRequest);
-        const hashCodeVersion = hashQueryRequest(subQueryRequest);
+        const subQueryRequest = await QueryService.getQueryRequestForSQL(
+          sessionId,
+          QueryRequestSchema.parse({
+            query: { iri: subQuery.iri },
+            argument: queryRequest.argument
+          })
+        );
+        if (subQueryRequest.query?.iri) {
+          const hashCodeVersion = hashQueryRequest(subQueryRequest);
+          if (!queryResultSet.id) throw new Error("Query result set id is required");
+          const existingQueryResultId = await getQueryResultIdIfExists(queryResultSet.id, hashCodeVersion, subQueryRequest.query.iri);
+          if (existingQueryResultId !== -1) {
+            queryIrisToHashCodes[subQuery.iri!] = existingQueryResultId;
+            continue;
+          }
 
-        const existingQueryResultId = await getQueryResultIdIfExists(queryResultSet.id!, hashCodeVersion, subQueryRequest.query.iri!);
-        if (existingQueryResultId !== -1) {
-          queryIrisToHashCodes[subQuery.iri!] = existingQueryResultId;
-          continue;
+          queryIrisToHashCodes[subQuery.iri!] = await createQueryResultEntry(subQueryRequest, queryResultSet, hashCodeVersion);
+          const subQuerySql = await QueryService.getQuerySql(sessionId, subQueryRequest);
+          const resolvedSql = await getResolvedSql(subQuerySql, subQueryRequest, queryIrisToHashCodes);
+          await executeCohortQuery(resolvedSql, subQueryRequest, queryIrisToHashCodes[subQuery.iri!]!);
         }
-
-        queryIrisToHashCodes[subQuery.iri!] = await createQueryResultEntry(subQueryRequest, queryResultSet, hashCodeVersion);
-        const subQuerySql = await QueryService.getQuerySql(sessionId, subQueryRequest);
-        const resolvedSql = await getResolvedSql(subQuerySql, subQueryRequest, queryIrisToHashCodes);
-        await executeCohortQuery(resolvedSql, subQueryRequest, queryIrisToHashCodes[subQuery.iri!]!);
       } catch (err: any) {
         console.error("Error running subquery sql:", subQuery.iri, "\nError:", err.message);
         throw err;
@@ -231,7 +237,7 @@ export async function getIndicatorSubQueryRequests(
   queryRequest: QueryRequest,
   jobId: number
 ): Promise<{ sql: string; queryRequest: QueryRequest }[]> {
-  if (!queryRequest.query.iri) throw new Error("Query IRI is required to get indicator subqueries");
+  if (!queryRequest.query?.iri) throw new Error("Query IRI is required to get indicator subqueries");
   const queriesToRun = [];
   const subqueries = await QueryService.getSubqueryIris(session, queryRequest.query.iri!, true);
   for (const subquery of subqueries) {

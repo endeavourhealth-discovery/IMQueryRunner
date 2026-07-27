@@ -106,6 +106,7 @@ export async function createResultSetEntry(queryRequest: any, job: Job): Promise
 }
 
 export async function createQueryResultEntry(queryRequest: QueryRequest, queryResultSet: QueryResultSet, hashCodeVersion: number, indicatorId?: number) {
+  if (!queryRequest.query?.queryType) throw new Error("Query must have queryType");
   switch (queryRequest.query.queryType) {
     case IMQType.COHORT:
     case IMQType.DATASET:
@@ -130,6 +131,7 @@ export async function createQueryResultEntry(queryRequest: QueryRequest, queryRe
 }
 
 export async function createIndicatorResultEntry(queryRequest: QueryRequest, queryResultSet: QueryResultSet, hashCodeVersion: number) {
+  if (!queryRequest.query?.iri) throw new Error("Query must have an iri");
   const indicatorResult = {
     startOfDaySnapshot: queryResultSet.startOfDaySnapshot,
     persistent: queryResultSet.persistent,
