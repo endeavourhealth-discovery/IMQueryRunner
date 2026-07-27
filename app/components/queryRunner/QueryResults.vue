@@ -7,12 +7,7 @@
         </div>
         <div v-if="executedSql" class="m-2">
           <Panel header="Executed SQL" :toggleable="true" :collapsed="true">
-            <div class="relative">
-              <pre class="cursor-pointer overflow-auto rounded bg-gray-900 p-4 text-sm text-green-400" title="Click to copy" @click="copyToClipboard">{{
-                executedSql
-              }}</pre>
-              <span v-if="copied" class="absolute right-2 top-2 rounded bg-green-600 px-2 py-1 text-xs text-white">Copied!</span>
-            </div>
+            <SQLViewer :sql="executedSql" />
           </Panel>
         </div>
         <DataTable
@@ -64,6 +59,8 @@ import { onMounted, ref } from "vue";
 import { useUserStore } from "@endeavour/vue-library/stores";
 
 import { isArray } from "lodash-es";
+
+import SQLViewer from "./SQLViewer.vue";
 
 interface Props {
   jobId: string | string[] | undefined;
@@ -175,15 +172,6 @@ async function getExecutedSql() {
       executedSql.value = value.executedSQL;
     }
   }
-}
-
-const copied = ref(false);
-
-async function copyToClipboard() {
-  if (!executedSql.value) return;
-  await navigator.clipboard.writeText(executedSql.value);
-  copied.value = true;
-  setTimeout(() => (copied.value = false), 2000);
 }
 </script>
 

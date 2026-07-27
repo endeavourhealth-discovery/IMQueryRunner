@@ -54,8 +54,9 @@
   </div>
   <Dialog v-model:visible="showErrorDialog" modal maximizable header="Error details">
     <div v-if="job.error.cause">
-      <div>SQL query: {{ job.error.cause.sql }}</div>
-      <div>SQL Message: {{ job.error.cause.sqlMessage }}</div>
+      <div>SQL Error: {{ job.error.cause.sqlMessage }}</div>
+      <div>SQL Query:</div>
+      <SQLViewer v-if="job.error.cause.sql" :sql="job.error.cause.sql" />
     </div>
 
     <div v-else>{{ job.error }}</div>
@@ -76,6 +77,8 @@ import type { Job } from "~~/models";
 import { ref } from "vue";
 
 import { useConfirm } from "primevue/useconfirm";
+
+import SQLViewer from "./SQLViewer.vue";
 
 interface Props {
   job: Job;
