@@ -7,8 +7,6 @@ import {
   IMLLanguageSchema,
   type Indicator,
   IndicatorSchema,
-  type Match,
-  MatchSchema,
   type PathDocument,
   PathDocumentSchema,
   type PathQuery,
@@ -25,7 +23,6 @@ import {
   type SubQueryDependency,
   SubQueryDependencySchema,
   type TTEntity,
-  isMatch,
   isQuery
 } from "@endeavour/vue-library/models";
 
@@ -48,15 +45,13 @@ const QueryService = {
     return QueryResponseSchema.parse(result);
   },
 
-  async flattenBooleans(sessionId: string, query: Query | Match): Promise<Query | Match> {
+  async flattenBooleans(sessionId: string, query: Query): Promise<Query> {
     const result = await $fetch(API_URL + "/flattenBooleans", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
       method: "POST"
     });
-    if (isQuery(result)) return QuerySchema.parse(result);
-    if (isMatch(result)) return MatchSchema.parse(result);
-    else throw new Error("Must be Match or Query");
+    return QuerySchema.parse(result);
   },
 
   async optimiseECLQuery(sessionId: string, query: Query): Promise<Query> {
@@ -211,7 +206,7 @@ const QueryService = {
     return QuerySchema.parse(result);
   },
 
-  async getNestedReturns(sessionId: string, match: Match): Promise<Return[]> {
+  async getNestedReturns(sessionId: string, match: Query): Promise<Return[]> {
     const result = await $fetch(API_URL + "/nestedReturns", {
       headers: { cookie: `session_id=${sessionId}` },
       body: { match: match },
