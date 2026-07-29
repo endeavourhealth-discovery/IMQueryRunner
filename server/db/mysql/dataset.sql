@@ -14,6 +14,8 @@ DROP TABLE IF EXISTS dataset.query_result_set;
 
 DROP TABLE IF EXISTS dataset.job;
 
+DROP TABLE IF EXISTS dataset.patient_exists;
+
 CREATE TABLE
     job (
         id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -98,6 +100,14 @@ CREATE TABLE
 		entity_org_id BIGINT,
         FOREIGN KEY (query_result_id) REFERENCES query_result (id)
     );
+    
+CREATE TABLE patient_exists (
+    query_iri VARCHAR(512) NOT NULL,
+    patient_id VARCHAR(64) NOT NULL,
+    step_no INT NOT NULL,
+    cte_name VARCHAR(128) NOT NULL,
+    patient_found TINYINT NOT NULL
+);
 
 -- Indexes
 -- ALTER TABLE dataset.cohort_results DROP INDEX idx_cohort_query_entity;

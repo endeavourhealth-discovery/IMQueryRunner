@@ -81,6 +81,14 @@ export const cohortResultsTable = dataset.table("cohort_results", {
   entityOrgId: int("entity_org_id").notNull()
 });
 
+export const patientExistsTable = dataset.table("patient_exists", {
+  queryIri: varchar("query_iri", { length: 512 }).notNull(),
+  patientId: varchar("patient_id", { length: 64 }).notNull(),
+  stepNo: int("step_no").notNull(),
+  cteName: varchar("cte_name", { length: 128 }).notNull(),
+  patientFound: tinyint("patient_found").notNull()
+});
+
 export const allergyIntolerance = compass.table("allergy_intolerance", {
   id: bigint({ mode: "number" }).notNull().primaryKey(),
   organizationId: bigint("organization_id", { mode: "number" }).notNull(),
