@@ -139,7 +139,8 @@ async function getArguments() {
   args.value = [
     { parameter: "$organisationId" } as ArgumentSelection,
     { parameter: "$patientId" } as ArgumentSelection,
-    { parameter: "$debugPatientId" } as ArgumentSelection
+    { parameter: "$debugPatientId" } as ArgumentSelection,
+    { parameter: "$searchDate" } as ArgumentSelection
   ];
   missingArgs.value = !!args.value.length;
 }
