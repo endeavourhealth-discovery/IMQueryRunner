@@ -1,5 +1,5 @@
 import { NAMESPACE } from "@endeavour/vue-library/enums";
-import type { ExtendedTTEntity, TTDocument } from "@endeavour/vue-library/interfaces";
+import type { TTDocument, TTEntity } from "@endeavour/vue-library/models";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}/filer/private`;
 
@@ -49,7 +49,7 @@ const FilerService = {
     });
   },
 
-  async fileEntity(sessionId: string, entity: ExtendedTTEntity, namespace: NAMESPACE, crud: string): Promise<void> {
+  async fileEntity(sessionId: string, entity: TTEntity, namespace: NAMESPACE, crud: string): Promise<void> {
     return await $fetch<void>(API_URL + "/file/entity", {
       headers: { cookie: `session_id=${sessionId}` },
       body: { entity: entity, namespace: namespace, crud: crud },

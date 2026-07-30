@@ -2,24 +2,25 @@ import { ref } from "vue";
 
 import { localStorageWithExpiry } from "@endeavour/vue-library";
 
+import { isString } from "lodash-es";
 import { defineStore } from "pinia";
 
 export const useSharedStore = defineStore("shared", () => {
   const showReleaseNotes = ref<boolean>(false);
   const showReleaseBanner = ref<boolean | null>(
     import.meta.client
-      ? localStorageWithExpiry.getItem("showQRReleaseBanner") === "true"
+      ? localStorageWithExpiry.getItem("showQRReleaseBanner", isString) === "true"
         ? true
-        : localStorageWithExpiry.getItem("showQRReleaseBanner") === "false"
+        : localStorageWithExpiry.getItem("showQRReleaseBanner", isString) === "false"
           ? false
           : null
       : null
   );
   const showDevBanner = ref<boolean | null>(
     import.meta.client
-      ? localStorageWithExpiry.getItem("showQRDevBanner") === "true"
+      ? localStorageWithExpiry.getItem("showQRDevBanner", isString) === "true"
         ? true
-        : localStorageWithExpiry.getItem("showQRDevBanner") === "false"
+        : localStorageWithExpiry.getItem("showQRDevBanner", isString) === "false"
           ? false
           : null
       : null

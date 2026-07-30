@@ -76,7 +76,7 @@ import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
 
 import { useUserStore } from "@endeavour/vue-library";
-import type { Argument } from "@endeavour/vue-library/interfaces";
+import type { Argument } from "@endeavour/vue-library/models";
 
 import { io } from "socket.io-client";
 

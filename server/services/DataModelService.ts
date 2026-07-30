@@ -1,10 +1,11 @@
-import type { NodeShape, PropertyDisplay, TTIriRef, UIProperty } from "@endeavour/vue-library/interfaces";
+import { PropertyDisplaySchema, TTIriRefSchema, UIPropertySchema, parseArray } from "@endeavour/vue-library";
+import { type NodeShape, NodeShapeSchema, type PropertyDisplay, type TTIriRef, type UIProperty } from "@endeavour/vue-library/models";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}dataModel/protected`;
 
 const DataModelService = {
   async getDataModelProperties(sessionId: string, iri: string, pathsOnly?: boolean): Promise<NodeShape> {
-    return await $fetch<NodeShape>(API_URL + "/dataModelProperties", {
+    const result = await $fetch(API_URL + "/dataModelProperties", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -12,9 +13,10 @@ const DataModelService = {
       },
       method: "GET"
     });
+    return NodeShapeSchema.parse(result);
   },
   async getDataModelPropertiesWithValueType(sessionId: string, iris: string[], valueType: string): Promise<NodeShape[]> {
-    return await $fetch<NodeShape[]>(API_URL + "/dataModelPropertiesWithValueType", {
+    const result = await $fetch(API_URL + "/dataModelPropertiesWithValueType", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iris: iris.join(","),
@@ -22,15 +24,17 @@ const DataModelService = {
       },
       method: "GET"
     });
+    return parseArray(result, NodeShapeSchema);
   },
   async getDataModelsFromProperty(sessionId: string, propIri: string): Promise<TTIriRef[]> {
-    return await $fetch<TTIriRef[]>(API_URL + "/dataModels", {
+    const result = await $fetch(API_URL + "/dataModels", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         propIri: propIri
       },
       method: "GET"
     });
+    return parseArray(result, TTIriRefSchema);
   },
   async checkPropertyType(sessionId: string, iri: string): Promise<string> {
     return await $fetch<string>(API_URL + "/checkPropertyType", {
@@ -41,19 +45,21 @@ const DataModelService = {
   },
 
   async getUIProperty(sessionId: string, dmIri: string, propIri: string): Promise<UIProperty> {
-    return await $fetch<UIProperty>(API_URL + "/UIPropertyForQB", {
+    const result = await $fetch(API_URL + "/UIPropertyForQB", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { dmIri: dmIri, propIri: propIri },
       method: "GET"
     });
+    return UIPropertySchema.parse(result);
   },
 
   async getPropertiesDisplay(sessionId: string, iri: string): Promise<PropertyDisplay[]> {
-    return await $fetch<PropertyDisplay[]>(API_URL + "/propertiesDisplay", {
+    const result = await $fetch(API_URL + "/propertiesDisplay", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri },
       method: "GET"
     });
+    return parseArray(result, PropertyDisplaySchema);
   }
 };
 if (process.env.NODE_ENV !== "test") Object.freeze(DataModelService);

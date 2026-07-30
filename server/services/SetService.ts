@@ -1,4 +1,16 @@
-import type { ECLQueryRequest, Node, Pageable, Query, SetDiffObject, SetExportRequest, TTEntity, TTIriRef } from "@endeavour/vue-library/interfaces";
+import { SetDiffObjectSchema, TTIriRefSchema, parseArray } from "@endeavour/vue-library";
+import {
+  type ECLQueryRequest,
+  type Node,
+  type Pageable,
+  type PageableNode,
+  PageableNodeSchema,
+  type Query,
+  type SetDiffObject,
+  type SetExportRequest,
+  type TTEntity,
+  type TTIriRef
+} from "@endeavour/vue-library/models";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}set`;
 
@@ -19,8 +31,8 @@ const SetService = {
       method: "GET"
     });
   },
-  async getMembers(sessionId: string, iri: string, entailments: boolean, pageIndex: number, pageSize: number): Promise<Pageable<Node>> {
-    return await $fetch<Pageable<Node>>(API_URL + "/protected/members", {
+  async getMembers(sessionId: string, iri: string, entailments: boolean, pageIndex: number, pageSize: number): Promise<PageableNode> {
+    const result = await $fetch(API_URL + "/protected/members", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -30,29 +42,32 @@ const SetService = {
       },
       method: "GET"
     });
+    return PageableNodeSchema.parse(result);
   },
 
-  async getMembersFromQuery(sessionId: string, query: Query, pageIndex: number, pageSize: number): Promise<Pageable<Node>> {
+  async getMembersFromQuery(sessionId: string, query: Query, pageIndex: number, pageSize: number): Promise<PageableNode> {
     const request = {
       query: query,
       page: pageIndex,
       size: pageSize
     } as ECLQueryRequest;
-    return await $fetch<Pageable<Node>>(API_URL + "/protected/membersFromQuery", {
+    const result = await $fetch(API_URL + "/protected/membersFromQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: request,
       method: "POST"
     });
+    return PageableNodeSchema.parse(result);
   },
 
   async getSubsets(sessionId: string, iri: string): Promise<TTIriRef[]> {
-    return await $fetch<TTIriRef[]>(API_URL + "/protected/subsets", {
+    const result = await $fetch<TTIriRef[]>(API_URL + "/protected/subsets", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri
       },
       method: "GET"
     });
+    return parseArray(result, TTIriRefSchema);
   },
 
   async getFullExportSet(sessionId: string, setRequest: SetExportRequest): Promise<Blob> {
@@ -65,7 +80,7 @@ const SetService = {
   },
 
   async getSetComparison(sessionId: string, iriA?: string, iriB?: string): Promise<SetDiffObject> {
-    return await $fetch<SetDiffObject>(API_URL + "/protected/setDiff", {
+    const result = await $fetch(API_URL + "/protected/setDiff", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         setIriA: iriA,
@@ -73,6 +88,7 @@ const SetService = {
       },
       method: "GET"
     });
+    return SetDiffObjectSchema.parse(result);
   },
 
   async updateSubsetsFromSuper(sessionId: string, entity: TTEntity): Promise<void> {

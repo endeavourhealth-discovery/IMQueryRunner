@@ -1,4 +1,4 @@
-import type { QueryRequest } from "@endeavour/vue-library/interfaces";
+import type { QueryRequest } from "@endeavour/vue-library/models";
 
 export interface RabbitMessage {
   data: QueryRequest;
