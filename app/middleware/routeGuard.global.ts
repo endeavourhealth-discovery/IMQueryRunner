@@ -5,7 +5,7 @@ import { isArray } from "lodash-es";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { requiresAuth, requiresRole } = to.meta;
-  const userStore = useUserStore();
+  const userStore = useUserStore(usePinia());
 
   if (requiresAuth || (isArray(requiresRole) && requiresRole.length > 0)) {
     if (!userStore.isLoggedIn) {

@@ -9,23 +9,35 @@ import murmurhash from "murmurhash";
 import { type ResultSetHeader } from "mysql2";
 
 import { mysqlDb } from "../db/mysql";
-import { queryResultTable } from "../db/mysql/schema";
+import { patientExistsTable, queryResultTable } from "../db/mysql/schema";
 import { createQueryResultEntry, getToday, updateJobStatus, updateWithEndTime, updateWithSQL } from "../helpers/mysqlHelper";
 import QueryService from "../services/QueryService";
 
 export async function executeQuery(sessionId: string, sql: string, queryRequest: QueryRequest, queryResultSet: QueryResultSet) {
   if (!queryRequest.query?.iri) throw new Error("Query IRI is required for execution");
-  const queryIrisToQueryResultIds = {} as { [key: string]: number };
   const hashCodeVersion = hashQueryRequest(queryRequest);
   const existingQueryResultId = await getQueryResultIdIfExists(queryResultSet.id!, hashCodeVersion, queryRequest.query.iri);
   if (existingQueryResultId !== -1) return;
 
   const queryResultId = await createQueryResultEntry(queryRequest, queryResultSet, hashCodeVersion);
-  queryIrisToQueryResultIds[queryRequest.query.iri] = queryResultId;
+
+  const debugPatientId = getDebugPatientId(queryRequest);
+
+  // Debug SQL still needs subquery IRIs resolved to their query_result_id (it joins against
+  // cohort_results for them), but unlike normal SQL it writes its own query IRI as a literal
+  // output value, not as a query_result_id join key - so it must NOT be added to the map below.
+  const queryIrisToQueryResultIds = {} as { [key: string]: number };
+  if (!debugPatientId) queryIrisToQueryResultIds[queryRequest.query.iri] = queryResultId;
 
   await runSubQueries(sessionId, queryRequest, queryIrisToQueryResultIds, queryResultSet);
 
   const resolvedSql = await getResolvedSql(sql, queryRequest, queryIrisToQueryResultIds);
+
+  if (debugPatientId) {
+    await executeDebugQuery(resolvedSql, queryRequest.query.iri, debugPatientId, queryResultId);
+    return;
+  }
+
   switch (queryRequest.query.queryType) {
     case IMQType.DATASET:
       await executeDatasetQuery(resolvedSql, queryResultId);
@@ -35,6 +47,23 @@ export async function executeQuery(sessionId: string, sql: string, queryRequest:
       break;
     default:
       throw new Error("Unsupported query type: " + queryRequest.query?.queryType);
+  }
+}
+
+export function getDebugPatientId(queryRequest: QueryRequest): string | undefined {
+  return queryRequest.argument?.find(arg => arg.parameter === "$debugPatientId")?.valueData;
+}
+
+export async function executeDebugQuery(resolvedSql: string, queryIri: string, patientId: string, queryResultId: number) {
+  try {
+    await mysqlDb.delete(patientExistsTable).where(and(eq(patientExistsTable.queryIri, queryIri), eq(patientExistsTable.patientId, patientId)));
+    await mysqlDb.execute(resolvedSql);
+    await updateWithEndTime(queryResultId, queryResultTable);
+  } catch (err) {
+    console.error("Error executing debug query:", queryIri, err);
+    throw err;
+  } finally {
+    await updateWithSQL(queryResultId, queryResultTable, resolvedSql);
   }
 }
 
@@ -201,7 +230,7 @@ async function runSubQueries(sessionId: string, queryRequest: QueryRequest, quer
     }
 }
 
-async function getResolvedSql(sql: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }) {
+function getResolvedArguments(sql: string, queryRequest: QueryRequest) {
   if (queryRequest.argument) {
     for (const arg of queryRequest.argument) {
       if (arg.valueData && arg.parameter) sql = sql.replaceAll(arg.parameter, `'${arg.valueData}'`);
@@ -210,6 +239,11 @@ async function getResolvedSql(sql: string, queryRequest: QueryRequest, queryIris
       else if (arg.valueDataList && arg.parameter) sql = sql.replaceAll(arg.parameter, `(${arg.valueDataList.map(v => `'${v}'`).join(", ")})`);
     }
   }
+  return sql;
+}
+
+async function getResolvedSql(sql: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }) {
+  sql = getResolvedArguments(sql, queryRequest);
   if (Object.keys(queryIrisToHashCodes).length > 0) {
     for (const iri of Object.keys(queryIrisToHashCodes)) {
       sql = sql.replaceAll(iri, "" + queryIrisToHashCodes[iri]);
@@ -226,11 +260,16 @@ function getIriLine(stringIris: string[]): string {
 }
 
 export async function getValidatedSQL(queryRequest: QueryRequest, sessionId: string, jobId: number): Promise<string> {
-  const sql = await QueryService.getQuerySql(sessionId, queryRequest);
-  if (!sql) {
-    throw new Error("Could not generate SQL for query: " + queryRequest?.query?.iri + ", for job: " + jobId);
-  }
-  return sql;
+  const debugPatientId = getDebugPatientId(queryRequest);
+  if (queryRequest.query?.iri) {
+    const sql = debugPatientId
+      ? await QueryService.getQuerySqlDebug(sessionId, queryRequest.query.iri, debugPatientId)
+      : await QueryService.getQuerySql(sessionId, queryRequest);
+    if (!sql) {
+      throw new Error("Could not generate SQL for query: " + queryRequest.query.iri + ", for job: " + jobId);
+    }
+    return sql;
+  } else throw new Error("Query request must have a query with an iri");
 }
 export async function getIndicatorSubQueryRequests(
   session: string,

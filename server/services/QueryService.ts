@@ -36,6 +36,14 @@ const QueryService = {
       method: "POST"
     })) as any;
   },
+
+  async getQuerySqlDebug(sessionId: string, queryIri: string, patientId: string): Promise<string> {
+    return await $fetch<string>(API_URL + "/sqlDebug", {
+      headers: { cookie: `session_id=${sessionId}` },
+      params: { queryIri, patientId },
+      method: "GET"
+    });
+  },
   async queryIM(sessionId: string, query: QueryRequest): Promise<QueryResponse> {
     const result = await $fetch(API_URL + "/queryIM", {
       headers: { cookie: `session_id=${sessionId}` },

@@ -15,6 +15,9 @@
           <div v-else-if="editArguments && data.parameter === '$patientId'">
             <PatientFilter v-model="data.valueDataList" />
           </div>
+          <div v-else-if="editArguments && data.parameter === '$debugPatientId'">
+            <InputText type="text" v-model="data.valueData" placeholder="Debug patient ID" data-testid="debug-patient-id-input" />
+          </div>
           <div v-else-if="editArguments && data.dataType && [XSD.STRING].includes(data.dataType?.iri)">
             <InputText type="text" v-model="data.valueData" data-testid="property-value-input" />
           </div>
@@ -78,6 +81,7 @@ const showDialog = defineModel<boolean>("showDialog");
 const allArgumentsValid: ComputedRef<boolean> = computed(() =>
   argumentList.value!.every(as => {
     if (as.parameter === "$organisationId" || as.parameter === "$patientId") return as.valueDataList && as.valueDataList.length > 0;
+    if (as.parameter === "$debugPatientId") return !as.valueData || /^\d+$/.test(as.valueData.toString().trim());
     return !!as.valueData;
   })
 );
@@ -133,6 +137,14 @@ function confirmArguments() {
     for (const argSelect of argumentList.value ?? []) {
       if (!argSelect.parameter) continue;
       const newArg: Argument = { parameter: argSelect.parameter };
+      if (argSelect.parameter === "$debugPatientId") {
+        const cleaned = argSelect.valueData?.toString().trim();
+        if (cleaned) {
+          newArg.valueData = cleaned;
+          completedArguments.push(newArg);
+        }
+        continue;
+      }
       if (["$organisationId", "$patientId"].includes(argSelect.parameter)) {
         const cleanedList = (argSelect.valueDataList ?? []).map(value => value?.toString().trim()).filter((value): value is string => !!value);
         const uniqueList = Array.from(new Set(cleanedList));
