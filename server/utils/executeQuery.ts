@@ -9,7 +9,7 @@ import murmurhash from "murmurhash";
 import { type ResultSetHeader } from "mysql2";
 
 import { mysqlDb } from "../db/mysql";
-import { patientExistsTable, queryResultTable } from "../db/mysql/schema";
+import { patientExistsTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
 import { createQueryResultEntry, getToday, updateJobStatus, updateWithEndTime, updateWithSQL } from "../helpers/mysqlHelper";
 import QueryService from "../services/QueryService";
 
@@ -23,9 +23,6 @@ export async function executeQuery(sessionId: string, sql: string, queryRequest:
 
   const debugPatientId = getDebugPatientId(queryRequest);
 
-  // Debug SQL still needs subquery IRIs resolved to their query_result_id (it joins against
-  // cohort_results for them), but unlike normal SQL it writes its own query IRI as a literal
-  // output value, not as a query_result_id join key - so it must NOT be added to the map below.
   const queryIrisToQueryResultIds = {} as { [key: string]: number };
   if (!debugPatientId) queryIrisToQueryResultIds[queryRequest.query.iri] = queryResultId;
 
@@ -106,7 +103,8 @@ export async function executeDatasetQuery(resolvedSql: string, queryResultId: nu
 
 export function hashQueryRequest(queryRequest: QueryRequest): number {
   let argHash = "";
-  for (const arg of queryRequest.argument!) {
+  const sortedArguments = [...queryRequest.argument!].sort((a, b) => (a.parameter ?? "").localeCompare(b.parameter ?? ""));
+  for (const arg of sortedArguments) {
     argHash += hashArgument(arg);
   }
   if (queryRequest.query.iri) argHash += queryRequest.query.iri;
@@ -156,9 +154,20 @@ export async function getQueryResultIdIfExists(resultSetId: number, hashCodeVers
   const results = await mysqlDb
     .select()
     .from(queryResultTable)
-    .where(and(eq(queryResultTable.id, resultSetId), eq(queryResultTable.version, hashCodeVersion), eq(queryResultTable.queryIri, iri)));
+    .where(and(eq(queryResultTable.queryResultSetId, resultSetId), eq(queryResultTable.version, hashCodeVersion), eq(queryResultTable.queryIri, iri)));
   const result = results[0];
   console.log(`Cache context check (${!!result}): ${resultSetId} with hash: ${hashCodeVersion}, iri: ${iri}.`);
+  return result ? result.id! : -1;
+}
+
+export async function getQueryResultIdIfExistsInJob(jobId: number, hashCodeVersion: number, iri: string): Promise<number> {
+  const results = await mysqlDb
+    .select({ id: queryResultTable.id })
+    .from(queryResultTable)
+    .innerJoin(queryResultSetTable, eq(queryResultTable.queryResultSetId, queryResultSetTable.id))
+    .where(and(eq(queryResultSetTable.jobId, jobId), eq(queryResultTable.version, hashCodeVersion), eq(queryResultTable.queryIri, iri)));
+  const result = results[0];
+  console.log(`Job cache context check (${!!result}): job ${jobId} with hash: ${hashCodeVersion}, iri: ${iri}.`);
   return result ? result.id! : -1;
 }
 
@@ -207,7 +216,7 @@ async function runSubQueries(sessionId: string, queryRequest: QueryRequest, quer
         } as QueryRequest);
         const hashCodeVersion = hashQueryRequest(subQueryRequest);
 
-        const existingQueryResultId = await getQueryResultIdIfExists(queryResultSet.id!, hashCodeVersion, subQueryRequest.query.iri!);
+        const existingQueryResultId = await getQueryResultIdIfExistsInJob(queryResultSet.jobId, hashCodeVersion, subQueryRequest.query.iri!);
         if (existingQueryResultId !== -1) {
           queryIrisToHashCodes[subQuery.iri!] = existingQueryResultId;
           continue;
