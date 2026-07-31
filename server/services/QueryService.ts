@@ -1,17 +1,29 @@
 import { DisplayMode } from "@endeavour/vue-library/enums";
-import { isArrayHasLength, isObjectHasKeys } from "@endeavour/vue-library/helpers";
-import type {
-  ArgumentReference,
-  IMLLanguage,
-  Indicator,
-  PathQuery,
-  Query,
-  QueryRequest,
-  QueryResponse,
-  Return,
-  SearchResponse,
-  SubQueryDependency,
-  TTEntity
+import { isArrayHasLength, isObjectHasKeys, parseArray } from "@endeavour/vue-library/helpers";
+import {
+  type ArgumentReference,
+  ArgumentReferenceSchema,
+  type IMLLanguage,
+  IMLLanguageSchema,
+  type Indicator,
+  IndicatorSchema,
+  type PathDocument,
+  PathDocumentSchema,
+  type PathQuery,
+  type Query,
+  type QueryRequest,
+  QueryRequestSchema,
+  type QueryResponse,
+  QueryResponseSchema,
+  QuerySchema,
+  type Return,
+  ReturnSchema,
+  type SearchResponse,
+  SearchResponseSchema,
+  type SubQueryDependency,
+  SubQueryDependencySchema,
+  type TTEntity,
+  isQuery
 } from "@endeavour/vue-library/models";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}query/protected`;
@@ -33,43 +45,48 @@ const QueryService = {
     });
   },
   async queryIM(sessionId: string, query: QueryRequest): Promise<QueryResponse> {
-    return await $fetch<QueryResponse>(API_URL + "/queryIM", {
+    const result = await $fetch(API_URL + "/queryIM", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
       method: "POST"
     });
+    return QueryResponseSchema.parse(result);
   },
 
   async flattenBooleans(sessionId: string, query: Query): Promise<Query> {
-    return await $fetch<Query>(API_URL + "/flattenBooleans", {
+    const result = await $fetch(API_URL + "/flattenBooleans", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
       method: "POST"
     });
+    return QuerySchema.parse(result);
   },
 
   async optimiseECLQuery(sessionId: string, query: Query): Promise<Query> {
-    return await $fetch<Query>(API_URL + "/optimiseECLQuery", {
+    const result = await $fetch(API_URL + "/optimiseECLQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
       method: "POST"
     });
+    return QuerySchema.parse(result);
   },
 
   async queryIMSearch(sessionId: string, queryRequest: QueryRequest): Promise<SearchResponse> {
-    return await $fetch<SearchResponse>(API_URL + "/queryIMSearch", {
+    const result = await $fetch(API_URL + "/queryIMSearch", {
       headers: { cookie: `session_id=${sessionId}` },
       body: queryRequest,
       method: "POST"
     });
+    return SearchResponseSchema.parse(result);
   },
 
-  async pathQuery(sessionId: string, pathQuery: PathQuery): Promise<{ match: Query[] }> {
-    return await $fetch<{ match: Query[] }>(API_URL + "/pathQuery", {
+  async pathQuery(sessionId: string, pathQuery: PathQuery): Promise<PathDocument> {
+    const result = await $fetch(API_URL + "/pathQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: pathQuery,
       method: "POST"
     });
+    return PathDocumentSchema.parse(result);
   },
 
   async askQuery(sessionId: string, query: QueryRequest): Promise<boolean> {
@@ -81,39 +98,43 @@ const QueryService = {
   },
 
   async getQueryDisplayFromQuery(sessionId: string, query: Query, displayMode: DisplayMode): Promise<Query> {
-    return await $fetch<Query>(API_URL + "/queryDisplayFromQuery", {
+    const result = await $fetch(API_URL + "/queryDisplayFromQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: { query: query, displayMode: displayMode },
       method: "POST"
     });
+    return QuerySchema.parse(result);
   },
 
   async getDisplayFromQueryIri(sessionId: string, iri: string, displayMode: DisplayMode): Promise<Query> {
-    return await $fetch<Query>(API_URL + "/queryDisplay", {
+    const result = await $fetch(API_URL + "/queryDisplay", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { queryIri: iri, displayMode: displayMode },
       method: "GET"
     });
+    return QuerySchema.parse(result);
   },
 
   async getQueryFromIri(sessionId: string, iri: string): Promise<Query> {
-    return await $fetch<Query>(API_URL + "/queryFromIri", {
+    const result = await $fetch(API_URL + "/queryFromIri", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { queryIri: iri },
       method: "GET"
     });
+    return QuerySchema.parse(result);
   },
 
   async getDisplayFromIndicatorIri(sessionId: string, iri: string): Promise<Indicator> {
-    return await $fetch<Indicator>(API_URL + "/indicatorDisplay", {
+    const result = await $fetch<Indicator>(API_URL + "/indicatorDisplay", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { queryIri: iri },
       method: "GET"
     });
+    return IndicatorSchema.parse(result);
   },
 
   async expandCohort(sessionId: string, queryIri: string, cohortIri: string, displayMode: DisplayMode): Promise<Query> {
-    return await $fetch<Query>(API_URL + "/expandCohort", {
+    const result = await $fetch(API_URL + "/expandCohort", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         queryIri: queryIri,
@@ -122,13 +143,15 @@ const QueryService = {
       },
       method: "GET"
     });
+    return QuerySchema.parse(result);
   },
 
   async getDefaultQuery(sessionId: string): Promise<Query> {
-    return await $fetch<Query>(API_URL + "/defaultQuery", {
+    const result = await $fetch(API_URL + "/defaultQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       method: "GET"
     });
+    return QuerySchema.parse(result);
   },
 
   async generateQuerySQL(sessionId: string, queryIri: string, lang?: string): Promise<string> {
@@ -140,11 +163,12 @@ const QueryService = {
   },
 
   async generateQueryIML(sessionId: string, queryIri: string): Promise<IMLLanguage> {
-    return await $fetch<IMLLanguage>(API_URL + "/imlFromIri", {
+    const result = await $fetch(API_URL + "/imlFromIri", {
       headers: { cookie: `session_id=${sessionId}` },
       params: { queryIri: queryIri },
       method: "GET"
     });
+    return IMLLanguageSchema.parse(result);
   },
 
   async generateQuerySQLfromQuery(sessionId: string, queryRequest: QueryRequest): Promise<string> {
@@ -173,31 +197,34 @@ const QueryService = {
   },
 
   async findMissingArguments(sessionId: string, queryRequest: QueryRequest): Promise<ArgumentReference[]> {
-    return $fetch<ArgumentReference[]>(API_URL + "/findRequestMissingArguments", {
+    const result = $fetch(API_URL + "/findRequestMissingArguments", {
       headers: { cookie: `session_id=${sessionId}` },
       body: queryRequest,
       method: "POST"
     });
+    return parseArray(result, ArgumentReferenceSchema);
   },
 
   async validateQuery(sessionId: string, query: Query): Promise<Query> {
-    return await $fetch<Query>(API_URL + "/validateQuery", {
+    const result = await $fetch(API_URL + "/validateQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
       method: "POST"
     });
+    return QuerySchema.parse(result);
   },
 
   async getNestedReturns(sessionId: string, match: Query): Promise<Return[]> {
-    return await $fetch<Return[]>(API_URL + "/nestedReturns", {
+    const result = await $fetch(API_URL + "/nestedReturns", {
       headers: { cookie: `session_id=${sessionId}` },
       body: { match: match },
       method: "POST"
     });
+    return parseArray(result, ReturnSchema);
   },
 
   async getSubqueryIris(sessionId: string, queryIri: string, isIndicator: boolean = false): Promise<SubQueryDependency[]> {
-    return await $fetch<SubQueryDependency[]>(`${useRuntimeConfig().public.imapiUrl}query/protected/subQueries`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}query/protected/subQueries`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         queryIri: queryIri,
@@ -205,14 +232,16 @@ const QueryService = {
       },
       method: "get"
     });
+    return parseArray(result, SubQueryDependencySchema);
   },
 
   async getQueryRequestForSQL(sessionId: string, queryRequest: QueryRequest): Promise<QueryRequest> {
-    return await $fetch<QueryRequest>(`${useRuntimeConfig().public.imapiUrl}query/protected/queryRequestForSQL`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}query/protected/queryRequestForSQL`, {
       headers: { cookie: `session_id=${sessionId}` },
       body: queryRequest,
       method: "post"
     });
+    return QueryRequestSchema.parse(result);
   }
 };
 

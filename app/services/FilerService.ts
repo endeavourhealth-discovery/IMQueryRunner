@@ -1,5 +1,3 @@
-import { NAMESPACE } from "@endeavour/vue-library/enums";
-
 const API_URL = "api/imapi/filer";
 
 const FilerService = {

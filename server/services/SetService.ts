@@ -1,5 +1,8 @@
+import { SetDiffObjectSchema, TTIriRefSchema, parseArray } from "@endeavour/vue-library";
 import {
   type ECLQueryRequest,
+  type Node,
+  type Pageable,
   type PageableNode,
   PageableNodeSchema,
   type Query,
@@ -28,7 +31,6 @@ const SetService = {
       method: "GET"
     });
   },
-
   async getMembers(sessionId: string, iri: string, entailments: boolean, pageIndex: number, pageSize: number): Promise<PageableNode> {
     const result = await $fetch(API_URL + "/protected/members", {
       headers: { cookie: `session_id=${sessionId}` },
@@ -40,7 +42,6 @@ const SetService = {
       },
       method: "GET"
     });
-
     return PageableNodeSchema.parse(result);
   },
 
@@ -55,18 +56,18 @@ const SetService = {
       body: request,
       method: "POST"
     });
-
     return PageableNodeSchema.parse(result);
   },
 
   async getSubsets(sessionId: string, iri: string): Promise<TTIriRef[]> {
-    return await $fetch<TTIriRef[]>(API_URL + "/protected/subsets", {
+    const result = await $fetch<TTIriRef[]>(API_URL + "/protected/subsets", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri
       },
       method: "GET"
     });
+    return parseArray(result, TTIriRefSchema);
   },
 
   async getFullExportSet(sessionId: string, setRequest: SetExportRequest): Promise<Blob> {
@@ -79,7 +80,7 @@ const SetService = {
   },
 
   async getSetComparison(sessionId: string, iriA?: string, iriB?: string): Promise<SetDiffObject> {
-    return await $fetch<SetDiffObject>(API_URL + "/protected/setDiff", {
+    const result = await $fetch(API_URL + "/protected/setDiff", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         setIriA: iriA,
@@ -87,6 +88,7 @@ const SetService = {
       },
       method: "GET"
     });
+    return SetDiffObjectSchema.parse(result);
   },
 
   async updateSubsetsFromSuper(sessionId: string, entity: TTEntity): Promise<void> {

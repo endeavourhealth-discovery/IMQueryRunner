@@ -1,15 +1,15 @@
-import type { ECLQueryRequest, Query, SearchResponse } from "@endeavour/vue-library/models";
+import { type ECLQueryRequest, ECLQueryRequestSchema, type Query, type SearchResponse, SearchResponseSchema } from "@endeavour/vue-library/models";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}/ecl/protected`;
 
 const EclService = {
   async ECLSearch(sessionId: string, eclSearchRequest: ECLQueryRequest): Promise<SearchResponse> {
-    const results = await $fetch<SearchResponse>(API_URL + "/eclSearch", {
+    const results = await $fetch(API_URL + "/eclSearch", {
       headers: { cookie: `session_id=${sessionId}` },
       body: eclSearchRequest,
       method: "POST"
     });
-    return results;
+    return SearchResponseSchema.parse(results);
   },
 
   async getEcl(sessionId: string, query: Query): Promise<string> {
@@ -21,7 +21,7 @@ const EclService = {
   },
 
   async getQueryFromECL(sessionId: string, ecl: string, raw: boolean = false): Promise<ECLQueryRequest> {
-    return await $fetch<ECLQueryRequest>(API_URL + "/queryFromEcl", {
+    const result = await $fetch(API_URL + "/queryFromEcl", {
       headers: {
         cookie: `session_id=${sessionId}`,
         "Content-Type": "application/json"
@@ -30,10 +30,11 @@ const EclService = {
       ignoreResponseError: raw,
       method: "POST"
     });
+    return ECLQueryRequestSchema.parse(result);
   },
 
   async getEclFromEcl(sessionId: string, ecl: string, showNames: boolean): Promise<ECLQueryRequest> {
-    return await $fetch<ECLQueryRequest>(API_URL + "/eclFromEcl", {
+    const result = await $fetch(API_URL + "/eclFromEcl", {
       body: { ecl: ecl, showNames: showNames, status: { valid: true } },
       headers: {
         "Content-Type": "application/json",
@@ -42,10 +43,11 @@ const EclService = {
       ignoreResponseError: true,
       method: "POST"
     });
+    return ECLQueryRequestSchema.parse(result);
   },
 
   async validateECL(sessionId: string, ecl: string, showNames: boolean): Promise<ECLQueryRequest> {
-    return await $fetch<ECLQueryRequest>(API_URL + "/validateEcl", {
+    const result = await $fetch(API_URL + "/validateEcl", {
       body: { ecl: ecl, showNames: showNames, status: { valid: true } },
       headers: {
         "Content-Type": "application/json",
@@ -53,10 +55,11 @@ const EclService = {
       },
       method: "POST"
     });
+    return ECLQueryRequestSchema.parse(result);
   },
 
   async validateModelFromECL(sessionId: string, ecl: string, showNames: boolean): Promise<ECLQueryRequest> {
-    return await $fetch<ECLQueryRequest>(API_URL + "/validateModelFromECL", {
+    const result = await $fetch(API_URL + "/validateModelFromECL", {
       body: { ecl: ecl, showNames: showNames, status: { valid: true } },
       headers: {
         "Content-Type": "application/json",
@@ -65,10 +68,11 @@ const EclService = {
       ignoreResponseError: true,
       method: "POST"
     });
+    return ECLQueryRequestSchema.parse(result);
   },
 
   async validateModelFromQuery(sessionId: string, query: Query): Promise<ECLQueryRequest> {
-    return await $fetch<ECLQueryRequest>(API_URL + "/validateModelFromQuery", {
+    const result = await $fetch(API_URL + "/validateModelFromQuery", {
       body: { query: query, status: { valid: true } },
       headers: {
         "Content-Type": "application/json",
@@ -77,6 +81,7 @@ const EclService = {
       ignoreResponseError: true,
       method: "POST"
     });
+    return ECLQueryRequestSchema.parse(result);
   },
 
   async getPropertiesForDomains(sessionId: string, conceptIri: string[], controller?: AbortController): Promise<string[]> {
@@ -107,7 +112,7 @@ const EclService = {
   },
 
   async getECLFromQuery(sessionId: string, query: Query, showNames?: boolean): Promise<ECLQueryRequest> {
-    return await $fetch<ECLQueryRequest>(API_URL + "/eclFromQuery", {
+    const result = await $fetch(API_URL + "/eclFromQuery", {
       body: { query: query, showNames: showNames },
       headers: {
         "Content-Type": "application/json",
@@ -116,6 +121,7 @@ const EclService = {
       ignoreResponseError: true,
       method: "POST"
     });
+    return ECLQueryRequestSchema.parse(result);
   }
 };
 export default EclService;

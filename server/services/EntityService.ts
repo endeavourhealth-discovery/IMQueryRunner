@@ -1,15 +1,28 @@
+import {
+  ExtendedEntityReferenceNodeSchema,
+  FilterOptionsSchema,
+  NamespaceSchema,
+  type PageableEntityReferenceNode,
+  PageableEntityReferenceNodeSchema,
+  type PageableTTIriRef,
+  PageableTTIriRefSchema,
+  SearchResultSummarySchema,
+  TTBundleSchema,
+  TTIriRefSchema,
+  parseArray
+} from "@endeavour/vue-library";
 import { IM } from "@endeavour/vue-library/enums";
-import type {
-  DownloadByQueryOptions,
-  EntityValidationRequest,
-  ExtendedEntityReferenceNode,
-  FilterOptions,
-  Namespace,
-  PageableTTIriRef,
-  SearchResultSummary,
-  TTBundle,
-  TTEntity,
-  TTIriRef
+import {
+  type DownloadByQueryOptions,
+  type EntityValidationRequest,
+  type ExtendedEntityReferenceNode,
+  type FilterOptions,
+  type Namespace,
+  type SearchResultSummary,
+  type TTBundle,
+  type TTEntity,
+  TTEntitySchema,
+  type TTIriRef
 } from "@endeavour/vue-library/models";
 
 import type { OrganizationChartNode } from "primevue";
@@ -17,26 +30,29 @@ import type { OrganizationChartNode } from "primevue";
 const EntityService = {
   // PUBLIC
   async getNamespaces(): Promise<Namespace[]> {
-    return await $fetch<Namespace[]>(`${useRuntimeConfig().public.imapiUrl}entity/public/namespaces`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/public/namespaces`, {
       method: "get"
     });
+    return parseArray(result, NamespaceSchema);
   },
 
   async getFilterOptions(): Promise<FilterOptions> {
-    return await $fetch<FilterOptions>(`${useRuntimeConfig().public.imapiUrl}entity/public/filterOptions`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/public/filterOptions`, {
       method: "get"
     });
+    return FilterOptionsSchema.parse(result);
   },
 
   async getFilterDefaultOptions(): Promise<FilterOptions> {
-    return await $fetch<FilterOptions>(`${useRuntimeConfig().public.imapiUrl}entity/public/filterDefaults`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/public/filterDefaults`, {
       method: "get"
     });
+    return FilterOptionsSchema.parse(result);
   },
 
   // PROTECTED
   async getPartialEntity(sessionId: string, iri: string, predicates: string[]): Promise<TTEntity> {
-    return await $fetch<TTEntity>(`${useRuntimeConfig().public.imapiUrl}entity/protected/partial`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/partial`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -44,10 +60,11 @@ const EntityService = {
       },
       method: "get"
     });
+    return TTEntitySchema.parse(result);
   },
 
   async getPartialEntities(sessionId: string, typeIris: string[], predicates: string[]): Promise<TTEntity[]> {
-    return await $fetch<TTEntity[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/partials`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/partials`, {
       headers: { cookie: `session_id=${sessionId}` },
       body: {
         iris: [...new Set(typeIris)].join(","),
@@ -55,10 +72,11 @@ const EntityService = {
       },
       method: "POST"
     });
+    return parseArray(result, TTEntitySchema);
   },
 
   async getPartialEntityBundle(sessionId: string, iri: string, predicates: string[]): Promise<TTBundle> {
-    return await $fetch<TTBundle>(`${useRuntimeConfig().public.imapiUrl}entity/protected/partialBundle`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/partialBundle`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -66,10 +84,11 @@ const EntityService = {
       },
       method: "get"
     });
+    return TTBundleSchema.parse(result);
   },
 
   async getEntityChildren(sessionId: string, iri: string, schemeIris?: string[], controller?: AbortController): Promise<ExtendedEntityReferenceNode[]> {
-    return await $fetch<ExtendedEntityReferenceNode[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/children`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/children`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -78,26 +97,29 @@ const EntityService = {
       signal: controller?.signal,
       method: "get"
     });
+    return parseArray(result, ExtendedEntityReferenceNodeSchema);
   },
 
   async getEntityAsEntityReferenceNode(sessionId: string, iri: string): Promise<ExtendedEntityReferenceNode> {
-    return await $fetch<ExtendedEntityReferenceNode>(`${useRuntimeConfig().public.imapiUrl}entity/protected/asEntityReferenceNode`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/asEntityReferenceNode`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri
       },
       method: "get"
     });
+    return ExtendedEntityReferenceNodeSchema.parse(result);
   },
 
   async getAsEntityReferenceNodes(sessionId: string, iris: string[]): Promise<TTEntity> {
-    return await $fetch<TTEntity>(`${useRuntimeConfig().public.imapiUrl}entity/protected/asEntityReferenceNodes`, {
+    const result = await $fetch<TTEntity>(`${useRuntimeConfig().public.imapiUrl}entity/protected/asEntityReferenceNodes`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iris: iris.join(",")
       },
       method: "get"
     });
+    return TTEntitySchema.parse(result);
   },
 
   async getPagedChildren(
@@ -108,18 +130,8 @@ const EntityService = {
     schemes?: string[],
     controller?: AbortController,
     typeFilter?: string[]
-  ): Promise<{
-    totalCount: number;
-    currentPage: number;
-    pageSize: number;
-    result: TTEntity[];
-  }> {
-    return await $fetch<{
-      totalCount: number;
-      currentPage: number;
-      pageSize: number;
-      result: TTEntity[];
-    }>(`${useRuntimeConfig().public.imapiUrl}entity/protected/childrenPaged`, {
+  ): Promise<PageableEntityReferenceNode> {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/childrenPaged`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -131,6 +143,7 @@ const EntityService = {
       signal: controller?.signal,
       method: "get"
     });
+    return PageableEntityReferenceNodeSchema.parse(result);
   },
 
   async getPartialAndTotalCount(
@@ -142,7 +155,7 @@ const EntityService = {
     schemeIris?: string[],
     controller?: AbortController
   ): Promise<PageableTTIriRef> {
-    return await $fetch<PageableTTIriRef>(`${useRuntimeConfig().public.imapiUrl}entity/protected/partialAndTotalCount`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/partialAndTotalCount`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -154,6 +167,7 @@ const EntityService = {
       signal: controller?.signal,
       method: "GET"
     });
+    return PageableTTIriRefSchema.parse(result);
   },
 
   async downloadEntity(sessionId: string, iri: string): Promise<Blob> {
@@ -166,15 +180,16 @@ const EntityService = {
   },
 
   async getEntityParents(sessionId: string, iri: string, schemeIris?: string[]): Promise<ExtendedEntityReferenceNode[]> {
-    return await $fetch<ExtendedEntityReferenceNode[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/parents`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/parents`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri, schemeIris: schemeIris?.join(",") },
       method: "GET"
     });
+    return parseArray(result, ExtendedEntityReferenceNodeSchema);
   },
 
   async getEntityUsages(sessionId: string, iri: string, pageIndex: number, pageSize: number): Promise<TTEntity[]> {
-    return await $fetch<TTEntity[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/usages`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/usages`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -183,6 +198,7 @@ const EntityService = {
       },
       method: "GET"
     });
+    return parseArray(result, TTEntitySchema);
   },
 
   async getUsagesTotalRecords(sessionId: string, iri: string): Promise<number> {
@@ -204,11 +220,12 @@ const EntityService = {
   },
 
   async getEntitySummary(sessionId: string, iri: string): Promise<SearchResultSummary> {
-    return await $fetch<SearchResultSummary>(`${useRuntimeConfig().public.imapiUrl}entity/protected/summary`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/summary`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri },
       method: "GET"
     });
+    return SearchResultSummarySchema.parse(result);
   },
 
   async downloadSearchResults(sessionId: string, downloadSettings: DownloadByQueryOptions) {
@@ -222,35 +239,39 @@ const EntityService = {
   },
 
   async getFolderPath(sessionId: string, iri: string): Promise<TTIriRef[]> {
-    return await $fetch<TTIriRef[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/folderPath`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/folderPath`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri },
       method: "GET"
     });
+    return parseArray(result, TTIriRefSchema);
   },
 
   async getPathBetweenNodes(sessionId: string, descendant: string, ancestor: string): Promise<TTIriRef[]> {
-    return await $fetch<TTIriRef[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/shortestParentHierarchy`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/shortestParentHierarchy`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: { descendant: descendant, ancestor: ancestor },
       method: "GET"
     });
+    return parseArray(result, TTIriRefSchema);
   },
 
   async getEntityByPredicateExclusions(sessionId: string, iri: string, predicates: string[]): Promise<TTEntity> {
-    return await $fetch<TTEntity>(`${useRuntimeConfig().public.imapiUrl}entity/protected/entityByPredicateExclusions`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/entityByPredicateExclusions`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri, predicates: predicates.join(",") },
       method: "GET"
     });
+    return TTEntitySchema.parse(result);
   },
 
   async getBundleByPredicateExclusions(sessionId: string, iri: string, predicates: string[]): Promise<TTBundle> {
-    return await $fetch<TTBundle>(`${useRuntimeConfig().public.imapiUrl}entity/protected/bundleByPredicateExclusions`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/bundleByPredicateExclusions`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri, predicates: predicates.join(",") },
       method: "GET"
     });
+    return TTBundleSchema.parse(result);
   },
 
   async checkValidation(sessionId: string, validationIri: string, data: EntityValidationRequest): Promise<{ valid: boolean; message: string | undefined }> {
@@ -270,19 +291,21 @@ const EntityService = {
   },
 
   async getProvHistory(sessionId: string, iri: string): Promise<TTEntity[]> {
-    return await $fetch<TTEntity[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/history`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/history`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri },
       method: "GET"
     });
+    return parseArray(result, TTEntitySchema);
   },
 
   async getAllowableChildTypes(sessionId: string, iri: string): Promise<TTEntity[]> {
-    return await $fetch<TTEntity[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/allowableChildTypes`, {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/allowableChildTypes`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri },
       method: "GET"
     });
+    return parseArray(result, TTEntitySchema);
   },
 
   // PRIVATE

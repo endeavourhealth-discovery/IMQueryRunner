@@ -1,6 +1,17 @@
 import { DisplayMode } from "@endeavour/vue-library/enums";
 import { isArrayHasLength, isObjectHasKeys } from "@endeavour/vue-library/helpers";
-import type { ArgumentReference, IMLLanguage, Indicator, Query, QueryRequest, QueryResponse, SearchResponse, TTEntity } from "@endeavour/vue-library/models";
+import type {
+  ArgumentReference,
+  IMLLanguage,
+  Indicator,
+  PathQuery,
+  Query,
+  QueryRequest,
+  QueryResponse,
+  Return,
+  SearchResponse,
+  TTEntity
+} from "@endeavour/vue-library/models";
 
 const API_URL = "api/imapi/query";
 

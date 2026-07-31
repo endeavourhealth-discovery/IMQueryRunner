@@ -1,16 +1,21 @@
 import { IM, RDFS } from "@endeavour/vue-library/enums";
-import type {
-  DownloadByQueryOptions,
-  EntityValidationRequest,
-  ExtendedEntityReferenceNode,
-  FilterOptions,
-  FiltersAsIris,
-  Namespace,
-  PageableTTIriRef,
-  SearchResultSummary,
-  TTBundle,
-  TTEntity,
-  TTIriRef
+import {
+  type DownloadByQueryOptions,
+  type EditRequest,
+  type EntityReferenceNode,
+  type EntityValidationRequest,
+  type ExtendedEntityReferenceNode,
+  type FilterOptions,
+  type FiltersAsIris,
+  type Namespace,
+  type Pageable,
+  type PageableTTIriRef,
+  PageableTTIriRefSchema,
+  type SearchResultSummary,
+  type TTBundle,
+  type TTEntity,
+  type TTIriRef,
+  type ValidatedEntity
 } from "@endeavour/vue-library/models";
 
 import { type OrganizationChartNode } from "primevue/organizationchart";
@@ -132,7 +137,7 @@ const EntityService = {
     filters?: FiltersAsIris,
     controller?: AbortController
   ): Promise<PageableTTIriRef> {
-    return await $fetch<PageableTTIriRef>(API_URL + "/partialAndTotalCount", {
+    const result = await $fetch(API_URL + "/partialAndTotalCount", {
       params: {
         iri: iri,
         predicate: predicate,
@@ -143,6 +148,7 @@ const EntityService = {
       signal: controller?.signal,
       method: "GET"
     });
+    return PageableTTIriRefSchema.parse(result);
   },
 
   async downloadEntity(iri: string): Promise<Blob> {

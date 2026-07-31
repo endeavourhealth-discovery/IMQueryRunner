@@ -23,7 +23,7 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.896.0",
     "@braintree/sanitize-url": "^7.1.2",
-    "@endeavour/vue-library": "3.0.5",
+    "@endeavour/vue-library": "3.0.7",
     "@pinia/nuxt": "0.11.2",
     "@primeuix/themes": "^2.0.3",
     "@tailwindcss/vite": "^4.1.13",
@@ -53,7 +53,7 @@
     "uuid": "^11.1.0",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4",
-    "zod": "4.3.6"
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@getgauge/cli": "^1.6.22",
