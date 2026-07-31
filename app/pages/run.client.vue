@@ -20,14 +20,28 @@
       />
     </div>
     <div class="m-2">
-      <Button icon="fa-solid fa-play" label="Add to queue" :disabled="selected === undefined" @click="showDialog = true" />
+      <Button icon="fa-solid fa-plus" label="Add to queue" :disabled="selected === undefined" @click="addToQueue" />
+    </div>
+    <DataTable v-if="queuedQueries.length" class="m-2" :value="queuedQueries">
+      <template #empty>None</template>
+      <Column header="Query">
+        <template #body="{ data }: { data: QueuedQuery }">{{ data.selected.name }}</template>
+      </Column>
+      <Column>
+        <template #body="{ index }">
+          <Button icon="fa-solid fa-trash" severity="danger" variant="outlined" @click="removeFromQueue(index)" />
+        </template>
+      </Column>
+    </DataTable>
+    <div class="m-2">
+      <Button icon="fa-solid fa-play" label="Run queue" :disabled="!queuedQueries.length" @click="showDialog = true" />
     </div>
     <Dialog v-model:visible="showDialog" :closable="false" modal>
-      Run query <span class="font-bold">{{ selected?.name }}</span
+      Run <span class="font-bold">{{ jobName }}</span
       >?
       <template #footer>
         <Button class="m-1" label="Cancel" variant="outlined" @click="showDialog = false" autofocus />
-        <Button class="m-1" label="Select" @click="runQuery" autofocus />
+        <Button class="m-1" label="Select" @click="runQueries" autofocus />
       </template>
     </Dialog>
   </div>
@@ -50,9 +64,23 @@ interface ArgumentSelection extends ArgumentReference {
   valueData?: any;
 }
 
+interface QueuedQuery {
+  selected: SearchResultSummary;
+  argument: Argument[];
+}
+
 const selected: Ref<SearchResultSummary | undefined> = ref();
 const args: Ref<ArgumentSelection[] | undefined> = ref([]);
 const completedArguments: Ref<Argument[]> = ref([]);
+const queuedQueries: Ref<QueuedQuery[]> = ref([]);
+
+const jobName = computed(() => {
+  if (!queuedQueries.value.length) return "";
+  const first = queuedQueries.value[0]!.selected.name;
+  const others = queuedQueries.value.length - 1;
+  if (!others) return first;
+  return `${first} and ${others} other ${others === 1 ? "query" : "queries"}`;
+});
 const request: any = {
   query: {
     where: {
@@ -109,18 +137,29 @@ function passArguments(args: Argument[], runOnConfirm: boolean) {
   missingArgs.value = !runOnConfirm;
 }
 
-async function runQuery() {
+function addToQueue() {
+  if (!selected.value) return;
+  queuedQueries.value.push({ selected: selected.value, argument: completedArguments.value });
+  selected.value = undefined;
+  args.value = [];
+  completedArguments.value = [];
+  missingArgs.value = true;
+}
+
+function removeFromQueue(index: number) {
+  queuedQueries.value.splice(index, 1);
+}
+
+async function runQueries() {
   const jobRequest = {
-    queryRequests: [
-      {
-        query: {
-          iri: selected.value?.iri
-        },
-        argument: completedArguments.value
-      }
-    ]
+    jobName: jobName.value,
+    queryRequests: queuedQueries.value.map(queuedQuery => ({
+      query: {
+        iri: queuedQuery.selected.iri
+      },
+      argument: queuedQuery.argument
+    }))
   } as JobRequest;
-  console.log("Running query with arguments:", jobRequest);
 
   await $fetch("/api/queue/job/add", {
     method: "post",
