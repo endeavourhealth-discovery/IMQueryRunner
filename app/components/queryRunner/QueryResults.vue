@@ -5,7 +5,7 @@
         <div class="m-2">
           <Button icon="fa-solid fa-arrow-left" label="Back to queue" @click="backToQueue" />
         </div>
-        <div v-if="executedSql" class="m-2">
+        <div v-if="executedSql" class="m-2 min-w-0">
           <Panel header="Executed SQL" :toggleable="true" :collapsed="true">
             <SQLViewer :sql="executedSql" />
           </Panel>
@@ -175,4 +175,10 @@ async function getExecutedSql() {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.p-panel-content-container),
+:deep(.p-panel-content-wrapper),
+:deep(.p-panel-content) {
+  min-width: 0;
+}
+</style>
