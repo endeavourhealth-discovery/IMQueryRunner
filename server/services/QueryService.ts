@@ -4,7 +4,6 @@ import type {
   ArgumentReference,
   IMLLanguage,
   Indicator,
-  Match,
   PathQuery,
   Query,
   QueryRequest,
@@ -41,8 +40,8 @@ const QueryService = {
     });
   },
 
-  async flattenBooleans(sessionId: string, query: Query | Match): Promise<Query | Match> {
-    return await $fetch<Query | Match>(API_URL + "/flattenBooleans", {
+  async flattenBooleans(sessionId: string, query: Query): Promise<Query> {
+    return await $fetch<Query>(API_URL + "/flattenBooleans", {
       headers: { cookie: `session_id=${sessionId}` },
       body: query,
       method: "POST"
@@ -65,8 +64,8 @@ const QueryService = {
     });
   },
 
-  async pathQuery(sessionId: string, pathQuery: PathQuery): Promise<{ match: Match[] }> {
-    return await $fetch<{ match: Match[] }>(API_URL + "/pathQuery", {
+  async pathQuery(sessionId: string, pathQuery: PathQuery): Promise<{ match: Query[] }> {
+    return await $fetch<{ match: Query[] }>(API_URL + "/pathQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: pathQuery,
       method: "POST"
@@ -189,7 +188,7 @@ const QueryService = {
     });
   },
 
-  async getNestedReturns(sessionId: string, match: Match): Promise<Return[]> {
+  async getNestedReturns(sessionId: string, match: Query): Promise<Return[]> {
     return await $fetch<Return[]>(API_URL + "/nestedReturns", {
       headers: { cookie: `session_id=${sessionId}` },
       body: { match: match },

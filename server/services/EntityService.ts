@@ -3,13 +3,12 @@ import type {
   DownloadByQueryOptions,
   EntityValidationRequest,
   ExtendedEntityReferenceNode,
-  ExtendedTTEntity,
   FilterOptions,
-  FiltersAsIris,
   Namespace,
-  Pageable,
+  PageableTTIriRef,
   SearchResultSummary,
   TTBundle,
+  TTEntity,
   TTIriRef
 } from "@endeavour/vue-library/models";
 
@@ -36,8 +35,8 @@ const EntityService = {
   },
 
   // PROTECTED
-  async getPartialEntity(sessionId: string, iri: string, predicates: string[]): Promise<ExtendedTTEntity> {
-    return await $fetch<ExtendedTTEntity>(`${useRuntimeConfig().public.imapiUrl}entity/protected/partial`, {
+  async getPartialEntity(sessionId: string, iri: string, predicates: string[]): Promise<TTEntity> {
+    return await $fetch<TTEntity>(`${useRuntimeConfig().public.imapiUrl}entity/protected/partial`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -47,8 +46,8 @@ const EntityService = {
     });
   },
 
-  async getPartialEntities(sessionId: string, typeIris: string[], predicates: string[]): Promise<ExtendedTTEntity[]> {
-    return await $fetch<ExtendedTTEntity[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/partials`, {
+  async getPartialEntities(sessionId: string, typeIris: string[], predicates: string[]): Promise<TTEntity[]> {
+    return await $fetch<TTEntity[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/partials`, {
       headers: { cookie: `session_id=${sessionId}` },
       body: {
         iris: [...new Set(typeIris)].join(","),
@@ -91,8 +90,8 @@ const EntityService = {
     });
   },
 
-  async getAsEntityReferenceNodes(sessionId: string, iris: string[]): Promise<ExtendedTTEntity> {
-    return await $fetch<ExtendedTTEntity>(`${useRuntimeConfig().public.imapiUrl}entity/protected/asEntityReferenceNodes`, {
+  async getAsEntityReferenceNodes(sessionId: string, iris: string[]): Promise<TTEntity> {
+    return await $fetch<TTEntity>(`${useRuntimeConfig().public.imapiUrl}entity/protected/asEntityReferenceNodes`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iris: iris.join(",")
@@ -113,13 +112,13 @@ const EntityService = {
     totalCount: number;
     currentPage: number;
     pageSize: number;
-    result: ExtendedTTEntity[];
+    result: TTEntity[];
   }> {
     return await $fetch<{
       totalCount: number;
       currentPage: number;
       pageSize: number;
-      result: ExtendedTTEntity[];
+      result: TTEntity[];
     }>(`${useRuntimeConfig().public.imapiUrl}entity/protected/childrenPaged`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
@@ -142,8 +141,8 @@ const EntityService = {
     pageSize: number,
     schemeIris?: string[],
     controller?: AbortController
-  ): Promise<Pageable<TTIriRef>> {
-    return await $fetch<Pageable<TTIriRef>>(`${useRuntimeConfig().public.imapiUrl}entity/protected/partialAndTotalCount`, {
+  ): Promise<PageableTTIriRef> {
+    return await $fetch<PageableTTIriRef>(`${useRuntimeConfig().public.imapiUrl}entity/protected/partialAndTotalCount`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -174,8 +173,8 @@ const EntityService = {
     });
   },
 
-  async getEntityUsages(sessionId: string, iri: string, pageIndex: number, pageSize: number): Promise<ExtendedTTEntity[]> {
-    return await $fetch<ExtendedTTEntity[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/usages`, {
+  async getEntityUsages(sessionId: string, iri: string, pageIndex: number, pageSize: number): Promise<TTEntity[]> {
+    return await $fetch<TTEntity[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/usages`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -238,8 +237,8 @@ const EntityService = {
     });
   },
 
-  async getEntityByPredicateExclusions(sessionId: string, iri: string, predicates: string[]): Promise<ExtendedTTEntity> {
-    return await $fetch<ExtendedTTEntity>(`${useRuntimeConfig().public.imapiUrl}entity/protected/entityByPredicateExclusions`, {
+  async getEntityByPredicateExclusions(sessionId: string, iri: string, predicates: string[]): Promise<TTEntity> {
+    return await $fetch<TTEntity>(`${useRuntimeConfig().public.imapiUrl}entity/protected/entityByPredicateExclusions`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri, predicates: predicates.join(",") },
       method: "GET"
@@ -270,16 +269,16 @@ const EntityService = {
     });
   },
 
-  async getProvHistory(sessionId: string, iri: string): Promise<ExtendedTTEntity[]> {
-    return await $fetch<ExtendedTTEntity[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/history`, {
+  async getProvHistory(sessionId: string, iri: string): Promise<TTEntity[]> {
+    return await $fetch<TTEntity[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/history`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri },
       method: "GET"
     });
   },
 
-  async getAllowableChildTypes(sessionId: string, iri: string): Promise<ExtendedTTEntity[]> {
-    return await $fetch<ExtendedTTEntity[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/allowableChildTypes`, {
+  async getAllowableChildTypes(sessionId: string, iri: string): Promise<TTEntity[]> {
+    return await $fetch<TTEntity[]>(`${useRuntimeConfig().public.imapiUrl}entity/protected/allowableChildTypes`, {
       headers: { cookie: `session_id=${sessionId}` },
       params: { iri: iri },
       method: "GET"

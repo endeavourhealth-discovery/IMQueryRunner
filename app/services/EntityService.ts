@@ -1,19 +1,16 @@
 import { IM, RDFS } from "@endeavour/vue-library/enums";
 import type {
   DownloadByQueryOptions,
-  EditRequest,
-  EntityReferenceNode,
   EntityValidationRequest,
   ExtendedEntityReferenceNode,
-  ExtendedTTEntity,
   FilterOptions,
   FiltersAsIris,
   Namespace,
-  Pageable,
+  PageableTTIriRef,
   SearchResultSummary,
   TTBundle,
-  TTIriRef,
-  ValidatedEntity
+  TTEntity,
+  TTIriRef
 } from "@endeavour/vue-library/models";
 
 import { type OrganizationChartNode } from "primevue/organizationchart";
@@ -44,8 +41,8 @@ const EntityService = {
 
   // ============================ PROTECTED ============================
 
-  async getPartialEntity(iri: string, predicates: string[]): Promise<ExtendedTTEntity> {
-    return await $fetch<ExtendedTTEntity>(API_URL + "/partial", {
+  async getPartialEntity(iri: string, predicates: string[]): Promise<TTEntity> {
+    return await $fetch<TTEntity>(API_URL + "/partial", {
       params: {
         iri: iri,
         predicates: predicates.join(",")
@@ -54,8 +51,8 @@ const EntityService = {
     });
   },
 
-  async getPartialEntities(typeIris: string[], predicates: string[]): Promise<ExtendedTTEntity[]> {
-    return await $fetch<ExtendedTTEntity[]>(API_URL + "/partials", {
+  async getPartialEntities(typeIris: string[], predicates: string[]): Promise<TTEntity[]> {
+    return await $fetch<TTEntity[]>(API_URL + "/partials", {
       body: {
         iris: [...new Set(typeIris)].join(","),
         predicates: [...new Set(predicates)].join(",")
@@ -107,13 +104,13 @@ const EntityService = {
     totalCount: number;
     currentPage: number;
     pageSize: number;
-    result: ExtendedTTEntity[];
+    result: TTEntity[];
   }> {
     return await $fetch<{
       totalCount: number;
       currentPage: number;
       pageSize: number;
-      result: ExtendedTTEntity[];
+      result: TTEntity[];
     }>(API_URL + "/childrenPaged", {
       params: {
         iri: iri,
@@ -134,8 +131,8 @@ const EntityService = {
     pageSize: number,
     filters?: FiltersAsIris,
     controller?: AbortController
-  ): Promise<Pageable<TTIriRef>> {
-    return await $fetch<Pageable<TTIriRef>>(API_URL + "/partialAndTotalCount", {
+  ): Promise<PageableTTIriRef> {
+    return await $fetch<PageableTTIriRef>(API_URL + "/partialAndTotalCount", {
       params: {
         iri: iri,
         predicate: predicate,
@@ -164,8 +161,8 @@ const EntityService = {
     });
   },
 
-  async getEntityUsages(iri: string, pageIndex: number, pageSize: number): Promise<ExtendedTTEntity[]> {
-    return await $fetch<ExtendedTTEntity[]>(API_URL + "/usages", {
+  async getEntityUsages(iri: string, pageIndex: number, pageSize: number): Promise<TTEntity[]> {
+    return await $fetch<TTEntity[]>(API_URL + "/usages", {
       params: {
         iri: iri,
         page: pageIndex,
@@ -221,8 +218,8 @@ const EntityService = {
     });
   },
 
-  async getEntityByPredicateExclusions(iri: string, predicates: string[]): Promise<ExtendedTTEntity> {
-    return await $fetch<ExtendedTTEntity>(API_URL + "/entityByPredicateExclusions", {
+  async getEntityByPredicateExclusions(iri: string, predicates: string[]): Promise<TTEntity> {
+    return await $fetch<TTEntity>(API_URL + "/entityByPredicateExclusions", {
       params: { iri: iri, predicates: predicates.join(",") },
       method: "GET"
     });
@@ -268,15 +265,15 @@ const EntityService = {
     });
   },
 
-  async getProvHistory(iri: string): Promise<ExtendedTTEntity[]> {
-    return await $fetch<ExtendedTTEntity[]>(API_URL + "/history", {
+  async getProvHistory(iri: string): Promise<TTEntity[]> {
+    return await $fetch<TTEntity[]>(API_URL + "/history", {
       params: { iri: iri },
       method: "GET"
     });
   },
 
-  async getAllowableChildTypes(iri: string): Promise<ExtendedTTEntity[]> {
-    return await $fetch<ExtendedTTEntity[]>(API_URL + "/allowableChildTypes", {
+  async getAllowableChildTypes(iri: string): Promise<TTEntity[]> {
+    return await $fetch<TTEntity[]>(API_URL + "/allowableChildTypes", {
       params: { iri: iri },
       method: "GET"
     });

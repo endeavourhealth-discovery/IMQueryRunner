@@ -1,18 +1,6 @@
 import { DisplayMode } from "@endeavour/vue-library/enums";
 import { isArrayHasLength, isObjectHasKeys } from "@endeavour/vue-library/helpers";
-import type {
-  ArgumentReference,
-  IMLLanguage,
-  Indicator,
-  Match,
-  PathQuery,
-  Query,
-  QueryRequest,
-  QueryResponse,
-  Return,
-  SearchResponse,
-  TTEntity
-} from "@endeavour/vue-library/models";
+import type { ArgumentReference, IMLLanguage, Indicator, Query, QueryRequest, QueryResponse, SearchResponse, TTEntity } from "@endeavour/vue-library/models";
 
 const API_URL = "api/imapi/query";
 
@@ -32,8 +20,8 @@ const QueryService = {
         method: "POST"
       });
   },
-  async flattenBooleans(query: Query | Match): Promise<Query | Match> {
-    return await $fetch<Query | Match>(API_URL + "/flattenBooleans", {
+  async flattenBooleans(query: Query): Promise<Query> {
+    return await $fetch<Query>(API_URL + "/flattenBooleans", {
       body: query,
       method: "POST"
     });

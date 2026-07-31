@@ -1,8 +1,5 @@
+import { parseArray } from "@endeavour/vue-library";
 import { RecentActivityItemSchema } from "@endeavour/vue-library/models";
-
-import * as z from "zod";
-
-const bodySchema = z.array(RecentActivityItemSchema);
 
 defineRouteMeta({
   openAPI: {
@@ -28,7 +25,8 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event): Promise<any> => {
-  const recentActivity = await readValidatedBody(event, bodySchema.parse);
+  const body = await readBody(event);
+  const recentActivity = parseArray(body, RecentActivityItemSchema);
   const user = await globalThis.apiGuard.getUser(event);
   user.recentActivity = recentActivity;
   return await globalThis.apiGuard.updateUser(event, user);

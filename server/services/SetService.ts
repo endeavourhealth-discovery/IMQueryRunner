@@ -1,4 +1,13 @@
-import type { ECLQueryRequest, Node, Pageable, Query, SetDiffObject, SetExportRequest, TTEntity, TTIriRef } from "@endeavour/vue-library/models";
+import {
+  type ECLQueryRequest,
+  type PageableNode,
+  PageableNodeSchema,
+  type Query,
+  type SetDiffObject,
+  type SetExportRequest,
+  type TTEntity,
+  type TTIriRef
+} from "@endeavour/vue-library/models";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}set`;
 
@@ -19,8 +28,9 @@ const SetService = {
       method: "GET"
     });
   },
-  async getMembers(sessionId: string, iri: string, entailments: boolean, pageIndex: number, pageSize: number): Promise<Pageable<Node>> {
-    return await $fetch<Pageable<Node>>(API_URL + "/protected/members", {
+
+  async getMembers(sessionId: string, iri: string, entailments: boolean, pageIndex: number, pageSize: number): Promise<PageableNode> {
+    const result = await $fetch(API_URL + "/protected/members", {
       headers: { cookie: `session_id=${sessionId}` },
       params: {
         iri: iri,
@@ -30,19 +40,23 @@ const SetService = {
       },
       method: "GET"
     });
+
+    return PageableNodeSchema.parse(result);
   },
 
-  async getMembersFromQuery(sessionId: string, query: Query, pageIndex: number, pageSize: number): Promise<Pageable<Node>> {
+  async getMembersFromQuery(sessionId: string, query: Query, pageIndex: number, pageSize: number): Promise<PageableNode> {
     const request = {
       query: query,
       page: pageIndex,
       size: pageSize
     } as ECLQueryRequest;
-    return await $fetch<Pageable<Node>>(API_URL + "/protected/membersFromQuery", {
+    const result = await $fetch(API_URL + "/protected/membersFromQuery", {
       headers: { cookie: `session_id=${sessionId}` },
       body: request,
       method: "POST"
     });
+
+    return PageableNodeSchema.parse(result);
   },
 
   async getSubsets(sessionId: string, iri: string): Promise<TTIriRef[]> {
