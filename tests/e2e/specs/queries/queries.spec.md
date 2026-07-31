@@ -46,16 +46,16 @@ This specification describes the query running functionality of IMQueryRunner.
 * Click "Back to queue" button
 
 
-## Run Diabetes & Mental Health
+## Run DM021
 * Open IMQueryRunner
 * Login
 * Click "Run a query" button
-* Search for "Data set for Diabetes mental health screen achieved" and select
+* Search for "[DM021] - Diabetes with frailty eligible for IFCC-HbA1c" and select
 * Click "Add to queue" button
 * Click "Run queue" button
 * Click "Select" button
 * Wait "10" seconds
 * Click "Refresh" button
 * Open results page
-* Check total results equal "11"
+* Check total results equal "0"
 * Click "Back to queue" button
