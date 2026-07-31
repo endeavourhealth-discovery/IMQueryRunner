@@ -10,6 +10,7 @@
     class="w-full"
     @update:modelValue="emit('update:modelValue', $event)"
   />
+  <small class="text-color-secondary"> Run query against a specific organisation. </small>
 </template>
 
 <script setup lang="ts">

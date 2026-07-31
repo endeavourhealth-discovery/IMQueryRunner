@@ -13,7 +13,7 @@ import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 import { mysqlDb } from "../db/mysql";
 import { indicatorResultTable, jobTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
 import QueryService from "../services/QueryService";
-import { resolveArgs } from "../utils/executeQuery";
+import { resolveArgs, sortQueryRequestsByDependency } from "../utils/executeQuery";
 
 export async function createJobEntry(jobRequest: JobRequest, sessionId: string, userId: string): Promise<Job> {
   const queryRequestsForSql = [];
@@ -22,10 +22,11 @@ export async function createJobEntry(jobRequest: JobRequest, sessionId: string, 
     resolveArgs(getQueryRequestForSQL);
     queryRequestsForSql.push(getQueryRequestForSQL);
   }
+  const orderedQueryRequests = await sortQueryRequestsByDependency(sessionId!, queryRequestsForSql);
   const now = getNow();
   const queryJob = {
     jobName: jobRequest.jobName || queryRequestsForSql[0]?.query?.name || "Unnamed Job",
-    queryRequests: queryRequestsForSql,
+    queryRequests: orderedQueryRequests,
     startOfDaySnapshot: jobRequest.startOfDaySnapshot ? 1 : 0,
     persistent: jobRequest.persistent ? 1 : 0,
     useStartOfDaySnapshot: jobRequest.useStartOfDaySnapshot ? 1 : 0,
@@ -106,8 +107,7 @@ export async function createResultSetEntry(queryRequest: any, job: Job): Promise
 }
 
 export async function createQueryResultEntry(queryRequest: QueryRequest, queryResultSet: QueryResultSet, hashCodeVersion: number, indicatorId?: number) {
-  if (!queryRequest.query?.queryType) throw new Error("Query must have queryType");
-  switch (queryRequest.query.queryType) {
+  switch (queryRequest.query?.queryType) {
     case IMQType.COHORT:
     case IMQType.DATASET:
       const queryResult = {
@@ -126,18 +126,17 @@ export async function createQueryResultEntry(queryRequest: QueryRequest, queryRe
       return result?.[0]?.insertId;
 
     default:
-      throw new Error("Unsupported query type: " + queryRequest.query.queryType);
+      throw new Error("Unsupported query type: " + queryRequest.query?.queryType);
   }
 }
 
 export async function createIndicatorResultEntry(queryRequest: QueryRequest, queryResultSet: QueryResultSet, hashCodeVersion: number) {
-  if (!queryRequest.query?.iri) throw new Error("Query must have an iri");
   const indicatorResult = {
     startOfDaySnapshot: queryResultSet.startOfDaySnapshot,
     persistent: queryResultSet.persistent,
     useStartOfDaySnapshot: queryResultSet.useStartOfDaySnapshot,
     startTime: getNow(),
-    queryIri: queryRequest.query.iri,
+    queryIri: queryRequest.query?.iri,
     searchDate: queryResultSet.searchDate ? new Date(queryResultSet.searchDate) : null,
     achievementDate: queryResultSet.achievementDate ? new Date(queryResultSet.achievementDate) : null,
     queryResultSetId: queryResultSet.id,

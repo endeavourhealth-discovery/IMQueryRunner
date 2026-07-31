@@ -13,7 +13,7 @@
       class="w-full"
     />
 
-    <small class="text-color-secondary"> Enter multiple patient IDs and press Enter after each one. </small>
+    <small class="text-color-secondary"> Run query against a specific set of patients. Enter multiple patient IDs and press Enter after each one. </small>
   </div>
 </template>
 

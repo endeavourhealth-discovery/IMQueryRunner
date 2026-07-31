@@ -15,8 +15,13 @@
           <div v-else-if="editArguments && data.parameter === '$patientId'">
             <PatientFilter v-model="data.valueDataList" />
           </div>
-          <div v-else-if="editArguments && data.parameter === '$debugPatientId'">
-            <InputText type="text" v-model="data.valueData" placeholder="Debug patient ID" data-testid="debug-patient-id-input" />
+          <div v-else-if="editArguments && data.parameter === '$debugPatientId'" class="flex flex-col gap-2">
+            <InputText type="text" v-model="data.valueData" placeholder="Enter patient id" data-testid="debug-patient-id-input" />
+            <small class="text-color-secondary"> Run query against a single patient id and get a step-by-step report. </small>
+          </div>
+          <div v-else-if="editArguments && data.parameter === '$searchDate'" class="flex flex-col gap-2">
+            <DatePicker v-model="data.valueData" dateFormat="yy-mm-dd" showIcon iconDisplay="input" updateModelType="string" data-testid="search-date-input" />
+            <small class="text-color-secondary"> Run query on a specific date. </small>
           </div>
           <div v-else-if="editArguments && data.dataType && [XSD.STRING].includes(data.dataType?.iri)">
             <InputText type="text" v-model="data.valueData" data-testid="property-value-input" />
@@ -51,8 +56,8 @@ import OrganisationSelect from "~/components/queryRunner/OrganisationSelect.vue"
 
 import { watch } from "vue";
 
+import type { Argument, ArgumentReference } from "@endeavour/vue-library";
 import { IM, XSD } from "@endeavour/vue-library/enums";
-import { type Argument, type ArgumentReference } from "@endeavour/vue-library/models";
 
 import { cloneDeep } from "lodash-es";
 import Column from "primevue/column";
@@ -82,6 +87,7 @@ const allArgumentsValid: ComputedRef<boolean> = computed(() =>
   argumentList.value!.every(as => {
     if (as.parameter === "$organisationId" || as.parameter === "$patientId") return as.valueDataList && as.valueDataList.length > 0;
     if (as.parameter === "$debugPatientId") return !as.valueData || /^\d+$/.test(as.valueData.toString().trim());
+    if (as.parameter === "$searchDate") return true;
     return !!as.valueData;
   })
 );
@@ -137,7 +143,7 @@ function confirmArguments() {
     for (const argSelect of argumentList.value ?? []) {
       if (!argSelect.parameter) continue;
       const newArg: Argument = { parameter: argSelect.parameter };
-      if (argSelect.parameter === "$debugPatientId") {
+      if (argSelect.parameter === "$debugPatientId" || argSelect.parameter === "$searchDate") {
         const cleaned = argSelect.valueData?.toString().trim();
         if (cleaned) {
           newArg.valueData = cleaned;
