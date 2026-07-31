@@ -172,9 +172,9 @@ async function runQueries() {
 async function getArguments() {
   const query = await QueryService.getQueryFromIri(selected.value!.iri);
   query.iri = selected.value!.iri;
-  args.value = await QueryService.findMissingArguments({
-    query: query
-  } as QueryRequest);
+  // args.value = await QueryService.findMissingArguments({
+  //   query: query
+  // } as QueryRequest);
   args.value = [
     { parameter: "$organisationId" } as ArgumentSelection,
     { parameter: "$patientId" } as ArgumentSelection,
