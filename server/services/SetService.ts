@@ -1,4 +1,4 @@
-import type { ECLQueryRequest, Node, Pageable, Query, SetDiffObject, SetExportRequest, TTEntity, TTIriRef } from "@endeavour/vue-library/interfaces";
+import type { ECLQueryRequest, Node, Pageable, Query, SetDiffObject, SetExportRequest, TTEntity, TTIriRef } from "@endeavour/vue-library/models";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}set`;
 

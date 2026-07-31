@@ -1,5 +1,4 @@
 import { NAMESPACE } from "@endeavour/vue-library/enums";
-import type { ExtendedTTEntity, TTDocument } from "@endeavour/vue-library/interfaces";
 
 const API_URL = "api/imapi/filer";
 

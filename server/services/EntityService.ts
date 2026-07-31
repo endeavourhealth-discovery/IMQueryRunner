@@ -11,7 +11,7 @@ import type {
   SearchResultSummary,
   TTBundle,
   TTIriRef
-} from "@endeavour/vue-library/interfaces";
+} from "@endeavour/vue-library/models";
 
 import type { OrganizationChartNode } from "primevue";
 

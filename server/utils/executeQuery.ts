@@ -2,7 +2,7 @@ import { JobStatus } from "~~/enums";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
 import { IMQType } from "@endeavour/vue-library";
-import { type Argument, type QueryRequest, type SubQueryDependency } from "@endeavour/vue-library/interfaces";
+import { type Argument, type QueryRequest, type SubQueryDependency } from "@endeavour/vue-library/models";
 
 import { and, eq } from "drizzle-orm";
 import murmurhash from "murmurhash";
@@ -14,7 +14,7 @@ import { createQueryResultEntry, getToday, updateJobStatus, updateWithEndTime, u
 import QueryService from "../services/QueryService";
 
 export async function executeQuery(sessionId: string, sql: string, queryRequest: QueryRequest, queryResultSet: QueryResultSet) {
-  if (!queryRequest.query.iri) throw new Error("Query IRI is required for execution");
+  if (!queryRequest.query?.iri) throw new Error("Query IRI is required for execution");
   const hashCodeVersion = hashQueryRequest(queryRequest);
   const existingQueryResultId = await getQueryResultIdIfExists(queryResultSet.id!, hashCodeVersion, queryRequest.query.iri);
   if (existingQueryResultId !== -1) return;
@@ -69,7 +69,7 @@ export async function executeCohortQuery(resolvedSql: string, queryRequest: Quer
     await mysqlDb.execute(resolvedSql);
     await updateWithEndTime(queryResultId, queryResultTable);
   } catch (err) {
-    console.error("Error executing query:", queryRequest.query.iri, err);
+    console.error("Error executing query:", queryRequest.query?.iri, err);
     throw err;
   } finally {
     await updateWithSQL(queryResultId, queryResultTable, resolvedSql);
@@ -107,7 +107,7 @@ export function hashQueryRequest(queryRequest: QueryRequest): number {
   for (const arg of sortedArguments) {
     argHash += hashArgument(arg);
   }
-  if (queryRequest.query.iri) argHash += queryRequest.query.iri;
+  if (queryRequest.query?.iri) argHash += queryRequest.query.iri;
   return murmurhash.v3(argHash);
 }
 
@@ -205,7 +205,7 @@ export async function isCached(hashCode: number, iri: string): Promise<boolean> 
 }
 
 async function runSubQueries(sessionId: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }, queryResultSet: QueryResultSet) {
-  const subQueries = await QueryService.getSubqueryIris(sessionId, queryRequest.query.iri!);
+  const subQueries = await QueryService.getSubqueryIris(sessionId, queryRequest.query!.iri!);
   console.log("Subqueries to run:", subQueries.length);
   if (subQueries.length)
     for (const subQuery of subQueries) {
@@ -216,7 +216,7 @@ async function runSubQueries(sessionId: string, queryRequest: QueryRequest, quer
         } as QueryRequest);
         const hashCodeVersion = hashQueryRequest(subQueryRequest);
 
-        const existingQueryResultId = await getQueryResultIdIfExistsInJob(queryResultSet.jobId, hashCodeVersion, subQueryRequest.query.iri!);
+        const existingQueryResultId = await getQueryResultIdIfExistsInJob(queryResultSet.jobId, hashCodeVersion, subQueryRequest.query!.iri!);
         if (existingQueryResultId !== -1) {
           queryIrisToHashCodes[subQuery.iri!] = existingQueryResultId;
           continue;
@@ -236,12 +236,12 @@ async function runSubQueries(sessionId: string, queryRequest: QueryRequest, quer
 export async function sortQueryRequestsByDependency(sessionId: string, queryRequests: QueryRequest[]): Promise<QueryRequest[]> {
   const iriToIndex = new Map<string, number>();
   queryRequests.forEach((queryRequest, index) => {
-    if (queryRequest.query.iri) iriToIndex.set(queryRequest.query.iri, index);
+    if (queryRequest.query?.iri) iriToIndex.set(queryRequest.query.iri, index);
   });
 
   const dependencyIndexes: number[][] = await Promise.all(
     queryRequests.map(async queryRequest => {
-      if (!queryRequest.query.iri) return [];
+      if (!queryRequest.query?.iri) return [];
       const subQueries = await QueryService.getSubqueryIris(sessionId, queryRequest.query.iri);
       return subQueries
         .map((subQuery: SubQueryDependency) => (subQuery.iri ? iriToIndex.get(subQuery.iri) : undefined))
@@ -301,7 +301,7 @@ function getIriLine(stringIris: string[]): string {
 export async function getValidatedSQL(queryRequest: QueryRequest, sessionId: string, jobId: number): Promise<string> {
   const debugPatientId = getDebugPatientId(queryRequest);
   const sql = debugPatientId
-    ? await QueryService.getQuerySqlDebug(sessionId, queryRequest.query.iri!, debugPatientId)
+    ? await QueryService.getQuerySqlDebug(sessionId, queryRequest.query!.iri!, debugPatientId)
     : await QueryService.getQuerySql(sessionId, queryRequest);
   if (!sql) {
     throw new Error("Could not generate SQL for query: " + queryRequest?.query?.iri + ", for job: " + jobId);
@@ -313,7 +313,7 @@ export async function getIndicatorSubQueryRequests(
   queryRequest: QueryRequest,
   jobId: number
 ): Promise<{ sql: string; queryRequest: QueryRequest }[]> {
-  if (!queryRequest.query.iri) throw new Error("Query IRI is required to get indicator subqueries");
+  if (!queryRequest.query?.iri) throw new Error("Query IRI is required to get indicator subqueries");
   const queriesToRun = [];
   const subqueries = await QueryService.getSubqueryIris(session, queryRequest.query.iri!, true);
   for (const subquery of subqueries) {

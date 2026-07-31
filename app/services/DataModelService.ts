@@ -1,4 +1,4 @@
-import type { NodeShape, PropertyDisplay, TTIriRef, UIProperty } from "@endeavour/vue-library/interfaces";
+import type { NodeShape, PropertyDisplay, TTIriRef, UIProperty } from "@endeavour/vue-library/models";
 
 const API_URL = "api/imapi/dataModel";
 

@@ -14,7 +14,7 @@ import type {
   TTBundle,
   TTIriRef,
   ValidatedEntity
-} from "@endeavour/vue-library/interfaces";
+} from "@endeavour/vue-library/models";
 
 import { type OrganizationChartNode } from "primevue/organizationchart";
 import type { TreeNode } from "primevue/treenode";

@@ -13,7 +13,7 @@ import type {
   SearchResponse,
   SubQueryDependency,
   TTEntity
-} from "@endeavour/vue-library/interfaces";
+} from "@endeavour/vue-library/models";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}query/protected`;
 

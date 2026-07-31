@@ -1,4 +1,4 @@
-import type { ConceptContextMap, SimpleMap, TermCode } from "@endeavour/vue-library/interfaces";
+import type { ConceptContextMap, SimpleMap, TermCode } from "@endeavour/vue-library/models";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}concept/protected`;
 

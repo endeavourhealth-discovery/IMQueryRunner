@@ -107,7 +107,7 @@ export async function createResultSetEntry(queryRequest: any, job: Job): Promise
 }
 
 export async function createQueryResultEntry(queryRequest: QueryRequest, queryResultSet: QueryResultSet, hashCodeVersion: number, indicatorId?: number) {
-  switch (queryRequest.query.queryType) {
+  switch (queryRequest.query?.queryType) {
     case IMQType.COHORT:
     case IMQType.DATASET:
       const queryResult = {
@@ -126,7 +126,7 @@ export async function createQueryResultEntry(queryRequest: QueryRequest, queryRe
       return result?.[0]?.insertId;
 
     default:
-      throw new Error("Unsupported query type: " + queryRequest.query.queryType);
+      throw new Error("Unsupported query type: " + queryRequest.query?.queryType);
   }
 }
 
@@ -136,7 +136,7 @@ export async function createIndicatorResultEntry(queryRequest: QueryRequest, que
     persistent: queryResultSet.persistent,
     useStartOfDaySnapshot: queryResultSet.useStartOfDaySnapshot,
     startTime: getNow(),
-    queryIri: queryRequest.query.iri,
+    queryIri: queryRequest.query?.iri,
     searchDate: queryResultSet.searchDate ? new Date(queryResultSet.searchDate) : null,
     achievementDate: queryResultSet.achievementDate ? new Date(queryResultSet.achievementDate) : null,
     queryResultSetId: queryResultSet.id,
