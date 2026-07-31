@@ -233,6 +233,42 @@ async function runSubQueries(sessionId: string, queryRequest: QueryRequest, quer
     }
 }
 
+export async function sortQueryRequestsByDependency(sessionId: string, queryRequests: QueryRequest[]): Promise<QueryRequest[]> {
+  const iriToIndex = new Map<string, number>();
+  queryRequests.forEach((queryRequest, index) => {
+    if (queryRequest.query.iri) iriToIndex.set(queryRequest.query.iri, index);
+  });
+
+  const dependencyIndexes: number[][] = await Promise.all(
+    queryRequests.map(async queryRequest => {
+      if (!queryRequest.query.iri) return [];
+      const subQueries = await QueryService.getSubqueryIris(sessionId, queryRequest.query.iri);
+      return subQueries
+        .map((subQuery: SubQueryDependency) => (subQuery.iri ? iriToIndex.get(subQuery.iri) : undefined))
+        .filter((index): index is number => index !== undefined);
+    })
+  );
+
+  const sorted: QueryRequest[] = [];
+  const visited = new Set<number>();
+  const visiting = new Set<number>();
+
+  function visit(index: number) {
+    if (visited.has(index) || visiting.has(index)) return;
+    visiting.add(index);
+    for (const dependencyIndex of dependencyIndexes[index]!) {
+      visit(dependencyIndex);
+    }
+    visiting.delete(index);
+    visited.add(index);
+    sorted.push(queryRequests[index]!);
+  }
+
+  for (let index = 0; index < queryRequests.length; index++) visit(index);
+
+  return sorted;
+}
+
 function getResolvedArguments(sql: string, queryRequest: QueryRequest) {
   if (queryRequest.argument) {
     for (const arg of queryRequest.argument) {

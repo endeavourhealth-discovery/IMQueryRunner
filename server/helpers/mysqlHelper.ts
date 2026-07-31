@@ -13,7 +13,7 @@ import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 import { mysqlDb } from "../db/mysql";
 import { indicatorResultTable, jobTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
 import QueryService from "../services/QueryService";
-import { resolveArgs } from "../utils/executeQuery";
+import { resolveArgs, sortQueryRequestsByDependency } from "../utils/executeQuery";
 
 export async function createJobEntry(jobRequest: JobRequest, sessionId: string, userId: string): Promise<Job> {
   const queryRequestsForSql = [];
@@ -22,10 +22,11 @@ export async function createJobEntry(jobRequest: JobRequest, sessionId: string, 
     resolveArgs(getQueryRequestForSQL);
     queryRequestsForSql.push(getQueryRequestForSQL);
   }
+  const orderedQueryRequests = await sortQueryRequestsByDependency(sessionId!, queryRequestsForSql);
   const now = getNow();
   const queryJob = {
     jobName: jobRequest.jobName || queryRequestsForSql[0]?.query?.name || "Unnamed Job",
-    queryRequests: queryRequestsForSql,
+    queryRequests: orderedQueryRequests,
     startOfDaySnapshot: jobRequest.startOfDaySnapshot ? 1 : 0,
     persistent: jobRequest.persistent ? 1 : 0,
     useStartOfDaySnapshot: jobRequest.useStartOfDaySnapshot ? 1 : 0,
