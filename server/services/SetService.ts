@@ -1,4 +1,5 @@
 import { SetDiffObjectSchema, TTIriRefSchema, parseArray } from "@endeavour/vue-library";
+import { parseApiResponse } from "@endeavour/vue-library/helpers";
 import {
   type ECLQueryRequest,
   type Node,
@@ -42,7 +43,7 @@ const SetService = {
       },
       method: "GET"
     });
-    return PageableNodeSchema.parse(result);
+    return parseApiResponse(result, PageableNodeSchema);
   },
 
   async getMembersFromQuery(sessionId: string, query: Query, pageIndex: number, pageSize: number): Promise<PageableNode> {
@@ -56,7 +57,7 @@ const SetService = {
       body: request,
       method: "POST"
     });
-    return PageableNodeSchema.parse(result);
+    return parseApiResponse(result, PageableNodeSchema);
   },
 
   async getSubsets(sessionId: string, iri: string): Promise<TTIriRef[]> {
@@ -67,7 +68,7 @@ const SetService = {
       },
       method: "GET"
     });
-    return parseArray(result, TTIriRefSchema);
+    return parseApiResponse(result, TTIriRefSchema, true);
   },
 
   async getFullExportSet(sessionId: string, setRequest: SetExportRequest): Promise<Blob> {
@@ -88,7 +89,7 @@ const SetService = {
       },
       method: "GET"
     });
-    return SetDiffObjectSchema.parse(result);
+    return parseApiResponse(result, SetDiffObjectSchema);
   },
 
   async updateSubsetsFromSuper(sessionId: string, entity: TTEntity): Promise<void> {

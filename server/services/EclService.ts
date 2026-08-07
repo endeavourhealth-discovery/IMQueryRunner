@@ -1,3 +1,4 @@
+import { parseApiResponse } from "@endeavour/vue-library/helpers";
 import { type ECLQueryRequest, ECLQueryRequestSchema, type Query, type SearchResponse, SearchResponseSchema } from "@endeavour/vue-library/models";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}/ecl/protected`;
@@ -9,7 +10,7 @@ const EclService = {
       body: eclSearchRequest,
       method: "POST"
     });
-    return SearchResponseSchema.parse(results);
+    return parseApiResponse(results, SearchResponseSchema);
   },
 
   async getEcl(sessionId: string, query: Query): Promise<string> {
@@ -30,7 +31,7 @@ const EclService = {
       ignoreResponseError: raw,
       method: "POST"
     });
-    return ECLQueryRequestSchema.parse(result);
+    return parseApiResponse(result, ECLQueryRequestSchema);
   },
 
   async getEclFromEcl(sessionId: string, ecl: string, showNames: boolean): Promise<ECLQueryRequest> {
@@ -43,7 +44,7 @@ const EclService = {
       ignoreResponseError: true,
       method: "POST"
     });
-    return ECLQueryRequestSchema.parse(result);
+    return parseApiResponse(result, ECLQueryRequestSchema);
   },
 
   async validateECL(sessionId: string, ecl: string, showNames: boolean): Promise<ECLQueryRequest> {
@@ -55,7 +56,7 @@ const EclService = {
       },
       method: "POST"
     });
-    return ECLQueryRequestSchema.parse(result);
+    return parseApiResponse(result, ECLQueryRequestSchema);
   },
 
   async validateModelFromECL(sessionId: string, ecl: string, showNames: boolean): Promise<ECLQueryRequest> {
@@ -68,7 +69,7 @@ const EclService = {
       ignoreResponseError: true,
       method: "POST"
     });
-    return ECLQueryRequestSchema.parse(result);
+    return parseApiResponse(result, ECLQueryRequestSchema);
   },
 
   async validateModelFromQuery(sessionId: string, query: Query): Promise<ECLQueryRequest> {
@@ -81,7 +82,7 @@ const EclService = {
       ignoreResponseError: true,
       method: "POST"
     });
-    return ECLQueryRequestSchema.parse(result);
+    return parseApiResponse(result, ECLQueryRequestSchema);
   },
 
   async getPropertiesForDomains(sessionId: string, conceptIri: string[], controller?: AbortController): Promise<string[]> {
@@ -121,7 +122,7 @@ const EclService = {
       ignoreResponseError: true,
       method: "POST"
     });
-    return ECLQueryRequestSchema.parse(result);
+    return parseApiResponse(result, ECLQueryRequestSchema);
   }
 };
 export default EclService;

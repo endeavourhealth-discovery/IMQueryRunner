@@ -22,7 +22,7 @@ const SetService = {
   },
 
   async getMembers(iri: string, entailments: boolean, pageIndex: number, pageSize: number, controller?: AbortController): Promise<PageableNode> {
-    const result = await $fetch(API_URL + "/members", {
+    return await $fetch<PageableNode>(API_URL + "/members", {
       params: {
         iri: iri,
         entailments: entailments,
@@ -32,7 +32,6 @@ const SetService = {
       signal: controller?.signal,
       method: "GET"
     });
-    return PageableNodeSchema.parse(result);
   },
 
   async getMembersFromQuery(query: Query, pageIndex: number, pageSize: number): Promise<PageableNode> {
@@ -41,11 +40,10 @@ const SetService = {
       page: pageIndex,
       size: pageSize
     } as ECLQueryRequest;
-    const result = await $fetch(API_URL + "/membersFromQuery", {
+    return await $fetch<PageableNode>(API_URL + "/membersFromQuery", {
       body: request,
       method: "POST"
     });
-    return PageableNodeSchema.parse(result);
   },
 
   async getSubsets(iri: string): Promise<TTIriRef[]> {

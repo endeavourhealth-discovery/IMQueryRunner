@@ -137,7 +137,7 @@ const EntityService = {
     filters?: FiltersAsIris,
     controller?: AbortController
   ): Promise<PageableTTIriRef> {
-    const result = await $fetch(API_URL + "/partialAndTotalCount", {
+    return await $fetch<PageableTTIriRef>(API_URL + "/partialAndTotalCount", {
       params: {
         iri: iri,
         predicate: predicate,
@@ -148,7 +148,6 @@ const EntityService = {
       signal: controller?.signal,
       method: "GET"
     });
-    return PageableTTIriRefSchema.parse(result);
   },
 
   async downloadEntity(iri: string): Promise<Blob> {

@@ -1,5 +1,6 @@
 import { DisplayMode } from "@endeavour/vue-library/enums";
 import { isArrayHasLength, isObjectHasKeys, parseArray } from "@endeavour/vue-library/helpers";
+import { parseApiResponse } from "@endeavour/vue-library/helpers";
 import {
   type ArgumentReference,
   ArgumentReferenceSchema,
@@ -50,7 +51,7 @@ const QueryService = {
       body: query,
       method: "POST"
     });
-    return QueryResponseSchema.parse(result);
+    return parseApiResponse(result, QueryResponseSchema);
   },
 
   async flattenBooleans(sessionId: string, query: Query): Promise<Query> {
@@ -59,7 +60,7 @@ const QueryService = {
       body: query,
       method: "POST"
     });
-    return QuerySchema.parse(result);
+    return parseApiResponse(result, QuerySchema);
   },
 
   async optimiseECLQuery(sessionId: string, query: Query): Promise<Query> {
@@ -68,7 +69,7 @@ const QueryService = {
       body: query,
       method: "POST"
     });
-    return QuerySchema.parse(result);
+    return parseApiResponse(result, QuerySchema);
   },
 
   async queryIMSearch(sessionId: string, queryRequest: QueryRequest): Promise<SearchResponse> {
@@ -77,7 +78,7 @@ const QueryService = {
       body: queryRequest,
       method: "POST"
     });
-    return SearchResponseSchema.parse(result);
+    return parseApiResponse(result, SearchResponseSchema);
   },
 
   async pathQuery(sessionId: string, pathQuery: PathQuery): Promise<PathDocument> {
@@ -86,7 +87,7 @@ const QueryService = {
       body: pathQuery,
       method: "POST"
     });
-    return PathDocumentSchema.parse(result);
+    return parseApiResponse(result, PathDocumentSchema);
   },
 
   async askQuery(sessionId: string, query: QueryRequest): Promise<boolean> {
@@ -103,7 +104,7 @@ const QueryService = {
       body: { query: query, displayMode: displayMode },
       method: "POST"
     });
-    return QuerySchema.parse(result);
+    return parseApiResponse(result, QuerySchema);
   },
 
   async getDisplayFromQueryIri(sessionId: string, iri: string, displayMode: DisplayMode): Promise<Query> {
@@ -112,7 +113,7 @@ const QueryService = {
       params: { queryIri: iri, displayMode: displayMode },
       method: "GET"
     });
-    return QuerySchema.parse(result);
+    return parseApiResponse(result, QuerySchema);
   },
 
   async getQueryFromIri(sessionId: string, iri: string): Promise<Query> {
@@ -121,7 +122,7 @@ const QueryService = {
       params: { queryIri: iri },
       method: "GET"
     });
-    return QuerySchema.parse(result);
+    return parseApiResponse(result, QuerySchema);
   },
 
   async getDisplayFromIndicatorIri(sessionId: string, iri: string): Promise<Indicator> {
@@ -130,7 +131,7 @@ const QueryService = {
       params: { queryIri: iri },
       method: "GET"
     });
-    return IndicatorSchema.parse(result);
+    return parseApiResponse(result, IndicatorSchema);
   },
 
   async expandCohort(sessionId: string, queryIri: string, cohortIri: string, displayMode: DisplayMode): Promise<Query> {
@@ -143,7 +144,7 @@ const QueryService = {
       },
       method: "GET"
     });
-    return QuerySchema.parse(result);
+    return parseApiResponse(result, QuerySchema);
   },
 
   async getDefaultQuery(sessionId: string): Promise<Query> {
@@ -151,7 +152,7 @@ const QueryService = {
       headers: { cookie: `session_id=${sessionId}` },
       method: "GET"
     });
-    return QuerySchema.parse(result);
+    return parseApiResponse(result, QuerySchema);
   },
 
   async generateQuerySQL(sessionId: string, queryIri: string, lang?: string): Promise<string> {
@@ -168,7 +169,7 @@ const QueryService = {
       params: { queryIri: queryIri },
       method: "GET"
     });
-    return IMLLanguageSchema.parse(result);
+    return parseApiResponse(result, IMLLanguageSchema);
   },
 
   async generateQuerySQLfromQuery(sessionId: string, queryRequest: QueryRequest): Promise<string> {
@@ -202,7 +203,7 @@ const QueryService = {
       body: queryRequest,
       method: "POST"
     });
-    return parseArray(result, ArgumentReferenceSchema);
+    return parseApiResponse(result, ArgumentReferenceSchema, true);
   },
 
   async validateQuery(sessionId: string, query: Query): Promise<Query> {
@@ -211,7 +212,7 @@ const QueryService = {
       body: query,
       method: "POST"
     });
-    return QuerySchema.parse(result);
+    return parseApiResponse(result, QuerySchema);
   },
 
   async getNestedReturns(sessionId: string, match: Query): Promise<Return[]> {
@@ -220,7 +221,7 @@ const QueryService = {
       body: { match: match },
       method: "POST"
     });
-    return parseArray(result, ReturnSchema);
+    return parseApiResponse(result, ReturnSchema, true);
   },
 
   async getSubqueryIris(sessionId: string, queryIri: string, isIndicator: boolean = false): Promise<SubQueryDependency[]> {
@@ -232,7 +233,7 @@ const QueryService = {
       },
       method: "get"
     });
-    return parseArray(result, SubQueryDependencySchema);
+    return parseApiResponse(result, SubQueryDependencySchema, true);
   },
 
   async getQueryRequestForSQL(sessionId: string, queryRequest: QueryRequest): Promise<QueryRequest> {
@@ -241,7 +242,7 @@ const QueryService = {
       body: queryRequest,
       method: "post"
     });
-    return QueryRequestSchema.parse(result);
+    return parseApiResponse(result, QueryRequestSchema);
   }
 };
 

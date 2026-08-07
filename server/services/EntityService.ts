@@ -11,6 +11,7 @@ import {
   TTIriRefSchema,
   parseArray
 } from "@endeavour/vue-library";
+import { parseApiResponse } from "@endeavour/vue-library";
 import { IM } from "@endeavour/vue-library/enums";
 import {
   type DownloadByQueryOptions,
@@ -33,21 +34,21 @@ const EntityService = {
     const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/public/namespaces`, {
       method: "get"
     });
-    return parseArray(result, NamespaceSchema);
+    return parseApiResponse(result, NamespaceSchema, true);
   },
 
   async getFilterOptions(): Promise<FilterOptions> {
     const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/public/filterOptions`, {
       method: "get"
     });
-    return FilterOptionsSchema.parse(result);
+    return parseApiResponse(result, FilterOptionsSchema);
   },
 
   async getFilterDefaultOptions(): Promise<FilterOptions> {
     const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/public/filterDefaults`, {
       method: "get"
     });
-    return FilterOptionsSchema.parse(result);
+    return parseApiResponse(result, FilterOptionsSchema);
   },
 
   // PROTECTED
@@ -60,7 +61,7 @@ const EntityService = {
       },
       method: "get"
     });
-    return TTEntitySchema.parse(result);
+    return parseApiResponse(result, TTEntitySchema);
   },
 
   async getPartialEntities(sessionId: string, typeIris: string[], predicates: string[]): Promise<TTEntity[]> {
@@ -72,7 +73,7 @@ const EntityService = {
       },
       method: "POST"
     });
-    return parseArray(result, TTEntitySchema);
+    return parseApiResponse(result, TTEntitySchema, true);
   },
 
   async getPartialEntityBundle(sessionId: string, iri: string, predicates: string[]): Promise<TTBundle> {
@@ -84,7 +85,7 @@ const EntityService = {
       },
       method: "get"
     });
-    return TTBundleSchema.parse(result);
+    return parseApiResponse(result, TTBundleSchema);
   },
 
   async getEntityChildren(sessionId: string, iri: string, schemeIris?: string[], controller?: AbortController): Promise<ExtendedEntityReferenceNode[]> {
@@ -97,7 +98,7 @@ const EntityService = {
       signal: controller?.signal,
       method: "get"
     });
-    return parseArray(result, ExtendedEntityReferenceNodeSchema);
+    return parseApiResponse(result, ExtendedEntityReferenceNodeSchema, true);
   },
 
   async getEntityAsEntityReferenceNode(sessionId: string, iri: string): Promise<ExtendedEntityReferenceNode> {
@@ -108,7 +109,7 @@ const EntityService = {
       },
       method: "get"
     });
-    return ExtendedEntityReferenceNodeSchema.parse(result);
+    return parseApiResponse(result, ExtendedEntityReferenceNodeSchema);
   },
 
   async getAsEntityReferenceNodes(sessionId: string, iris: string[]): Promise<TTEntity> {
@@ -119,7 +120,7 @@ const EntityService = {
       },
       method: "get"
     });
-    return TTEntitySchema.parse(result);
+    return parseApiResponse(result, TTEntitySchema);
   },
 
   async getPagedChildren(
@@ -143,7 +144,7 @@ const EntityService = {
       signal: controller?.signal,
       method: "get"
     });
-    return PageableEntityReferenceNodeSchema.parse(result);
+    return parseApiResponse(result, PageableEntityReferenceNodeSchema);
   },
 
   async getPartialAndTotalCount(
@@ -167,7 +168,7 @@ const EntityService = {
       signal: controller?.signal,
       method: "GET"
     });
-    return PageableTTIriRefSchema.parse(result);
+    return parseApiResponse(result, PageableTTIriRefSchema);
   },
 
   async downloadEntity(sessionId: string, iri: string): Promise<Blob> {
@@ -185,7 +186,7 @@ const EntityService = {
       params: { iri: iri, schemeIris: schemeIris?.join(",") },
       method: "GET"
     });
-    return parseArray(result, ExtendedEntityReferenceNodeSchema);
+    return parseApiResponse(result, ExtendedEntityReferenceNodeSchema, true);
   },
 
   async getEntityUsages(sessionId: string, iri: string, pageIndex: number, pageSize: number): Promise<TTEntity[]> {
@@ -198,7 +199,7 @@ const EntityService = {
       },
       method: "GET"
     });
-    return parseArray(result, TTEntitySchema);
+    return parseApiResponse(result, TTEntitySchema, true);
   },
 
   async getUsagesTotalRecords(sessionId: string, iri: string): Promise<number> {
@@ -225,7 +226,7 @@ const EntityService = {
       params: { iri: iri },
       method: "GET"
     });
-    return SearchResultSummarySchema.parse(result);
+    return parseApiResponse(result, SearchResultSummarySchema);
   },
 
   async downloadSearchResults(sessionId: string, downloadSettings: DownloadByQueryOptions) {
@@ -244,7 +245,7 @@ const EntityService = {
       params: { iri: iri },
       method: "GET"
     });
-    return parseArray(result, TTIriRefSchema);
+    return parseApiResponse(result, TTIriRefSchema, true);
   },
 
   async getPathBetweenNodes(sessionId: string, descendant: string, ancestor: string): Promise<TTIriRef[]> {
@@ -253,7 +254,7 @@ const EntityService = {
       params: { descendant: descendant, ancestor: ancestor },
       method: "GET"
     });
-    return parseArray(result, TTIriRefSchema);
+    return parseApiResponse(result, TTIriRefSchema, true);
   },
 
   async getEntityByPredicateExclusions(sessionId: string, iri: string, predicates: string[]): Promise<TTEntity> {
@@ -262,7 +263,7 @@ const EntityService = {
       params: { iri: iri, predicates: predicates.join(",") },
       method: "GET"
     });
-    return TTEntitySchema.parse(result);
+    return parseApiResponse(result, TTEntitySchema);
   },
 
   async getBundleByPredicateExclusions(sessionId: string, iri: string, predicates: string[]): Promise<TTBundle> {
@@ -271,7 +272,7 @@ const EntityService = {
       params: { iri: iri, predicates: predicates.join(",") },
       method: "GET"
     });
-    return TTBundleSchema.parse(result);
+    return parseApiResponse(result, TTBundleSchema);
   },
 
   async checkValidation(sessionId: string, validationIri: string, data: EntityValidationRequest): Promise<{ valid: boolean; message: string | undefined }> {
@@ -296,7 +297,7 @@ const EntityService = {
       params: { iri: iri },
       method: "GET"
     });
-    return parseArray(result, TTEntitySchema);
+    return parseApiResponse(result, TTEntitySchema, true);
   },
 
   async getAllowableChildTypes(sessionId: string, iri: string): Promise<TTEntity[]> {
@@ -305,7 +306,7 @@ const EntityService = {
       params: { iri: iri },
       method: "GET"
     });
-    return parseArray(result, TTEntitySchema);
+    return parseApiResponse(result, TTEntitySchema, true);
   },
 
   // PRIVATE
