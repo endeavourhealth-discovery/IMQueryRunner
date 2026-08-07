@@ -2,6 +2,8 @@ import { PropertyDisplaySchema, TTIriRefSchema, UIPropertySchema, parseArray } f
 import { parseApiResponse } from "@endeavour/vue-library/helpers";
 import { type NodeShape, NodeShapeSchema, type PropertyDisplay, type TTIriRef, type UIProperty } from "@endeavour/vue-library/models";
 
+import z from "zod";
+
 const API_URL = `${useRuntimeConfig().public.imapiUrl}dataModel/protected`;
 
 const DataModelService = {
@@ -25,7 +27,7 @@ const DataModelService = {
       },
       method: "GET"
     });
-    return parseApiResponse(result, NodeShapeSchema, true);
+    return parseApiResponse(result, z.array(NodeShapeSchema));
   },
   async getDataModelsFromProperty(sessionId: string, propIri: string): Promise<TTIriRef[]> {
     const result = await $fetch(API_URL + "/dataModels", {
@@ -35,7 +37,7 @@ const DataModelService = {
       },
       method: "GET"
     });
-    return parseApiResponse(result, TTIriRefSchema, true);
+    return parseApiResponse(result, z.array(TTIriRefSchema));
   },
   async checkPropertyType(sessionId: string, iri: string): Promise<string> {
     return await $fetch<string>(API_URL + "/checkPropertyType", {
@@ -60,7 +62,7 @@ const DataModelService = {
       params: { iri: iri },
       method: "GET"
     });
-    return parseApiResponse(result, PropertyDisplaySchema, true);
+    return parseApiResponse(result, z.array(PropertyDisplaySchema));
   }
 };
 if (process.env.NODE_ENV !== "test") Object.freeze(DataModelService);

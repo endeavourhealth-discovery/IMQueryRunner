@@ -3,6 +3,8 @@ import { parseApiResponse } from "@endeavour/vue-library";
 import { REPO } from "@endeavour/vue-library/enums";
 import { type GithubRelease, GithubReleaseSchema } from "@endeavour/vue-library/models";
 
+import z from "zod";
+
 const API_URL = `${useRuntimeConfig().public.imapiUrl}github`;
 
 const GithubService = {
@@ -27,7 +29,7 @@ const GithubService = {
       params: { repositoryName: repositoryName },
       method: "GET"
     });
-    return parseApiResponse(result, GithubReleaseSchema, true);
+    return parseApiResponse(result, z.array(GithubReleaseSchema));
   }
 };
 

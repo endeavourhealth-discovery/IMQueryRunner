@@ -13,6 +13,8 @@ import {
   type TTIriRef
 } from "@endeavour/vue-library/models";
 
+import z from "zod";
+
 const API_URL = `${useRuntimeConfig().public.imapiUrl}set`;
 
 const SetService = {
@@ -68,7 +70,7 @@ const SetService = {
       },
       method: "GET"
     });
-    return parseApiResponse(result, TTIriRefSchema, true);
+    return parseApiResponse(result, z.array(TTIriRefSchema));
   },
 
   async getFullExportSet(sessionId: string, setRequest: SetExportRequest): Promise<Blob> {

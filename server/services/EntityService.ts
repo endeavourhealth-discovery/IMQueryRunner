@@ -27,6 +27,7 @@ import {
 } from "@endeavour/vue-library/models";
 
 import type { OrganizationChartNode } from "primevue";
+import z from "zod";
 
 const EntityService = {
   // PUBLIC
@@ -34,7 +35,7 @@ const EntityService = {
     const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/public/namespaces`, {
       method: "get"
     });
-    return parseApiResponse(result, NamespaceSchema, true);
+    return parseApiResponse(result, z.array(NamespaceSchema));
   },
 
   async getFilterOptions(): Promise<FilterOptions> {
@@ -73,7 +74,7 @@ const EntityService = {
       },
       method: "POST"
     });
-    return parseApiResponse(result, TTEntitySchema, true);
+    return parseApiResponse(result, z.array(TTEntitySchema));
   },
 
   async getPartialEntityBundle(sessionId: string, iri: string, predicates: string[]): Promise<TTBundle> {
@@ -98,7 +99,7 @@ const EntityService = {
       signal: controller?.signal,
       method: "get"
     });
-    return parseApiResponse(result, ExtendedEntityReferenceNodeSchema, true);
+    return parseApiResponse(result, z.array(ExtendedEntityReferenceNodeSchema));
   },
 
   async getEntityAsEntityReferenceNode(sessionId: string, iri: string): Promise<ExtendedEntityReferenceNode> {
@@ -186,7 +187,7 @@ const EntityService = {
       params: { iri: iri, schemeIris: schemeIris?.join(",") },
       method: "GET"
     });
-    return parseApiResponse(result, ExtendedEntityReferenceNodeSchema, true);
+    return parseApiResponse(result, z.array(ExtendedEntityReferenceNodeSchema));
   },
 
   async getEntityUsages(sessionId: string, iri: string, pageIndex: number, pageSize: number): Promise<TTEntity[]> {
@@ -199,7 +200,7 @@ const EntityService = {
       },
       method: "GET"
     });
-    return parseApiResponse(result, TTEntitySchema, true);
+    return parseApiResponse(result, z.array(TTEntitySchema));
   },
 
   async getUsagesTotalRecords(sessionId: string, iri: string): Promise<number> {
@@ -245,7 +246,7 @@ const EntityService = {
       params: { iri: iri },
       method: "GET"
     });
-    return parseApiResponse(result, TTIriRefSchema, true);
+    return parseApiResponse(result, z.array(TTIriRefSchema));
   },
 
   async getPathBetweenNodes(sessionId: string, descendant: string, ancestor: string): Promise<TTIriRef[]> {
@@ -254,7 +255,7 @@ const EntityService = {
       params: { descendant: descendant, ancestor: ancestor },
       method: "GET"
     });
-    return parseApiResponse(result, TTIriRefSchema, true);
+    return parseApiResponse(result, z.array(TTIriRefSchema));
   },
 
   async getEntityByPredicateExclusions(sessionId: string, iri: string, predicates: string[]): Promise<TTEntity> {
@@ -297,7 +298,7 @@ const EntityService = {
       params: { iri: iri },
       method: "GET"
     });
-    return parseApiResponse(result, TTEntitySchema, true);
+    return parseApiResponse(result, z.array(TTEntitySchema));
   },
 
   async getAllowableChildTypes(sessionId: string, iri: string): Promise<TTEntity[]> {
@@ -306,7 +307,7 @@ const EntityService = {
       params: { iri: iri },
       method: "GET"
     });
-    return parseApiResponse(result, TTEntitySchema, true);
+    return parseApiResponse(result, z.array(TTEntitySchema));
   },
 
   // PRIVATE

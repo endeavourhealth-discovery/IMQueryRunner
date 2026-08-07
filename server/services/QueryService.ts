@@ -27,6 +27,8 @@ import {
   isQuery
 } from "@endeavour/vue-library/models";
 
+import z from "zod";
+
 const API_URL = `${useRuntimeConfig().public.imapiUrl}query/protected`;
 
 const QueryService = {
@@ -203,7 +205,7 @@ const QueryService = {
       body: queryRequest,
       method: "POST"
     });
-    return parseApiResponse(result, ArgumentReferenceSchema, true);
+    return parseApiResponse(result, z.array(ArgumentReferenceSchema));
   },
 
   async validateQuery(sessionId: string, query: Query): Promise<Query> {
@@ -221,7 +223,7 @@ const QueryService = {
       body: { match: match },
       method: "POST"
     });
-    return parseApiResponse(result, ReturnSchema, true);
+    return parseApiResponse(result, z.array(ReturnSchema));
   },
 
   async getSubqueryIris(sessionId: string, queryIri: string, isIndicator: boolean = false): Promise<SubQueryDependency[]> {
@@ -233,7 +235,7 @@ const QueryService = {
       },
       method: "get"
     });
-    return parseApiResponse(result, SubQueryDependencySchema, true);
+    return parseApiResponse(result, z.array(SubQueryDependencySchema));
   },
 
   async getQueryRequestForSQL(sessionId: string, queryRequest: QueryRequest): Promise<QueryRequest> {
