@@ -1,4 +1,5 @@
 import { PrimeVueColors, PrimeVuePresetThemes } from "@endeavour/vue-library/enums";
+import { parseApiResponse } from "@endeavour/vue-library/helpers";
 import type { NamespacePermissionJava, RecentActivityItemDto } from "@endeavour/vue-library/models";
 import { User, UserSchema } from "@endeavour/vue-library/models";
 
@@ -14,7 +15,7 @@ const UserService = {
       body: preset,
       method: "POST"
     });
-    return UserSchema.parse(result);
+    return parseApiResponse(result, UserSchema);
   },
 
   async updateUserPrimaryColor(sessionId: string, color: PrimeVueColors): Promise<User> {
@@ -26,7 +27,7 @@ const UserService = {
       },
       method: "POST"
     });
-    return UserSchema.parse(result);
+    return parseApiResponse(result, UserSchema);
   },
 
   async updateUserSurfaceColor(sessionId: string, color: PrimeVueColors): Promise<User> {
@@ -38,7 +39,7 @@ const UserService = {
       },
       method: "POST"
     });
-    return UserSchema.parse(result);
+    return parseApiResponse(result, UserSchema);
   },
 
   async updateUserDarkMode(sessionId: string, bool: boolean): Promise<User> {
@@ -47,7 +48,7 @@ const UserService = {
       body: { bool: bool },
       method: "POST"
     });
-    return UserSchema.parse(result);
+    return parseApiResponse(result, UserSchema);
   },
 
   async updateUserFontSize(sessionId: string, fontSize: string): Promise<User> {
@@ -59,7 +60,7 @@ const UserService = {
       },
       method: "POST"
     });
-    return UserSchema.parse(result);
+    return parseApiResponse(result, UserSchema);
   },
 
   async updateUserRecentActivity(sessionId: string, recentActivity: RecentActivityItemDto[]): Promise<User> {
@@ -68,7 +69,7 @@ const UserService = {
       body: recentActivity,
       method: "POST"
     });
-    return UserSchema.parse(result);
+    return parseApiResponse(result, UserSchema);
   },
 
   async updateUserFavourites(sessionId: string, favourites: string[]): Promise<User> {
@@ -77,7 +78,7 @@ const UserService = {
       body: favourites,
       method: "POST"
     });
-    return UserSchema.parse(result);
+    return parseApiResponse(result, UserSchema);
   },
 
   async updateUserOrganisations(sessionId: string, organisations: string[]): Promise<User> {
@@ -86,7 +87,7 @@ const UserService = {
       body: organisations,
       method: "POST"
     });
-    return UserSchema.parse(result);
+    return parseApiResponse(result, UserSchema);
   },
 
   async updateUserNamespaces(sessionId: string, namespaces: NamespacePermissionJava[]): Promise<User> {

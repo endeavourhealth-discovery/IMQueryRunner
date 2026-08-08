@@ -1,5 +1,8 @@
 import { PropertyDisplaySchema, TTIriRefSchema, UIPropertySchema, parseArray } from "@endeavour/vue-library";
+import { parseApiResponse } from "@endeavour/vue-library/helpers";
 import { type NodeShape, NodeShapeSchema, type PropertyDisplay, type TTIriRef, type UIProperty } from "@endeavour/vue-library/models";
+
+import z from "zod";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}dataModel/protected`;
 
@@ -13,7 +16,7 @@ const DataModelService = {
       },
       method: "GET"
     });
-    return NodeShapeSchema.parse(result);
+    return parseApiResponse(result, NodeShapeSchema);
   },
   async getDataModelPropertiesWithValueType(sessionId: string, iris: string[], valueType: string): Promise<NodeShape[]> {
     const result = await $fetch(API_URL + "/dataModelPropertiesWithValueType", {
@@ -24,7 +27,7 @@ const DataModelService = {
       },
       method: "GET"
     });
-    return parseArray(result, NodeShapeSchema);
+    return parseApiResponse(result, z.array(NodeShapeSchema));
   },
   async getDataModelsFromProperty(sessionId: string, propIri: string): Promise<TTIriRef[]> {
     const result = await $fetch(API_URL + "/dataModels", {
@@ -34,7 +37,7 @@ const DataModelService = {
       },
       method: "GET"
     });
-    return parseArray(result, TTIriRefSchema);
+    return parseApiResponse(result, z.array(TTIriRefSchema));
   },
   async checkPropertyType(sessionId: string, iri: string): Promise<string> {
     return await $fetch<string>(API_URL + "/checkPropertyType", {
@@ -50,7 +53,7 @@ const DataModelService = {
       params: { dmIri: dmIri, propIri: propIri },
       method: "GET"
     });
-    return UIPropertySchema.parse(result);
+    return parseApiResponse(result, UIPropertySchema);
   },
 
   async getPropertiesDisplay(sessionId: string, iri: string): Promise<PropertyDisplay[]> {
@@ -59,7 +62,7 @@ const DataModelService = {
       params: { iri: iri },
       method: "GET"
     });
-    return parseArray(result, PropertyDisplaySchema);
+    return parseApiResponse(result, z.array(PropertyDisplaySchema));
   }
 };
 if (process.env.NODE_ENV !== "test") Object.freeze(DataModelService);

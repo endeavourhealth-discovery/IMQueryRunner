@@ -1,6 +1,9 @@
 import { parseArray } from "@endeavour/vue-library";
+import { parseApiResponse } from "@endeavour/vue-library";
 import { REPO } from "@endeavour/vue-library/enums";
 import { type GithubRelease, GithubReleaseSchema } from "@endeavour/vue-library/models";
+
+import z from "zod";
 
 const API_URL = `${useRuntimeConfig().public.imapiUrl}github`;
 
@@ -14,7 +17,7 @@ const GithubService = {
       params: { repositoryName: repositoryName },
       method: "GET"
     });
-    return GithubReleaseSchema.parse(result);
+    return parseApiResponse(result, GithubReleaseSchema);
   },
 
   async getAllReleases(sessionId: string, repositoryName: REPO): Promise<GithubRelease[]> {
@@ -26,7 +29,7 @@ const GithubService = {
       params: { repositoryName: repositoryName },
       method: "GET"
     });
-    return parseArray(result, GithubReleaseSchema);
+    return parseApiResponse(result, z.array(GithubReleaseSchema));
   }
 };
 
