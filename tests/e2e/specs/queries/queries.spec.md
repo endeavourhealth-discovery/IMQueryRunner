@@ -45,3 +45,30 @@ This specification describes the query running functionality of IMQueryRunner.
 * Check total results equal "11"
 * Click "Back to queue" button
 
+## Run Data set for Diabetes mental health screen achieved
+* Open IMQueryRunner
+* Login
+* Click "Run a query" button
+* Search for "Data set for Diabetes mental health screen achieved" and select
+* Click "Add to queue" button
+* Click "Run queue" button
+* Click "Select" button
+* Wait "10" seconds
+* Click "Refresh" button
+* Open results page
+* Check total results equal "11"
+* Click "Back to queue" button
+
+## Run CKD005 - Patients on the CKD register
+* Open IMQueryRunner
+* Login
+* Click "Run a query" button
+* Search for "CKD005 - Patients on the CKD register" and select
+* Click "Add to queue" button
+* Click "Run queue" button
+* Click "Select" button
+* Wait "10" seconds
+* Click "Refresh" button
+* Open results page
+* Check total results equal "1"
+* Click "Back to queue" button
