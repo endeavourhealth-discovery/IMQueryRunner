@@ -35,7 +35,7 @@ This specification describes the query running functionality of IMQueryRunner.
 * Open IMQueryRunner
 * Login
 * Click "Run a query" button
-* Search for "DM017 - Patients aged 17 or over on the diabetes register" and select
+* Search for "DM017 | Diabetes Register" and select
 * Click "Add to queue" button
 * Click "Run queue" button
 * Click "Select" button
