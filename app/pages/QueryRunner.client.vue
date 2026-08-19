@@ -80,8 +80,8 @@ import type { Job, JobRequest } from "~~/models";
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
 
-import { useUserStore } from "@endeavour/vue-library";
 import type { Argument } from "@endeavour/vue-library/models";
+import { useUserStore } from "@endeavour/vue-library/stores";
 
 import { io } from "socket.io-client";
 
@@ -90,12 +90,12 @@ definePageMeta({
   requiresRole: ["EXECUTOR", "ADMIN"]
 });
 
-const { currentUser } = useUserStore();
+const userStore = useUserStore();
 const confirm = useConfirm();
 
 const socket = io({
   extraHeaders: {
-    authorization: `bearer ${currentUser?.id}`
+    authorization: `bearer ${userStore.currentUser?.id}`
   }
 });
 
@@ -132,10 +132,11 @@ const polling = ref(false);
 
 onMounted(async () => {
   loading.value = true;
+  if (userStore.refreshInterval) pollInterval.value = userStore.refreshInterval;
   loading.value = false;
   document.addEventListener("visibilitychange", handleVisibilityChange);
   scheduleNextPoll();
-  socket.emit("joinRoom", "test-room", currentUser?.username);
+  socket.emit("joinRoom", "test-room", userStore.currentUser?.username);
   socket.on("message", function (data) {
     alert(data);
   });
@@ -144,6 +145,7 @@ onMounted(async () => {
 });
 
 watch(pollInterval, () => {
+  userStore.updateRefreshInterval(pollInterval.value);
   scheduleNextPoll();
 });
 
@@ -154,7 +156,7 @@ async function initSearch() {
     result: Job[];
   }>("/api/queue", {
     query: {
-      userId: currentUser?.id,
+      userId: userStore.currentUser?.id,
       page: page.value,
       size: rows.value
     }
@@ -209,7 +211,7 @@ async function refresh() {
   searchLoading.value = true;
   const foundJobs = await $fetch<{ totalCount: number; result: Job[] }>("/api/queue", {
     query: {
-      userId: currentUser?.id,
+      userId: userStore.currentUser?.id,
       page: page.value,
       size: rows.value
     }
