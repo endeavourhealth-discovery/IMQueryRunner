@@ -123,8 +123,8 @@ const intervalList = ref<IntervalOption[]>([
   { name: "manual", time: 0 },
   { name: "every 5s", time: 5000 },
   { name: "every 10s", time: 10000 },
-  { name: "every 15s", time: 150000 },
-  { name: "every 30s", time: 300000 }
+  { name: "every 15s", time: 15000 },
+  { name: "every 30s", time: 30000 }
 ]);
 const pollInterval = ref(0);
 const pollTimer = ref<ReturnType<typeof setTimeout> | undefined>();
