@@ -2,64 +2,69 @@
   <div class="flex-auto overflow-auto">
     <div class="h-[calc(100% - 3.5rem)] overflow-auto">
       <div class="flex h-full flex-auto flex-col flex-nowrap overflow-auto bg-(--p-content-background)">
-        <div class="flex gap-2 m-2">
-          <Button class="flex" severity="secondary" icon="fa-solid fa-arrows-rotate" label="Refresh" @click="refresh" />
+        <div class="flex gap-4 m-2">
+          <div class="flex gap-1 m-0">
+            <Button class="flex" severity="secondary" icon="fa-solid fa-arrows-rotate" label="Refresh" @click="refresh" />
+            <Select v-model="pollInterval" :options="intervalList" optionLabel="name" optionValue="time" placeholder="Refresh every..."></Select>
+          </div>
           <Button class="flex" icon="fa-solid fa-magnifying-glass" label="Run a query" @click="runQuery" />
         </div>
-        <DataTable
-          :value="jobs"
-          :paginator="true"
-          :rows="rows"
-          :scrollable="true"
-          scrollHeight="flex"
-          :autoLayout="true"
-          @page="onPage($event)"
-          :lazy="true"
-          :totalRecords="totalCount"
-          :rows-per-page-options="[rowsOriginal, rowsOriginal * 2, rowsOriginal * 4, rowsOriginal * 8]"
-          :loading="searchLoading"
-          :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
-        >
-          <template #empty>None</template>
-          <Column field="jobName" header="Job name"></Column>
-          <Column>
-            <template #body="{ data }: { data: Job }">
-              <!-- <Button
+        <transition name="fade">
+          <DataTable
+            :value="jobs"
+            :paginator="true"
+            :rows="rows"
+            :scrollable="true"
+            scrollHeight="flex"
+            :autoLayout="true"
+            @page="onPage($event)"
+            :lazy="true"
+            :totalRecords="totalCount"
+            :rows-per-page-options="[rowsOriginal, rowsOriginal * 2, rowsOriginal * 4, rowsOriginal * 8]"
+            :loading="searchLoading"
+            :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
+          >
+            <template #empty>None</template>
+            <Column field="jobName" header="Job name"></Column>
+            <Column>
+              <template #body="{ data }: { data: Job }">
+                <!-- <Button
                 :disabled="!data.queryDefinition.argument.length"
                 label="View arguments"
                 @click="viewArgumentDisplay(data.queryDefinition.argument)"
               /> -->
-            </template>
-          </Column>
-          <Column v-if="adminView" field="userId" header="User"></Column>
-          <Column field="queuedAt" header="Queued">
-            <template #body="{ data }: { data: Job }">
-              <span>{{ data.queueDate ? getDisplayDateTime(data.queueDate) : "-" }}</span>
-            </template>
-          </Column>
-          <Column field="stoppedAt" header="Finished">
-            <template #body="{ data }: { data: Job }">
-              <span>{{ data.finishDate ? getDisplayDateTime(data.finishDate) : "-" }}</span>
-            </template>
-          </Column>
-          <Column field="status" header="Status">
-            <template #body="{ data }: { data: Job }">
-              <Tag :severity="data.status ? getStatusSeverity(data.status) : '-'" :value="data.status" />
-            </template>
-          </Column>
-          <Column>
-            <template #body="slotProps">
-              <ActionButtons
-                :job="slotProps.data"
-                @cancel-query="cancelJob"
-                @go-to-query="goToQuery"
-                @view-query-results="viewQueryResults"
-                @delete-query="deleteJob"
-                @requeue-query="requeueJob"
-              />
-            </template>
-          </Column>
-        </DataTable>
+              </template>
+            </Column>
+            <Column v-if="adminView" field="userId" header="User"></Column>
+            <Column field="queuedAt" header="Queued">
+              <template #body="{ data }: { data: Job }">
+                <span>{{ data.queueDate ? getDisplayDateTime(data.queueDate) : "-" }}</span>
+              </template>
+            </Column>
+            <Column field="stoppedAt" header="Finished">
+              <template #body="{ data }: { data: Job }">
+                <span>{{ data.finishDate ? getDisplayDateTime(data.finishDate) : "-" }}</span>
+              </template>
+            </Column>
+            <Column field="status" header="Status">
+              <template #body="{ data }: { data: Job }">
+                <Tag :severity="data.status ? getStatusSeverity(data.status) : '-'" :value="data.status" />
+              </template>
+            </Column>
+            <Column>
+              <template #body="slotProps">
+                <ActionButtons
+                  :job="slotProps.data"
+                  @cancel-query="cancelJob"
+                  @go-to-query="goToQuery"
+                  @view-query-results="viewQueryResults"
+                  @delete-query="deleteJob"
+                  @requeue-query="requeueJob"
+                />
+              </template>
+            </Column>
+          </DataTable>
+        </transition>
       </div>
     </div>
     <ArgumentDisplayDialog :arguments="currentArguments" :show-footer-buttons="false" v-model:showDialog="showArgumentDisplay" />
@@ -75,8 +80,8 @@ import type { Job, JobRequest } from "~~/models";
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
 
-import { useUserStore } from "@endeavour/vue-library";
 import type { Argument } from "@endeavour/vue-library/models";
+import { useUserStore } from "@endeavour/vue-library/stores";
 
 import { io } from "socket.io-client";
 
@@ -85,12 +90,12 @@ definePageMeta({
   requiresRole: ["EXECUTOR", "ADMIN"]
 });
 
-const { currentUser } = useUserStore();
+const userStore = useUserStore();
 const confirm = useConfirm();
 
 const socket = io({
   extraHeaders: {
-    authorization: `bearer ${currentUser?.id}`
+    authorization: `bearer ${userStore.currentUser?.id}`
   }
 });
 
@@ -108,15 +113,40 @@ const transport = ref("N/A");
 const showArgumentDisplay = ref(false);
 const currentArguments: Ref<Argument[]> = ref([]);
 const adminView = false; //TODO: determine admin view based on user role and preference
+
+interface IntervalOption {
+  name: string;
+  time: number;
+}
+
+const intervalList = ref<IntervalOption[]>([
+  { name: "manual", time: 0 },
+  { name: "every 5s", time: 5000 },
+  { name: "every 10s", time: 10000 },
+  { name: "every 15s", time: 150000 },
+  { name: "every 30s", time: 300000 }
+]);
+const pollInterval = ref(0);
+const pollTimer = ref<ReturnType<typeof setTimeout> | undefined>();
+const polling = ref(false);
+
 onMounted(async () => {
   loading.value = true;
+  if (userStore.refreshInterval) pollInterval.value = userStore.refreshInterval;
   loading.value = false;
-  socket.emit("joinRoom", "test-room", currentUser?.username);
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+  scheduleNextPoll();
+  socket.emit("joinRoom", "test-room", userStore.currentUser?.username);
   socket.on("message", function (data) {
     alert(data);
   });
   socket.emit("hello");
   await initSearch();
+});
+
+watch(pollInterval, () => {
+  userStore.updateRefreshInterval(pollInterval.value);
+  scheduleNextPoll();
 });
 
 async function initSearch() {
@@ -126,7 +156,7 @@ async function initSearch() {
     result: Job[];
   }>("/api/queue", {
     query: {
-      userId: currentUser?.id,
+      userId: userStore.currentUser?.id,
       page: page.value,
       size: rows.value
     }
@@ -145,11 +175,43 @@ async function initSearch() {
   searchLoading.value = false;
 }
 
+function scheduleNextPoll() {
+  if (pollTimer.value) clearTimeout(pollTimer.value);
+  if (pollInterval.value) pollTimer.value = setTimeout(poll, pollInterval.value);
+}
+
+async function poll() {
+  if (document.visibilityState !== "visible") return;
+  if (polling.value) return;
+
+  polling.value = true;
+
+  try {
+    await refresh();
+  } catch (error) {
+    console.error("Queue polling failed:", error);
+  } finally {
+    polling.value = false;
+    scheduleNextPoll();
+  }
+}
+
+function handleVisibilityChange() {
+  if (document.visibilityState === "visible") {
+    void poll();
+  } else {
+    if (pollTimer.value) {
+      clearTimeout(pollTimer.value);
+      pollTimer.value = undefined;
+    }
+  }
+}
+
 async function refresh() {
   searchLoading.value = true;
   const foundJobs = await $fetch<{ totalCount: number; result: Job[] }>("/api/queue", {
     query: {
-      userId: currentUser?.id,
+      userId: userStore.currentUser?.id,
       page: page.value,
       size: rows.value
     }
@@ -285,6 +347,14 @@ function onDisconnect() {
 
 onBeforeUnmount(() => {
   socket.disconnect();
+});
+
+onUnmounted(() => {
+  if (pollTimer.value) {
+    clearTimeout(pollTimer.value);
+    pollTimer.value = undefined;
+  }
+  document.removeEventListener("visibilitychange", handleVisibilityChange);
 });
 
 socket.on("queueUpdate", value => {
