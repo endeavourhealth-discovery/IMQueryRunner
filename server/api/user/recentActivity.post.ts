@@ -1,4 +1,4 @@
-import { parseArray } from "@endeavour/vue-library";
+import { parseArray } from "@endeavour/vue-library/helpers";
 import { RecentActivityItemSchema } from "@endeavour/vue-library/models";
 
 defineRouteMeta({

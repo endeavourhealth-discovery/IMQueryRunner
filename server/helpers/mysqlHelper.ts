@@ -5,7 +5,8 @@ import { type Job } from "~~/models/job.schema";
 import { type QueryResult } from "~~/models/queryResult.schema";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
-import { IMQType, type QueryRequest } from "@endeavour/vue-library";
+import { IMQType } from "@endeavour/vue-library/enums";
+import { type QueryRequest } from "@endeavour/vue-library/models";
 
 import { eq } from "drizzle-orm";
 import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";

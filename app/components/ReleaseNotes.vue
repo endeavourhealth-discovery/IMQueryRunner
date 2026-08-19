@@ -55,7 +55,7 @@ import GithubService from "~/services/GithubService";
 
 import { type Ref, nextTick, onMounted, ref } from "vue";
 
-import { REPO } from "@endeavour/vue-library";
+import { REPO } from "@endeavour/vue-library/enums";
 import { isObjectHasKeys } from "@endeavour/vue-library/helpers";
 import type { GithubRelease } from "@endeavour/vue-library/models";
 

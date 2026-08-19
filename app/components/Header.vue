@@ -113,10 +113,10 @@
 </template>
 
 <script setup lang="ts">
-import { useUserStore } from "@endeavour/vue-library";
 import { useChangeFontSize, useChangeThemeOptions } from "@endeavour/vue-library/composables";
 import { presets, primaryColors, surfaceColors } from "@endeavour/vue-library/constants";
 import { FontSize, PrimeVueColors, PrimeVuePresetThemes } from "@endeavour/vue-library/enums";
+import { useUserStore } from "@endeavour/vue-library/stores";
 
 import type { MenuItem } from "primevue/menuitem";
 

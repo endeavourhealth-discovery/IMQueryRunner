@@ -1,4 +1,4 @@
-import { useUserStore } from "@endeavour/vue-library";
+import { useUserStore } from "@endeavour/vue-library/stores";
 
 export default defineNuxtPlugin(() => {
   const userStore = useUserStore(usePinia());

@@ -1,6 +1,6 @@
 import { JobStatus } from "~~/enums/JobStatus";
 
-import { type QueryRequest } from "@endeavour/vue-library";
+import { type QueryRequest } from "@endeavour/vue-library/models";
 
 import { sql } from "drizzle-orm";
 import { bigint, boolean, date, datetime, decimal, double, index, int, json, text, tinyint, unique, varchar } from "drizzle-orm/mysql-core";

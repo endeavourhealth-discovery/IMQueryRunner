@@ -1,7 +1,7 @@
 import { mysqlDb } from "~~/server/db/mysql";
 import { cohortResultsTable, datasetResultsTable, indicatorResultTable, queryResultSetTable, queryResultTable } from "~~/server/db/mysql/schema";
 
-import { IMQType } from "@endeavour/vue-library";
+import { IMQType } from "@endeavour/vue-library/enums";
 
 import { and, count, eq } from "drizzle-orm";
 import { z } from "zod";

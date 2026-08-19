@@ -10,7 +10,7 @@ import {
 } from "~~/server/db/mysql/schema";
 import { getDebugPatientId } from "~~/server/utils/executeQuery";
 
-import { IMQType } from "@endeavour/vue-library";
+import { IMQType } from "@endeavour/vue-library/enums";
 
 import { and, count, eq } from "drizzle-orm";
 import { z } from "zod";
