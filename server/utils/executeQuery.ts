@@ -289,14 +289,6 @@ async function getResolvedSql(sql: string, queryRequest: QueryRequest, queryIris
     }
   }
 
-  const unresolved = sql.match(/https?:\/\/\S+/gi);
-  if (unresolved) {
-    throw new Error(
-      `Failed to resolve dependency IRI(s) in generated SQL for query ${queryRequest.query?.iri}: ${unresolved.join(", ")}. ` +
-        "The SQL generator referenced a dependency that subQueries did not return, so it was never executed and its result id was never substituted."
-    );
-  }
-
   return sql;
 }
 

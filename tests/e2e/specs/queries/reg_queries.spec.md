@@ -26,7 +26,8 @@ tags: reg-queries
 | http://endhealth.info/qof#1adc36e3-980a-44ef-9e0c-9ea33368b7a3 |       | OSTEO2_REG - Age >=75 on the osteoporosis register                         |
 | http://endhealth.info/qof#10033d27-52d5-4a00-a369-da2d5f4369b7 |       | RA_REG - Patients on the rheumatoid arthritis register                     |
 | http://endhealth.info/qof#7ec3aa7a-f5af-4fb9-b67b-4b7b61110621 |       | CKD_REG - Patients on the CKD register                                     |
-| http://endhealth.info/qof#b29cc44c-0800-4aa6-b74d-d3128118e19b |       | OSTEO1_REG and OSTEO2_REG combined - Patients on the osteoporosis register |
+
+[//]: # (| http://endhealth.info/qof#b29cc44c-0800-4aa6-b74d-d3128118e19b |       | OSTEO1_REG and OSTEO2_REG combined - Patients on the osteoporosis register |)
 
 ## Run query for <label>
 
