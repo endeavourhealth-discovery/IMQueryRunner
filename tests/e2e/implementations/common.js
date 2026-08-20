@@ -102,6 +102,14 @@ step("Search for <text> and select", async text => {
   await pw.page.waitForTimeout(2000);
 });
 
+step("Search for <search> and select <select>", async (search, select) => {
+  await pw.page.waitForSelector("#autocomplete-search", { state: "visible" });
+  await pw.page.locator("#autocomplete-search").nth(0).fill(search);
+  await pw.page.waitForTimeout(3000);
+  await pw.page.locator(".p-listbox-option").filter({ hasText: select }).click();
+  await pw.page.waitForTimeout(2000);
+});
+
 step("Wait <time> seconds", async time => {
   await pw.page.waitForTimeout(Number.parseInt(time) * 1000);
 });
