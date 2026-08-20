@@ -11,6 +11,7 @@
     "test:e2e": "gauge run --verbose --tags \"!iri-list\"",
     "test:e2e:ci": "cross-env headless_chrome=true screenshot_on_failure=true gauge run --tags \"!iri-list\"",
     "test:e2e:iri-list": "gauge run --tags iri-list",
+    "test:e2e:reg-queries": "gauge run --tags reg-queries",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",

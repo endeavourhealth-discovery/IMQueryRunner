@@ -288,6 +288,7 @@ async function getResolvedSql(sql: string, queryRequest: QueryRequest, queryIris
       sql = sql.replaceAll(iri, "" + queryIrisToHashCodes[iri]);
     }
   }
+
   return sql;
 }
 
