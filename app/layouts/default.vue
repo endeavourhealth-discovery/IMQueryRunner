@@ -13,7 +13,8 @@
 <script setup lang="ts">
 import GithubService from "~/services/GithubService";
 
-import { type GithubRelease, REPO } from "@endeavour/vue-library";
+import { REPO } from "@endeavour/vue-library/enums";
+import { type GithubRelease } from "@endeavour/vue-library/models";
 
 import semver from "semver";
 

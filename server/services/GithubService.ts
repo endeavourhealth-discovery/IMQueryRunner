@@ -1,6 +1,5 @@
-import { parseArray } from "@endeavour/vue-library";
-import { parseApiResponse } from "@endeavour/vue-library";
 import { REPO } from "@endeavour/vue-library/enums";
+import { parseApiResponse } from "@endeavour/vue-library/helpers";
 import { type GithubRelease, GithubReleaseSchema } from "@endeavour/vue-library/models";
 
 import z from "zod";

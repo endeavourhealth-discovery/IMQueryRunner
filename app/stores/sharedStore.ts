@@ -1,6 +1,6 @@
 import { ref } from "vue";
 
-import { localStorageWithExpiry } from "@endeavour/vue-library";
+import { localStorageWithExpiry } from "@endeavour/vue-library/helpers";
 
 import { isString } from "lodash-es";
 import { defineStore } from "pinia";

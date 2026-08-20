@@ -56,8 +56,8 @@ import OrganisationSelect from "~/components/queryRunner/OrganisationSelect.vue"
 
 import { watch } from "vue";
 
-import type { Argument, ArgumentReference } from "@endeavour/vue-library";
 import { IM, XSD } from "@endeavour/vue-library/enums";
+import type { Argument, ArgumentReference } from "@endeavour/vue-library/models";
 
 import { cloneDeep } from "lodash-es";
 import Column from "primevue/column";

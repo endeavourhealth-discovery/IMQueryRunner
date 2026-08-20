@@ -1,7 +1,7 @@
 import { JobStatus } from "~~/enums";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
-import { IMQType } from "@endeavour/vue-library";
+import { IMQType } from "@endeavour/vue-library/enums";
 import { type Argument, type QueryRequest, type SubQueryDependency } from "@endeavour/vue-library/models";
 
 import { and, eq } from "drizzle-orm";

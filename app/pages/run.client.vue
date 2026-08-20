@@ -55,7 +55,7 @@ import type { JobRequest } from "~~/models";
 
 import { watch } from "vue";
 
-import { IM, RDF } from "@endeavour/vue-library";
+import { IM, RDF } from "@endeavour/vue-library/enums";
 import { type Argument, type ArgumentReference, type QueryRequest, type SearchResultSummary } from "@endeavour/vue-library/models";
 
 import { cloneDeep } from "lodash-es";
