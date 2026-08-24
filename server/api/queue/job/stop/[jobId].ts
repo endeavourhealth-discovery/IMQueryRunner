@@ -1,7 +1,7 @@
 import { JobStatus } from "~~/enums";
-import { mysqlDb } from "~~/server/db/mysql";
+import { getConnectionId, mysqlDb, pool } from "~~/server/db/mysql";
 import { jobTable } from "~~/server/db/mysql/schema";
-import { getNow } from "~~/server/helpers/mysqlHelper";
+import { updateJobStatus } from "~~/server/helpers/mysqlHelper";
 
 import { eq } from "drizzle-orm";
 import * as z from "zod";
@@ -12,44 +12,22 @@ const paramSchema = z.object({
 
 export default defineEventHandler(async event => {
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
+
+  const connection = await pool.getConnection();
+
   const items = await mysqlDb
     .select()
     .from(jobTable)
     .where(eq(jobTable.id, Number(jobId)));
   const item = items[0];
-  const now = getNow();
 
   if (item?.status === JobStatus.QUEUED) {
-    await mysqlDb
-      .update(jobTable)
-      .set({
-        status: JobStatus.CANCELLED,
-        finishDate: now
-      })
-      .where(eq(jobTable.id, item.id));
+    await updateJobStatus(item.id, JobStatus.CANCELLED, null);
   } else if (item?.status === JobStatus.RUNNING) {
-    // TODO: kill query in mysql
-    const activeQuery = mysqlDb.execute(`
-          SELECT *
-          FROM pg_stat_activity
-          WHERE state = 'active' LIMIT 1
-      `);
-    const result = mysqlDb.execute(`
-      SELECT pg_cancel_backend(${activeQuery})
-      `);
-    if (!result) {
-      mysqlDb.execute(`
-        SELECT pg_terminate_backend(${activeQuery})
-        `);
-    }
-    await mysqlDb
-      .update(jobTable)
-      .set({
-        status: JobStatus.CANCELLED,
-        finishDate: now
-      })
-      .where(eq(jobTable.id, item.id));
+    await mysqlDb.execute(`KILL QUERY ${await getConnectionId()}`);
+    await updateJobStatus(item.id, JobStatus.CANCELLED, null);
   } else {
     createError("Query queue item not found for id: " + jobId);
   }
+  await connection.end();
 });

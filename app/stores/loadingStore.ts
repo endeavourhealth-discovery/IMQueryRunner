@@ -1,7 +1,5 @@
 import { ref } from "vue";
 
-import { localStorageWithExpiry } from "@endeavour/vue-library";
-
 import { defineStore } from "pinia";
 
 export const useLoadingStore = defineStore("loading", () => {

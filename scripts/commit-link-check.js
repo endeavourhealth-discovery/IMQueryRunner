@@ -1,0 +1,17 @@
+import { execSync } from "node:child_process";
+
+const files = execSync("git diff --cached --name-only --diff-filter=ACMR", { encoding: "utf8" }).split("\n").filter(Boolean);
+
+for (const file of files) {
+  if (file !== "pnpm-workspace.yaml" && file !== "pnpm-lock.yaml") continue;
+
+  const content = execSync(`git show :${file}`, { encoding: "utf8" });
+
+  if (content.includes('@endeavour/vue-library') && content.includes("link:../VueLibrary")) {
+    console.error(
+      "\nLocal VueLibrary must be unlinked before committing.\nPlease use 'pnpm unlink' OR manually remove overrides from pnpm-workspace.yaml and run pnpm install before committing.\n"
+    );
+    process.exit(1);
+  }
+}
+process.exit(0);

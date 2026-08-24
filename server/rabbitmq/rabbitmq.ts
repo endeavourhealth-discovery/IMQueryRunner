@@ -1,9 +1,8 @@
 import { JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
 
-import { IMQType } from "@endeavour/vue-library";
-import { type QueryRequest } from "@endeavour/vue-library/interfaces";
-import type { User } from "@endeavour/vue-library/models";
+import { IMQType } from "@endeavour/vue-library/enums";
+import { type QueryRequest, type User } from "@endeavour/vue-library/models";
 
 import { Connection } from "rabbitmq-client";
 
@@ -49,42 +48,62 @@ const sub = rabbit.createConsumer(
     ]
   },
   async (msg: any) => {
-    const session = await getSession();
-    const job = await getJobById(Number(msg.messageId!));
-    if (job && JobStatus.CANCELLED === job.status) {
-      throw new Error("Item is cancelled. Query rejected.");
-    }
-    await updateJobStatus(job.id, JobStatus.RUNNING);
-    for (const queryRequest of job.queryRequests) {
-      const sql = await getValidatedSQL(queryRequest, session, job.id);
-      const queryResultSet = await createResultSetEntry(queryRequest, job);
-      const queriesToRun: { sql: string; queryRequest: QueryRequest }[] = [];
-      let indicatorId: null | number = null;
-      if (queryRequest.query.queryType === IMQType.INDICATOR) {
-        indicatorId = await createIndicatorResultEntry(queryRequest, queryResultSet, hashQueryRequest(queryRequest));
-        queriesToRun.push.apply(queriesToRun, await getIndicatorSubQueryRequests(session, queryRequest, job.id));
-      } else {
-        queriesToRun.push({ sql, queryRequest });
+    let job: Job | undefined;
+
+    try {
+      const session = await getSession();
+      job = await getJobById(Number(msg.messageId!));
+
+      if (job.status === JobStatus.CANCELLED) {
+        throw new Error("Item is cancelled. Query rejected.");
       }
 
-      console.log("Queries to run:", queriesToRun.length);
-      for (const { sql, queryRequest } of queriesToRun) {
-        try {
-          await executeQuery(await getSession(), sql, queryRequest, queryResultSet);
-          await updateWithEndTime(queryResultSet.id!, queryResultSetTable);
-        } catch (err) {
-          await updateJobStatus(job.id, JobStatus.ERRORED, err);
-          return;
+      await updateJobStatus(job.id, JobStatus.RUNNING);
+
+      for (const queryRequest of job.queryRequests) {
+        const sql = await getValidatedSQL(queryRequest, session, job.id);
+        const queryResultSet = await createResultSetEntry(queryRequest, job);
+
+        const queriesToRun: { sql: string; queryRequest: QueryRequest }[] = [];
+        let indicatorId: number | null = null;
+
+        if (queryRequest.query.queryType === IMQType.INDICATOR) {
+          indicatorId = await createIndicatorResultEntry(queryRequest, queryResultSet, hashQueryRequest(queryRequest));
+
+          queriesToRun.push(...(await getIndicatorSubQueryRequests(session, queryRequest, job.id)));
+        } else {
+          queriesToRun.push({ sql, queryRequest });
+        }
+
+        console.log("Queries to run:", queriesToRun.length);
+
+        for (const item of queriesToRun) {
+          await executeQuery(session, item.sql, item.queryRequest, queryResultSet);
+        }
+
+        await updateWithEndTime(queryResultSet.id!, queryResultSetTable);
+
+        if (indicatorId) {
+          await updateWithEndTime(indicatorId, indicatorResultTable);
         }
       }
-      if (indicatorId) {
-        await updateWithEndTime(indicatorId, indicatorResultTable);
+
+      await updateJobStatus(job.id, JobStatus.COMPLETED);
+    } catch (err) {
+      console.error("Consumer failed for message:", msg?.messageId, err);
+
+      if (job?.id) {
+        try {
+          await updateJobStatus(job.id, JobStatus.ERRORED, err);
+        } catch (statusErr) {
+          console.error("Failed to update job status to ERRORED:", statusErr);
+        }
       }
+
+      throw err;
     }
-    await updateJobStatus(job.id, JobStatus.COMPLETED);
   }
 );
-
 sub.on("error", (err: Error) => {});
 
 const pub = rabbit.createPublisher({

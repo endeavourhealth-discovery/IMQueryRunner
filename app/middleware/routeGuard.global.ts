@@ -1,11 +1,11 @@
-import { hasRoles } from "@endeavour/vue-library/models";
+import { hasAnyRole } from "@endeavour/vue-library/models";
 import { useUserStore } from "@endeavour/vue-library/stores";
 
 import { isArray } from "lodash-es";
 
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { requiresAuth, requiresRole } = to.meta;
-  const userStore = useUserStore();
+  const userStore = useUserStore(usePinia());
 
   if (requiresAuth || (isArray(requiresRole) && requiresRole.length > 0)) {
     if (!userStore.isLoggedIn) {
@@ -16,6 +16,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       } else return globalThis.uiGuard.login();
     }
 
-    if (!hasRoles(userStore.currentUser!, requiresRole as string[])) return navigateTo("/unauthorized");
+    if (!hasAnyRole(userStore.currentUser!, requiresRole as string[])) {
+      return navigateTo("/unauthorized");
+    }
   }
 });

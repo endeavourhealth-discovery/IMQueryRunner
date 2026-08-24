@@ -9,13 +9,27 @@
     <Column field="valueData" header="Value">
       <template #body="{ data }">
         <div class="argument-selector-content">
-          <div v-if="editArguments && data.dataType && [XSD.STRING].includes(data.dataType?.iri)">
+          <div v-if="editArguments && data.parameter === '$organisationId'">
+            <OrganisationSelect v-model="data.valueDataList" />
+          </div>
+          <div v-else-if="editArguments && data.parameter === '$patientId'">
+            <PatientFilter v-model="data.valueDataList" />
+          </div>
+          <div v-else-if="editArguments && data.parameter === '$debugPatientId'" class="flex flex-col gap-2">
+            <InputText type="text" v-model="data.valueData" placeholder="Enter patient id" data-testid="debug-patient-id-input" />
+            <small class="text-color-secondary"> Run query against a single patient id and get a step-by-step report. </small>
+          </div>
+          <div v-else-if="editArguments && data.parameter === '$searchDate'" class="flex flex-col gap-2">
+            <DatePicker v-model="data.valueData" dateFormat="yy-mm-dd" showIcon iconDisplay="input" updateModelType="string" data-testid="search-date-input" />
+            <small class="text-color-secondary"> Run query on a specific date. </small>
+          </div>
+          <div v-else-if="editArguments && data.dataType && [XSD.STRING].includes(data.dataType?.iri)">
             <InputText type="text" v-model="data.valueData" data-testid="property-value-input" />
           </div>
-          <div v-if="editArguments && data.dataType && [XSD.BOOLEAN].includes(data.dataType.iri)">
+          <div v-else-if="editArguments && data.dataType && [XSD.BOOLEAN].includes(data.dataType.iri)">
             <Select :options="booleanOptions" optionLabel="name" optionValue="value" v-model="data.valueData" />
           </div>
-          <div v-if="editArguments && data.dataType && [IM.DATE, IM.DATE_TIME, IM.TIME].includes(data.dataType.iri)">
+          <div v-else-if="editArguments && data.dataType && [IM.DATE, IM.DATE_TIME, IM.TIME].includes(data.dataType.iri)">
             <DatePicker
               v-model="data.valueData"
               :showTime="IM.DATE_TIME === data.dataType.iri"
@@ -26,7 +40,7 @@
               updateModelType="string"
             />
           </div>
-          <div v-else>{{ data.valueData }}</div>
+          <div v-else>{{ data.valueData ?? data.valueDataList }}</div>
         </div>
       </template>
     </Column>
@@ -38,13 +52,17 @@
 </template>
 
 <script setup lang="ts">
+import OrganisationSelect from "~/components/queryRunner/OrganisationSelect.vue";
+
 import { watch } from "vue";
 
 import { IM, XSD } from "@endeavour/vue-library/enums";
-import { type Argument, type ArgumentReference } from "@endeavour/vue-library/interfaces";
+import type { Argument, ArgumentReference } from "@endeavour/vue-library/models";
 
 import { cloneDeep } from "lodash-es";
 import Column from "primevue/column";
+
+import PatientFilter from "./PatientFilter.vue";
 
 interface Props {
   arguments: ArgumentReference[] | undefined;
@@ -55,6 +73,7 @@ interface Props {
 
 interface ArgumentSelection extends ArgumentReference {
   valueData?: any;
+  valueDataList?: string[];
 }
 
 const props = defineProps<Props>();
@@ -64,8 +83,14 @@ const emit = defineEmits<{
 }>();
 
 const showDialog = defineModel<boolean>("showDialog");
-const allArgumentsValid: ComputedRef<boolean> = computed(() => argumentList.value!.every(as => as.valueData));
-
+const allArgumentsValid: ComputedRef<boolean> = computed(() =>
+  argumentList.value!.every(as => {
+    if (as.parameter === "$organisationId" || as.parameter === "$patientId") return as.valueDataList && as.valueDataList.length > 0;
+    if (as.parameter === "$debugPatientId") return !as.valueData || /^\d+$/.test(as.valueData.toString().trim());
+    if (as.parameter === "$searchDate") return true;
+    return !!as.valueData;
+  })
+);
 const loading = ref(false);
 const includeIri = ref(false);
 const argumentList = ref<ArgumentSelection[] | undefined>([]);
@@ -113,25 +138,53 @@ function resetArguments() {
 
 function confirmArguments() {
   submitting.value = true;
-  if (allArgumentsValid.value) {
+  try {
     const completedArguments: Argument[] = [];
-    if (argumentList.value) {
-      for (const argSelect of argumentList.value) {
-        const newArg: Argument = { parameter: argSelect.parameter };
-        switch (argSelect.dataType?.iri) {
-          case XSD.STRING:
-          case XSD.BOOLEAN:
-          case IM.DATE:
-          case IM.DATE_TIME:
-          case IM.TIME:
+    for (const argSelect of argumentList.value ?? []) {
+      if (!argSelect.parameter) continue;
+      const newArg: Argument = { parameter: argSelect.parameter };
+      if (argSelect.parameter === "$debugPatientId" || argSelect.parameter === "$searchDate") {
+        const cleaned = argSelect.valueData?.toString().trim();
+        if (cleaned) {
+          newArg.valueData = cleaned;
+          completedArguments.push(newArg);
+        }
+        continue;
+      }
+      if (["$organisationId", "$patientId"].includes(argSelect.parameter)) {
+        const cleanedList = (argSelect.valueDataList ?? []).map(value => value?.toString().trim()).filter((value): value is string => !!value);
+        const uniqueList = Array.from(new Set(cleanedList));
+        if (uniqueList.length > 0) {
+          newArg.valueDataList = uniqueList;
+          completedArguments.push(newArg);
+        }
+        continue;
+      }
+      switch (argSelect.dataType?.iri) {
+        case XSD.STRING:
+        case XSD.BOOLEAN:
+        case IM.DATE:
+        case IM.DATE_TIME:
+        case IM.TIME:
+          if (argSelect.valueData !== undefined && argSelect.valueData !== null && argSelect.valueData !== "") {
             newArg.valueData = argSelect.valueData;
             newArg.dataType = argSelect.dataType;
-            break;
-        }
-        completedArguments.push(newArg);
+            completedArguments.push(newArg);
+          }
+          break;
+        default:
+          if (argSelect.valueData !== undefined && argSelect.valueData !== null && argSelect.valueData !== "") {
+            newArg.valueData = argSelect.valueData;
+            if (argSelect.dataType) {
+              newArg.dataType = argSelect.dataType;
+            }
+            completedArguments.push(newArg);
+          }
+          break;
       }
     }
-    emit("argumentsCompleted", completedArguments, props.runOnConfirm);
+    emit("argumentsCompleted", completedArguments, props.runOnConfirm ?? false);
+  } finally {
     submitting.value = false;
   }
 }

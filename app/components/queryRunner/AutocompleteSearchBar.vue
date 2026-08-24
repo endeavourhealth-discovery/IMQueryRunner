@@ -49,7 +49,7 @@
         <div class="advanced-search-container">
           <small>
             Showing {{ results?.entities?.length ? 1 : 0 }}-{{ results?.entities?.length ? results.entities.length : 0 }} of
-            {{ results?.count ? results.count : 0 }} results
+            {{ results?.totalCount ? results.totalCount : 0 }} results
           </small>
         </div>
       </div>
@@ -82,7 +82,7 @@ import QueryService from "~/services/QueryService";
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 import { IM, TextSearchStyle } from "@endeavour/vue-library/enums";
-import { type QueryRequest, type SearchResponse, type SearchResultSummary, type TTIriRef } from "@endeavour/vue-library/interfaces";
+import { PageSchema, type QueryRequest, type SearchResponse, type SearchResultSummary, type TTIriRef } from "@endeavour/vue-library/models";
 
 import { cloneDeep, debounce, isEqual } from "lodash-es";
 import type { TreeNode } from "primevue/treenode";
@@ -357,7 +357,7 @@ async function search() {
     if (imQueryCopy) {
       searchLoading.value = true;
       imQueryCopy.textSearch = searchText.value;
-      imQueryCopy.page = { pageNumber: 1, pageSize: 10 };
+      imQueryCopy.page = PageSchema.parse({ pageNumber: 1, pageSize: 10 });
       imQueryCopy.textSearchStyle = TextSearchStyle.autocomplete;
       const response = await QueryService.queryIMSearch(imQueryCopy);
       searchLoading.value = false;

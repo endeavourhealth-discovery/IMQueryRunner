@@ -5,6 +5,11 @@
         <div class="m-2">
           <Button icon="fa-solid fa-arrow-left" label="Back to queue" @click="backToQueue" />
         </div>
+        <div v-if="executedSql" class="m-2 min-w-0">
+          <Panel header="Executed SQL" :toggleable="true" :collapsed="true">
+            <SQLViewer :sql="executedSql" />
+          </Panel>
+        </div>
         <DataTable
           ref="dt"
           :size="'small'"
@@ -55,6 +60,8 @@ import { useUserStore } from "@endeavour/vue-library/stores";
 
 import { isArray } from "lodash-es";
 
+import SQLViewer from "./SQLViewer.vue";
+
 interface Props {
   jobId: string | string[] | undefined;
   queryIri: string | string[] | undefined;
@@ -73,9 +80,10 @@ const rows = ref(25);
 const originalSize = ref(25);
 const totalCount = ref();
 const columns: Ref<any[]> = ref([]);
+const executedSql = ref<string | null>(null);
 
 onMounted(async () => {
-  await getQueryResults();
+  await Promise.all([getQueryResults(), getExecutedSql()]);
   formatResultsForTable();
 });
 
@@ -154,6 +162,23 @@ async function onPage(event: any) {
 function backToQueue() {
   navigateTo("/");
 }
+
+async function getExecutedSql() {
+  if (props.jobId && props.queryIri) {
+    const value = await $fetch<{ executedSQL: string | null }>(
+      `/api/queue/job/sql/${props.jobId}/${props.queryType}/${encodeURIComponent(props.queryIri as string)}`
+    );
+    if (value?.executedSQL) {
+      executedSql.value = value.executedSQL;
+    }
+  }
+}
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.p-panel-content-container),
+:deep(.p-panel-content-wrapper),
+:deep(.p-panel-content) {
+  min-width: 0;
+}
+</style>

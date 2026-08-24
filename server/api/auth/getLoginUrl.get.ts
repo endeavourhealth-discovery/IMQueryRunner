@@ -1,8 +1,6 @@
 import { getIp } from "~~/server/helpers/getIp";
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
 
-import { PermissionSchema } from "@endeavour/vue-library/models";
-
 import * as z from "zod";
 
 const loginUrlSchema = z.object({

@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "type": "module",
   "private": true,
+  "packageManager": "pnpm@11.15.0",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
     "test:unit": "vitest",
-    "test:e2e": "gauge run --verbose",
-    "test:e2e:ci": "cross-env headless_chrome=true screenshot_on_failure=true gauge run",
+    "test:e2e": "gauge run --verbose --tags \"!iri-list\"",
+    "test:e2e:ci": "cross-env headless_chrome=true screenshot_on_failure=true gauge run --tags \"!iri-list\"",
+    "test:e2e:iri-list": "gauge run --tags iri-list",
+    "test:e2e:reg-queries": "gauge run --tags reg-queries",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
@@ -17,12 +20,12 @@
     "format": "prettier --write \"{app,docs,enums,models,server,shared,types,tests}/**/*.{js,ts,vue,json,css,scss,md}\"",
     "format:check": "prettier --write \"{app,docs,enums,models,server,shared,types,tests}/**/*.{js,ts,vue,json,css,scss,md}\"",
     "prepare": "husky",
-    "preinstall": "pnpm add endeavourhealth-discovery/VueLibrary"
+    "preinstall": "pnpm config set \"@endeavour:registry=https://artifactory.endhealth.co.uk/repository/npm/\""
   },
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.896.0",
     "@braintree/sanitize-url": "^7.1.2",
-    "@endeavour/vue-library": "github:endeavourhealth-discovery/VueLibrary",
+    "@endeavour/vue-library": "4.0.1",
     "@pinia/nuxt": "0.11.2",
     "@primeuix/themes": "^2.0.3",
     "@tailwindcss/vite": "^4.1.13",
@@ -52,7 +55,7 @@
     "uuid": "^11.1.0",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4",
-    "zod": "4.3.6"
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@getgauge/cli": "^1.6.22",

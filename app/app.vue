@@ -18,7 +18,10 @@
 </template>
 
 <script setup lang="ts">
-import { type GithubRelease, REPO, injectionKeysVueLibrary, useChangeFontSize, useChangeThemeOptions, useUserStore } from "@endeavour/vue-library";
+import { useChangeFontSize, useChangeThemeOptions } from "@endeavour/vue-library/composables";
+import { REPO } from "@endeavour/vue-library/enums";
+import { type GithubRelease } from "@endeavour/vue-library/models";
+import { useUserStore } from "@endeavour/vue-library/stores";
 
 import semver from "semver";
 
@@ -26,7 +29,6 @@ import ReleaseNotes from "./components/ReleaseNotes.vue";
 import CookiesConsent from "./layouts/CookiesConsent.vue";
 import GithubService from "./services/GithubService";
 import StatusService from "./services/StatusService";
-import UserService from "./services/UserService";
 
 const sharedStore = useSharedStore();
 const loadingStore = useLoadingStore();

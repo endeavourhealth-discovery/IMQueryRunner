@@ -1,7 +1,16 @@
 import { mysqlDb } from "~~/server/db/mysql";
-import { cohortResultsTable, datasetResultsTable, indicatorResultTable, queryResultSetTable, queryResultTable } from "~~/server/db/mysql/schema";
+import {
+  cohortResultsTable,
+  datasetResultsTable,
+  indicatorResultTable,
+  jobTable,
+  patientExistsTable,
+  queryResultSetTable,
+  queryResultTable
+} from "~~/server/db/mysql/schema";
+import { getDebugPatientId } from "~~/server/utils/executeQuery";
 
-import { IMQType } from "@endeavour/vue-library";
+import { IMQType } from "@endeavour/vue-library/enums";
 
 import { and, count, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -39,6 +48,19 @@ export default defineEventHandler(async event => {
     totalCount: 0,
     page: page
   };
+
+  const jobRows = await mysqlDb.select().from(jobTable).where(eq(jobTable.id, queryResultSet.jobId));
+  const job = jobRows[0];
+  const debugPatientId = job?.queryRequests?.map(getDebugPatientId).find(Boolean);
+
+  if (debugPatientId) {
+    const whereClause = and(eq(patientExistsTable.queryIri, decodedQueryIri), eq(patientExistsTable.patientId, debugPatientId));
+    const debugResults = await mysqlDb.select().from(patientExistsTable).where(whereClause).limit(limit).offset(offset);
+    const totalResult = await mysqlDb.select({ count: count() }).from(patientExistsTable).where(whereClause);
+    returnObject.result = debugResults;
+    returnObject.totalCount = totalResult[0]?.count ?? 0;
+    return returnObject;
+  }
 
   if (queryType === IMQType.INDICATOR) {
     const indicatorResultRows = await mysqlDb

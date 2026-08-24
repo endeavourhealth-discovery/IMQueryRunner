@@ -5,7 +5,8 @@ import { type Job } from "~~/models/job.schema";
 import { type QueryResult } from "~~/models/queryResult.schema";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
-import { IMQType, type QueryRequest } from "@endeavour/vue-library";
+import { IMQType } from "@endeavour/vue-library/enums";
+import { type QueryRequest } from "@endeavour/vue-library/models";
 
 import { eq } from "drizzle-orm";
 import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";
@@ -13,7 +14,7 @@ import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 import { mysqlDb } from "../db/mysql";
 import { indicatorResultTable, jobTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
 import QueryService from "../services/QueryService";
-import { resolveArgs } from "../utils/executeQuery";
+import { resolveArgs, sortQueryRequestsByDependency } from "../utils/executeQuery";
 
 export async function createJobEntry(jobRequest: JobRequest, sessionId: string, userId: string): Promise<Job> {
   const queryRequestsForSql = [];
@@ -22,10 +23,11 @@ export async function createJobEntry(jobRequest: JobRequest, sessionId: string, 
     resolveArgs(getQueryRequestForSQL);
     queryRequestsForSql.push(getQueryRequestForSQL);
   }
+  const orderedQueryRequests = await sortQueryRequestsByDependency(sessionId!, queryRequestsForSql);
   const now = getNow();
   const queryJob = {
     jobName: jobRequest.jobName || queryRequestsForSql[0]?.query?.name || "Unnamed Job",
-    queryRequests: queryRequestsForSql,
+    queryRequests: orderedQueryRequests,
     startOfDaySnapshot: jobRequest.startOfDaySnapshot ? 1 : 0,
     persistent: jobRequest.persistent ? 1 : 0,
     useStartOfDaySnapshot: jobRequest.useStartOfDaySnapshot ? 1 : 0,
@@ -59,16 +61,26 @@ export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error
     case JobStatus.RUNNING:
       set.runDate = now;
       break;
+    case JobStatus.CANCELLED:
+      set.finishDate = now;
+      break;
     case JobStatus.COMPLETED:
       set.finishDate = now;
       break;
     case JobStatus.ERRORED:
       set.finishDate = now;
-      set.error = error;
-      console.error(`Error executing query for job ID: ${jobId}`);
-      console.error(error);
+      set.error =
+        error instanceof Error
+          ? {
+              name: error.name,
+              message: error.message,
+              stack: error.stack,
+              cause: (error as any).cause ?? null
+            }
+          : typeof error === "string"
+            ? { message: error }
+            : (error as any);
       break;
-
     default:
       throw new Error(`Invalid job status: ${jobStatus}`);
   }
@@ -96,7 +108,7 @@ export async function createResultSetEntry(queryRequest: any, job: Job): Promise
 }
 
 export async function createQueryResultEntry(queryRequest: QueryRequest, queryResultSet: QueryResultSet, hashCodeVersion: number, indicatorId?: number) {
-  switch (queryRequest.query.queryType) {
+  switch (queryRequest.query?.queryType) {
     case IMQType.COHORT:
     case IMQType.DATASET:
       const queryResult = {
@@ -115,7 +127,7 @@ export async function createQueryResultEntry(queryRequest: QueryRequest, queryRe
       return result?.[0]?.insertId;
 
     default:
-      throw new Error("Unsupported query type: " + queryRequest.query.queryType);
+      throw new Error("Unsupported query type: " + queryRequest.query?.queryType);
   }
 }
 
@@ -125,7 +137,7 @@ export async function createIndicatorResultEntry(queryRequest: QueryRequest, que
     persistent: queryResultSet.persistent,
     useStartOfDaySnapshot: queryResultSet.useStartOfDaySnapshot,
     startTime: getNow(),
-    queryIri: queryRequest.query.iri,
+    queryIri: queryRequest.query?.iri,
     searchDate: queryResultSet.searchDate ? new Date(queryResultSet.searchDate) : null,
     achievementDate: queryResultSet.achievementDate ? new Date(queryResultSet.achievementDate) : null,
     queryResultSetId: queryResultSet.id,
@@ -140,6 +152,15 @@ export async function updateWithEndTime(id: number, table: MySqlTableWithColumns
     .update(table)
     .set({
       endTime: getNow()
+    })
+    .where(eq(table.id, id));
+}
+
+export async function updateWithSQL(id: number, table: MySqlTableWithColumns<any>, sql: string) {
+  await mysqlDb
+    .update(table)
+    .set({
+      executedSQL: sql
     })
     .where(eq(table.id, id));
 }

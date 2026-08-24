@@ -32,6 +32,7 @@ export default defineNuxtConfig({
   nitro: {
     scheduledTasks: {
       //[process.env.QUERY_KILL_INTERVAL_CRON as string]: ['kill-queries']
+      //[process.env.QUERY_RUNTIME_DAILY_CRON as string]: ['run-query-daily']
     },
     experimental: {
       websocket: true,

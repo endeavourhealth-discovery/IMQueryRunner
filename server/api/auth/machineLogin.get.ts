@@ -1,7 +1,7 @@
 import { getIp } from "~~/server/helpers/getIp";
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
 
-import { PermissionSchema, type User } from "@endeavour/vue-library/models";
+import { type User } from "@endeavour/vue-library/models";
 
 import * as z from "zod";
 

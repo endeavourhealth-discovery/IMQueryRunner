@@ -1,6 +1,6 @@
 import { JobStatus } from "~~/enums/JobStatus";
 
-import { type QueryRequest } from "@endeavour/vue-library";
+import { type QueryRequest } from "@endeavour/vue-library/models";
 
 import { sql } from "drizzle-orm";
 import { bigint, boolean, date, datetime, decimal, double, index, int, json, text, tinyint, unique, varchar } from "drizzle-orm/mysql-core";
@@ -63,6 +63,7 @@ export const queryResultTable = dataset.table("query_result", {
   startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
   persistent: tinyint("persistent").notNull(),
   useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
+  executedSQL: text("executed_sql"),
   version: int("version").notNull()
 });
 
@@ -70,12 +71,22 @@ export const datasetResultsTable = dataset.table("dataset_results", {
   queryResultId: int("query_result_id").notNull(),
   entityId: int("entity_id").notNull(),
   columnGroup: varchar("column_group", { length: 255 }).notNull(),
-  json: json("json").notNull()
+  json: json("json").notNull(),
+  entityOrgId: int("entity_org_id").notNull()
 });
 
 export const cohortResultsTable = dataset.table("cohort_results", {
   queryResultId: int("query_result_id").notNull(),
-  entityId: int("entity_id").notNull()
+  entityId: int("entity_id").notNull(),
+  entityOrgId: int("entity_org_id").notNull()
+});
+
+export const patientExistsTable = dataset.table("patient_exists", {
+  queryIri: varchar("query_iri", { length: 512 }).notNull(),
+  patientId: varchar("patient_id", { length: 64 }).notNull(),
+  stepNo: int("step_no").notNull(),
+  cteName: varchar("cte_name", { length: 128 }).notNull(),
+  patientFound: tinyint("patient_found").notNull()
 });
 
 export const allergyIntolerance = compass.table("allergy_intolerance", {
@@ -351,4 +362,14 @@ export const smallPat = compass.table("small_pat", {
   currentAddressId: bigint("current_address_id", { mode: "number" }),
   ethnicCodeConceptId: int("ethnic_code_concept_id"),
   registeredPracticeOrganizationId: bigint("registered_practice_organization_id", { mode: "number" })
+});
+
+export const organization = compass.table("organization", {
+  id: bigint({ mode: "number" }).notNull().primaryKey(),
+  odsCode: varchar("ods_code", { length: 50 }),
+  name: varchar("name", { length: 255 }),
+  typeCode: varchar("type_code", { length: 50 }),
+  typeDesc: varchar("type_desc", { length: 255 }),
+  postcode: varchar("postcode", { length: 10 }),
+  parentOrganizationId: bigint("parent_organization_id", { mode: "number" })
 });

@@ -1,5 +1,5 @@
 import { REPO } from "@endeavour/vue-library/enums";
-import type { GithubRelease } from "@endeavour/vue-library/interfaces";
+import type { GithubRelease } from "@endeavour/vue-library/models";
 
 const API_URL = "api/imapi/github";
 
