@@ -58,7 +58,7 @@ const sub = rabbit.createConsumer(
         throw new Error("Item is cancelled. Query rejected.");
       }
 
-      await updateJobStatus(job.id, JobStatus.RUNNING);
+      await updateJobStatus(job.id, JobStatus.RUNNING, job.userId);
 
       for (const queryRequest of job.queryRequests) {
         const sql = await getValidatedSQL(queryRequest, session, job.id);
@@ -88,13 +88,13 @@ const sub = rabbit.createConsumer(
         }
       }
 
-      await updateJobStatus(job.id, JobStatus.COMPLETED);
+      await updateJobStatus(job.id, JobStatus.COMPLETED, job.userId);
     } catch (err) {
       console.error("Consumer failed for message:", msg?.messageId, err);
 
       if (job?.id) {
         try {
-          await updateJobStatus(job.id, JobStatus.ERRORED, err);
+          await updateJobStatus(job.id, JobStatus.ERRORED, job.userId, err);
         } catch (statusErr) {
           console.error("Failed to update job status to ERRORED:", statusErr);
         }
