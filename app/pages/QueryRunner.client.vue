@@ -5,7 +5,7 @@
         <div class="flex gap-4 m-2">
           <div class="flex gap-1 m-0">
             <Button class="flex" severity="secondary" icon="fa-solid fa-arrows-rotate" label="Refresh" @click="refresh" />
-            <Select v-model="pollInterval" :options="intervalList" optionLabel="name" optionValue="time" placeholder="Refresh every..."></Select>
+            <Select v-model="selectedInterval" :options="intervalList" optionLabel="name" placeholder="Refresh options"></Select>
           </div>
           <Button class="flex" icon="fa-solid fa-magnifying-glass" label="Run a query" @click="runQuery" />
         </div>
@@ -117,39 +117,49 @@ interface IntervalOption {
 
 const intervalList = ref<IntervalOption[]>([
   { name: "manual", time: 0 },
+  { name: "auto", time: 0 },
   { name: "every 5s", time: 5000 },
   { name: "every 10s", time: 10000 },
   { name: "every 15s", time: 15000 },
   { name: "every 30s", time: 30000 }
 ]);
-const pollInterval = ref(0);
 const pollTimer = ref<ReturnType<typeof setTimeout> | undefined>();
 const polling = ref(false);
 
+const selectedInterval: Ref<IntervalOption> = ref({ name: "manual", time: 0 });
+const isAuto = computed(() => selectedInterval.value.name === "auto");
+const isManual = computed(() => selectedInterval.value.name === "manual");
+const isPolling = computed(() => !isAuto.value && !isManual.value);
+
 onMounted(async () => {
   loading.value = true;
-  if (userStore.refreshInterval) pollInterval.value = userStore.refreshInterval;
+  if (userStore.refreshInterval) {
+    const interval = intervalList.value.find(interval => interval.name === userStore.refreshInterval);
+    if (interval) selectedInterval.value = interval;
+  }
   loading.value = false;
   document.addEventListener("visibilitychange", handleVisibilityChange);
-  scheduleNextPoll();
-
-  socket.on("connect", onConnect);
-  socket.on("disconnect", onDisconnect);
-  socket.on("queueUpdate", async () => {
-    await refresh();
-  });
-
-  socket.emit("joinRoom");
-  socket.on("message", function (data) {
-    alert(data);
-  });
-  socket.emit("hello");
   await initSearch();
+  if (selectedInterval.value.name === "auto") {
+    connectWebSocket();
+  } else if (selectedInterval.value.time && selectedInterval.value.time > 0) {
+    scheduleNextPoll();
+  }
 });
 
-watch(pollInterval, () => {
-  userStore.updateRefreshInterval(pollInterval.value);
-  scheduleNextPoll();
+watch(selectedInterval, async () => {
+  if (!selectedInterval.value) return;
+  userStore.updateRefreshInterval(selectedInterval.value.name);
+  stopPolling();
+  if (selectedInterval.value.name === "auto") {
+    connectWebSocket();
+    await refresh();
+  } else {
+    disconnectWebSocket();
+    if (selectedInterval.value.time && selectedInterval.value.time > 0) {
+      scheduleNextPoll();
+    }
+  }
 });
 
 async function initSearch() {
@@ -178,12 +188,22 @@ async function initSearch() {
   searchLoading.value = false;
 }
 
+function stopPolling() {
+  if (pollTimer.value) {
+    clearTimeout(pollTimer.value);
+    pollTimer.value = undefined;
+  }
+}
+
 function scheduleNextPoll() {
-  if (pollTimer.value) clearTimeout(pollTimer.value);
-  if (pollInterval.value) pollTimer.value = setTimeout(poll, pollInterval.value);
+  stopPolling();
+  if (isPolling.value && document.visibilityState === "visible" && selectedInterval.value.time) {
+    pollTimer.value = setTimeout(poll, selectedInterval.value.time);
+  }
 }
 
 async function poll() {
+  if (!isPolling.value) return;
   if (document.visibilityState !== "visible") return;
   if (polling.value) return;
 
@@ -195,19 +215,56 @@ async function poll() {
     console.error("Queue polling failed:", error);
   } finally {
     polling.value = false;
-    scheduleNextPoll();
+    if (isPolling.value) scheduleNextPoll();
   }
 }
 
 function handleVisibilityChange() {
   if (document.visibilityState === "visible") {
-    void poll();
+    if (isPolling.value) void poll();
   } else {
-    if (pollTimer.value) {
-      clearTimeout(pollTimer.value);
-      pollTimer.value = undefined;
-    }
+    stopPolling();
   }
+}
+
+function connectWebSocket() {
+  if (socket.connected) return;
+  socket.on("connect", onConnect);
+  socket.on("disconnect", onDisconnect);
+  socket.on("queueUpdate", onQueueUpdate);
+  socket.connect();
+}
+
+function disconnectWebSocket() {
+  socket.off("connect", onConnect);
+  socket.off("disconnect", onDisconnect);
+  socket.off("queueUpdate", onQueueUpdate);
+  if (socket.connected) socket.disconnect();
+  websocketIsConnected.value = false;
+  transport.value = "N/A";
+}
+
+async function onQueueUpdate() {
+  if (!isAuto.value) return;
+  await refresh();
+}
+
+function onConnect() {
+  websocketIsConnected.value = true;
+  transport.value = socket.io.engine.transport.name;
+  socket.emit("joinRoom");
+  socket.on("message", function (data) {
+    alert(data);
+  });
+  socket.emit("hello");
+  socket.io.engine.on("upgrade", rawTransport => {
+    transport.value = rawTransport.name;
+  });
+}
+
+function onDisconnect() {
+  websocketIsConnected.value = false;
+  transport.value = "N/A";
 }
 
 async function refresh() {
@@ -334,32 +391,10 @@ function getDisplayDateTime(date: string) {
   );
 }
 
-function onConnect() {
-  websocketIsConnected.value = true;
-  transport.value = socket.io.engine.transport.name;
-  socket.io.engine.on("upgrade", rawTransport => {
-    transport.value = rawTransport.name;
-  });
-}
-
-function onDisconnect() {
-  websocketIsConnected.value = false;
-  transport.value = "N/A";
-}
-
 onBeforeUnmount(() => {
-  socket.off("connect", onConnect);
-  socket.off("disconnect", onDisconnect);
-  socket.off("queueUpdate", refresh);
-  socket.disconnect();
-});
-
-onUnmounted(() => {
-  if (pollTimer.value) {
-    clearTimeout(pollTimer.value);
-    pollTimer.value = undefined;
-  }
+  stopPolling();
   document.removeEventListener("visibilitychange", handleVisibilityChange);
+  disconnectWebSocket();
 });
 </script>
 
