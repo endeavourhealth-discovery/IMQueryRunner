@@ -14,7 +14,7 @@ export default defineEventHandler(async event => {
   try {
     await sendMessage(user.id, queryJob);
   } catch (err) {
-    await updateJobStatus(queryJob.id, JobStatus.ERRORED, err);
+    await updateJobStatus(queryJob.id, JobStatus.ERRORED, user.id, err);
     return;
   }
   console.log("Job queued with id:", queryJob.id);

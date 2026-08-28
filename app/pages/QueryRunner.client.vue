@@ -93,11 +93,7 @@ definePageMeta({
 const userStore = useUserStore();
 const confirm = useConfirm();
 
-const socket = io({
-  extraHeaders: {
-    authorization: `bearer ${userStore.currentUser?.id}`
-  }
-});
+const socket = io();
 
 const jobs: Ref<Job[]> = ref([]);
 const loading = ref(true);
@@ -136,7 +132,14 @@ onMounted(async () => {
   loading.value = false;
   document.addEventListener("visibilitychange", handleVisibilityChange);
   scheduleNextPoll();
-  socket.emit("joinRoom", "test-room", userStore.currentUser?.username);
+
+  socket.on("connect", onConnect);
+  socket.on("disconnect", onDisconnect);
+  socket.on("queueUpdate", async () => {
+    await refresh();
+  });
+
+  socket.emit("joinRoom");
   socket.on("message", function (data) {
     alert(data);
   });
@@ -208,7 +211,6 @@ function handleVisibilityChange() {
 }
 
 async function refresh() {
-  searchLoading.value = true;
   const foundJobs = await $fetch<{ totalCount: number; result: Job[] }>("/api/queue", {
     query: {
       userId: userStore.currentUser?.id,
@@ -346,6 +348,9 @@ function onDisconnect() {
 }
 
 onBeforeUnmount(() => {
+  socket.off("connect", onConnect);
+  socket.off("disconnect", onDisconnect);
+  socket.off("queueUpdate", refresh);
   socket.disconnect();
 });
 
@@ -355,10 +360,6 @@ onUnmounted(() => {
     pollTimer.value = undefined;
   }
   document.removeEventListener("visibilitychange", handleVisibilityChange);
-});
-
-socket.on("queueUpdate", value => {
-  jobs.value = value;
 });
 </script>
 
