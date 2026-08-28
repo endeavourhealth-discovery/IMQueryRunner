@@ -13,8 +13,10 @@ step("Open results page", async () => {
 });
 
 step("Check total results equal <total>", async total => {
-  await pw.page.locator(".p-datatable-header").filter({ hasText: total });
+  const expectedTotal = total.trim();
   await pw.page.waitForTimeout(2000);
+  const headerText = (await pw.page.locator(".p-datatable-header").innerText()).trim();
+  assert.ok(headerText.includes(`Total results: ${expectedTotal}`), `Expected "Total results: ${expectedTotal}" but got "${headerText}"`);
 });
 
 step("Check results for <count>", async count => {
