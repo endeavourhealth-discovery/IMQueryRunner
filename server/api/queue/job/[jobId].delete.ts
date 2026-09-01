@@ -1,3 +1,5 @@
+import { JobStatus } from "~~/enums";
+
 import { eq } from "drizzle-orm";
 import * as z from "zod";
 
@@ -17,28 +19,33 @@ export default defineEventHandler(async event => {
     .where(eq(jobTable.id, Number(jobId)));
   const item = items[0];
   if (item) {
-    const resultSetIds = await mysqlDb.select().from(queryResultSetTable).where(eq(queryResultSetTable.jobId, item.id));
-    const resultSetId = resultSetIds[0];
-    if (resultSetId) {
-      const resultIds = await mysqlDb.select().from(queryResultTable).where(eq(queryResultTable.queryResultSetId, resultSetId.id));
-      const resultId = resultIds[0];
-      if (resultId) {
-        try {
-          await mysqlDb.delete(cohortResultsTable).where(eq(cohortResultsTable.queryResultId, resultId.id));
-          await mysqlDb.delete(queryResultTable).where(eq(queryResultTable.id, resultId.id));
-          await mysqlDb.delete(queryResultSetTable).where(eq(queryResultSetTable.jobId, item.id));
-          await mysqlDb.delete(jobTable).where(eq(jobTable.id, item.id));
-        } catch (err) {
-          console.error("Error deleting job id:", item.id, err);
-          throw err;
+    if (item.status !== JobStatus.QUEUED) {
+      const resultSetIds = await mysqlDb.select().from(queryResultSetTable).where(eq(queryResultSetTable.jobId, item.id));
+      const resultSetId = resultSetIds[0];
+      if (resultSetId) {
+        const resultIds = await mysqlDb.select().from(queryResultTable).where(eq(queryResultTable.queryResultSetId, resultSetId.id));
+        const resultId = resultIds[0];
+        if (resultId) {
+          try {
+            await mysqlDb.delete(cohortResultsTable).where(eq(cohortResultsTable.queryResultId, resultId.id));
+            await mysqlDb.delete(queryResultTable).where(eq(queryResultTable.id, resultId.id));
+            await mysqlDb.delete(queryResultSetTable).where(eq(queryResultSetTable.jobId, item.id));
+            await mysqlDb.delete(jobTable).where(eq(jobTable.id, item.id));
+          } catch (err) {
+            console.error(err);
+            throw createError("Error deleting job id:" + item.id);
+          }
+        } else {
+          throw createError("Query result data not found for job id: " + jobId);
         }
       } else {
-        createError("Query result data not found for job id: " + jobId);
+        await mysqlDb.delete(jobTable).where(eq(jobTable.id, item.id));
+        throw createError("Query result set data not found for job id: " + jobId);
       }
     } else {
-      createError("Query result set data not found for job id: " + jobId);
+      await mysqlDb.delete(jobTable).where(eq(jobTable.id, item.id));
     }
   } else {
-    createError("Query queue item not found for job id: " + jobId);
+    throw createError("Query queue item not found for job id: " + jobId);
   }
 });
