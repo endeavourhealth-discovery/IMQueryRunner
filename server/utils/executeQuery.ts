@@ -1,4 +1,4 @@
-import { JobStatus } from "~~/enums";
+import { ErrorCode, JobStatus } from "~~/enums";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
 import { IMQType } from "@endeavour/vue-library/enums";
@@ -294,7 +294,7 @@ async function getResolvedSql(sql: string, queryRequest: QueryRequest, queryIris
 
 function getIriLine(stringIris: string[]): string {
   for (const stringIri of stringIris) {
-    if (stringIri.indexOf(":") === -1) throw createError("Invalid iri");
+    if (stringIri.indexOf(":") === -1) throw createError({ statusCode: 400, statusText: ErrorCode.InvalidRequestError, message: "Invalid iri" });
   }
   return stringIris.join(" ");
 }

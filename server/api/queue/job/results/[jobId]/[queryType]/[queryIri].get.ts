@@ -1,3 +1,4 @@
+import { ErrorCode } from "~~/enums";
 import { mysqlDb } from "~~/server/db/mysql";
 import {
   cohortResultsTable,
@@ -38,7 +39,7 @@ export default defineEventHandler(async event => {
     .where(and(eq(queryResultSetTable.jobId, Number(jobId)), eq(queryResultSetTable.queryIri, decodedQueryIri)));
   const queryResultSet = queryResultSetRows[0];
   if (!queryResultSet) {
-    throw createError("Query result set not found");
+    throw createError({ status: 404, statusText: ErrorCode.MissingDataError, message: "Query result set not found" });
   }
 
   const limit = size;
@@ -78,7 +79,7 @@ export default defineEventHandler(async event => {
     const queryResult = queryResultRows[0];
 
     if (!queryResult) {
-      throw createError("Query result not found");
+      throw createError({ statusCode: 404, statusText: ErrorCode.MissingDataError, message: "Query result not found" });
     }
 
     if (queryType === IMQType.COHORT) {

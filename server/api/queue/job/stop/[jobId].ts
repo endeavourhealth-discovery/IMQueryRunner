@@ -1,4 +1,4 @@
-import { JobStatus } from "~~/enums";
+import { ErrorCode, JobStatus } from "~~/enums";
 import { getConnectionId, mysqlDb, pool } from "~~/server/db/mysql";
 import { jobTable } from "~~/server/db/mysql/schema";
 import { updateJobStatus } from "~~/server/helpers/mysqlHelper";
@@ -27,7 +27,7 @@ export default defineEventHandler(async event => {
     await mysqlDb.execute(`KILL QUERY ${await getConnectionId()}`);
     await updateJobStatus(item.id, JobStatus.CANCELLED, item.userId, null);
   } else {
-    createError("Query queue item not found for id: " + jobId);
+    createError({ statusCode: 404, statusText: ErrorCode.RabbitMQConsumerError, message: "Query queue item not found for id: " + jobId });
   }
   await connection.end();
 });

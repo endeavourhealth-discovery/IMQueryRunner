@@ -1,3 +1,4 @@
+import { ErrorCode } from "~~/enums";
 import { mysqlDb } from "~~/server/db/mysql";
 import { cohortResultsTable, datasetResultsTable, indicatorResultTable, queryResultSetTable, queryResultTable } from "~~/server/db/mysql/schema";
 
@@ -29,7 +30,7 @@ export default defineEventHandler(async event => {
     .where(and(eq(queryResultSetTable.jobId, Number(jobId)), eq(queryResultSetTable.queryIri, decodedQueryIri)));
   const queryResultSet = queryResultSetRows[0];
   if (!queryResultSet) {
-    throw createError("Query result set not found");
+    throw createError({ statusCode: 404, statusText: ErrorCode.MissingDataError, message: "Query result set not found" });
   }
 
   const returnObject = {
@@ -48,7 +49,7 @@ export default defineEventHandler(async event => {
     const executedSql = queryResultRows[0]?.executedSql ?? null;
 
     if (!executedSql) {
-      throw createError("Query SQL not found");
+      throw createError({ statusCode: 404, statusText: ErrorCode.MissingDataError, message: "Query SQL not found" });
     }
 
     returnObject.executedSQL = executedSql;
