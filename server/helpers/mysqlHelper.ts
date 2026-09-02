@@ -1,3 +1,4 @@
+import { emitQueueUpdate } from "#server/utils/queueEvents.ts";
 import { JobStatus } from "~~/enums";
 import { type JobRequest } from "~~/models/JobRequest";
 import { type IndicatorResult } from "~~/models/indicatorResult.schema";
@@ -38,6 +39,7 @@ export async function createJobEntry(jobRequest: JobRequest, sessionId: string, 
   } as Job;
 
   const result = await mysqlDb.insert(jobTable).values(queryJob);
+  emitQueueUpdate(userId);
   if (!result?.[0]?.insertId) throw new Error("Failed to insert job into database");
   queryJob.id = result[0].insertId;
   return queryJob;
@@ -52,7 +54,7 @@ export async function getJobById(jobId: number): Promise<Job> {
   return job;
 }
 
-export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error: any = null) {
+export async function updateJobStatus(jobId: number, jobStatus: JobStatus, userId: string, error: any = null) {
   const now = getNow();
   const set = {
     status: jobStatus
@@ -85,6 +87,7 @@ export async function updateJobStatus(jobId: number, jobStatus: JobStatus, error
       throw new Error(`Invalid job status: ${jobStatus}`);
   }
   await mysqlDb.update(jobTable).set(set).where(eq(jobTable.id, jobId));
+  emitQueueUpdate(userId);
 }
 
 export async function createResultSetEntry(queryRequest: any, job: Job): Promise<QueryResultSet> {
@@ -101,6 +104,7 @@ export async function createResultSetEntry(queryRequest: any, job: Job): Promise
   } as QueryResultSet;
 
   const result = await mysqlDb.insert(queryResultSetTable).values(queryResultSet);
+  emitQueueUpdate(job.userId);
   const queryResultSetId = result?.[0]?.insertId;
   queryResultSet.id = queryResultSetId!;
   console.log("Inserted query result set with id:", queryResultSet.id, "for job id:", job.id);

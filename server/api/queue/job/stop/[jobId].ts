@@ -22,10 +22,10 @@ export default defineEventHandler(async event => {
   const item = items[0];
 
   if (item?.status === JobStatus.QUEUED) {
-    await updateJobStatus(item.id, JobStatus.CANCELLED, null);
+    await updateJobStatus(item.id, JobStatus.CANCELLED, item.userId, null);
   } else if (item?.status === JobStatus.RUNNING) {
     await mysqlDb.execute(`KILL QUERY ${await getConnectionId()}`);
-    await updateJobStatus(item.id, JobStatus.CANCELLED, null);
+    await updateJobStatus(item.id, JobStatus.CANCELLED, item.userId, null);
   } else {
     createError("Query queue item not found for id: " + jobId);
   }
