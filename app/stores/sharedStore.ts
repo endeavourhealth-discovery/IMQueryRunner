@@ -27,6 +27,7 @@ export const useSharedStore = defineStore("shared", () => {
   );
   const showCookieConsent = ref<boolean>(false);
   const isDevMode = ref<boolean>(true);
+  const error = ref<string>("");
 
   function updateShowReleaseNotes(bool: boolean) {
     showReleaseNotes.value = bool;
@@ -54,16 +55,22 @@ export const useSharedStore = defineStore("shared", () => {
     isDevMode.value = devMode;
   }
 
+  function updateError(err: string) {
+    error.value = err;
+  }
+
   return {
     isDevMode,
     showDevBanner,
     showReleaseBanner,
     showReleaseNotes,
     showCookieConsent,
+    error,
     updateIsDevMode,
     updateShowDevBanner,
     updateShowReleaseBanner,
     updateShowReleaseNotes,
-    updateShowCookieConsent
+    updateShowCookieConsent,
+    updateError
   };
 });

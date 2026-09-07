@@ -9,25 +9,25 @@ export default defineNuxtConfig({
       theme: {
         preset: Aura,
         options: {
-          darkModeSelector: ".my-app-dark",
-        },
+          darkModeSelector: ".my-app-dark"
+        }
       },
-      ripple: true,
+      ripple: true
     },
-    autoImport: true,
+    autoImport: true
   },
   routeRules: {
     "/": {
-      redirect: "/QueryRunner",
-    },
+      redirect: "/QueryRunner"
+    }
   },
-  css: ["~/assets/css/main.css"],
+  css: ["~/assets/css/main.css", "@endeavour/vue-library/components.css"],
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss()]
   },
   compatibilityDate: "2025-07-15",
   $development: {
-    devtools: {enabled: true},
+    devtools: { enabled: true }
   },
   nitro: {
     scheduledTasks: {
@@ -38,7 +38,7 @@ export default defineNuxtConfig({
       websocket: true,
       openAPI: true,
       tasks: true
-    },
+    }
   },
   runtimeConfig: {
     public: {
@@ -52,58 +52,58 @@ export default defineNuxtConfig({
       // cognitoRegion: process.env.COGNITO_REGION,
       // cognitoUserPool: process.env.COGNITO_USER_POOL,
       // cognitoWebClient: process.env.COGNITO_WEB_CLIENT,
-    },
+    }
   },
   typescript: {
-    typeCheck: true,
+    typeCheck: true
   },
   app: {
     head: {
       htmlAttrs: {
-        lang: 'en',
+        lang: "en"
       },
       link: [
         {
           rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/fontawesome.css",
+          href: "https://im.endhealth.co.uk/fonts/css/fontawesome.css"
         },
         {
           rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/solid.css",
+          href: "https://im.endhealth.co.uk/fonts/css/solid.css"
         },
         {
           rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/regular.css",
+          href: "https://im.endhealth.co.uk/fonts/css/regular.css"
         },
         {
           rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/brands.css",
+          href: "https://im.endhealth.co.uk/fonts/css/brands.css"
         },
         {
           rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/duotone.css",
+          href: "https://im.endhealth.co.uk/fonts/css/duotone.css"
         },
         {
           rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/light.css",
+          href: "https://im.endhealth.co.uk/fonts/css/light.css"
         },
         {
           rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/sharp-light.css",
+          href: "https://im.endhealth.co.uk/fonts/css/sharp-light.css"
         },
         {
           rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/sharp-regular.css",
+          href: "https://im.endhealth.co.uk/fonts/css/sharp-regular.css"
         },
         {
           rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/sharp-solid.css",
+          href: "https://im.endhealth.co.uk/fonts/css/sharp-solid.css"
         },
         {
           rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/sharp-thin.css",
-        },
-      ],
-    },
-  },
+          href: "https://im.endhealth.co.uk/fonts/css/sharp-thin.css"
+        }
+      ]
+    }
+  }
 });
