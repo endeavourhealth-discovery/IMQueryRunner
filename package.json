@@ -27,7 +27,7 @@
   "dependencies": {
     "@aws-sdk/client-cognito-identity-provider": "^3.896.0",
     "@braintree/sanitize-url": "^7.1.2",
-    "@endeavour/vue-library": "4.0.3",
+    "@endeavour/vue-library": "4.1.0",
     "@pinia/nuxt": "0.11.2",
     "@primeuix/themes": "^2.0.3",
     "@tailwindcss/vite": "^4.1.13",
@@ -46,7 +46,7 @@
     "ofetch": "^1.4.1",
     "perfect-debounce": "^2.0.0",
     "pg": "^8.16.3",
-    "pinia": "^3.0.4",
+    "pinia": "4.0.2",
     "pino": "^10.0.0",
     "primevue": "^4.5.5",
     "rabbitmq-client": "^5.0.5",

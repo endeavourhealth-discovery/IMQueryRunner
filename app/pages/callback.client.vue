@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ErrorCode } from "~~/enums";
+
 import { useUserStore } from "@endeavour/vue-library/stores";
 
 import { useRoute } from "vue-router";
@@ -12,7 +14,7 @@ onMounted(async () => {
   if (code) {
     await globalThis.uiGuard.callback(code, state);
     if (!userStore.isLoggedIn) {
-      throw createError("Failed to fetch login session");
+      throw createError({ status: 403, statusText: ErrorCode.AuthorisationError, message: "Failed to fetch login session" });
     }
     await navigateTo(state);
   }
