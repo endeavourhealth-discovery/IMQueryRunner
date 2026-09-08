@@ -1,3 +1,4 @@
+import type { ResolvedSql } from "~~/models/ResolvedSql.ts";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
 import { IMQType } from "@endeavour/vue-library/enums";
@@ -8,7 +9,7 @@ import murmurhash from "murmurhash";
 
 import { mysqlDb } from "../db/mysql";
 import { patientExistsTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
-import { createQueryResultEntry, getToday, updateWithEndTime } from "../helpers/mysqlHelper";
+import { createQueryResultEntry, getToday, updateWithEndTime, updateWithSQL } from "../helpers/mysqlHelper";
 import QueryService from "../services/QueryService";
 
 export async function executeQuery(sessionId: string, sql: string, queryRequest: QueryRequest, queryResultSet: QueryResultSet) {
@@ -49,24 +50,28 @@ export function getDebugPatientId(queryRequest: QueryRequest): string | undefine
   return queryRequest.argument?.find(arg => arg.parameter === "$debugPatientId")?.valueData;
 }
 
-export async function executeDebugQuery(resolvedSql: SQL, queryIri: string, patientId: string, queryResultId: number) {
+export async function executeDebugQuery(resolvedSql: ResolvedSql, queryIri: string, patientId: string, queryResultId: number) {
   try {
     await mysqlDb.delete(patientExistsTable).where(and(eq(patientExistsTable.queryIri, queryIri), eq(patientExistsTable.patientId, patientId)));
-    await mysqlDb.execute(resolvedSql);
+    await mysqlDb.execute(resolvedSql.query);
     await updateWithEndTime(queryResultId, queryResultTable);
   } catch (err) {
     console.error("Error executing debug query:", queryIri, err);
     throw err;
+  } finally {
+    await updateWithSQL(queryResultId, queryResultTable, resolvedSql.displaySql);
   }
 }
 
-export async function executeCohortQuery(resolvedSql: SQL, queryRequest: QueryRequest, queryResultId: number) {
+export async function executeCohortQuery(resolvedSql: ResolvedSql, queryRequest: QueryRequest, queryResultId: number) {
   try {
-    await mysqlDb.execute(resolvedSql);
+    await mysqlDb.execute(resolvedSql.query);
     await updateWithEndTime(queryResultId, queryResultTable);
   } catch (err) {
     console.error("Error executing query:", queryRequest.query?.iri, err);
     throw err;
+  } finally {
+    await updateWithSQL(queryResultId, queryResultTable, resolvedSql.displaySql);
   }
 }
 
@@ -83,16 +88,20 @@ export async function executeDatasetQuery(
 
   console.log("Dataset parts to run:", sqlParts.length);
 
+  let lastResolvedSql: ResolvedSql | undefined;
+
   try {
     for (const sqlPart of sqlParts) {
-      const resolvedSql = getResolvedSql(sqlPart, queryRequest, queryIrisToQueryResultIds);
-      await mysqlDb.execute(resolvedSql);
+      lastResolvedSql = getResolvedSql(sqlPart, queryRequest, queryIrisToQueryResultIds);
+      await mysqlDb.execute(lastResolvedSql.query);
     }
 
     await updateWithEndTime(queryResultId, queryResultTable);
   } catch (err) {
-    console.error("Error executing SQL part:", err);
+    console.error("Error executing SQL part:", lastResolvedSql?.displaySql, err);
     throw err;
+  } finally {
+    await updateWithSQL(queryResultId, queryResultTable, lastResolvedSql?.displaySql ?? querySql);
   }
 }
 
@@ -281,7 +290,7 @@ function getArgumentSql(arg: Argument): SQL {
   throw new Error(`Argument ${arg.parameter ?? "<unknown>"} has no supported value`);
 }
 
-function getResolvedSql(querySql: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }): SQL {
+function getResolvedSql(querySql: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }): ResolvedSql {
   const replacements = new Map<string, SQL>();
   for (const arg of queryRequest.argument ?? []) {
     if (arg.parameter) replacements.set(arg.parameter, getArgumentSql(arg));
@@ -292,7 +301,10 @@ function getResolvedSql(querySql: string, queryRequest: QueryRequest, queryIrisT
   }
 
   if (replacements.size === 0) {
-    return sql.raw(querySql);
+    return {
+      query: sql.raw(querySql),
+      displaySql: querySql
+    };
   }
 
   const pattern = new RegExp(
@@ -304,23 +316,34 @@ function getResolvedSql(querySql: string, queryRequest: QueryRequest, queryIrisT
   );
 
   const parts: SQL[] = [];
+  const displayParts: string[] = [];
   let lastIndex = 0;
 
   for (const match of querySql.matchAll(pattern)) {
     const index = match.index ?? 0;
-    if (index > lastIndex) parts.push(sql.raw(querySql.slice(lastIndex, index)));
+    if (index > lastIndex) {
+      const literal = querySql.slice(lastIndex, index);
+      parts.push(sql.raw(literal));
+      displayParts.push(literal);
+    }
 
     const replacement = replacements.get(match[0]);
 
     if (!replacement) throw new Error(`No replacement found for SQL token "${match[0]}"`);
 
     parts.push(replacement);
+    displayParts.push("?");
+
     lastIndex = index + match[0].length;
   }
 
-  if (lastIndex < querySql.length) parts.push(sql.raw(querySql.slice(lastIndex)));
+  if (lastIndex < querySql.length) {
+    const remaining = querySql.slice(lastIndex);
+    parts.push(sql.raw(remaining));
+    displayParts.push(remaining);
+  }
 
-  return sql.join(parts, sql.raw(""));
+  return { query: sql.join(parts, sql.raw("")), displaySql: displayParts.join("") };
 }
 
 function escapeRegExp(value: string): string {
