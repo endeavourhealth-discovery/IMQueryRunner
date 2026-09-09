@@ -1,16 +1,15 @@
-import { ErrorCode, JobStatus } from "~~/enums";
+import type { ResolvedSql } from "~~/models/ResolvedSql.ts";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
 import { IMQType } from "@endeavour/vue-library/enums";
 import { type Argument, type QueryRequest, type SubQueryDependency } from "@endeavour/vue-library/models";
 
-import { and, eq } from "drizzle-orm";
+import { SQL, and, eq, sql } from "drizzle-orm";
 import murmurhash from "murmurhash";
-import { type ResultSetHeader } from "mysql2";
 
 import { mysqlDb } from "../db/mysql";
 import { patientExistsTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
-import { createQueryResultEntry, getToday, updateJobStatus, updateWithEndTime, updateWithSQL } from "../helpers/mysqlHelper";
+import { createQueryResultEntry, getToday, updateWithEndTime, updateWithSQL } from "../helpers/mysqlHelper";
 import QueryService from "../services/QueryService";
 
 export async function executeQuery(sessionId: string, sql: string, queryRequest: QueryRequest, queryResultSet: QueryResultSet) {
@@ -28,7 +27,7 @@ export async function executeQuery(sessionId: string, sql: string, queryRequest:
 
   await runSubQueries(sessionId, queryRequest, queryIrisToQueryResultIds, queryResultSet);
 
-  const resolvedSql = await getResolvedSql(sql, queryRequest, queryIrisToQueryResultIds);
+  const resolvedSql = getResolvedSql(sql, queryRequest, queryIrisToQueryResultIds);
 
   if (debugPatientId) {
     await executeDebugQuery(resolvedSql, queryRequest.query.iri, debugPatientId, queryResultId);
@@ -37,7 +36,7 @@ export async function executeQuery(sessionId: string, sql: string, queryRequest:
 
   switch (queryRequest.query.queryType) {
     case IMQType.DATASET:
-      await executeDatasetQuery(resolvedSql, queryResultId);
+      await executeDatasetQuery(sql, queryRequest, queryIrisToQueryResultIds, queryResultId);
       break;
     case IMQType.COHORT:
       await executeCohortQuery(resolvedSql, queryRequest, queryResultId);
@@ -51,53 +50,58 @@ export function getDebugPatientId(queryRequest: QueryRequest): string | undefine
   return queryRequest.argument?.find(arg => arg.parameter === "$debugPatientId")?.valueData;
 }
 
-export async function executeDebugQuery(resolvedSql: string, queryIri: string, patientId: string, queryResultId: number) {
+export async function executeDebugQuery(resolvedSql: ResolvedSql, queryIri: string, patientId: string, queryResultId: number) {
   try {
     await mysqlDb.delete(patientExistsTable).where(and(eq(patientExistsTable.queryIri, queryIri), eq(patientExistsTable.patientId, patientId)));
-    await mysqlDb.execute(resolvedSql);
+    await mysqlDb.execute(resolvedSql.query);
     await updateWithEndTime(queryResultId, queryResultTable);
   } catch (err) {
     console.error("Error executing debug query:", queryIri, err);
     throw err;
   } finally {
-    await updateWithSQL(queryResultId, queryResultTable, resolvedSql);
+    await updateWithSQL(queryResultId, queryResultTable, resolvedSql.displaySql);
   }
 }
 
-export async function executeCohortQuery(resolvedSql: string, queryRequest: QueryRequest, queryResultId: number) {
+export async function executeCohortQuery(resolvedSql: ResolvedSql, queryRequest: QueryRequest, queryResultId: number) {
   try {
-    await mysqlDb.execute(resolvedSql);
+    await mysqlDb.execute(resolvedSql.query);
     await updateWithEndTime(queryResultId, queryResultTable);
   } catch (err) {
     console.error("Error executing query:", queryRequest.query?.iri, err);
     throw err;
   } finally {
-    await updateWithSQL(queryResultId, queryResultTable, resolvedSql);
+    await updateWithSQL(queryResultId, queryResultTable, resolvedSql.displaySql);
   }
 }
 
-export async function executeDatasetQuery(resolvedSql: string, queryResultId: number) {
-  const sqlParts = resolvedSql
+export async function executeDatasetQuery(
+  querySql: string,
+  queryRequest: QueryRequest,
+  queryIrisToQueryResultIds: { [key: string]: number },
+  queryResultId: number
+) {
+  const sqlParts = querySql
     .split("----------------------------------------")
     .map(part => part.trim())
     .filter(Boolean);
 
   console.log("Dataset parts to run:", sqlParts.length);
 
-  let lastSql = resolvedSql;
+  let lastResolvedSql: ResolvedSql | undefined;
 
   try {
     for (const sqlPart of sqlParts) {
-      lastSql = sqlPart;
-      await mysqlDb.execute(sqlPart);
+      lastResolvedSql = getResolvedSql(sqlPart, queryRequest, queryIrisToQueryResultIds);
+      await mysqlDb.execute(lastResolvedSql.query);
     }
 
     await updateWithEndTime(queryResultId, queryResultTable);
   } catch (err) {
-    console.error("Error executing SQL part:", lastSql, err);
+    console.error("Error executing SQL part:", lastResolvedSql?.displaySql, err);
     throw err;
   } finally {
-    await updateWithSQL(queryResultId, queryResultTable, lastSql || resolvedSql);
+    await updateWithSQL(queryResultId, queryResultTable, lastResolvedSql?.displaySql ?? querySql);
   }
 }
 
@@ -224,7 +228,7 @@ async function runSubQueries(sessionId: string, queryRequest: QueryRequest, quer
 
         queryIrisToHashCodes[subQuery.iri!] = await createQueryResultEntry(subQueryRequest, queryResultSet, hashCodeVersion);
         const subQuerySql = await QueryService.getQuerySql(sessionId, subQueryRequest);
-        const resolvedSql = await getResolvedSql(subQuerySql, subQueryRequest, queryIrisToHashCodes);
+        const resolvedSql = getResolvedSql(subQuerySql, subQueryRequest, queryIrisToHashCodes);
         await executeCohortQuery(resolvedSql, subQueryRequest, queryIrisToHashCodes[subQuery.iri!]!);
       } catch (err: any) {
         console.error("Error running subquery sql:", subQuery.iri, "\nError:", err.message);
@@ -269,34 +273,81 @@ export async function sortQueryRequestsByDependency(sessionId: string, queryRequ
   return sorted;
 }
 
-function getResolvedArguments(sql: string, queryRequest: QueryRequest) {
-  if (queryRequest.argument) {
-    for (const arg of queryRequest.argument) {
-      if (arg.valueData && arg.parameter) sql = sql.replaceAll(arg.parameter, `'${arg.valueData}'`);
-      else if (arg.valueIri && arg.parameter) sql = sql.replaceAll(arg.parameter, `'${arg.valueIri.iri}'`);
-      else if (arg.valueIriList && arg.parameter) sql = sql.replaceAll(arg.parameter, getIriLine(arg.valueIriList.map(v => v.iri)));
-      else if (arg.valueDataList && arg.parameter) sql = sql.replaceAll(arg.parameter, `(${arg.valueDataList.map(v => `'${v}'`).join(", ")})`);
-    }
-  }
-  return sql;
+function getArgumentSql(arg: Argument): SQL {
+  if (arg.valueData !== undefined && arg.valueData !== null) return sql`${arg.valueData}`;
+  if (arg.valueIri?.iri !== undefined) return sql`${arg.valueIri.iri}`;
+  if (arg.valueIriList)
+    return sql.join(
+      arg.valueIriList.map(value => sql`${value.iri}`),
+      sql.raw(" ")
+    );
+  if (arg.valueDataList)
+    return sql`(${sql.join(
+      arg.valueDataList.map(value => sql`${value}`),
+      sql.raw(", ")
+    )})`;
+
+  throw new Error(`Argument ${arg.parameter ?? "<unknown>"} has no supported value`);
 }
 
-async function getResolvedSql(sql: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }) {
-  sql = getResolvedArguments(sql, queryRequest);
-  if (Object.keys(queryIrisToHashCodes).length > 0) {
-    for (const iri of Object.keys(queryIrisToHashCodes)) {
-      sql = sql.replaceAll(iri, "" + queryIrisToHashCodes[iri]);
-    }
+function getResolvedSql(querySql: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }): ResolvedSql {
+  const replacements = new Map<string, SQL>();
+  for (const arg of queryRequest.argument ?? []) {
+    if (arg.parameter) replacements.set(arg.parameter, getArgumentSql(arg));
   }
 
-  return sql;
+  for (const [iri, queryResultId] of Object.entries(queryIrisToHashCodes)) {
+    replacements.set(iri, sql`${queryResultId}`);
+  }
+
+  if (replacements.size === 0) {
+    return {
+      query: sql.raw(querySql),
+      displaySql: querySql
+    };
+  }
+
+  const pattern = new RegExp(
+    [...replacements.keys()]
+      .sort((a, b) => b.length - a.length)
+      .map(escapeRegExp)
+      .join("|"),
+    "g"
+  );
+
+  const parts: SQL[] = [];
+  const displayParts: string[] = [];
+  let lastIndex = 0;
+
+  for (const match of querySql.matchAll(pattern)) {
+    const index = match.index ?? 0;
+    if (index > lastIndex) {
+      const literal = querySql.slice(lastIndex, index);
+      parts.push(sql.raw(literal));
+      displayParts.push(literal);
+    }
+
+    const replacement = replacements.get(match[0]);
+
+    if (!replacement) throw new Error(`No replacement found for SQL token "${match[0]}"`);
+
+    parts.push(replacement);
+    displayParts.push("?");
+
+    lastIndex = index + match[0].length;
+  }
+
+  if (lastIndex < querySql.length) {
+    const remaining = querySql.slice(lastIndex);
+    parts.push(sql.raw(remaining));
+    displayParts.push(remaining);
+  }
+
+  return { query: sql.join(parts, sql.raw("")), displaySql: displayParts.join("") };
 }
 
-function getIriLine(stringIris: string[]): string {
-  for (const stringIri of stringIris) {
-    if (stringIri.indexOf(":") === -1) throw createError({ statusCode: 400, statusText: ErrorCode.InvalidRequestError, message: "Invalid iri" });
-  }
-  return stringIris.join(" ");
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 export async function getValidatedSQL(queryRequest: QueryRequest, sessionId: string, jobId: number): Promise<string> {
@@ -309,6 +360,7 @@ export async function getValidatedSQL(queryRequest: QueryRequest, sessionId: str
   }
   return sql;
 }
+
 export async function getIndicatorSubQueryRequests(
   session: string,
   queryRequest: QueryRequest,
