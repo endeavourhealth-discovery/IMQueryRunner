@@ -11,6 +11,7 @@
       <NuxtPage />
     </NuxtLayout>
     <ConfirmDialog />
+    <DynamicDialog class="dynamic-dialog" />
     <Toast />
     <ReleaseNotes v-if="showReleaseNotes && initialLoadComplete" />
     <CookiesConsent v-if="initialLoadComplete" />
@@ -21,7 +22,7 @@
 import { useChangeFontSize, useChangeThemeOptions } from "@endeavour/vue-library/composables";
 import { REPO } from "@endeavour/vue-library/enums";
 import { type GithubRelease } from "@endeavour/vue-library/models";
-import { useUserStore } from "@endeavour/vue-library/stores";
+import { useDialogStore, useUserStore } from "@endeavour/vue-library/stores";
 
 import semver from "semver";
 
@@ -30,9 +31,11 @@ import CookiesConsent from "./layouts/CookiesConsent.vue";
 import GithubService from "./services/GithubService";
 import StatusService from "./services/StatusService";
 
+const dialog = useDialog();
 const sharedStore = useSharedStore();
 const loadingStore = useLoadingStore();
 const userStore = useUserStore();
+const dialogStore = useDialogStore();
 const { changeFontSize } = useChangeFontSize();
 const { changeDarkMode, changePreset, changePrimaryColor, changeSurfaceColor } = useChangeThemeOptions();
 
@@ -93,6 +96,7 @@ onMounted(async () => {
     if (currentFontSize.value) await changeFontSize(currentFontSize.value);
     // await setShowReleaseBanner();
   }
+  dialogStore.register(dialog);
   initialLoadComplete.value = true;
 });
 

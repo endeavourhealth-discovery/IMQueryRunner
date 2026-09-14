@@ -1,3 +1,5 @@
+import { ErrorCode } from "~~/enums";
+
 import { hasAnyRole } from "@endeavour/vue-library/models";
 import { useUserStore } from "@endeavour/vue-library/stores";
 
@@ -17,7 +19,12 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     }
 
     if (!hasAnyRole(userStore.currentUser!, requiresRole as string[])) {
-      return navigateTo("/unauthorized");
+      throw createError({
+        status: 403,
+        statusText: ErrorCode.AuthorisationError,
+        message: "The page or resource you were trying to reach is forbidden. Please contact an admin to request access to this resource.",
+        data: { requiredRole: requiresRole }
+      });
     }
   }
 });

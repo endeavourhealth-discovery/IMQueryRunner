@@ -1,4 +1,4 @@
-import { JobStatus } from "~~/enums";
+import { ErrorCode, JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
 
 import { IMQType } from "@endeavour/vue-library/enums";
@@ -17,16 +17,21 @@ rabbit.on("connection", () => {});
 let sessionId: string | undefined = undefined;
 async function getSession() {
   if (!sessionId) {
-    const response = await $fetch<{ sessionId: string; user: User }>("/api/auth/machineLogin", {
-      query: {
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET
-      },
-      headers: {
-        "X-IGNORE-IP": "true"
-      }
-    });
-    sessionId = response.sessionId;
+    try {
+      const response = await $fetch<{ sessionId: string; user: User }>("/api/auth/machineLogin", {
+        query: {
+          clientId: process.env.CLIENT_ID,
+          clientSecret: process.env.CLIENT_SECRET
+        },
+        headers: {
+          "X-IGNORE-IP": "true"
+        }
+      });
+      sessionId = response.sessionId;
+    } catch (err: unknown) {
+      if (isError(err)) throw createError({ statusCode: 401, statusMessage: ErrorCode.AuthorisationError, message: err.message });
+      else throw createError({ statusCode: 500, statusMessage: ErrorCode.InternalServerError, message: err instanceof Error ? err.message : "Unknown error" });
+    }
   }
   return sessionId;
 }
@@ -55,7 +60,8 @@ const sub = rabbit.createConsumer(
       job = await getJobById(Number(msg.messageId!));
 
       if (job.status === JobStatus.CANCELLED) {
-        throw new Error("Item is cancelled. Query rejected.");
+        console.warn("Item is cancelled. Query rejected.");
+        return;
       }
 
       await updateJobStatus(job.id, JobStatus.RUNNING, job.userId);
@@ -89,7 +95,7 @@ const sub = rabbit.createConsumer(
       }
 
       await updateJobStatus(job.id, JobStatus.COMPLETED, job.userId);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("Consumer failed for message:", msg?.messageId, err);
 
       if (job?.id) {
@@ -99,12 +105,13 @@ const sub = rabbit.createConsumer(
           console.error("Failed to update job status to ERRORED:", statusErr);
         }
       }
-
-      throw err;
+      throw createError({ statusCode: 500, statusMessage: ErrorCode.RabbitMQConsumerError, message: "[RabbitMQ] consumer error", cause: err });
     }
   }
 );
-sub.on("error", (err: Error) => {});
+sub.on("error", (err: Error) => {
+  console.error("[RabbitMQ] queue error:", { message: err.message, name: err.name, stack: err.stack });
+});
 
 const pub = rabbit.createPublisher({
   confirm: true,

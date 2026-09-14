@@ -1,3 +1,3 @@
-import { JobStatus } from "./JobStatus";
+export { JobStatus } from "./JobStatus";
 
-export { JobStatus };
+export { ErrorCode } from "./ErrorCode";

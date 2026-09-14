@@ -56,26 +56,4 @@ export default defineNuxtPlugin(nuxtApp => {
       return result;
     }
   } as EndSecUI;
-
-  nuxtApp.vueApp.config.errorHandler = async (error: any) => {
-    if (error instanceof FetchError) {
-      const path = error.request instanceof Request ? error.request.url : error.request;
-
-      if (!path) return;
-
-      switch (error.status) {
-        case 401: {
-          await clearError();
-          await globalThis.uiGuard.login();
-          break;
-        }
-        case 403:
-          await clearError({ redirect: "/unauthorized" });
-          break;
-        default:
-          await clearError({ redirect: "/error" });
-          break;
-      }
-    }
-  };
 });

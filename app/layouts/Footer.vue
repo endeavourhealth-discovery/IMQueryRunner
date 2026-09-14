@@ -23,6 +23,14 @@
         @click="showReleaseNotes"
         data-testid="releases-button"
       />
+      <IMFontAwesomeIcon
+        icon="fa-duotone fa-bugs"
+        :style="'--fa-primary-color: var(--p-primary-color); --fa-secondary-color: var(--p-content-color)'"
+        class="footer-icon"
+        v-tooltip.left="'Report bug'"
+        @click="reportBug"
+        data-testid="reportbug-button"
+      />
     </div>
   </div>
 </template>
@@ -53,6 +61,10 @@ function showReleaseNotes() {
 
 function showCookieSettings() {
   sharedStore.updateShowCookieConsent(true);
+}
+
+function reportBug() {
+  return navigateTo("/BugReport");
 }
 </script>
 
