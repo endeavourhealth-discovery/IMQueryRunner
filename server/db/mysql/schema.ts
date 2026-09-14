@@ -3,11 +3,10 @@ import { JobStatus } from "~~/enums/JobStatus";
 import { type QueryRequest } from "@endeavour/vue-library/models";
 
 import { sql } from "drizzle-orm";
-import { bigint, boolean, date, datetime, decimal, double, index, int, json, text, tinyint, unique, varchar } from "drizzle-orm/mysql-core";
+import { bigint, boolean, date, datetime, decimal, double, index, int, json, mysqlTable, text, tinyint, unique, varchar } from "drizzle-orm/mysql-core";
 import { mysqlSchema } from "drizzle-orm/mysql-core";
 
 const dataset = mysqlSchema("dataset");
-const compass = mysqlSchema("compass");
 
 export const jobTable = dataset.table("job", {
   id: int("id").autoincrement().notNull().primaryKey(),
@@ -89,7 +88,7 @@ export const patientExistsTable = dataset.table("patient_exists", {
   patientFound: tinyint("patient_found").notNull()
 });
 
-export const allergyIntolerance = compass.table("allergy_intolerance", {
+export const allergyIntolerance = mysqlTable("allergy_intolerance", {
   id: bigint({ mode: "number" }).notNull().primaryKey(),
   organizationId: bigint("organization_id", { mode: "number" }).notNull(),
   patientId: bigint("patient_id", { mode: "number" }).notNull(),
@@ -107,7 +106,7 @@ export const allergyIntolerance = compass.table("allergy_intolerance", {
   dateRecorded: datetime("date_recorded", { mode: "string" })
 });
 
-export const concept = compass.table(
+export const concept = mysqlTable(
   "concept",
   {
     dbid: int().autoincrement().notNull().primaryKey(),
@@ -126,7 +125,7 @@ export const concept = compass.table(
   table => [index("concept_draft").on(table.draft), unique("concept_id_uq").on(table.id), unique("concept_scheme_code_idx").on(table.scheme, table.code)]
 );
 
-export const conceptMap = compass.table(
+export const conceptMap = mysqlTable(
   "concept_map",
   {
     legacy: int().notNull(),
@@ -140,7 +139,7 @@ export const conceptMap = compass.table(
   table => [unique("concept_map_uq").on(table.legacy, table.deleted, table.updated)]
 );
 
-export const conceptSetMember = compass.table(
+export const conceptSetMember = mysqlTable(
   "concept_set_member",
   {
     id: int().autoincrement().notNull().primaryKey(),
@@ -152,7 +151,7 @@ export const conceptSetMember = compass.table(
   table => [index("idx_set_self").on(table.set, table.self), index("idx_csm").on(table.im1Id, table.self)]
 );
 
-export const encounter = compass.table("encounter", {
+export const encounter = mysqlTable("encounter", {
   id: bigint({ mode: "number" }).notNull().primaryKey(),
   organizationId: bigint("organization_id", { mode: "number" }).notNull(),
   patientId: bigint("patient_id", { mode: "number" }).notNull(),
@@ -178,7 +177,7 @@ export const encounter = compass.table("encounter", {
   dateRecorded: datetime("date_recorded", { mode: "string" })
 });
 
-export const episodeOfCare = compass.table("episode_of_care", {
+export const episodeOfCare = mysqlTable("episode_of_care", {
   id: bigint({ mode: "number" }).notNull().primaryKey(),
   organizationId: bigint("organization_id", { mode: "number" }).notNull(),
   patientId: bigint("patient_id", { mode: "number" }).notNull(),
@@ -194,7 +193,7 @@ export const episodeOfCare = compass.table("episode_of_care", {
   })
 });
 
-export const medicationOrder = compass.table("medication_order", {
+export const medicationOrder = mysqlTable("medication_order", {
   id: bigint({ mode: "number" }).notNull().primaryKey(),
   organizationId: bigint("organization_id", { mode: "number" }).notNull(),
   patientId: bigint("patient_id", { mode: "number" }).notNull(),
@@ -221,7 +220,7 @@ export const medicationOrder = compass.table("medication_order", {
   dateRecorded: datetime("date_recorded", { mode: "string" })
 });
 
-export const medicationStatement = compass.table("medication_statement", {
+export const medicationStatement = mysqlTable("medication_statement", {
   id: bigint({ mode: "number" }).notNull().primaryKey(),
   organizationId: bigint("organization_id", { mode: "number" }).notNull(),
   patientId: bigint("patient_id", { mode: "number" }).notNull(),
@@ -246,7 +245,7 @@ export const medicationStatement = compass.table("medication_statement", {
   dateRecorded: datetime("date_recorded", { mode: "string" })
 });
 
-export const observation = compass.table(
+export const observation = mysqlTable(
   "observation",
   {
     id: bigint({ mode: "number" }).notNull().primaryKey(),
@@ -280,7 +279,7 @@ export const observation = compass.table(
   table => [index("idx_obs").on(table.coreConceptId, table.clinicalEffectiveDate, table.patientId)]
 );
 
-export const patient = compass.table("patient", {
+export const patient = mysqlTable("patient", {
   id: bigint({ mode: "number" }).notNull().primaryKey(),
   organizationId: bigint("organization_id", { mode: "number" }).notNull(),
   personId: bigint("person_id", { mode: "number" }).notNull(),
@@ -298,7 +297,7 @@ export const patient = compass.table("patient", {
   registeredPracticeOrganizationId: bigint("registered_practice_organization_id", { mode: "number" })
 });
 
-export const patientAddress = compass.table("patient_address", {
+export const patientAddress = mysqlTable("patient_address", {
   id: bigint({ mode: "number" }).notNull().primaryKey(),
   organizationId: bigint("organization_id", { mode: "number" }).notNull(),
   patientId: bigint("patient_id", { mode: "number" }).notNull(),
@@ -323,7 +322,7 @@ export const patientAddress = compass.table("patient_address", {
   townsendDeprivationIndex: double("townsend_deprivation_index")
 });
 
-export const patientContact = compass.table("patient_contact", {
+export const patientContact = mysqlTable("patient_contact", {
   id: bigint({ mode: "number" }).notNull().primaryKey(),
   organizationId: bigint("organization_id", { mode: "number" }).notNull(),
   patientId: bigint("patient_id", { mode: "number" }).notNull(),
@@ -337,7 +336,7 @@ export const patientContact = compass.table("patient_contact", {
   value: varchar({ length: 255 })
 });
 
-export const practitioner = compass.table("practitioner", {
+export const practitioner = mysqlTable("practitioner", {
   id: bigint({ mode: "number" }).notNull().primaryKey(),
   organizationId: bigint("organization_id", { mode: "number" }).notNull(),
   name: varchar({ length: 1024 }),
@@ -346,7 +345,7 @@ export const practitioner = compass.table("practitioner", {
   gmcCode: varchar("gmc_code", { length: 50 })
 });
 
-export const smallPat = compass.table("small_pat", {
+export const smallPat = mysqlTable("small_pat", {
   id: bigint({ mode: "number" }).notNull().primaryKey(),
   organizationId: bigint("organization_id", { mode: "number" }).notNull(),
   personId: bigint("person_id", { mode: "number" }).notNull(),
@@ -364,7 +363,7 @@ export const smallPat = compass.table("small_pat", {
   registeredPracticeOrganizationId: bigint("registered_practice_organization_id", { mode: "number" })
 });
 
-export const organization = compass.table("organization", {
+export const organization = mysqlTable("organization", {
   id: bigint({ mode: "number" }).notNull().primaryKey(),
   odsCode: varchar("ods_code", { length: 50 }),
   name: varchar("name", { length: 255 }),
