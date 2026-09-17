@@ -118,8 +118,8 @@ importers:
         specifier: ^4.3.9
         version: 4.5.5(@babel/parser@7.29.7)(magicast@0.5.3)(supports-color@10.2.2)(vue@3.5.40(typescript@5.9.3))
       '@sonar/scan':
-        specifier: ^4.3.5
-        version: 4.4.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
+        specifier: 5.0.0
+        version: 5.0.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^6.0.2
         version: 6.0.2(@vue/compiler-sfc@3.5.40)(prettier@3.9.6)(supports-color@10.2.2)
@@ -1756,9 +1756,9 @@ packages:
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
 
-  '@sonar/scan@4.4.0':
-    resolution: {integrity: sha512-ZRQERJ1pLNfoyrwudfXSYlDI1CaFY6dnvsbSzLELVcyHZ5HAr95FJHshXaDesEja9QONeF1MlcDtgVWSEU1aRA==}
-    engines: {node: '>= 18'}
+  '@sonar/scan@5.0.0':
+    resolution: {integrity: sha512-mYSzI4Bq0qdCive+eov1qDMjSIpCxbMdGc2Xhg6U0dnBt59Uzkx1sg/mOXsq7YEoPqSGWZMKFsAXe0jQYtm8lg==}
+    engines: {node: '>=22.12.0'}
     hasBin: true
 
   '@speed-highlight/core@1.2.17':
@@ -2187,10 +2187,6 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  adm-zip@0.5.17:
-    resolution: {integrity: sha512-+Ut8d9LLqwEvHHJl1+PIHqoyDxFgVN847JTVM3Izi3xHDWPE4UtzzXysMZQs64DMcrJfBeS/uoEP4AD3HQHnQQ==}
-    engines: {node: '>=12.0'}
-
   adm-zip@0.6.0:
     resolution: {integrity: sha512-XleryMhbuksdKtofnWZ9Sk+4CUTbms4Mb/EU32SZwToAyZ5RgVos/ki8n+yr0LWHOGKuakbXTuuYNHLQjhddgg==}
     engines: {node: '>=14.0'}
@@ -2281,8 +2277,8 @@ packages:
     resolution: {integrity: sha512-NZKeq9AfyQvEeNlN0zSYAaWrmBffJh3IELMZfRpJVWgrpEbtEpnjvzqBPf+mxoI287JohRDoa+/nsfqqiZmF6g==}
     engines: {node: '>= 6.0.0'}
 
-  axios@1.17.0:
-    resolution: {integrity: sha512-J8SwNxprqqpbfenehxWYXE7CW+wM1BB4w3+N+g+/Wx40xM4rsLrfPmHHxSWIxJLYDgSY/HqlFPIYb2/S3rxafw==}
+  axios@1.18.1:
+    resolution: {integrity: sha512-3nTvFlvpn9Zu/RkHUqtc7/+al4UpRW5az71ap5zccp6e8RAYEzhMTecX8Dz1wWDYrPpUoB1HAQEGEAEvUr7S9g==}
 
   axios@1.19.0:
     resolution: {integrity: sha512-ht/iuYZXEjFxLH/Hkezgd7m6JKlHHXEUSneaDz8uZe1Gj5QZtCnpyDsckvAiEnT89OEbCLmnte4R4sn7P0EKFw==}
@@ -2509,6 +2505,10 @@ packages:
   commander@14.0.3:
     resolution: {integrity: sha512-H+y0Jo/T1RZ9qPP4Eh1pkcQcLRglraJaSLoyOtHxu6AapkjWVCy2Sit1QQ4x3Dng8qDlSsZEet7g5Pq06MvTgw==}
     engines: {node: '>=20'}
+
+  commander@15.0.0:
+    resolution: {integrity: sha512-z67u4ZhzCL/Tydu1lJARtEZYWbWaN7oYLHbsuzocr6y4N6WZAagG3RQ4FW61V1/0+jImpj293XfrcYnd1qxtPg==}
+    engines: {node: '>=22.12.0'}
 
   commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
@@ -4635,11 +4635,6 @@ packages:
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
-    hasBin: true
-
-  semver@7.8.4:
-    resolution: {integrity: sha512-rUCObTnP32Q08R2uuIrt7r9PlEonuTmtuXYcW6s5kjdlj3xbnwe+21yXptAUYcMAABLkYYTtnmzb3w3EDZfueA==}
-    engines: {node: '>=10'}
     hasBin: true
 
   semver@7.8.5:
@@ -7255,16 +7250,16 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
-  '@sonar/scan@4.4.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)':
+  '@sonar/scan@5.0.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)':
     dependencies:
-      adm-zip: 0.5.17
-      axios: 1.17.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
-      commander: 14.0.3
+      adm-zip: 0.6.0
+      axios: 1.18.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
+      commander: 15.0.0
       hpagent: 1.2.0
       node-forge: 1.4.0
       properties-file: 5.0.5
       proxy-from-env: 2.1.0
-      semver: 7.8.4
+      semver: 7.8.5
       slugify: 1.6.9
       tar-stream: 3.2.0
     transitivePeerDependencies:
@@ -7752,8 +7747,6 @@ snapshots:
 
   acorn@8.18.0: {}
 
-  adm-zip@0.5.17: {}
-
   adm-zip@0.6.0: {}
 
   agent-base@6.0.2(supports-color@10.2.2):
@@ -7845,7 +7838,7 @@ snapshots:
 
   aws-ssl-profiles@1.1.2: {}
 
-  axios@1.17.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2):
+  axios@1.18.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
       follow-redirects: 1.16.0(debug@4.4.3(supports-color@10.2.2))
       form-data: 4.0.6
@@ -8091,6 +8084,8 @@ snapshots:
   commander@11.1.0: {}
 
   commander@14.0.3: {}
+
+  commander@15.0.0: {}
 
   commander@2.20.3: {}
 
@@ -10301,8 +10296,6 @@ snapshots:
   secure-json-parse@4.1.0: {}
 
   semver@6.3.1: {}
-
-  semver@7.8.4: {}
 
   semver@7.8.5: {}
 

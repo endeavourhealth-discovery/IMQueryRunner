@@ -39,7 +39,7 @@ export async function executeQuery(sessionId: string, sql: string, queryRequest:
       await executeDatasetQuery(sql, queryRequest, queryIrisToQueryResultIds, queryResultId);
       break;
     case IMQType.COHORT:
-      await executeCohortQuery(resolvedSql, queryRequest, queryResultId);
+      await executeCohortQuery(sql, resolvedSql, queryRequest, queryResultId);
       break;
     default:
       throw new Error("Unsupported query type: " + queryRequest.query.queryType);
@@ -63,7 +63,7 @@ export async function executeDebugQuery(resolvedSql: ResolvedSql, queryIri: stri
   }
 }
 
-export async function executeCohortQuery(resolvedSql: ResolvedSql, queryRequest: QueryRequest, queryResultId: number) {
+export async function executeCohortQuery(sql: string, resolvedSql: ResolvedSql, queryRequest: QueryRequest, queryResultId: number) {
   try {
     await mysqlDb.execute(resolvedSql.query);
     await updateWithEndTime(queryResultId, queryResultTable);
@@ -71,7 +71,7 @@ export async function executeCohortQuery(resolvedSql: ResolvedSql, queryRequest:
     console.error("Error executing query:", queryRequest.query?.iri, err);
     throw err;
   } finally {
-    await updateWithSQL(queryResultId, queryResultTable, resolvedSql.displaySql);
+    await updateWithSQL(queryResultId, queryResultTable, sql);
   }
 }
 
@@ -101,7 +101,7 @@ export async function executeDatasetQuery(
     console.error("Error executing SQL part:", lastResolvedSql?.displaySql, err);
     throw err;
   } finally {
-    await updateWithSQL(queryResultId, queryResultTable, lastResolvedSql?.displaySql ?? querySql);
+    await updateWithSQL(queryResultId, queryResultTable, querySql);
   }
 }
 
@@ -229,7 +229,7 @@ async function runSubQueries(sessionId: string, queryRequest: QueryRequest, quer
         queryIrisToHashCodes[subQuery.iri!] = await createQueryResultEntry(subQueryRequest, queryResultSet, hashCodeVersion);
         const subQuerySql = await QueryService.getQuerySql(sessionId, subQueryRequest);
         const resolvedSql = getResolvedSql(subQuerySql, subQueryRequest, queryIrisToHashCodes);
-        await executeCohortQuery(resolvedSql, subQueryRequest, queryIrisToHashCodes[subQuery.iri!]!);
+        await executeCohortQuery(subQuerySql, resolvedSql, subQueryRequest, queryIrisToHashCodes[subQuery.iri!]!);
       } catch (err: any) {
         console.error("Error running subquery sql:", subQuery.iri, "\nError:", err.message);
         throw err;

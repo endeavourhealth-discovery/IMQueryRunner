@@ -104,7 +104,7 @@ function openViewResultsMenuItems(event: MouseEvent): void {
   viewResultsMenuItems.value = [];
   for (const queryRequest of props.job.queryRequests) {
     const item = {
-      label: `View results for "${queryRequest.query.iri}"`,
+      label: `View results for "${queryRequest.query.name}"`,
       icon: "fa-duotone fa-solid fa-table-list",
       command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType),
       visible: false
