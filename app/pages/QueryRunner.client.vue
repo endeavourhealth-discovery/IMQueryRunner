@@ -7,7 +7,7 @@
             <Button class="flex" severity="secondary" icon="fa-solid fa-arrows-rotate" label="Refresh" @click="refresh" />
             <Select v-model="selectedInterval" :options="intervalList" optionLabel="name" placeholder="Refresh options"></Select>
           </div>
-          <Button class="flex" icon="fa-solid fa-magnifying-glass" label="Run a query" @click="runQuery" />
+          <Button class="flex" icon="fa-solid fa-magnifying-glass" label="Search and run" @click="runQuery" />
         </div>
         <transition name="fade">
           <DataTable
@@ -387,7 +387,17 @@ function scrollToTop() {
 function getDisplayDateTime(date: string) {
   const d = new Date(date);
   return (
-    d.getUTCDate() + "/" + (d.getUTCMonth() + 1) + "/" + d.getUTCFullYear() + " " + d.getUTCHours() + ":" + d.getUTCMinutes() + ":" + d.getUTCMilliseconds()
+    d.getUTCDate().toString().padStart(2, "0") +
+    "/" +
+    (d.getUTCMonth() + 1).toString().padStart(2, "0") +
+    "/" +
+    d.getUTCFullYear() +
+    " " +
+    d.getUTCHours().toString().padStart(2, "0") +
+    ":" +
+    d.getUTCMinutes().toString().padStart(2, "0") +
+    ":" +
+    d.getUTCSeconds().toString().padStart(2, "0")
   );
 }
 

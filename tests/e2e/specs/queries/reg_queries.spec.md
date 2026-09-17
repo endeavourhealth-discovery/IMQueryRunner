@@ -33,11 +33,11 @@ tags: reg-queries
 
 * Open IMQueryRunner
 * Login
-* Click "Run a query" button
+* Click "Search and run" button
 * Search for <iri> and select <label>
 * Click "Add to queue" button
 * Click "Run queue" button
-* Click "Select" button
+* Click "Run" button
 * Wait "10" seconds
 * Click "Refresh" button
 * Check results for <count>
