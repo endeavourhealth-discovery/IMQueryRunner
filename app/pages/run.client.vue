@@ -41,7 +41,7 @@
       >?
       <template #footer>
         <Button class="m-1" label="Cancel" variant="outlined" @click="showDialog = false" autofocus />
-        <Button class="m-1" label="Select" @click="runQueries" autofocus />
+        <Button class="m-1" label="Run" @click="runQueries" :disabled="disableRunButton" autofocus />
       </template>
     </Dialog>
   </div>
@@ -103,6 +103,7 @@ const request: any = {
 
 const showDialog = ref(false);
 const missingArgs = ref(true);
+const disableRunButton = ref(false);
 
 watch(
   selected,
@@ -151,6 +152,7 @@ function removeFromQueue(index: number) {
 }
 
 async function runQueries() {
+  disableRunButton.value = true;
   const jobRequest = {
     jobName: jobName.value,
     queryRequests: queuedQueries.value.map(queuedQuery => ({
@@ -185,6 +187,7 @@ async function getArguments() {
 }
 
 function backToQueue() {
+  disableRunButton.value = false;
   navigateTo("/QueryRunner");
 }
 </script>

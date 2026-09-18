@@ -4,11 +4,11 @@ This specification describes the query running functionality of IMQueryRunner.
 ## Run Registered GMS
 * Open IMQueryRunner
 * Login
-* Click "Run a query" button
+* Click "Search and run" button
 * Search for "http://endhealth.info/im#Q_RegisteredGMS" and select "Patients registered for GMS services on the reference date"
 * Click "Add to queue" button
 * Click "Run queue" button
-* Click "Select" button
+* Click "Run" button
 * Wait "20" seconds
 * Click "Refresh" button
 * Open results page
@@ -19,11 +19,11 @@ This specification describes the query running functionality of IMQueryRunner.
 ## Run Unresolved Diabetes
 * Open IMQueryRunner
 * Login
-* Click "Run a query" button
+* Click "Search and run" button
 * Search for "http://endhealth.info/qof#abd9ffb6-891e-4c61-99bd-ce3b70ce4f3e" and select "Patient having unresolved Diabetes code"
 * Click "Add to queue" button
 * Click "Run queue" button
-* Click "Select" button
+* Click "Run" button
 * Wait "10" seconds
 * Click "Refresh" button
 * Open results page
@@ -34,11 +34,11 @@ This specification describes the query running functionality of IMQueryRunner.
 ## Run DM017
 * Open IMQueryRunner
 * Login
-* Click "Run a query" button
+* Click "Search and run" button
 * Search for "http://smartlifehealth.info/smh#4f227531-005f-4293-99b0-ad35379c4f10" and select "DM017 - Patients on Diabetes QOF Register"
 * Click "Add to queue" button
 * Click "Run queue" button
-* Click "Select" button
+* Click "Run" button
 * Wait "10" seconds
 * Click "Refresh" button
 * Open results page

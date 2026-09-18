@@ -62,7 +62,7 @@ step("Click logo to return to homepage", async () => {
 });
 
 step("Click <text> button", async text => {
-  await pw.page.getByRole("button", { name: text }).click();
+  await pw.page.getByRole("button", { name: text, exact: true }).click();
   await pw.page.waitForLoadState("networkidle");
 });
 
