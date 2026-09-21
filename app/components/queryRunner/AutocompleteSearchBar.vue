@@ -320,8 +320,8 @@ function debounceForSearch(event: Event): void {
 }
 
 async function doSearch(event: any) {
-  results.value = await search();
   showResultsOverlay(event);
+  results.value = await search();
 }
 
 async function onEnter(event: KeyboardEvent) {
