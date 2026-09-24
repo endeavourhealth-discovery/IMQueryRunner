@@ -371,23 +371,6 @@ function getIriLine(stringIris: string[]): string {
   return stringIris.join(" ");
 }
 
-function formatSql(sql: string, params: unknown[]): string {
-  let i = 0;
-
-  return sql.replace(/\?/g, () => {
-    const value = params[i++];
-
-    if (null === value) return "NULL";
-    if ("string" === typeof value) {
-      return `'${value.replaceAll("'", "''")}'`;
-    }
-    if ("number" === typeof value) return String(value);
-    if ("boolean" === typeof value) return value ? "TRUE" : "FALSE";
-
-    return `'${String(value).replaceAll("'", "''")}'`;
-  });
-}
-
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
