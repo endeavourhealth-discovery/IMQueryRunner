@@ -1,3 +1,4 @@
+import { ErrorCode } from "~~/enums";
 import type { ResolvedSql } from "~~/models/ResolvedSql.ts";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
@@ -39,7 +40,7 @@ export async function executeQuery(sessionId: string, sql: string, queryRequest:
       await executeDatasetQuery(sql, queryRequest, queryIrisToQueryResultIds, queryResultId);
       break;
     case IMQType.COHORT:
-      await executeCohortQuery(sql, resolvedSql, queryRequest, queryResultId);
+      await executeCohortQuery(resolvedSql, queryRequest, queryResultId);
       break;
     default:
       throw new Error("Unsupported query type: " + queryRequest.query.queryType);
@@ -63,7 +64,7 @@ export async function executeDebugQuery(resolvedSql: ResolvedSql, queryIri: stri
   }
 }
 
-export async function executeCohortQuery(sql: string, resolvedSql: ResolvedSql, queryRequest: QueryRequest, queryResultId: number) {
+export async function executeCohortQuery(resolvedSql: ResolvedSql, queryRequest: QueryRequest, queryResultId: number) {
   try {
     await mysqlDb.execute(resolvedSql.query);
     await updateWithEndTime(queryResultId, queryResultTable);
@@ -71,7 +72,7 @@ export async function executeCohortQuery(sql: string, resolvedSql: ResolvedSql, 
     console.error("Error executing query:", queryRequest.query?.iri, err);
     throw err;
   } finally {
-    await updateWithSQL(queryResultId, queryResultTable, sql);
+    await updateWithSQL(queryResultId, queryResultTable, resolvedSql.displaySql);
   }
 }
 
@@ -86,14 +87,16 @@ export async function executeDatasetQuery(
     .map(part => part.trim())
     .filter(Boolean);
 
+  let resolvedSqlParts = "";
+
   console.log("Dataset parts to run:", sqlParts.length);
 
   let lastResolvedSql: ResolvedSql | undefined;
-
   try {
     for (const sqlPart of sqlParts) {
       lastResolvedSql = getResolvedSql(sqlPart, queryRequest, queryIrisToQueryResultIds);
       await mysqlDb.execute(lastResolvedSql.query);
+      resolvedSqlParts = resolvedSqlParts + lastResolvedSql.displaySql + "\n";
     }
 
     await updateWithEndTime(queryResultId, queryResultTable);
@@ -101,7 +104,7 @@ export async function executeDatasetQuery(
     console.error("Error executing SQL part:", lastResolvedSql?.displaySql, err);
     throw err;
   } finally {
-    await updateWithSQL(queryResultId, queryResultTable, querySql);
+    await updateWithSQL(queryResultId, queryResultTable, resolvedSqlParts ?? querySql);
   }
 }
 
@@ -229,7 +232,7 @@ async function runSubQueries(sessionId: string, queryRequest: QueryRequest, quer
         queryIrisToHashCodes[subQuery.iri!] = await createQueryResultEntry(subQueryRequest, queryResultSet, hashCodeVersion);
         const subQuerySql = await QueryService.getQuerySql(sessionId, subQueryRequest);
         const resolvedSql = getResolvedSql(subQuerySql, subQueryRequest, queryIrisToHashCodes);
-        await executeCohortQuery(subQuerySql, resolvedSql, subQueryRequest, queryIrisToHashCodes[subQuery.iri!]!);
+        await executeCohortQuery(resolvedSql, subQueryRequest, queryIrisToHashCodes[subQuery.iri!]!);
       } catch (err: any) {
         console.error("Error running subquery sql:", subQuery.iri, "\nError:", err.message);
         throw err;
@@ -316,7 +319,6 @@ function getResolvedSql(querySql: string, queryRequest: QueryRequest, queryIrisT
   );
 
   const parts: SQL[] = [];
-  const displayParts: string[] = [];
   let lastIndex = 0;
 
   for (const match of querySql.matchAll(pattern)) {
@@ -324,7 +326,6 @@ function getResolvedSql(querySql: string, queryRequest: QueryRequest, queryIrisT
     if (index > lastIndex) {
       const literal = querySql.slice(lastIndex, index);
       parts.push(sql.raw(literal));
-      displayParts.push(literal);
     }
 
     const replacement = replacements.get(match[0]);
@@ -332,7 +333,6 @@ function getResolvedSql(querySql: string, queryRequest: QueryRequest, queryIrisT
     if (!replacement) throw new Error(`No replacement found for SQL token "${match[0]}"`);
 
     parts.push(replacement);
-    displayParts.push("?");
 
     lastIndex = index + match[0].length;
   }
@@ -340,10 +340,52 @@ function getResolvedSql(querySql: string, queryRequest: QueryRequest, queryIrisT
   if (lastIndex < querySql.length) {
     const remaining = querySql.slice(lastIndex);
     parts.push(sql.raw(remaining));
-    displayParts.push(remaining);
   }
 
-  return { query: sql.join(parts, sql.raw("")), displaySql: displayParts.join("") };
+  const formattedString = getSqlString(querySql, queryRequest, queryIrisToHashCodes);
+
+  return { query: sql.join(parts, sql.raw("")), displaySql: formattedString };
+}
+
+function getSqlString(querySql: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }): string {
+  if (queryRequest.argument) {
+    for (const arg of queryRequest.argument) {
+      if (arg.valueData && arg.parameter) querySql = querySql.replaceAll(arg.parameter, `'${arg.valueData}'`);
+      else if (arg.valueIri && arg.parameter) querySql = querySql.replaceAll(arg.parameter, `'${arg.valueIri.iri}'`);
+      else if (arg.valueIriList && arg.parameter) querySql = querySql.replaceAll(arg.parameter, getIriLine(arg.valueIriList.map(v => v.iri)));
+      else if (arg.valueDataList && arg.parameter) querySql = querySql.replaceAll(arg.parameter, `(${arg.valueDataList.map(v => `'${v}'`).join(", ")})`);
+    }
+  }
+  if (Object.keys(queryIrisToHashCodes).length > 0) {
+    for (const iri of Object.keys(queryIrisToHashCodes)) {
+      querySql = querySql.replaceAll(iri, "" + queryIrisToHashCodes[iri]);
+    }
+  }
+  return querySql;
+}
+
+function getIriLine(stringIris: string[]): string {
+  for (const stringIri of stringIris) {
+    if (stringIri.indexOf(":") === -1) throw createError({ statusCode: 400, statusText: ErrorCode.InvalidRequestError, message: "Invalid iri" });
+  }
+  return stringIris.join(" ");
+}
+
+function formatSql(sql: string, params: unknown[]): string {
+  let i = 0;
+
+  return sql.replace(/\?/g, () => {
+    const value = params[i++];
+
+    if (null === value) return "NULL";
+    if ("string" === typeof value) {
+      return `'${value.replaceAll("'", "''")}'`;
+    }
+    if ("number" === typeof value) return String(value);
+    if ("boolean" === typeof value) return value ? "TRUE" : "FALSE";
+
+    return `'${String(value).replaceAll("'", "''")}'`;
+  });
 }
 
 function escapeRegExp(value: string): string {
