@@ -72,10 +72,13 @@
 
 <script setup lang="ts">
 import { JobStatus } from "@@/enums";
-import type { Job } from "~~/models";
+import type { Job, QueryResultDetails } from "~~/models";
 
 import { ref } from "vue";
 
+import { isArrayHasLength } from "@endeavour/vue-library";
+
+import type { MenuItem } from "primevue/menuitem";
 import { useConfirm } from "primevue/useconfirm";
 
 import SQLViewer from "./SQLViewer.vue";
@@ -99,20 +102,34 @@ const confirm = useConfirm();
 const showErrorDialog = ref(false);
 const viewResultsMenuItems: Ref<any[]> = ref([]);
 const viewResultsMenu = ref();
+const resultLoading = ref(false);
 
 function openViewResultsMenuItems(event: MouseEvent): void {
+  resultLoading.value = true;
   viewResultsMenuItems.value = [];
   for (const queryRequest of props.job.queryRequests) {
-    const item = {
-      label: `View results for "${queryRequest.query.name}"`,
-      icon: "fa-duotone fa-solid fa-table-list",
-      command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType),
-      visible: false
-    };
-    item.visible = true;
-    viewResultsMenuItems.value.push(item);
+    getResultDetails(props.job).then(details => {
+      if (!details) throw createError("Failed to get query results details");
+      const item: MenuItem = {
+        label: `View results for "${details.primaryQueryResultsDetails.queryName} (${details.primaryQueryResultsDetails.totalCount})"`,
+        icon: "fa-duotone fa-solid fa-table-list",
+        command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType)
+      };
+      viewResultsMenuItems.value.push(item);
+      viewResultsMenuItems.value.push({ separator: true });
+      if (isArrayHasLength(details.subQueryResultsDetails)) {
+        const subMenuItems: MenuItem = {
+          label: "      Sub queries",
+          items: details.subQueryResultsDetails.map(subQuery => ({
+            label: `    ${subQuery.queryName} (${subQuery.totalCount})`,
+            disabled: true
+          }))
+        };
+        viewResultsMenuItems.value.push(subMenuItems);
+      }
+    });
   }
-
+  resultLoading.value = false;
   viewResultsMenu.value.toggle(event);
 }
 
@@ -164,6 +181,26 @@ async function viewQueryResults(queryIri: string, queryType: string) {
 
 function requeueQuery() {
   emit("requeueQuery", props.job.id);
+}
+
+async function getResultDetails(job: Job): Promise<
+  | undefined
+  | {
+      primaryQueryResultsDetails: QueryResultDetails;
+      subQueryResultsDetails: QueryResultDetails[];
+    }
+> {
+  const results = await useFetch<QueryResultDetails[]>(`/api/queue/job/results/${job.id}/details`);
+  if (!results.data.value) return undefined;
+  const details = results.data.value;
+  const primaryQueryResultsDetails = details.find(d => d.queryName === job.jobName);
+  if (!primaryQueryResultsDetails) throw createError("Failed to get query result details");
+  const subQueryResultsDetails = details.filter(d => d.queryName !== job.jobName);
+  const totalCount = details.reduce((sum, d) => sum + d.totalCount, 0);
+  return {
+    primaryQueryResultsDetails: { queryName: primaryQueryResultsDetails.queryName, totalCount: totalCount },
+    subQueryResultsDetails: subQueryResultsDetails
+  };
 }
 
 function showErrorDetails() {}
