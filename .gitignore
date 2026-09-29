@@ -41,3 +41,4 @@ prisma/migrations/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/IMQueryRunner.iml
