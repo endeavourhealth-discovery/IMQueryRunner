@@ -111,18 +111,24 @@ function openViewResultsMenuItems(event: MouseEvent): void {
     getResultDetails(props.job).then(details => {
       if (!details) throw createError("Failed to get query results details");
       const item: MenuItem = {
-        label: `View results for "${details.primaryQueryResultsDetails.queryName} (${details.primaryQueryResultsDetails.totalCount})"`,
-        icon: "fa-duotone fa-solid fa-table-list",
-        command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType)
+        label: "Results",
+        items: [
+          {
+            label: `${details.primaryQueryResultsDetails.queryName} (${details.primaryQueryResultsDetails.totalCount})`,
+            icon: "fa-duotone fa-solid fa-table-list",
+            command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType)
+          }
+        ]
       };
       viewResultsMenuItems.value.push(item);
       viewResultsMenuItems.value.push({ separator: true });
       if (isArrayHasLength(details.subQueryResultsDetails)) {
         const subMenuItems: MenuItem = {
-          label: "      Sub queries",
+          label: "Sub queries",
           items: details.subQueryResultsDetails.map(subQuery => ({
             label: `    ${subQuery.queryName} (${subQuery.totalCount})`,
-            disabled: true
+            icon: "fa-duotone fa-solid fa-table-list",
+            command: () => viewQueryResults(encodeURIComponent(subQuery.queryIri), subQuery.queryType)
           }))
         };
         viewResultsMenuItems.value.push(subMenuItems);
@@ -196,9 +202,8 @@ async function getResultDetails(job: Job): Promise<
   const primaryQueryResultsDetails = details.find(d => d.queryName === job.jobName);
   if (!primaryQueryResultsDetails) throw createError("Failed to get query result details");
   const subQueryResultsDetails = details.filter(d => d.queryName !== job.jobName);
-  const totalCount = details.reduce((sum, d) => sum + d.totalCount, 0);
   return {
-    primaryQueryResultsDetails: { queryName: primaryQueryResultsDetails.queryName, totalCount: totalCount },
+    primaryQueryResultsDetails: primaryQueryResultsDetails,
     subQueryResultsDetails: subQueryResultsDetails
   };
 }

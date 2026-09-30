@@ -13,7 +13,7 @@ import {
 import EntityService from "~~/server/services/EntityService";
 import { getDebugPatientId } from "~~/server/utils/executeQuery";
 
-import { isArrayHasLength } from "@endeavour/vue-library";
+import { isArrayHasLength, isEnumValue } from "@endeavour/vue-library";
 import { IMQType } from "@endeavour/vue-library/enums";
 
 import { and, count, eq } from "drizzle-orm";
@@ -40,10 +40,12 @@ export default defineEventHandler(async event => {
       .where(eq(queryResultSetTable.jobId, Number(jobId)));
     if (isArrayHasLength(queryResultSetRows)) {
       for (const queryResultSet of queryResultSetRows) {
-        const queryType = job.queryRequests.filter(qr => qr.query?.iri === queryResultSet.queryIri)[0]?.query?.queryType;
         const queryResultRows = await mysqlDb.select().from(queryResultTable).where(eq(queryResultTable.queryResultSetId, queryResultSet.id));
         if (isArrayHasLength(queryResultRows)) {
           for (const queryResultRow of queryResultRows) {
+            const queryType = queryResultRow.queryType;
+            if (!isEnumValue(IMQType, queryType))
+              throw createError({ status: 500, statusText: ErrorCode.MissingDataError, message: "Query type is missing or incorrect" });
             if (queryType === IMQType.COHORT) {
               const countResult = await mysqlDb
                 .select({ count: count() })
@@ -51,7 +53,7 @@ export default defineEventHandler(async event => {
                 .where(eq(cohortResultsTable.queryResultId, queryResultRow.id));
               if (isArrayHasLength(countResult)) {
                 const name = (await EntityService.getEntitySummary(sessionId, queryResultRow.queryIri)).name ?? "";
-                results.push({ totalCount: countResult[0].count, queryName: name });
+                results.push({ totalCount: countResult[0].count, queryName: name, queryIri: queryResultRow.queryIri, queryType: queryType });
               }
             } else if (queryType === IMQType.DATASET) {
               const countResult = await mysqlDb
@@ -60,7 +62,7 @@ export default defineEventHandler(async event => {
                 .where(eq(datasetResultsTable.queryResultId, queryResultRow.id));
               if (isArrayHasLength(countResult)) {
                 const name = (await EntityService.getEntitySummary(sessionId, queryResultRow.queryIri)).name ?? "";
-                results.push({ totalCount: countResult[0].count, queryName: name });
+                results.push({ totalCount: countResult[0].count, queryName: name, queryIri: queryResultRow.queryIri, queryType: queryType });
               }
             } else if (queryType === IMQType.INDICATOR) {
               const countResult = await mysqlDb
@@ -69,7 +71,7 @@ export default defineEventHandler(async event => {
                 .where(eq(indicatorResultTable.queryResultSetId, queryResultSet.id));
               if (isArrayHasLength(countResult)) {
                 const name = (await EntityService.getEntitySummary(sessionId, queryResultRow.queryIri)).name ?? "";
-                results.push({ totalCount: countResult[0].count, queryName: name });
+                results.push({ totalCount: countResult[0].count, queryName: name, queryIri: queryResultRow.queryIri, queryType: queryType });
               }
             } else {
               throw createError({ status: 400, statusText: ErrorCode.InvalidRequestError, message: "Query type is invalid" });

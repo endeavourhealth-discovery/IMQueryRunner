@@ -125,7 +125,8 @@ export async function createQueryResultEntry(queryRequest: QueryRequest, queryRe
         achievementDate: queryResultSet.achievementDate ? new Date(queryResultSet.achievementDate) : null,
         indicatorResultId: indicatorId,
         queryResultSetId: queryResultSet.id,
-        version: hashCodeVersion
+        version: hashCodeVersion,
+        queryType: queryRequest.query.queryType
       } as QueryResult;
       const result = await mysqlDb.insert(queryResultTable).values(queryResult);
       return result?.[0]?.insertId;
