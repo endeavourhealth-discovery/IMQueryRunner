@@ -63,7 +63,8 @@ export const queryResultTable = dataset.table("query_result", {
   persistent: tinyint("persistent").notNull(),
   useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
   executedSQL: text("executed_sql"),
-  version: int("version").notNull()
+  version: int("version").notNull(),
+  queryType: varchar("query_type", { length: 255 }).notNull()
 });
 
 export const datasetResultsTable = dataset.table("dataset_results", {

@@ -80,7 +80,8 @@ CREATE TABLE
         version BIGINT,
         executed_sql TEXT,
         FOREIGN KEY (query_result_set_id) REFERENCES query_result_set (id),
-        FOREIGN KEY (indicator_result_id) REFERENCES indicator_result (id)
+        FOREIGN KEY (indicator_result_id) REFERENCES indicator_result (id),
+        query_type VARCHAR(255)
     );
 
 CREATE TABLE
@@ -100,7 +101,7 @@ CREATE TABLE
 		entity_org_id BIGINT,
         FOREIGN KEY (query_result_id) REFERENCES query_result (id)
     );
-    
+
 CREATE TABLE patient_exists (
     query_iri VARCHAR(512) NOT NULL,
     patient_id VARCHAR(64) NOT NULL,

@@ -56,6 +56,7 @@
 import type { Ref } from "vue";
 import { onMounted, ref } from "vue";
 
+import { isArrayHasLength } from "@endeavour/vue-library";
 import { useUserStore } from "@endeavour/vue-library/stores";
 
 import { isArray } from "lodash-es";
@@ -120,6 +121,7 @@ async function getTotalQueryResults() {
 }
 
 function formatResultsForTable() {
+  if (!isArrayHasLength(queryResults.value)) return;
   for (const key of Object.keys(queryResults.value[0])) {
     if (key !== "hashcode") columns.value.push({ field: key, header: key.replace("_", " ") });
   }

@@ -1,7 +1,6 @@
-import type { IndicatorResult } from "./indicatorResult.schema";
-import type { Job } from "./job.schema";
-import type { JobRequest } from "./jobRequest.schema.ts";
-import type { QueryResult } from "./queryResult.schema";
-import type { QueryResultSet } from "./queryResultSet.schema";
-
-export type { Job, JobRequest, QueryResult, QueryResultSet, IndicatorResult };
+export type { IndicatorResult } from "./indicatorResult.schema";
+export type { Job } from "./job.schema";
+export type { JobRequest } from "./jobRequest.schema.ts";
+export type { QueryResult } from "./queryResult.schema";
+export type { QueryResultSet } from "./queryResultSet.schema";
+export type { QueryResultDetails } from "./QueryResultDetails.schema.ts";
