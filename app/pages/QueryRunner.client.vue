@@ -164,7 +164,7 @@ watch(selectedInterval, async () => {
 
 async function initSearch() {
   searchLoading.value = true;
-  const results = await useFetch<{
+  const results = await $fetch<{
     totalCount: number;
     result: Job[];
   }>("/api/queue", {
@@ -174,9 +174,9 @@ async function initSearch() {
       size: rows.value
     }
   });
-  if (results.data.value) {
-    totalCount.value = results.data.value.totalCount;
-    jobs.value = results.data.value.result.sort((a, b) => {
+  if (results) {
+    totalCount.value = results.totalCount;
+    jobs.value = results.result.sort((a, b) => {
       if (!a.queueDate) return 1;
       if (!b.queueDate) return -1;
       return new Date(b.queueDate).getTime() - new Date(a.queueDate).getTime();
