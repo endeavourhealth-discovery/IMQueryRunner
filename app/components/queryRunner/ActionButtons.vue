@@ -196,9 +196,9 @@ async function getResultDetails(job: Job): Promise<
       subQueryResultsDetails: QueryResultDetails[];
     }
 > {
-  const results = await useFetch<QueryResultDetails[]>(`/api/queue/job/results/${job.id}/details`);
-  if (!results.data.value) return undefined;
-  const details = results.data.value;
+  const results = await $fetch<QueryResultDetails[]>(`/api/queue/job/results/${job.id}/details`);
+  if (!results) return undefined;
+  const details = results;
   const primaryQueryResultsDetails = details.find(d => d.queryName === job.jobName);
   if (!primaryQueryResultsDetails) throw createError("Failed to get query result details");
   const subQueryResultsDetails = details.filter(d => d.queryName !== job.jobName);
