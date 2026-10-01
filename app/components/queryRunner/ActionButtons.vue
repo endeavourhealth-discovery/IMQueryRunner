@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 import { JobStatus } from "@@/enums";
-import type { Job, QueryResultDetails } from "~~/models";
+import type { Job, QueryResultSummary } from "~~/models";
 
 import { ref } from "vue";
 
@@ -85,6 +85,7 @@ import SQLViewer from "./SQLViewer.vue";
 
 interface Props {
   job: Job;
+  resultSummary: QueryResultSummary[] | undefined;
 }
 
 const props = defineProps<Props>();
@@ -108,32 +109,32 @@ function openViewResultsMenuItems(event: MouseEvent): void {
   resultLoading.value = true;
   viewResultsMenuItems.value = [];
   for (const queryRequest of props.job.queryRequests) {
-    getResultDetails(props.job).then(details => {
-      if (!details) throw createError("Failed to get query results details");
-      const item: MenuItem = {
-        label: "Results",
-        items: [
-          {
-            label: `${details.primaryQueryResultsDetails.queryName} (${details.primaryQueryResultsDetails.totalCount})`,
-            icon: "fa-duotone fa-solid fa-table-list",
-            command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType)
-          }
-        ]
+    const details = getResultDetails();
+    console.log(details);
+    if (!details) return;
+    const item: MenuItem = {
+      label: "Results",
+      items: [
+        {
+          label: `${details.primaryQueryResultsDetails.queryName} (${details.primaryQueryResultsDetails.totalCount})`,
+          icon: "fa-duotone fa-solid fa-table-list",
+          command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType)
+        }
+      ]
+    };
+    viewResultsMenuItems.value.push(item);
+    viewResultsMenuItems.value.push({ separator: true });
+    if (isArrayHasLength(details.subQueryResultsDetails)) {
+      const subMenuItems: MenuItem = {
+        label: "Sub queries",
+        items: details.subQueryResultsDetails.map(subQuery => ({
+          label: `    ${subQuery.queryName} (${subQuery.totalCount})`,
+          icon: "fa-duotone fa-solid fa-table-list",
+          command: () => viewQueryResults(encodeURIComponent(subQuery.queryIri), subQuery.queryType)
+        }))
       };
-      viewResultsMenuItems.value.push(item);
-      viewResultsMenuItems.value.push({ separator: true });
-      if (isArrayHasLength(details.subQueryResultsDetails)) {
-        const subMenuItems: MenuItem = {
-          label: "Sub queries",
-          items: details.subQueryResultsDetails.map(subQuery => ({
-            label: `    ${subQuery.queryName} (${subQuery.totalCount})`,
-            icon: "fa-duotone fa-solid fa-table-list",
-            command: () => viewQueryResults(encodeURIComponent(subQuery.queryIri), subQuery.queryType)
-          }))
-        };
-        viewResultsMenuItems.value.push(subMenuItems);
-      }
-    });
+      viewResultsMenuItems.value.push(subMenuItems);
+    }
   }
   resultLoading.value = false;
   viewResultsMenu.value.toggle(event);
@@ -189,19 +190,19 @@ function requeueQuery() {
   emit("requeueQuery", props.job.id);
 }
 
-async function getResultDetails(job: Job): Promise<
-  | undefined
+function getResultDetails():
   | {
-      primaryQueryResultsDetails: QueryResultDetails;
-      subQueryResultsDetails: QueryResultDetails[];
+      primaryQueryResultsDetails: QueryResultSummary;
+      subQueryResultsDetails: QueryResultSummary[];
     }
-> {
-  const results = await $fetch<QueryResultDetails[]>(`/api/queue/job/results/${job.id}/details`);
+  | undefined {
+  const results = props.resultSummary;
+  console.log(results);
   if (!results) return undefined;
   const details = results;
-  const primaryQueryResultsDetails = details.find(d => d.queryName === job.jobName);
+  const primaryQueryResultsDetails = details.find(d => d.queryName === props.job.jobName);
   if (!primaryQueryResultsDetails) throw createError("Failed to get query result details");
-  const subQueryResultsDetails = details.filter(d => d.queryName !== job.jobName);
+  const subQueryResultsDetails = details.filter(d => d.queryName !== props.job.jobName);
   return {
     primaryQueryResultsDetails: primaryQueryResultsDetails,
     subQueryResultsDetails: subQueryResultsDetails

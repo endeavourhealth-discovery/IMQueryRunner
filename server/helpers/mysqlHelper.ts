@@ -1,19 +1,29 @@
 import { emitQueueUpdate } from "#server/utils/queueEvents.ts";
-import { JobStatus } from "~~/enums";
+import { ErrorCode, JobStatus } from "~~/enums";
 import { type JobRequest } from "~~/models/JobRequest";
 import { type IndicatorResult } from "~~/models/indicatorResult.schema";
 import { type Job } from "~~/models/job.schema";
 import { type QueryResult } from "~~/models/queryResult.schema";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
+import { isArrayHasLength } from "@endeavour/vue-library";
 import { IMQType } from "@endeavour/vue-library/enums";
 import { type QueryRequest } from "@endeavour/vue-library/models";
 
-import { eq } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 
 import { mysqlDb } from "../db/mysql";
-import { indicatorResultTable, jobTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
+import {
+  cohortResultsTable,
+  datasetResultsTable,
+  indicatorResultTable,
+  jobTable,
+  patientExistsTable,
+  queryResultSetTable,
+  queryResultTable
+} from "../db/mysql/schema";
+import EntityService from "../services/EntityService";
 import QueryService from "../services/QueryService";
 import { resolveArgs, sortQueryRequestsByDependency } from "../utils/executeQuery";
 
@@ -49,9 +59,128 @@ export async function getJobById(jobId: number): Promise<Job> {
   const jobs = await mysqlDb.select().from(jobTable).where(eq(jobTable.id, jobId));
   const job = jobs[0];
   if (!job) {
-    throw new Error("Could not find job with id: " + jobId);
+    throw createError({ status: 400, statusText: ErrorCode.MissingDataError, message: "Queue job not found" });
   }
   return job;
+}
+
+export async function getQueryResultSetRows(job: Job) {
+  if (job.status !== JobStatus.COMPLETED) return [];
+  const queryResultSetRows = await mysqlDb.select().from(queryResultSetTable).where(eq(queryResultSetTable.jobId, job.id));
+  if (!isArrayHasLength(queryResultSetRows)) {
+    throw createError({ statusCode: 400, statusText: ErrorCode.MissingDataError, message: "Query result set not found" });
+  }
+  return queryResultSetRows;
+}
+
+export async function getQueryResultsPaged(
+  queryIri: string,
+  queryResultSetId: number,
+  queryType: IMQType,
+  page: number = 1,
+  size: number = 25,
+  debugPatientId?: string
+) {
+  const offset = (page - 1) * size;
+  const returnObject = {
+    result: [] as any[],
+    totalCount: 0,
+    page: page
+  };
+  if (debugPatientId) {
+    const whereClause = and(eq(patientExistsTable.queryIri, queryIri), eq(patientExistsTable.patientId, debugPatientId));
+    const debugResults = await mysqlDb.select().from(patientExistsTable).where(whereClause).limit(size).offset(offset);
+    const totalResult = await mysqlDb.select({ count: count() }).from(patientExistsTable).where(whereClause);
+    returnObject.result = debugResults;
+    returnObject.totalCount = totalResult[0]?.count ?? 0;
+    return returnObject;
+  }
+
+  if (queryType === IMQType.INDICATOR) {
+    const indicatorResultRows = await mysqlDb
+      .select()
+      .from(indicatorResultTable)
+      .where(and(eq(indicatorResultTable.queryIri, queryIri), eq(indicatorResultTable.queryResultSetId, queryResultSetId)));
+    const indicatorResult = indicatorResultRows[0];
+    // TODO: return indicator results - get sql from imapi
+    return returnObject;
+  } else {
+    const queryResultRows = await mysqlDb
+      .select()
+      .from(queryResultTable)
+      .where(and(eq(queryResultTable.queryIri, queryIri), eq(queryResultTable.queryResultSetId, queryResultSetId)));
+    const queryResult = queryResultRows[0];
+
+    if (!queryResult) {
+      throw createError({ statusCode: 404, statusText: ErrorCode.MissingDataError, message: "Query result not found" });
+    }
+
+    if (queryType === IMQType.COHORT) {
+      const whereClause = eq(cohortResultsTable.queryResultId, queryResult.id);
+      const cohortResults = await mysqlDb.select().from(cohortResultsTable).where(whereClause).limit(size).offset(offset);
+      const totalResult = await mysqlDb.select({ count: count() }).from(cohortResultsTable).where(whereClause);
+      const totalCount = totalResult[0]?.count ?? 0;
+      returnObject.result = cohortResults;
+      returnObject.totalCount = totalCount;
+    } else if (queryType === IMQType.DATASET) {
+      const whereClause = eq(datasetResultsTable.queryResultId, queryResult.id);
+      const datasetResults = await mysqlDb.select().from(datasetResultsTable).where(whereClause).limit(size).offset(offset);
+      const totalResult = await mysqlDb.select({ count: count() }).from(datasetResultsTable).where(whereClause);
+      const totalCount = totalResult[0]?.count ?? 0;
+      returnObject.result = datasetResults;
+      returnObject.totalCount = totalCount;
+    }
+  }
+}
+
+export async function getQueryResultRows(queryResultSetId: number) {
+  const queryResultRows = await mysqlDb.select().from(queryResultTable).where(eq(queryResultTable.queryResultSetId, queryResultSetId));
+  if (!isArrayHasLength(queryResultRows)) throw createError({ status: 404, statusText: ErrorCode.MissingDataError, message: "Query result not found" });
+  return queryResultRows;
+}
+
+export async function getQueryResultRow(queryResultSetId: number, queryIri: string) {
+  const queryResultRows = await mysqlDb
+    .select()
+    .from(queryResultTable)
+    .where(and(eq(queryResultTable.queryIri, queryIri), eq(queryResultTable.queryResultSetId, queryResultSetId)));
+  if (!isArrayHasLength(queryResultRows))
+    throw createError({ status: 400, statusText: ErrorCode.MissingDataError, message: `Query result not found for query ${queryIri}` });
+  return queryResultRows[0];
+}
+
+export async function getQueryResultSQL(queryResultSetId: number, queryIri: string) {
+  const queryResultRows = await mysqlDb
+    .select({ executedSql: queryResultTable.executedSQL })
+    .from(queryResultTable)
+    .where(and(eq(queryResultTable.queryIri, queryIri), eq(queryResultTable.queryResultSetId, queryResultSetId)));
+  if (!isArrayHasLength(queryResultRows))
+    throw createError({ status: 400, statusText: ErrorCode.MissingDataError, message: `Query result not found for query ${queryIri}` });
+  return queryResultRows[0].executedSql ?? "";
+}
+
+export async function getQueryResultSummary(sessionId: string, queryResultSetId: number, queryResultRowId: number, queryIri: string, queryType: IMQType) {
+  const name = (await EntityService.getEntitySummary(sessionId, queryIri)).name ?? "";
+  const result = { totalCount: 0, queryName: name, queryIri: queryIri, queryType: queryType };
+  if (queryType === IMQType.COHORT) {
+    const countResult = await mysqlDb.select({ count: count() }).from(cohortResultsTable).where(eq(cohortResultsTable.queryResultId, queryResultRowId));
+    if (isArrayHasLength(countResult)) {
+      result.totalCount = countResult[0].count;
+    }
+  } else if (queryType === IMQType.DATASET) {
+    const countResult = await mysqlDb.select({ count: count() }).from(datasetResultsTable).where(eq(datasetResultsTable.queryResultId, queryResultRowId));
+    if (isArrayHasLength(countResult)) {
+      result.totalCount = countResult[0].count;
+    }
+  } else if (queryType === IMQType.INDICATOR) {
+    const countResult = await mysqlDb.select({ count: count() }).from(indicatorResultTable).where(eq(indicatorResultTable.queryResultSetId, queryResultSetId));
+    if (isArrayHasLength(countResult)) {
+      result.totalCount = countResult[0].count;
+    }
+  } else {
+    throw createError({ status: 400, statusText: ErrorCode.InvalidRequestError, message: "Query type is invalid" });
+  }
+  return result;
 }
 
 export async function updateJobStatus(jobId: number, jobStatus: JobStatus, userId: string, error: any = null) {

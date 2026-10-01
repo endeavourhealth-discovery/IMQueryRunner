@@ -55,6 +55,7 @@
               <template #body="slotProps">
                 <ActionButtons
                   :job="slotProps.data"
+                  :resultSummary="resultSummaries.find(rs => Number(rs.jobId) === slotProps.data.id)?.resultsSummary"
                   @cancel-query="cancelJob"
                   @go-to-query="goToQuery"
                   @view-query-results="viewQueryResults"
@@ -75,7 +76,7 @@
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
 import { JobStatus } from "~~/enums";
-import type { Job, JobRequest } from "~~/models";
+import type { Job, JobRequest, QueryResultSummary } from "~~/models";
 
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
@@ -96,6 +97,7 @@ const confirm = useConfirm();
 const socket = io();
 
 const jobs: Ref<Job[]> = ref([]);
+const resultSummaries: Ref<{ jobId: number; resultsSummary: QueryResultSummary[] }[]> = ref([]);
 const loading = ref(true);
 const searchLoading = ref(false);
 const totalCount = ref(0);
@@ -175,6 +177,10 @@ async function initSearch() {
     }
   });
   if (results) {
+    const jobIds = results.result.map(r => r.id);
+    resultSummaries.value = await $fetch<{ jobId: number; resultsSummary: QueryResultSummary[] }[]>("/api/queue/job/results/summaries", {
+      query: { jobIds: jobIds.join(",") }
+    });
     totalCount.value = results.totalCount;
     jobs.value = results.result.sort((a, b) => {
       if (!a.queueDate) return 1;

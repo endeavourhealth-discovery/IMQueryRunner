@@ -1,5 +1,6 @@
 import { JobStatus } from "~~/enums/JobStatus";
 
+import { IMQType } from "@endeavour/vue-library";
 import { type QueryRequest } from "@endeavour/vue-library/models";
 
 import { sql } from "drizzle-orm";
@@ -64,7 +65,7 @@ export const queryResultTable = dataset.table("query_result", {
   useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
   executedSQL: text("executed_sql"),
   version: int("version").notNull(),
-  queryType: varchar("query_type", { length: 255 }).notNull()
+  queryType: varchar("query_type", { length: 255 }).$type<IMQType>().notNull()
 });
 
 export const datasetResultsTable = dataset.table("dataset_results", {
