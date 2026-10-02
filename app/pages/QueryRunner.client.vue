@@ -274,26 +274,7 @@ function onDisconnect() {
 }
 
 async function refresh() {
-  const foundJobs = await $fetch<{ totalCount: number; result: Job[] }>("/api/queue", {
-    query: {
-      userId: userStore.currentUser?.id,
-      page: page.value,
-      size: rows.value
-    }
-  });
-  if (foundJobs) {
-    const jobIds = foundJobs.result.map(r => r.id);
-    resultSummaries.value = await $fetch<{ jobId: number; resultsSummary: QueryResultSummary[] }[]>("/api/queue/job/results/summaries", {
-      query: { jobIds: jobIds.join(",") }
-    });
-    totalCount.value = foundJobs.totalCount;
-    jobs.value = foundJobs.result;
-  } else {
-    totalCount.value = 0;
-    jobs.value = [];
-  }
-
-  searchLoading.value = false;
+  await initSearch();
 }
 
 function getStatusSeverity(status: JobStatus): "secondary" | "success" | "info" | "warn" | "danger" | "contrast" {
