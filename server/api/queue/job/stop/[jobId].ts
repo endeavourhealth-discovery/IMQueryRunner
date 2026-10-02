@@ -1,13 +1,12 @@
 import { ErrorCode, JobStatus } from "~~/enums";
 import { getConnectionId, mysqlDb, pool } from "~~/server/db/mysql";
-import { jobTable } from "~~/server/db/mysql/schema";
-import { updateJobStatus } from "~~/server/helpers/mysqlHelper";
+import { getJobById, updateJobStatus } from "~~/server/helpers/mysqlHelper";
 
 import { eq } from "drizzle-orm";
 import * as z from "zod";
 
 const paramSchema = z.object({
-  jobId: z.string()
+  jobId: z.coerce.number()
 });
 
 export default defineEventHandler(async event => {
@@ -15,17 +14,13 @@ export default defineEventHandler(async event => {
 
   const connection = await pool.getConnection();
 
-  const items = await mysqlDb
-    .select()
-    .from(jobTable)
-    .where(eq(jobTable.id, Number(jobId)));
-  const item = items[0];
+  const job = await getJobById(jobId);
 
-  if (item?.status === JobStatus.QUEUED) {
-    await updateJobStatus(item.id, JobStatus.CANCELLED, item.userId, null);
-  } else if (item?.status === JobStatus.RUNNING) {
+  if (job.status === JobStatus.QUEUED) {
+    await updateJobStatus(job.id, JobStatus.CANCELLED, job.userId, null);
+  } else if (job.status === JobStatus.RUNNING) {
     await mysqlDb.execute(`KILL QUERY ${await getConnectionId()}`);
-    await updateJobStatus(item.id, JobStatus.CANCELLED, item.userId, null);
+    await updateJobStatus(job.id, JobStatus.CANCELLED, job.userId, null);
   } else {
     createError({ statusCode: 404, statusText: ErrorCode.RabbitMQConsumerError, message: "Query queue item not found for id: " + jobId });
   }

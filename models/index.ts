@@ -3,4 +3,4 @@ export type { Job } from "./job.schema";
 export type { JobRequest } from "./jobRequest.schema.ts";
 export type { QueryResult } from "./queryResult.schema";
 export type { QueryResultSet } from "./queryResultSet.schema";
-export type { QueryResultDetails } from "./QueryResultDetails.schema.ts";
+export type { QueryResultSummary } from "./QueryResultSummary.schema.ts";
