@@ -1,6 +1,6 @@
 /* globals gauge */
 
-const { chromium } = require("@playwright/test");
+const { chromium, expect } = require("@playwright/test");
 const { pw } = require("./playwright");
 const path = require("path");
 require("dotenv").config();
@@ -112,4 +112,10 @@ step("Search for <search> and select <select>", async (search, select) => {
 
 step("Wait <time> seconds", async time => {
   await pw.page.waitForTimeout(Number.parseInt(time) * 1000);
+});
+
+step("Wait for datatable to finish loading", async () => {
+  const loading = pw.page.locator(".p-datatable-loading-icon");
+  await expect(loading).toBeHidden({ timeout: 30000 });
+  await expect(pw.page.locator(".p-datatable")).toBeVisible();
 });

@@ -315,5 +315,5 @@ instead of its name, for every IRI in the table below.
 * Click "Run" button
 * Wait "10" seconds
 * Click "Refresh" button
-* Wait "5" seconds
+* Wait for datatable to finish loading
 * Check results for <count>
