@@ -11,6 +11,7 @@ This specification describes the query running functionality of IMQueryRunner.
 * Click "Run" button
 * Wait "20" seconds
 * Click "Refresh" button
+* Wait "5" seconds
 * Open results page
 * Check total results equal "6479"
 * Click "Back to queue" button
@@ -26,6 +27,7 @@ This specification describes the query running functionality of IMQueryRunner.
 * Click "Run" button
 * Wait "10" seconds
 * Click "Refresh" button
+* Wait "5" seconds
 * Open results page
 * Check total results equal "12"
 * Click "Back to queue" button
@@ -41,6 +43,7 @@ This specification describes the query running functionality of IMQueryRunner.
 * Click "Run" button
 * Wait "10" seconds
 * Click "Refresh" button
+* Wait "5" seconds
 * Open results page
 * Check total results equal "12"
 * Click "Back to queue" button
