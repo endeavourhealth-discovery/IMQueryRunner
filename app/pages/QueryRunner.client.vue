@@ -282,6 +282,10 @@ async function refresh() {
     }
   });
   if (foundJobs) {
+    const jobIds = foundJobs.result.map(r => r.id);
+    resultSummaries.value = await $fetch<{ jobId: number; resultsSummary: QueryResultSummary[] }[]>("/api/queue/job/results/summaries", {
+      query: { jobIds: jobIds.join(",") }
+    });
     totalCount.value = foundJobs.totalCount;
     jobs.value = foundJobs.result;
   } else {
