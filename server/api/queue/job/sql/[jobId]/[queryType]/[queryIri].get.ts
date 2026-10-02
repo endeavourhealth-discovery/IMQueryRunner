@@ -5,8 +5,8 @@ import { IMQType } from "@endeavour/vue-library/enums";
 import { z } from "zod";
 
 const paramSchema = z.object({
-  jobId: z.string(),
-  queryType: z.string(),
+  jobId: z.coerce.number(),
+  queryType: z.enum(IMQType),
   queryIri: z.string()
 });
 
@@ -15,7 +15,7 @@ export default defineEventHandler(async event => {
   const decodedQueryIri = decodeURIComponent(queryIri);
   // TODO: Refactor to use a single query with joins instead of multiple queries
 
-  const job = await getJobById(Number(jobId));
+  const job = await getJobById(jobId);
 
   const queryResultSetRows = await getQueryResultSetRows(job);
   const queryResultSet = queryResultSetRows[0];

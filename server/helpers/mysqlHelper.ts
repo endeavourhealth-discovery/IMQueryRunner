@@ -131,6 +131,7 @@ export async function getQueryResultsPaged(
       returnObject.totalCount = totalCount;
     }
   }
+  return returnObject;
 }
 
 export async function getQueryResultRows(queryResultSetId: number) {

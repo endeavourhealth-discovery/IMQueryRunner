@@ -110,7 +110,6 @@ function openViewResultsMenuItems(event: MouseEvent): void {
   viewResultsMenuItems.value = [];
   for (const queryRequest of props.job.queryRequests) {
     const details = getResultDetails();
-    console.log(details);
     if (!details) return;
     const item: MenuItem = {
       label: "Results",
@@ -197,7 +196,6 @@ function getResultDetails():
     }
   | undefined {
   const results = props.resultSummary;
-  console.log(results);
   if (!results) return undefined;
   const details = results;
   const primaryQueryResultsDetails = details.find(d => d.queryName === props.job.jobName);

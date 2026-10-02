@@ -3,7 +3,7 @@ import { getJobById } from "~~/server/helpers/mysqlHelper";
 import * as z from "zod";
 
 const paramSchema = z.object({
-  jobId: z.number()
+  jobId: z.coerce.number()
 });
 
 export default defineEventHandler(async event => {

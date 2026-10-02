@@ -4,7 +4,7 @@ import { getJobById, getQueryResultRows, getQueryResultSetRows, getQueryResultSu
 import { z } from "zod";
 
 const paramSchema = z.object({
-  jobId: z.string()
+  jobId: z.coerce.number()
 });
 
 export default defineEventHandler(async event => {
@@ -13,7 +13,7 @@ export default defineEventHandler(async event => {
 
   const results: QueryResultSummary[] = [];
 
-  const job = await getJobById(Number(jobId));
+  const job = await getJobById(jobId);
 
   const queryResultSetRows = await getQueryResultSetRows(job);
   for (const queryResultSet of queryResultSetRows) {

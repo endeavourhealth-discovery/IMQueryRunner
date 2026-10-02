@@ -6,9 +6,9 @@ import { IMQType } from "@endeavour/vue-library/enums";
 import { z } from "zod";
 
 const paramSchema = z.object({
-  jobId: z.number(),
+  jobId: z.coerce.number(),
   queryType: z.enum(IMQType),
-  queryIri: z.url()
+  queryIri: z.string()
 });
 
 const querySchema = z.object({
@@ -29,5 +29,6 @@ export default defineEventHandler(async event => {
 
   const debugPatientId = job?.queryRequests?.map(getDebugPatientId).find(Boolean);
 
-  return await getQueryResultsPaged(decodedQueryIri, queryResultSet.id, queryType, page, size, debugPatientId);
+  const resultsPaged = await getQueryResultsPaged(decodedQueryIri, queryResultSet.id, queryType, page, size, debugPatientId);
+  return resultsPaged;
 });

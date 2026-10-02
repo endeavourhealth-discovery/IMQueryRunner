@@ -8,7 +8,7 @@ import { mysqlDb } from "../../../db/mysql";
 import { cohortResultsTable, jobTable, queryResultSetTable, queryResultTable } from "../../../db/mysql/schema";
 
 const paramSchema = z.object({
-  jobId: z.number()
+  jobId: z.coerce.number()
 });
 
 export default defineEventHandler(async event => {
