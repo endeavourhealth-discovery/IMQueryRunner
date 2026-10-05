@@ -45,8 +45,9 @@ describe("fromCasdoorUser", () => {
     expect(user.favourites).toEqual([]);
   });
 
-  it("drops an avatar that is not a valid URL", () => {
-    expect(fromCasdoorUser({ ...baseUser, avatar: "/relative.png" }).avatar).toBe("");
+  it("resolves relative avatars and defaults an empty one", () => {
+    expect(fromCasdoorUser({ ...baseUser, avatar: "colour/002-woman.png" }).avatar).toBe("https://im.endhealth.co.uk/avatars/colour/002-woman.png");
+    expect(fromCasdoorUser({ ...baseUser, avatar: "" }).avatar).toBe("https://im.endhealth.co.uk/avatars/colour/001-man.png");
   });
 });
 
@@ -60,5 +61,13 @@ describe("toCasdoorProperties", () => {
   it("keeps properties this app does not own", () => {
     const user = fromCasdoorUser(baseUser);
     expect(toCasdoorProperties(user, { somethingElse: "keep" }).somethingElse).toBe("keep");
+  });
+
+  it("never lets a user overwrite their own namespaces or organisations", () => {
+    const user = { ...fromCasdoorUser(baseUser), namespaces: [{ iri: NAMESPACE.IM, read: true, write: true }], organisations: ["x"] };
+    const existing = { namespaces: JSON.stringify([{ iri: NAMESPACE.IM, read: true, write: false }]), organisations: JSON.stringify([NAMESPACE.IM]) };
+    const written = toCasdoorProperties(user, existing);
+    expect(written.namespaces).toBe(existing.namespaces);
+    expect(written.organisations).toBe(existing.organisations);
   });
 });
