@@ -45,7 +45,9 @@ export default defineNuxtConfig({
       url: process.env.CASDOOR_URL,
       organisation: process.env.CASDOOR_ORGANISATION_NAME,
       clientId: process.env.CASDOOR_CLIENT_ID,
-      clientSecret: process.env.CASDOOR_CLIENT_SECRET
+      clientSecret: process.env.CASDOOR_CLIENT_SECRET,
+      // Casdoor casbin enforcer (owner/name) consulted for authorisation, e.g. Endeavour/TestEnforcer
+      enforcerId: process.env.CASDOOR_ENFORCER_ID
     },
     oauth: {
       oidc: {

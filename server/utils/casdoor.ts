@@ -39,6 +39,13 @@ export async function updateCasdoorUser(user: CasdoorUser): Promise<void> {
   await casdoorRequest("update-user", { method: "POST", query: { id: `${user.owner}/${user.name}` }, body: user });
 }
 
+/** Asks a Casdoor (casbin) enforcer whether `sub` may perform `act` on `obj`. */
+export async function casdoorEnforce(enforcerId: string, sub: object, obj: string, act: string): Promise<boolean> {
+  // Casdoor answers with one boolean per enforcer evaluated
+  const results = await casdoorRequest<boolean[]>("enforce", { method: "POST", query: { enforcerId }, body: [sub, obj, act] });
+  return results.length > 0 && results.every(Boolean);
+}
+
 /** An application access token for server-to-server calls (RabbitMQ worker, etc.). */
 export async function getClientCredentialsToken(clientId: string, clientSecret: string): Promise<{ access_token: string; expires_in: number }> {
   const { url } = useRuntimeConfig().casdoor;
