@@ -81,11 +81,7 @@ watch(darkMode, async (newValue, oldValue) => {
 onMounted(async () => {
   initialLoadComplete.value = false;
   if (!userStore.isLoggedIn) {
-    const result = await globalThis.uiGuard.isLoggedIn();
-    if (result) {
-      const user = await globalThis.uiGuard.getUser();
-      userStore.updateCurrentUser(user);
-    } else console.log("No user session found");
+    if (!(await useAuth().load())) console.log("No user session found");
   }
 
   await setModes();

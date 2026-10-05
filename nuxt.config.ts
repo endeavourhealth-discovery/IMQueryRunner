@@ -3,7 +3,7 @@ import Aura from "@primeuix/themes/aura";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
-  modules: ["@primevue/nuxt-module", "@pinia/nuxt"],
+  modules: ["@primevue/nuxt-module", "@pinia/nuxt", "nuxt-auth-utils"],
   primevue: {
     options: {
       theme: {
@@ -41,17 +41,28 @@ export default defineNuxtConfig({
     }
   },
   runtimeConfig: {
+    casdoor: {
+      url: process.env.CASDOOR_URL,
+      organisation: process.env.CASDOOR_ORGANISATION_NAME,
+      clientId: process.env.CASDOOR_CLIENT_ID,
+      clientSecret: process.env.CASDOOR_CLIENT_SECRET
+    },
+    oauth: {
+      oidc: {
+        clientId: process.env.CASDOOR_CLIENT_ID,
+        clientSecret: process.env.CASDOOR_CLIENT_SECRET,
+        openidConfig: `${process.env.CASDOOR_URL}/.well-known/openid-configuration`,
+        scope: ["openid", "profile", "email"],
+        redirectURL: process.env.CASDOOR_REDIRECT_URL
+      }
+    },
+    session: {
+      maxAge: 60 * 60 * 24 * 30
+    },
     public: {
       casdoorUrl: process.env.CASDOOR_URL,
-      casdoorOrganisationName: process.env.CASDOOR_ORGANISATION_NAME,
-      casdoorClientId: process.env.CASDOOR_CLIENT_ID,
-      casdoorClientSecret: process.env.CASDOOR_CLIENT_SECRET,
       imapiUrl: process.env.IMAPI_URL,
       imDirectoryUrl: process.env.IM_DIRECTORY_URL
-      // cognitoIdentityPoolId: process.env.COGNITO_IDENTITY_POOL,
-      // cognitoRegion: process.env.COGNITO_REGION,
-      // cognitoUserPool: process.env.COGNITO_USER_POOL,
-      // cognitoWebClient: process.env.COGNITO_WEB_CLIENT,
     }
   },
   typescript: {

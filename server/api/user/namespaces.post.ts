@@ -48,7 +48,7 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event): Promise<any> => {
   const namespaces = await readValidatedBody(event, bodySchema.parse);
-  const user = await globalThis.apiGuard.getUser(event);
+  const user = await getCurrentUser(event);
   user.namespaces = namespaces;
-  return await globalThis.apiGuard.updateUser(event, user);
+  return await updateCurrentUser(event, user);
 });

@@ -27,7 +27,7 @@ defineRouteMeta({
 export default defineEventHandler(async (event): Promise<any> => {
   const body = await readBody(event);
   const recentActivity = parseArray(body, RecentActivityItemSchema);
-  const user = await globalThis.apiGuard.getUser(event);
+  const user = await getCurrentUser(event);
   user.recentActivity = recentActivity;
-  return await globalThis.apiGuard.updateUser(event, user);
+  return await updateCurrentUser(event, user);
 });

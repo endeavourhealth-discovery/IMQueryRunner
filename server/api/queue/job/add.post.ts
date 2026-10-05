@@ -10,7 +10,7 @@ import * as z from "zod";
 
 export default defineEventHandler(async event => {
   const sessionId = getCookie(event, "session_id");
-  const user = await globalThis.apiGuard.getUser(event);
+  const user = await getCurrentUser(event);
   const jobRequest = await readValidatedBody(event, jobRequestSchema.parse);
   console.log("Received job request with tasks:", jobRequest?.queryRequests?.length);
   const queryJob = await createJobEntry(jobRequest, sessionId!, user!.id);

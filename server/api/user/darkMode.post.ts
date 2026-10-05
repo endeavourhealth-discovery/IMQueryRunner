@@ -30,7 +30,7 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event): Promise<any> => {
   const darkMode = await readValidatedBody(event, bodySchema.parse);
-  const user = await globalThis.apiGuard.getUser(event);
+  const user = await getCurrentUser(event);
   user.darkMode = darkMode.bool;
-  return await globalThis.apiGuard.updateUser(event, user);
+  return await updateCurrentUser(event, user);
 });

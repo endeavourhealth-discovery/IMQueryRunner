@@ -13,7 +13,7 @@ const querySchema = z.object({
 
 export default defineEventHandler(async event => {
   const LOG = Logger("api/queue/user");
-  const user = await globalThis.apiGuard.getUser(event);
+  const user = await getCurrentUser(event);
 
   const { page, size, date } = await getValidatedQuery(event, querySchema.parse);
 

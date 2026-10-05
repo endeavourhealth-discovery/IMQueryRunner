@@ -121,6 +121,7 @@ import { useUserStore } from "@endeavour/vue-library/stores";
 import type { MenuItem } from "primevue/menuitem";
 
 const userStore = useUserStore();
+const { login, logout, profile } = useAuth();
 const { changeFontSize } = useChangeFontSize();
 const { changeDarkMode, changePreset, changePrimaryColor, changeSurfaceColor } = useChangeThemeOptions();
 
@@ -191,7 +192,7 @@ function setUserMenuItems(): void {
       label: "Login",
       icon: "fa-solid fa-fw fa-user",
       command: async () => {
-        await globalThis.uiGuard.login();
+        await login();
       }
     },
     { separator: true },
@@ -218,14 +219,14 @@ function setUserMenuItems(): void {
       label: "My Account",
       icon: "fa-solid fa-fw fa-cog",
       command: async () => {
-        await globalThis.uiGuard.profile();
+        await profile();
       }
     },
     {
       label: "Logout",
       icon: "fa-solid fa-fw fa-arrow-right-from-bracket",
       command: async () => {
-        await globalThis.uiGuard.logout();
+        await logout();
       }
     },
     { separator: true },
