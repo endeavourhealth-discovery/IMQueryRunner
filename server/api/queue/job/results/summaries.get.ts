@@ -10,7 +10,7 @@ const querySchema = z.object({
 });
 
 export default defineEventHandler(async event => {
-  const sessionId = getCookie(event, "session_id")!;
+  const accessToken = await getAccessToken(event);
   const { jobIds } = await getValidatedQuery(event, querySchema.parse);
 
   const results: { jobId: string; resultsSummary: QueryResultSummary[] }[] = [];
@@ -24,7 +24,7 @@ export default defineEventHandler(async event => {
       for (const queryResultSet of queryResultSetRows) {
         const queryResultRows = await getQueryResultRows(queryResultSet.id);
         for (const queryResultRow of queryResultRows) {
-          jobResults.push(await getQueryResultSummary(sessionId, queryResultSet.id, queryResultRow.id, queryResultRow.queryIri, queryResultRow.queryType));
+          jobResults.push(await getQueryResultSummary(accessToken, queryResultSet.id, queryResultRow.id, queryResultRow.queryIri, queryResultRow.queryType));
         }
       }
       results.push({ jobId: jobId.toString(), resultsSummary: jobResults });

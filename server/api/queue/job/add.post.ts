@@ -9,11 +9,11 @@ import QueryService from "~~/server/services/QueryService";
 import * as z from "zod";
 
 export default defineEventHandler(async event => {
-  const sessionId = getCookie(event, "session_id");
+  const accessToken = await getAccessToken(event);
   const user = await requirePermission(event, "JOB", "EXECUTE");
   const jobRequest = await readValidatedBody(event, jobRequestSchema.parse);
   console.log("Received job request with tasks:", jobRequest?.queryRequests?.length);
-  const queryJob = await createJobEntry(jobRequest, sessionId!, user!.id);
+  const queryJob = await createJobEntry(jobRequest, accessToken, user!.id);
   try {
     await sendMessage(user.id, queryJob);
   } catch (err) {

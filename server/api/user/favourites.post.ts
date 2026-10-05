@@ -6,7 +6,6 @@ defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Update user favourites",
-    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {

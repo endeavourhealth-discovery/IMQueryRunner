@@ -8,7 +8,6 @@ defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Update user surface color",
-    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
