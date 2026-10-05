@@ -23,10 +23,6 @@
             <DatePicker v-model="data.valueData" dateFormat="yy-mm-dd" showIcon iconDisplay="input" updateModelType="string" data-testid="search-date-input" />
             <small class="text-color-secondary"> Run query on a specific date. </small>
           </div>
-          <div v-else-if="editArguments && data.parameter === '$achievementDate'" class="flex flex-col gap-2">
-            <DatePicker v-model="data.valueData" dateFormat="yy-mm-dd" showIcon iconDisplay="input" updateModelType="string" data-testid="search-date-input" />
-            <small class="text-color-secondary"> Set achievement date to a specific date. </small>
-          </div>
           <div v-else-if="editArguments && data.dataType && [XSD.STRING].includes(data.dataType?.iri)">
             <InputText type="text" v-model="data.valueData" data-testid="property-value-input" />
           </div>
