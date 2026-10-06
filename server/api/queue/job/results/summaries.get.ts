@@ -1,3 +1,4 @@
+import Logger from "#shared/logger";
 import type { QueryResultSummary } from "~~/models";
 import { getJobById, getQueryResultRows, getQueryResultSetRows, getQueryResultSummary } from "~~/server/helpers/mysqlHelper";
 
@@ -10,21 +11,32 @@ const querySchema = z.object({
 });
 
 export default defineEventHandler(async event => {
+  const LOG = Logger("api/queue/job/results/summaries");
   const sessionId = getCookie(event, "session_id")!;
   const { jobIds } = await getValidatedQuery(event, querySchema.parse);
-  const results: { jobId: string; resultsSummary: QueryResultSummary[] }[] = [];
-  for (const jobId of jobIds.split(",").map(j => Number(j))) {
+  const results: { jobId: string; resultsSummary: QueryResultSummary[]; error?: string }[] = [];
+  const ids = jobIds
+    .split(",")
+    .filter(j => j.trim() !== "")
+    .map(j => Number(j));
+  for (const jobId of ids) {
     const jobResults: QueryResultSummary[] = [];
-    const job = await getJobById(Number(jobId));
+    let jobError: string | undefined;
+    try {
+      const job = await getJobById(jobId);
 
-    const queryResultSetRows = await getQueryResultSetRows(job);
-    for (const queryResultSet of queryResultSetRows) {
-      const queryResultRows = await getQueryResultRows(queryResultSet.id);
-      for (const queryResultRow of queryResultRows) {
-        jobResults.push(await getQueryResultSummary(sessionId, queryResultSet.id, queryResultRow.id, queryResultRow.queryIri, queryResultRow.queryType));
+      const queryResultSetRows = await getQueryResultSetRows(job);
+      for (const queryResultSet of queryResultSetRows) {
+        const queryResultRows = await getQueryResultRows(queryResultSet.id);
+        for (const queryResultRow of queryResultRows) {
+          jobResults.push(await getQueryResultSummary(sessionId, queryResultSet.id, queryResultRow.id, queryResultRow.queryIri, queryResultRow.queryType));
+        }
       }
+    } catch (error: any) {
+      jobError = error?.message ?? String(error);
+      LOG.error(`Failed to get result summaries for job ${jobId}: ${jobError}`);
     }
-    results.push({ jobId: jobId.toString(), resultsSummary: jobResults });
+    results.push({ jobId: jobId.toString(), resultsSummary: jobResults, ...(jobError && { error: jobError }) });
   }
   return results;
 });

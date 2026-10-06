@@ -97,7 +97,7 @@ const confirm = useConfirm();
 const socket = io();
 
 const jobs: Ref<Job[]> = ref([]);
-const resultSummaries: Ref<{ jobId: number; resultsSummary: QueryResultSummary[] }[]> = ref([]);
+const resultSummaries: Ref<{ jobId: number; resultsSummary: QueryResultSummary[]; error?: string }[]> = ref([]);
 const loading = ref(true);
 const searchLoading = ref(false);
 const totalCount = ref(0);
@@ -166,32 +166,40 @@ watch(selectedInterval, async () => {
 
 async function initSearch() {
   searchLoading.value = true;
-  const results = await $fetch<{
-    totalCount: number;
-    result: Job[];
-  }>("/api/queue", {
-    query: {
-      userId: userStore.currentUser?.id,
-      page: page.value,
-      size: rows.value
+  try {
+    const results = await $fetch<{
+      totalCount: number;
+      result: Job[];
+    }>("/api/queue", {
+      query: {
+        userId: userStore.currentUser?.id,
+        page: page.value,
+        size: rows.value
+      }
+    });
+    if (results) {
+      const jobIds = results.result.map(r => r.id);
+      resultSummaries.value = jobIds.length
+        ? await $fetch<{ jobId: number; resultsSummary: QueryResultSummary[]; error?: string }[]>("/api/queue/job/results/summaries", {
+            query: { jobIds: jobIds.join(",") }
+          })
+        : [];
+      for (const summary of resultSummaries.value) {
+        if (summary.error) console.warn(`Failed to get result summaries for job ${summary.jobId}: ${summary.error}`);
+      }
+      totalCount.value = results.totalCount;
+      jobs.value = results.result.sort((a, b) => {
+        if (!a.queueDate) return 1;
+        if (!b.queueDate) return -1;
+        return new Date(b.queueDate).getTime() - new Date(a.queueDate).getTime();
+      });
+    } else {
+      totalCount.value = 0;
+      jobs.value = [];
     }
-  });
-  if (results) {
-    const jobIds = results.result.map(r => r.id);
-    resultSummaries.value = await $fetch<{ jobId: number; resultsSummary: QueryResultSummary[] }[]>("/api/queue/job/results/summaries", {
-      query: { jobIds: jobIds.join(",") }
-    });
-    totalCount.value = results.totalCount;
-    jobs.value = results.result.sort((a, b) => {
-      if (!a.queueDate) return 1;
-      if (!b.queueDate) return -1;
-      return new Date(b.queueDate).getTime() - new Date(a.queueDate).getTime();
-    });
-  } else {
-    totalCount.value = 0;
-    jobs.value = [];
+  } finally {
+    searchLoading.value = false;
   }
-  searchLoading.value = false;
 }
 
 function stopPolling() {
