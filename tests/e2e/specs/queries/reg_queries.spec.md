@@ -38,7 +38,7 @@ tags: reg-queries
 * Click "Add to queue" button
 * Click "Run queue" button
 * Click "Run" button
-* Wait "10" seconds
+* Wait for job to complete
 * Click "Refresh" button
 * Wait for datatable to finish loading
 * Check results for <count>
