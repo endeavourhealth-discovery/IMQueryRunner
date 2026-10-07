@@ -109,8 +109,11 @@ function openViewResultsMenuItems(event: MouseEvent): void {
   resultLoading.value = true;
   viewResultsMenuItems.value = [];
   for (const queryRequest of props.job.queryRequests) {
-    const details = getResultDetails();
-    if (!details) return;
+    const details = getResultDetails(queryRequest.query.iri);
+    if (!details) {
+      console.warn(`No result summary found for job ${props.job.id} query ${queryRequest.query.iri}`);
+      continue;
+    }
     const item: MenuItem = {
       label: "Results",
       items: [
@@ -189,7 +192,7 @@ function requeueQuery() {
   emit("requeueQuery", props.job.id);
 }
 
-function getResultDetails():
+function getResultDetails(queryIri: string):
   | {
       primaryQueryResultsDetails: QueryResultSummary;
       subQueryResultsDetails: QueryResultSummary[];
@@ -198,9 +201,9 @@ function getResultDetails():
   const results = props.resultSummary;
   if (!results) return undefined;
   const details = results;
-  const primaryQueryResultsDetails = details.find(d => d.queryName === props.job.jobName);
-  if (!primaryQueryResultsDetails) throw createError("Failed to get query result details");
-  const subQueryResultsDetails = details.filter(d => d.queryName !== props.job.jobName);
+  const primaryQueryResultsDetails = details.find(d => d.queryIri === queryIri);
+  if (!primaryQueryResultsDetails) return undefined;
+  const subQueryResultsDetails = details.filter(d => d.queryIri !== queryIri);
   return {
     primaryQueryResultsDetails: primaryQueryResultsDetails,
     subQueryResultsDetails: subQueryResultsDetails
