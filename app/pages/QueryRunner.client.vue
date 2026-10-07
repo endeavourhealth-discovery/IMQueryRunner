@@ -351,19 +351,18 @@ async function deleteJob(jobId: string) {
 async function requeueJob(jobId: string) {
   const found = getById(jobId);
   if (!found) {
-    console.error("Job not found for requeueing:", jobId);
+    console.error("Job not found for re-queueing:", jobId);
     return;
   }
-  if (found) {
-    const jobRequest = {
-      jobName: "Requeued " + (found?.jobName || "Requeued Job"),
-      queryRequests: found?.queryRequests
-    } as JobRequest;
-    await $fetch("/api/queue/job/add", {
-      method: "post",
-      body: jobRequest
-    });
-  }
+
+  await $fetch("/api/queue/job/add", {
+    method: "post",
+    body: {
+      jobName: "Re-queued " + (found.jobName || "Re-queued Job"),
+      queryRequests: found.queryRequests
+    }
+  });
+
   await refresh();
 }
 

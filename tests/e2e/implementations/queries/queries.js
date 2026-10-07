@@ -36,9 +36,9 @@ step("Check results for <count>", async count => {
     const waits = [0, 10000, 20000];
     let statusText;
 
-    for (let i = 0; i < waits.length; i++) {
-      if (waits[i]) {
-        await pw.page.waitForTimeout(waits[i]);
+    for (const element of waits) {
+      if (element) {
+        await pw.page.waitForTimeout(element);
       }
 
       statusText = (await pw.page.locator('[data-p-index="0"]').locator(".p-tag").innerText()).trim();
@@ -47,7 +47,14 @@ step("Check results for <count>", async count => {
         return;
       }
 
+      if (statusText === "ERRORED") {
+        await pw.page.locator('[data-p-index="0"]').locator('[data-testid="show-error-button"]').click();
+        await pw.page.waitForTimeout(2000);
+        assert.fail(`Query ERRORED`);
+      }
+
       if (statusText !== "RUNNING") {
+        console.log("");
         assert.fail(`Expected job status "COMPLETED" but got "${statusText}"`);
       }
     }
