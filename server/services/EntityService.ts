@@ -12,9 +12,9 @@ import z from "zod";
 
 const EntityService = {
   // PROTECTED
-  async getEntityChildren(sessionId: string, iri: string, schemeIris?: string[], controller?: AbortController): Promise<ExtendedEntityReferenceNode[]> {
+  async getEntityChildren(accessToken: string, iri: string, schemeIris?: string[], controller?: AbortController): Promise<ExtendedEntityReferenceNode[]> {
     const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/children`, {
-      headers: { cookie: `session_id=${sessionId}` },
+      headers: { Authorization: `Bearer ${accessToken}` },
       params: {
         iri: iri,
         schemeIris: schemeIris
@@ -25,9 +25,9 @@ const EntityService = {
     return parseApiResponse(result, z.array(ExtendedEntityReferenceNodeSchema));
   },
 
-  async getEntitySummary(sessionId: string, iri: string): Promise<SearchResultSummary> {
+  async getEntitySummary(accessToken: string, iri: string): Promise<SearchResultSummary> {
     const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/summary`, {
-      headers: { cookie: `session_id=${sessionId}` },
+      headers: { Authorization: `Bearer ${accessToken}` },
       params: {
         iri: iri
       },

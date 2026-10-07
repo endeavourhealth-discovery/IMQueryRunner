@@ -18,7 +18,7 @@ export default defineNuxtPlugin(nuxtApp => {
     const status = getStatus(error);
     if (status === 401) {
       await clearError();
-      await globalThis.uiGuard.login();
+      await nuxtApp.runWithContext(() => useAuth().login());
       return;
     }
     console.error(error);
@@ -27,7 +27,7 @@ export default defineNuxtPlugin(nuxtApp => {
     const status = getStatus(error);
     if (status === 401) {
       await clearError();
-      await globalThis.uiGuard.login();
+      await nuxtApp.runWithContext(() => useAuth().login());
       return;
     }
     console.error(error);

@@ -12,31 +12,35 @@ const querySchema = z.object({
 
 export default defineEventHandler(async event => {
   const LOG = Logger("api/queue/job/results/summaries");
-  const sessionId = getCookie(event, "session_id")!;
+  const accessToken = await getAccessToken(event);
   const { jobIds } = await getValidatedQuery(event, querySchema.parse);
-  const results: { jobId: string; resultsSummary: QueryResultSummary[]; error?: string }[] = [];
-  const ids = jobIds
-    .split(",")
-    .filter(j => j.trim() !== "")
-    .map(j => Number(j));
-  for (const jobId of ids) {
-    const jobResults: QueryResultSummary[] = [];
-    let jobError: string | undefined;
-    try {
-      const job = await getJobById(jobId);
 
-      const queryResultSetRows = await getQueryResultSetRows(job);
-      for (const queryResultSet of queryResultSetRows) {
-        const queryResultRows = await getQueryResultRows(queryResultSet.id);
-        for (const queryResultRow of queryResultRows) {
-          jobResults.push(await getQueryResultSummary(sessionId, queryResultSet.id, queryResultRow.id, queryResultRow.queryIri, queryResultRow.queryType));
+  const results: { jobId: string; resultsSummary: QueryResultSummary[]; error?: string }[] = [];
+
+  if (jobIds) {
+    const ids = jobIds
+      .split(",")
+      .filter(j => j.trim() !== "")
+      .map(j => Number(j));
+    for (const jobId of ids) {
+      const jobResults: QueryResultSummary[] = [];
+      let jobError: string | undefined;
+      try {
+        const job = await getJobById(jobId);
+
+        const queryResultSetRows = await getQueryResultSetRows(job);
+        for (const queryResultSet of queryResultSetRows) {
+          const queryResultRows = await getQueryResultRows(queryResultSet.id);
+          for (const queryResultRow of queryResultRows) {
+            jobResults.push(await getQueryResultSummary(accessToken, queryResultSet.id, queryResultRow.id, queryResultRow.queryIri, queryResultRow.queryType));
+          }
         }
+      } catch (error: any) {
+        jobError = error?.message ?? String(error);
+        LOG.error(`Failed to get result summaries for job ${jobId}: ${jobError}`);
       }
-    } catch (error: any) {
-      jobError = error?.message ?? String(error);
-      LOG.error(`Failed to get result summaries for job ${jobId}: ${jobError}`);
+      results.push({ jobId: jobId.toString(), resultsSummary: jobResults, ...(jobError && { error: jobError }) });
     }
-    results.push({ jobId: jobId.toString(), resultsSummary: jobResults, ...(jobError && { error: jobError }) });
   }
   return results;
 });

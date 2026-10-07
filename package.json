@@ -45,6 +45,7 @@
     "murmurhash": "2.0.1",
     "mysql2": "3.23.2",
     "nuxt": "4.5.1",
+    "nuxt-auth-utils": "^0.5.30",
     "object-hash": "3.0.0",
     "ofetch": "1.5.1",
     "perfect-debounce": "2.1.0",
