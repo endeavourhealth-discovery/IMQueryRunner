@@ -75,7 +75,6 @@ const { currentUser } = useUserStore();
 const loading = ref(false);
 const downloadLoading = ref(false);
 const queryResults: Ref<any[]> = ref([]);
-const totalResults: Ref<any[]> = ref([]);
 const page = ref(1);
 const rows = ref(25);
 const originalSize = ref(25);
@@ -107,19 +106,6 @@ async function getQueryResults() {
   }
 }
 
-async function getTotalQueryResults() {
-  if (props.jobId) {
-    const value = await $fetch<{ result: any[] }>(`/api/queue/job/results/total/${props.jobId}`, {
-      query: {
-        userId: currentUser?.id
-      }
-    });
-    if (value && isArray(value.result)) {
-      totalResults.value = value.result;
-    }
-  }
-}
-
 function formatResultsForTable() {
   if (!isArrayHasLength(queryResults.value)) return;
   for (const key of Object.keys(queryResults.value[0])) {
@@ -127,32 +113,13 @@ function formatResultsForTable() {
   }
 }
 
-async function downloadQueryResults() {
-  await getTotalQueryResults();
-
-  const headers = Object.keys(totalResults.value[0]);
-  const csv = [
-    headers.join(","),
-    ...totalResults.value.map(row =>
-      headers
-        .map(field => {
-          const value = row[field] ?? "";
-          return `"${String(value).replace(/"/g, '""')}"`;
-        })
-        .join(",")
-    )
-  ].join("\n");
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-
+// The server streams the whole result as CSV, so a large result never has to fit in the browser first
+function downloadQueryResults() {
   const link = document.createElement("a");
-  link.href = url;
-  link.setAttribute("download", props.jobId!.toString());
+  link.href = `/api/queue/job/results/${props.jobId}/${props.queryType}/${encodeURIComponent(props.queryIri as string)}/download`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  URL.revokeObjectURL(url);
 }
 
 async function onPage(event: any) {

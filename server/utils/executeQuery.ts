@@ -1,3 +1,4 @@
+import Logger from "#shared/logger";
 import { ErrorCode } from "~~/enums";
 import type { ResolvedSql } from "~~/models/ResolvedSql.ts";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
@@ -12,8 +13,47 @@ import { mysqlDb } from "../db/mysql";
 import { patientExistsTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
 import { createQueryResultEntry, getToday, updateWithEndTime, updateWithSQL } from "../helpers/mysqlHelper";
 import QueryService from "../services/QueryService";
+import { createLimiter } from "./memoryCache";
 
-export async function executeQuery(accessToken: string, sql: string, queryRequest: QueryRequest, queryResultSet: QueryResultSet) {
+const LOG = Logger("server/utils/executeQuery");
+
+/** IMAPI calls in flight at once while preparing one job. */
+const IMAPI_CONCURRENCY = 5;
+
+/**
+ * Per-job memo of IMAPI lookups, so a sub query shared by several requests in the same job is only fetched once.
+ * Deliberately scoped to one job and never kept longer: a later job must see the query definitions as they are then.
+ * Create one per job and pass it to every call for that job. Treat the memoised values as read-only.
+ */
+export interface ExecutionContext {
+  subQueries: Map<string, Promise<SubQueryDependency[]>>;
+  requests: Map<string, Promise<QueryRequest>>;
+  sql: Map<string, Promise<string>>;
+  limit: ReturnType<typeof createLimiter>;
+}
+
+export function createExecutionContext(): ExecutionContext {
+  return { subQueries: new Map(), requests: new Map(), sql: new Map(), limit: createLimiter(IMAPI_CONCURRENCY) };
+}
+
+function memo<T>(cache: Map<string, Promise<T>>, key: string, load: () => Promise<T>): Promise<T> {
+  let promise = cache.get(key);
+  if (!promise) {
+    promise = load();
+    cache.set(key, promise);
+    // A failed lookup must not be remembered
+    promise.catch(() => cache.delete(key));
+  }
+  return promise;
+}
+
+export async function executeQuery(
+  accessToken: string,
+  sql: string,
+  queryRequest: QueryRequest,
+  queryResultSet: QueryResultSet,
+  ctx: ExecutionContext = createExecutionContext()
+) {
   if (!queryRequest.query?.iri) throw new Error("Query IRI is required for execution");
   const hashCodeVersion = hashQueryRequest(queryRequest);
   const existingQueryResultId = await getQueryResultIdIfExists(queryResultSet.id!, hashCodeVersion, queryRequest.query.iri);
@@ -26,7 +66,7 @@ export async function executeQuery(accessToken: string, sql: string, queryReques
   const queryIrisToQueryResultIds = {} as { [key: string]: number };
   if (!debugPatientId) queryIrisToQueryResultIds[queryRequest.query.iri] = queryResultId;
 
-  await runSubQueries(accessToken, queryRequest, queryIrisToQueryResultIds, queryResultSet);
+  await runSubQueries(accessToken, queryRequest, queryIrisToQueryResultIds, queryResultSet, ctx);
 
   const resolvedSql = getResolvedSql(sql, queryRequest, queryIrisToQueryResultIds);
 
@@ -57,7 +97,7 @@ export async function executeDebugQuery(resolvedSql: ResolvedSql, queryIri: stri
     await mysqlDb.execute(resolvedSql.query);
     await updateWithEndTime(queryResultId, queryResultTable);
   } catch (err) {
-    console.error("Error executing debug query:", queryIri, err);
+    LOG.error({ err, queryIri }, "Error executing debug query");
     throw err;
   } finally {
     await updateWithSQL(queryResultId, queryResultTable, resolvedSql.displaySql);
@@ -69,7 +109,7 @@ export async function executeCohortQuery(resolvedSql: ResolvedSql, queryRequest:
     await mysqlDb.execute(resolvedSql.query);
     await updateWithEndTime(queryResultId, queryResultTable);
   } catch (err) {
-    console.error("Error executing query:", queryRequest.query?.iri, err);
+    LOG.error({ err, queryIri: queryRequest.query?.iri }, "Error executing query");
     throw err;
   } finally {
     await updateWithSQL(queryResultId, queryResultTable, resolvedSql.displaySql);
@@ -89,7 +129,7 @@ export async function executeDatasetQuery(
 
   let resolvedSqlParts = "";
 
-  console.log("Dataset parts to run:", sqlParts.length);
+  LOG.debug(`Dataset parts to run: ${sqlParts.length}`);
 
   let lastResolvedSql: ResolvedSql | undefined;
   try {
@@ -101,19 +141,25 @@ export async function executeDatasetQuery(
 
     await updateWithEndTime(queryResultId, queryResultTable);
   } catch (err) {
-    console.error("Error executing SQL part:", lastResolvedSql?.displaySql, err);
+    LOG.error({ err, sql: lastResolvedSql?.displaySql }, "Error executing SQL part");
     throw err;
   } finally {
     await updateWithSQL(queryResultId, queryResultTable, resolvedSqlParts ?? querySql);
   }
 }
 
-export function hashQueryRequest(queryRequest: QueryRequest): number {
-  let argHash = "";
-  const sortedArguments = [...queryRequest.argument!].sort((a, b) => (a.parameter ?? "").localeCompare(b.parameter ?? ""));
+/** Order-independent string identifying a set of arguments. The first part of every query hash, so it must not change. */
+function argumentsKey(argument: Argument[] | undefined): string {
+  let key = "";
+  const sortedArguments = [...(argument ?? [])].sort((a, b) => (a.parameter ?? "").localeCompare(b.parameter ?? ""));
   for (const arg of sortedArguments) {
-    argHash += hashArgument(arg);
+    key += hashArgument(arg);
   }
+  return key;
+}
+
+export function hashQueryRequest(queryRequest: QueryRequest): number {
+  let argHash = argumentsKey(queryRequest.argument!);
   if (queryRequest.query?.iri) argHash += queryRequest.query.iri;
   return murmurhash.v3(argHash);
 }
@@ -159,11 +205,12 @@ function hashArgument(argument: Argument): string {
 
 export async function getQueryResultIdIfExists(resultSetId: number, hashCodeVersion: number, iri: string): Promise<number> {
   const results = await mysqlDb
-    .select()
+    .select({ id: queryResultTable.id })
     .from(queryResultTable)
-    .where(and(eq(queryResultTable.queryResultSetId, resultSetId), eq(queryResultTable.version, hashCodeVersion), eq(queryResultTable.queryIri, iri)));
+    .where(and(eq(queryResultTable.queryResultSetId, resultSetId), eq(queryResultTable.version, hashCodeVersion), eq(queryResultTable.queryIri, iri)))
+    .limit(1);
   const result = results[0];
-  console.log(`Cache context check (${!!result}): ${resultSetId} with hash: ${hashCodeVersion}, iri: ${iri}.`);
+  LOG.debug(`Cache context check (${!!result}): ${resultSetId} with hash: ${hashCodeVersion}, iri: ${iri}.`);
   return result ? result.id! : -1;
 }
 
@@ -172,72 +219,62 @@ export async function getQueryResultIdIfExistsInJob(jobId: number, hashCodeVersi
     .select({ id: queryResultTable.id })
     .from(queryResultTable)
     .innerJoin(queryResultSetTable, eq(queryResultTable.queryResultSetId, queryResultSetTable.id))
-    .where(and(eq(queryResultSetTable.jobId, jobId), eq(queryResultTable.version, hashCodeVersion), eq(queryResultTable.queryIri, iri)));
+    .where(and(eq(queryResultSetTable.jobId, jobId), eq(queryResultTable.version, hashCodeVersion), eq(queryResultTable.queryIri, iri)))
+    .limit(1);
   const result = results[0];
-  console.log(`Job cache context check (${!!result}): job ${jobId} with hash: ${hashCodeVersion}, iri: ${iri}.`);
+  LOG.debug(`Job cache context check (${!!result}): job ${jobId} with hash: ${hashCodeVersion}, iri: ${iri}.`);
   return result ? result.id! : -1;
 }
 
-export async function isCached(hashCode: number, iri: string): Promise<boolean> {
-  return false;
-  // const jobResult = await mysqlDb.query.jobTable.findFirst({
-  //   where: (jobTable, { eq, and }) =>
-  //     and(eq(jobTable.scheduleId, hashCode), eq(jobTable.status, "COMPLETED")),
-  // });
-  // if (jobResult) {
-  //   console.log(`Cache hit for hashCode: ${hashCode}, and iri: ${iri}`);
-  //   return true;
-  // } else {
-  //   const cohortResult = await mysqlDb.query.cohortTable.findFirst({
-  //     where: (cohortTable, { eq }) => eq(cohortTable.hash, hashCode),
-  //   });
-  //   if (cohortResult) {
-  //     console.log(
-  //       `Cache hit in cohort for hashCode: ${hashCode}, and iri: ${iri}`,
-  //     );
-  //     return true;
-  //   } else {
-  //     const datasetResult = await mysqlDb.query.datasetTable.findFirst({
-  //       where: (datasetTable, { eq }) => eq(datasetTable.hash, hashCode),
-  //     });
-  //     if (datasetResult) {
-  //       console.log(
-  //         `Cache hit in dataset for hashCode: ${hashCode}, and iri: ${iri}`,
-  //       );
-  //       return true;
-  //     }
-  //     return false;
-  //   }
-  // }
+async function getSubQueryRequest(accessToken: string, iri: string, argument: Argument[] | undefined, ctx: ExecutionContext): Promise<QueryRequest> {
+  return memo(ctx.requests, `${iri}|${argumentsKey(argument)}`, () =>
+    ctx.limit(() => QueryService.getQueryRequestForSQL(accessToken, { query: { iri }, argument } as QueryRequest))
+  );
 }
 
-async function runSubQueries(accessToken: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }, queryResultSet: QueryResultSet) {
-  const subQueries = await QueryService.getSubqueryIris(accessToken, queryRequest.query!.iri!);
-  console.log("Subqueries to run:", subQueries.length);
-  if (subQueries.length)
-    for (const subQuery of subQueries) {
-      try {
-        const subQueryRequest = await QueryService.getQueryRequestForSQL(accessToken, {
-          query: { iri: subQuery.iri },
-          argument: queryRequest.argument
-        } as QueryRequest);
-        const hashCodeVersion = hashQueryRequest(subQueryRequest);
+function getSubQuerySql(accessToken: string, subQueryRequest: QueryRequest, ctx: ExecutionContext): Promise<string> {
+  return memo(ctx.sql, `${subQueryRequest.query?.iri}|${argumentsKey(subQueryRequest.argument)}`, () =>
+    ctx.limit(() => QueryService.getQuerySql(accessToken, subQueryRequest))
+  );
+}
 
-        const existingQueryResultId = await getQueryResultIdIfExistsInJob(queryResultSet.jobId, hashCodeVersion, subQueryRequest.query!.iri!);
-        if (existingQueryResultId !== -1) {
-          queryIrisToHashCodes[subQuery.iri!] = existingQueryResultId;
-          continue;
-        }
+async function runSubQueries(
+  accessToken: string,
+  queryRequest: QueryRequest,
+  queryIrisToHashCodes: { [key: string]: number },
+  queryResultSet: QueryResultSet,
+  ctx: ExecutionContext
+) {
+  const subQueries = await memo(ctx.subQueries, queryRequest.query!.iri!, () =>
+    ctx.limit(() => QueryService.getSubqueryIris(accessToken, queryRequest.query!.iri!))
+  );
+  LOG.debug(`Subqueries to run: ${subQueries.length}`);
+  if (!subQueries.length) return;
 
-        queryIrisToHashCodes[subQuery.iri!] = await createQueryResultEntry(subQueryRequest, queryResultSet, hashCodeVersion);
-        const subQuerySql = await QueryService.getQuerySql(accessToken, subQueryRequest);
-        const resolvedSql = getResolvedSql(subQuerySql, subQueryRequest, queryIrisToHashCodes);
-        await executeCohortQuery(resolvedSql, subQueryRequest, queryIrisToHashCodes[subQuery.iri!]!);
-      } catch (err: any) {
-        console.error("Error running subquery sql:", subQuery.iri, "\nError:", err.message);
-        throw err;
+  // Looking up what each sub query is does not depend on running the ones before it, so fetch them together.
+  // Running them stays strictly in order below: later ones use the result ids of earlier ones.
+  const subQueryRequests = await Promise.all(subQueries.map(subQuery => getSubQueryRequest(accessToken, subQuery.iri!, queryRequest.argument, ctx)));
+
+  for (const [index, subQuery] of subQueries.entries()) {
+    try {
+      const subQueryRequest = subQueryRequests[index]!;
+      const hashCodeVersion = hashQueryRequest(subQueryRequest);
+
+      const existingQueryResultId = await getQueryResultIdIfExistsInJob(queryResultSet.jobId, hashCodeVersion, subQueryRequest.query!.iri!);
+      if (existingQueryResultId !== -1) {
+        queryIrisToHashCodes[subQuery.iri!] = existingQueryResultId;
+        continue;
       }
+
+      queryIrisToHashCodes[subQuery.iri!] = await createQueryResultEntry(subQueryRequest, queryResultSet, hashCodeVersion);
+      const subQuerySql = await getSubQuerySql(accessToken, subQueryRequest, ctx);
+      const resolvedSql = getResolvedSql(subQuerySql, subQueryRequest, queryIrisToHashCodes);
+      await executeCohortQuery(resolvedSql, subQueryRequest, queryIrisToHashCodes[subQuery.iri!]!);
+    } catch (err: any) {
+      LOG.error({ err, subQueryIri: subQuery.iri }, "Error running subquery sql");
+      throw err;
     }
+  }
 }
 
 export async function sortQueryRequestsByDependency(accessToken: string, queryRequests: QueryRequest[]): Promise<QueryRequest[]> {
@@ -389,24 +426,27 @@ export async function getValidatedSQL(queryRequest: QueryRequest, accessToken: s
 export async function getIndicatorSubQueryRequests(
   accessToken: string,
   queryRequest: QueryRequest,
-  jobId: number
+  jobId: number,
+  ctx: ExecutionContext = createExecutionContext()
 ): Promise<{ sql: string; queryRequest: QueryRequest }[]> {
   if (!queryRequest.query?.iri) throw new Error("Query IRI is required to get indicator subqueries");
-  const queriesToRun = [];
-  const subqueries = await QueryService.getSubqueryIris(accessToken, queryRequest.query.iri!, true);
-  for (const subquery of subqueries) {
-    const subqueryRequest = await QueryService.getQueryRequestForSQL(accessToken, {
-      query: {
-        iri: subquery.iri,
-        queryType: IMQType.COHORT
-      },
-      argument: queryRequest.argument
-    } as QueryRequest);
-    const subquerySql = await getValidatedSQL(subqueryRequest, accessToken, jobId);
-    queriesToRun.push({
-      sql: subquerySql,
-      queryRequest: subqueryRequest
-    });
-  }
-  return queriesToRun;
+  const subqueries = await memo(ctx.subQueries, `indicator|${queryRequest.query.iri}`, () =>
+    ctx.limit(() => QueryService.getSubqueryIris(accessToken, queryRequest.query!.iri!, true))
+  );
+  // Independent of one another, so fetched together; Promise.all keeps the original order
+  return Promise.all(
+    subqueries.map(async subquery => {
+      const subqueryRequest = await ctx.limit(() =>
+        QueryService.getQueryRequestForSQL(accessToken, {
+          query: {
+            iri: subquery.iri,
+            queryType: IMQType.COHORT
+          },
+          argument: queryRequest.argument
+        } as QueryRequest)
+      );
+      const sql = await ctx.limit(() => getValidatedSQL(subqueryRequest, accessToken, jobId));
+      return { sql, queryRequest: subqueryRequest };
+    })
+  );
 }

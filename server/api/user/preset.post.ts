@@ -30,7 +30,5 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event): Promise<any> => {
   const body = await readValidatedBody(event, bodySchema.parse);
-  const user = await getCurrentUser(event);
-  user.theme = body.theme;
-  return await updateCurrentUser(event, user);
+  return await updateCurrentUserPreferences(event, { theme: body.theme });
 });

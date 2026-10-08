@@ -1,5 +1,3 @@
-import { JobStatus } from "~~/enums";
-
 import { z } from "zod";
 
 export const queryResultSetSchema = z.object({

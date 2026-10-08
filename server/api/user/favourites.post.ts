@@ -25,7 +25,5 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event): Promise<any> => {
   const favourites = await readValidatedBody(event, bodySchema.parse);
-  const user = await getCurrentUser(event);
-  user.favourites = favourites;
-  return await updateCurrentUser(event, user);
+  return await updateCurrentUserPreferences(event, { favourites });
 });

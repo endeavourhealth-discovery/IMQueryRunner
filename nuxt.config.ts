@@ -2,6 +2,12 @@
 import Aura from "@primeuix/themes/aura";
 import tailwindcss from "@tailwindcss/vite";
 
+const IM_FONTS_ORIGIN = "https://im.endhealth.co.uk";
+
+// Only the Font Awesome styles the app and @endeavour/vue-library actually use (solid, regular, duotone).
+// Each entry is a render-blocking request: before adding a style (light, brands, sharp-*, thin), check it is really used.
+const FONT_AWESOME_STYLES = ["fontawesome", "solid", "regular", "duotone"];
+
 export default defineNuxtConfig({
   modules: ["@primevue/nuxt-module", "@pinia/nuxt", "nuxt-auth-utils"],
   primevue: {
@@ -76,46 +82,10 @@ export default defineNuxtConfig({
         lang: "en"
       },
       link: [
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/fontawesome.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/solid.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/regular.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/brands.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/duotone.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/light.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/sharp-light.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/sharp-regular.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/sharp-solid.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/sharp-thin.css"
-        }
+        // The stylesheets and the font files they reference are fetched with different credential modes, which use separate connections
+        { rel: "preconnect", href: IM_FONTS_ORIGIN },
+        { rel: "preconnect", href: IM_FONTS_ORIGIN, crossorigin: "anonymous" },
+        ...FONT_AWESOME_STYLES.map(style => ({ rel: "stylesheet" as const, href: `${IM_FONTS_ORIGIN}/fonts/css/${style}.css` }))
       ]
     }
   }

@@ -36,18 +36,8 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
     socket.on("joinRoom", () => {
       socket.join(`queue:user:${socket.data.user.id}`);
     });
-    socket.on("leaveRoom", (room, user) => {
-      socket.leave(room);
-      socket.to(room).emit("leave", {
-        from_id: user.id,
-        from_name: user.name,
-        system: true,
-        content: `${user.name ?? user.id} left the room`
-      });
-    });
-    socket.on("message", (room, message) => {
-      socket.to(room).emit("message", message);
-    });
+    // Clients may only ever join their own room (above). Do not add handlers that relay client-supplied
+    // rooms or user details: any signed-in client could use them to emit into another user's room.
   });
 
   nitroApp.router.use(

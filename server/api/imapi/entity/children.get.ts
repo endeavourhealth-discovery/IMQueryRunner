@@ -1,4 +1,3 @@
-import { filterOptionsSchema } from "~~/models/filterOptions.schema";
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
 import EntityService from "~~/server/services/EntityService";
 

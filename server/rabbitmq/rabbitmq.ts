@@ -1,3 +1,4 @@
+import Logger from "#shared/logger";
 import { ErrorCode, JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
 
@@ -8,11 +9,14 @@ import { Connection } from "rabbitmq-client";
 
 import { indicatorResultTable, queryResultSetTable } from "../db/mysql/schema";
 import { createIndicatorResultEntry, createResultSetEntry, getJobById, updateJobStatus, updateWithEndTime } from "../helpers/mysqlHelper";
-import { executeQuery, getIndicatorSubQueryRequests, getValidatedSQL } from "../utils/executeQuery";
+import { createExecutionContext, executeQuery, getIndicatorSubQueryRequests, getValidatedSQL } from "../utils/executeQuery";
+
+const LOG = Logger("server/rabbitmq");
 
 const rabbit = new Connection(process.env.RABBITMQ_URL);
-rabbit.on("error", (err: Error) => {});
-rabbit.on("connection", () => {});
+// The client reconnects on its own; log so an outage is visible rather than silent
+rabbit.on("error", (err: Error) => LOG.error({ err }, "Connection error"));
+rabbit.on("connection", () => LOG.info("Connected"));
 
 /** The worker calls IMAPI as this application (client credentials), not as the user who queued the job. */
 async function getWorkerAccessToken() {
@@ -48,11 +52,14 @@ const sub = rabbit.createConsumer(
       job = await getJobById(Number(msg.messageId!));
 
       if (job.status === JobStatus.CANCELLED) {
-        console.warn("Item is cancelled. Query rejected.");
+        LOG.warn(`Job ${job.id} is cancelled. Query rejected.`);
         return;
       }
 
       await updateJobStatus(job.id, JobStatus.RUNNING, job.userId);
+
+      // Shared by every query in this job so a sub query used more than once is only looked up once
+      const ctx = createExecutionContext();
 
       for (const queryRequest of job.queryRequests) {
         const sql = await getValidatedSQL(queryRequest, accessToken, job.id);
@@ -64,15 +71,15 @@ const sub = rabbit.createConsumer(
         if (queryRequest.query.queryType === IMQType.INDICATOR) {
           indicatorId = await createIndicatorResultEntry(queryRequest, queryResultSet, hashQueryRequest(queryRequest));
 
-          queriesToRun.push(...(await getIndicatorSubQueryRequests(accessToken, queryRequest, job.id)));
+          queriesToRun.push(...(await getIndicatorSubQueryRequests(accessToken, queryRequest, job.id, ctx)));
         } else {
           queriesToRun.push({ sql, queryRequest });
         }
 
-        console.log("Queries to run:", queriesToRun.length);
+        LOG.debug(`Queries to run: ${queriesToRun.length}`);
 
         for (const item of queriesToRun) {
-          await executeQuery(accessToken, item.sql, item.queryRequest, queryResultSet);
+          await executeQuery(accessToken, item.sql, item.queryRequest, queryResultSet, ctx);
         }
 
         await updateWithEndTime(queryResultSet.id!, queryResultSetTable);
@@ -84,13 +91,13 @@ const sub = rabbit.createConsumer(
 
       await updateJobStatus(job.id, JobStatus.COMPLETED, job.userId);
     } catch (err: unknown) {
-      console.error("Consumer failed for message:", msg?.messageId, err);
+      LOG.error({ err, messageId: msg?.messageId }, "Consumer failed for message");
 
       if (job?.id) {
         try {
           await updateJobStatus(job.id, JobStatus.ERRORED, job.userId, err);
         } catch (statusErr) {
-          console.error("Failed to update job status to ERRORED:", statusErr);
+          LOG.error({ err: statusErr, jobId: job.id }, "Failed to update job status to ERRORED");
         }
       }
       throw createError({ statusCode: 500, statusMessage: ErrorCode.RabbitMQConsumerError, message: "[RabbitMQ] consumer error", cause: err });
@@ -98,7 +105,7 @@ const sub = rabbit.createConsumer(
   }
 );
 sub.on("error", (err: Error) => {
-  console.error("[RabbitMQ] queue error:", { message: err.message, name: err.name, stack: err.stack });
+  LOG.error({ err }, "Queue error");
 });
 
 const pub = rabbit.createPublisher({

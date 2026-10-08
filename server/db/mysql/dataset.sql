@@ -110,7 +110,11 @@ CREATE TABLE patient_exists (
     patient_found TINYINT NOT NULL
 );
 
--- Indexes
+-- Indexes (existing databases: see dataset-indexes.sql)
+CREATE INDEX idx_job_user_queue_date ON dataset.job (user_id, queue_date);
+CREATE INDEX idx_query_result_set_iri ON dataset.query_result (query_result_set_id, query_iri);
+CREATE INDEX idx_patient_exists_iri_patient ON dataset.patient_exists (query_iri, patient_id);
+
 -- ALTER TABLE dataset.cohort_results DROP INDEX idx_cohort_query_entity;
 -- CREATE UNIQUE INDEX idx_cohort_query_entity ON dataset.cohort_results (query_result_id, entity_id);
 

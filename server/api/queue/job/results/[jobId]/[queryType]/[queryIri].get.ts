@@ -1,4 +1,5 @@
-import { getJobById, getQueryResultSetRows, getQueryResultsPaged } from "~~/server/helpers/mysqlHelper";
+import { ErrorCode, JobStatus } from "~~/enums";
+import { getDebugResultsPaged, getJobForUser, getQueryResultIdForJob, getQueryResultsPaged } from "~~/server/helpers/mysqlHelper";
 import { getDebugPatientId } from "~~/server/utils/executeQuery";
 
 import { IMQType } from "@endeavour/vue-library/enums";
@@ -11,24 +12,35 @@ const paramSchema = z.object({
   queryIri: z.string()
 });
 
+// The results table offers page sizes up to 8 x 25, so 200 is the largest size the UI asks for
 const querySchema = z.object({
-  page: z.coerce.number().default(1),
-  size: z.coerce.number().default(25)
+  page: z.coerce.number().int().min(1).default(1),
+  size: z.coerce.number().int().min(1).max(200).default(25)
 });
 
 export default defineEventHandler(async event => {
+  const { user } = await requireUserSession(event);
   const { jobId, queryIri, queryType } = await getValidatedRouterParams(event, paramSchema.parse);
   const { page, size } = await getValidatedQuery(event, querySchema.parse);
   const decodedQueryIri = decodeURIComponent(queryIri);
-  // TODO: Refactor to use a single query with joins instead of multiple queries
 
-  const job = await getJobById(jobId);
+  // Also the ownership check: a job that is not the caller's is a 404
+  const job = await getJobForUser(jobId, user.id);
 
-  const queryResultSetRows = await getQueryResultSetRows(job);
-  const queryResultSet = queryResultSetRows[0];
+  const debugPatientId = job.queryRequests?.map(getDebugPatientId).find(Boolean);
+  if (debugPatientId) return getDebugResultsPaged(decodedQueryIri, debugPatientId, page, size);
 
-  const debugPatientId = job?.queryRequests?.map(getDebugPatientId).find(Boolean);
+  // TODO: return indicator results - get sql from imapi
+  if (queryType === IMQType.INDICATOR) return { result: [], totalCount: 0, page };
 
-  const resultsPaged = await getQueryResultsPaged(decodedQueryIri, queryResultSet.id, queryType, page, size, debugPatientId);
-  return resultsPaged;
+  if (job.status !== JobStatus.COMPLETED) {
+    throw createError({ statusCode: 409, statusText: ErrorCode.InvalidRequestError, message: "Job has not completed" });
+  }
+
+  const queryResultId = await getQueryResultIdForJob(job.id, decodedQueryIri);
+  if (queryResultId === undefined) {
+    throw createError({ statusCode: 404, statusText: ErrorCode.MissingDataError, message: "Query result not found" });
+  }
+
+  return getQueryResultsPaged(queryResultId, queryType, page, size);
 });
