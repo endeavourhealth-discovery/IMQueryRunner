@@ -84,7 +84,7 @@ import type { Ref } from "vue";
 import type { Argument } from "@endeavour/vue-library/models";
 import { useUserStore } from "@endeavour/vue-library/stores";
 
-import { io } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 
 definePageMeta({
   requiresAuth: true,
@@ -94,7 +94,9 @@ definePageMeta({
 const userStore = useUserStore();
 const confirm = useConfirm();
 
-const socket = io();
+// Created on demand: the library is only downloaded, and a connection only opened, when "auto" refresh is selected
+let socket: Socket | undefined;
+let disposed = false;
 
 const jobs: Ref<Job[]> = ref([]);
 const resultSummaries: Ref<{ jobId: number; resultsSummary: QueryResultSummary[]; error?: string }[]> = ref([]);
@@ -241,19 +243,34 @@ function handleVisibilityChange() {
   }
 }
 
-function connectWebSocket() {
-  if (socket.connected) return;
-  socket.on("connect", onConnect);
-  socket.on("disconnect", onDisconnect);
-  socket.on("queueUpdate", onQueueUpdate);
+async function connectWebSocket() {
+  if (socket?.connected) return;
+  if (!socket) {
+    let io: typeof import("socket.io-client").io;
+    try {
+      ({ io } = await import("socket.io-client"));
+    } catch (error) {
+      console.error("Could not load the live update library:", error);
+      return;
+    }
+    // The user may have left "auto" (or the page) while the library was loading
+    if (!isAuto.value || disposed) return;
+    socket ??= io({ autoConnect: false });
+  }
+  // off() first so repeated calls never register a handler twice
+  socket.off("connect", onConnect).on("connect", onConnect);
+  socket.off("disconnect", onDisconnect).on("disconnect", onDisconnect);
+  socket.off("queueUpdate", onQueueUpdate).on("queueUpdate", onQueueUpdate);
   socket.connect();
 }
 
 function disconnectWebSocket() {
-  socket.off("connect", onConnect);
-  socket.off("disconnect", onDisconnect);
-  socket.off("queueUpdate", onQueueUpdate);
-  if (socket.connected) socket.disconnect();
+  if (socket) {
+    socket.off("connect", onConnect);
+    socket.off("disconnect", onDisconnect);
+    socket.off("queueUpdate", onQueueUpdate);
+    if (socket.connected) socket.disconnect();
+  }
   websocketIsConnected.value = false;
   transport.value = "N/A";
 }
@@ -264,6 +281,7 @@ async function onQueueUpdate() {
 }
 
 function onConnect() {
+  if (!socket) return;
   websocketIsConnected.value = true;
   transport.value = socket.io.engine.transport.name;
   socket.emit("joinRoom");
@@ -397,6 +415,7 @@ function getDisplayDateTime(date: string) {
 }
 
 onBeforeUnmount(() => {
+  disposed = true;
   stopPolling();
   document.removeEventListener("visibilitychange", handleVisibilityChange);
   disconnectWebSocket();
