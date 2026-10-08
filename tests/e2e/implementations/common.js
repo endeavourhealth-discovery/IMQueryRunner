@@ -80,7 +80,6 @@ step("Click logo to return to homepage", async () => {
 
 step("Click <text> button", async text => {
   await pw.page.getByRole("button", { name: text, exact: true }).click();
-  await pw.page.waitForLoadState("networkidle");
 });
 
 step("Type <text> into <input>", async (text, input) => {
