@@ -20,8 +20,9 @@ const querySchema = z.object({
     .pipe(z.array(z.number().int()).max(MAX_JOB_IDS))
 });
 
+const LOG = Logger("api/queue/job/results/summaries");
+
 export default defineEventHandler(async event => {
-  const LOG = Logger("api/queue/job/results/summaries");
   const { user } = await requireUserSession(event);
   const accessToken = await getAccessToken(event);
   const { jobIds } = await getValidatedQuery(event, querySchema.parse);

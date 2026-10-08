@@ -29,7 +29,5 @@ defineRouteMeta({
 
 export default defineEventHandler(async (event): Promise<any> => {
   const darkMode = await readValidatedBody(event, bodySchema.parse);
-  const user = await getCurrentUser(event);
-  user.darkMode = darkMode.bool;
-  return await updateCurrentUser(event, user);
+  return await updateCurrentUserPreferences(event, { darkMode: darkMode.bool });
 });

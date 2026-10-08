@@ -23,7 +23,15 @@ export const mysqlDb: MySql2Database<typeof schema> = drizzle({
   mode: "default"
 });
 
-export async function getConnectionId(): Promise<number> {
+/**
+ * Runs `task` with the thread id of a pool connection that stays checked out (so idle) until the task finishes,
+ * then returns it to the pool. Taking a connection and not releasing it permanently uses up one of the pool's slots.
+ */
+export async function withConnectionId<T>(task: (threadId: number) => Promise<T>): Promise<T> {
   const conn = await pool.getConnection();
-  return conn.threadId;
+  try {
+    return await task(conn.threadId);
+  } finally {
+    conn.release();
+  }
 }

@@ -1,4 +1,5 @@
 import { emitQueueUpdate } from "#server/utils/queueEvents.ts";
+import Logger from "#shared/logger";
 import { ErrorCode, JobStatus } from "~~/enums";
 import { type JobRequest } from "~~/models/JobRequest";
 import { type IndicatorResult } from "~~/models/indicatorResult.schema";
@@ -27,6 +28,8 @@ import QueryService from "../services/QueryService";
 import { resolveArgs, sortQueryRequestsByDependency } from "../utils/executeQuery";
 import { TtlCache } from "../utils/memoryCache";
 
+const LOG = Logger("server/helpers/mysqlHelper");
+
 export async function createJobEntry(jobRequest: JobRequest, accessToken: string, userId: string): Promise<Job> {
   const queryRequestsForSql = [];
   for (const queryRequest of jobRequest.queryRequests) {
@@ -49,9 +52,9 @@ export async function createJobEntry(jobRequest: JobRequest, accessToken: string
   } as Job;
 
   const result = await mysqlDb.insert(jobTable).values(queryJob);
-  emitQueueUpdate(userId);
   if (!result?.[0]?.insertId) throw new Error("Failed to insert job into database");
   queryJob.id = result[0].insertId;
+  emitQueueUpdate(userId, { jobId: queryJob.id, status: JobStatus.QUEUED });
   return queryJob;
 }
 
@@ -254,7 +257,7 @@ export async function updateJobStatus(jobId: number, jobStatus: JobStatus, userI
       throw new Error(`Invalid job status: ${jobStatus}`);
   }
   await mysqlDb.update(jobTable).set(set).where(eq(jobTable.id, jobId));
-  emitQueueUpdate(userId);
+  emitQueueUpdate(userId, { jobId, status: jobStatus });
 }
 
 export async function createResultSetEntry(queryRequest: any, job: Job): Promise<QueryResultSet> {
@@ -271,10 +274,9 @@ export async function createResultSetEntry(queryRequest: any, job: Job): Promise
   } as QueryResultSet;
 
   const result = await mysqlDb.insert(queryResultSetTable).values(queryResultSet);
-  emitQueueUpdate(job.userId);
   const queryResultSetId = result?.[0]?.insertId;
   queryResultSet.id = queryResultSetId!;
-  console.log("Inserted query result set with id:", queryResultSet.id, "for job id:", job.id);
+  LOG.debug(`Inserted query result set ${queryResultSet.id} for job ${job.id}`);
   return queryResultSet;
 }
 

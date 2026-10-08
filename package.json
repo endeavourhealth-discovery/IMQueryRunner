@@ -20,7 +20,7 @@
     "drizzle-pull": "pnpm drizzle-pull-mysql",
     "drizzle-pull-mysql": "npx drizzle-kit pull --config=server/db/mysql.drizzle.ts",
     "format": "prettier --write \"{app,docs,enums,models,server,shared,types,tests}/**/*.{js,ts,vue,json,css,scss,md}\"",
-    "format:check": "prettier --write \"{app,docs,enums,models,server,shared,types,tests}/**/*.{js,ts,vue,json,css,scss,md}\"",
+    "format:check": "prettier --check \"{app,docs,enums,models,server,shared,types,tests}/**/*.{js,ts,vue,json,css,scss,md}\"",
     "prepare": "husky",
     "preinstall": "pnpm config set \"@endeavour:registry=https://artifactory.endhealth.co.uk/repository/npm/\"",
     "sonar": "sonar-scanner-npm"

@@ -42,3 +42,6 @@ prisma/migrations/
 /playwright/.cache/
 /playwright/.auth/
 /IMQueryRunner.iml
+
+# TypeScript incremental build cache
+*.tsbuildinfo

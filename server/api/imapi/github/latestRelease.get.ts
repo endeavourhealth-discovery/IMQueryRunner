@@ -16,7 +16,12 @@ defineRouteMeta({
     parameters: [{ name: "repositoryName", description: "Name of the github repository as a REPO enum", in: "query" }]
   }
 });
-export default defineEventHandler(async (event): Promise<any> => {
-  const { repositoryName } = await getQueryParams(event, paramSchema.parse);
-  return await GithubService.getLatestRelease(repositoryName);
-});
+// Releases come from IMAPI, which calls the rate-limited GitHub API, and change only when something is published.
+// Cached per repository (the cache key includes the query string) for 15 minutes, then refreshed in the background.
+export default defineCachedEventHandler(
+  async (event): Promise<any> => {
+    const { repositoryName } = await getQueryParams(event, paramSchema.parse);
+    return await GithubService.getLatestRelease(repositoryName);
+  },
+  { name: "githubLatestRelease", maxAge: 15 * 60, staleMaxAge: 60 * 60, swr: true }
+);
