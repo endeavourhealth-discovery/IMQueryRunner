@@ -1,5 +1,3 @@
-import { PrimeVuePresetThemes } from "@endeavour/vue-library/enums";
-
 import * as z from "zod";
 
 const bodySchema = z.array(z.string());

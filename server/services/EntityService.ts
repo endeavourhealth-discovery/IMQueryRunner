@@ -1,4 +1,3 @@
-import { IM } from "@endeavour/vue-library/enums";
 import { parseApiResponse } from "@endeavour/vue-library/helpers";
 import {
   type ExtendedEntityReferenceNode,
@@ -7,7 +6,6 @@ import {
   SearchResultSummarySchema
 } from "@endeavour/vue-library/models";
 
-import type { OrganizationChartNode } from "primevue";
 import z from "zod";
 
 const EntityService = {

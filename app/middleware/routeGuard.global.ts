@@ -5,7 +5,7 @@ import { useUserStore } from "@endeavour/vue-library/stores";
 
 import { isArray } from "lodash-es";
 
-export default defineNuxtRouteMiddleware(async (to, from) => {
+export default defineNuxtRouteMiddleware(async to => {
   const { requiresAuth, requiresRole } = to.meta;
   const userStore = useUserStore(usePinia());
 

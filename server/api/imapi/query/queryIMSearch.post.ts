@@ -1,4 +1,3 @@
-import { getQueryParams } from "~~/server/helpers/getQueryParams";
 import QueryService from "~~/server/services/QueryService";
 
 import * as z from "zod";

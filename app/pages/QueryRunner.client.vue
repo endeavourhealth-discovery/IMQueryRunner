@@ -76,7 +76,7 @@
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
 import { JobStatus } from "~~/enums";
-import type { Job, JobRequest, QueryResultSummary, QueueUpdate } from "~~/models";
+import type { Job, QueryResultSummary, QueueUpdate } from "~~/models";
 
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
