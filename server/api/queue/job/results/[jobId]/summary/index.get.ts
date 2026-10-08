@@ -1,5 +1,5 @@
-import type { QueryResultSummary } from "~~/models";
-import { getJobForUser, getJobResultSummaries } from "~~/server/helpers/mysqlHelper";
+import { getJobsResultSummaries } from "~~/server/helpers/jobSummaries";
+import { getJobForUser } from "~~/server/helpers/mysqlHelper";
 
 import { z } from "zod";
 
@@ -13,6 +13,7 @@ export default defineEventHandler(async event => {
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
 
   const job = await getJobForUser(jobId, user.id);
-  const results: QueryResultSummary[] = await getJobResultSummaries(accessToken, job);
-  return results;
+  const [result] = await getJobsResultSummaries(accessToken, user.id, [job]);
+  if (result!.error !== undefined) throw result!.error;
+  return result!.summaries;
 });
