@@ -65,6 +65,22 @@ export async function getJobById(jobId: number): Promise<Job> {
   return job;
 }
 
+/**
+ * Loads a job only if it belongs to `userId`. A job owned by someone else is reported as not found (404),
+ * so job ids cannot be probed. Use this for anything reachable from the API; `getJobById` is for the queue consumer.
+ */
+export async function getJobForUser(jobId: number, userId: string): Promise<Job> {
+  const jobs = await mysqlDb
+    .select()
+    .from(jobTable)
+    .where(and(eq(jobTable.id, jobId), eq(jobTable.userId, userId)));
+  const job = jobs[0];
+  if (!job) {
+    throw createError({ status: 404, statusText: ErrorCode.MissingDataError, message: "Queue job not found" });
+  }
+  return job;
+}
+
 export async function getQueryResultSetRows(job: Job) {
   if (job.status !== JobStatus.COMPLETED) return [];
   const queryResultSetRows = await mysqlDb.select().from(queryResultSetTable).where(eq(queryResultSetTable.jobId, job.id));

@@ -1,4 +1,4 @@
-import { getJobById, getQueryResultSQL, getQueryResultSetRows } from "~~/server/helpers/mysqlHelper";
+import { getJobForUser, getQueryResultSQL, getQueryResultSetRows } from "~~/server/helpers/mysqlHelper";
 
 import { IMQType } from "@endeavour/vue-library/enums";
 
@@ -11,11 +11,12 @@ const paramSchema = z.object({
 });
 
 export default defineEventHandler(async event => {
+  const { user } = await requireUserSession(event);
   const { jobId, queryIri, queryType } = await getValidatedRouterParams(event, paramSchema.parse);
   const decodedQueryIri = decodeURIComponent(queryIri);
   // TODO: Refactor to use a single query with joins instead of multiple queries
 
-  const job = await getJobById(jobId);
+  const job = await getJobForUser(jobId, user.id);
 
   const queryResultSetRows = await getQueryResultSetRows(job);
   const queryResultSet = queryResultSetRows[0];

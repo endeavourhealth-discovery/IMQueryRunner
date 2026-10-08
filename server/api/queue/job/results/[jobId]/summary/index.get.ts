@@ -1,5 +1,5 @@
 import type { QueryResultSummary } from "~~/models";
-import { getJobById, getJobResultSummaries } from "~~/server/helpers/mysqlHelper";
+import { getJobForUser, getJobResultSummaries } from "~~/server/helpers/mysqlHelper";
 
 import { z } from "zod";
 
@@ -8,10 +8,11 @@ const paramSchema = z.object({
 });
 
 export default defineEventHandler(async event => {
+  const { user } = await requireUserSession(event);
   const accessToken = await getAccessToken(event);
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
 
-  const job = await getJobById(jobId);
+  const job = await getJobForUser(jobId, user.id);
   const results: QueryResultSummary[] = await getJobResultSummaries(accessToken, job);
   return results;
 });

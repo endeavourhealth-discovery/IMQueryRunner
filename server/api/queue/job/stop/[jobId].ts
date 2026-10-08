@@ -1,6 +1,6 @@
 import { ErrorCode, JobStatus } from "~~/enums";
 import { getConnectionId, mysqlDb, pool } from "~~/server/db/mysql";
-import { getJobById, updateJobStatus } from "~~/server/helpers/mysqlHelper";
+import { getJobForUser, updateJobStatus } from "~~/server/helpers/mysqlHelper";
 
 import { eq } from "drizzle-orm";
 import * as z from "zod";
@@ -10,11 +10,13 @@ const paramSchema = z.object({
 });
 
 export default defineEventHandler(async event => {
+  const { user } = await requireUserSession(event);
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
 
-  const connection = await pool.getConnection();
+  // Check ownership before taking a pool connection so a 404 cannot leak one
+  const job = await getJobForUser(jobId, user.id);
 
-  const job = await getJobById(jobId);
+  const connection = await pool.getConnection();
 
   if (job.status === JobStatus.QUEUED) {
     await updateJobStatus(job.id, JobStatus.CANCELLED, job.userId, null);

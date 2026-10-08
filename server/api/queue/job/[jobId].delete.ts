@@ -1,5 +1,5 @@
 import { JobStatus } from "~~/enums";
-import { getJobById, getQueryResultSetRows } from "~~/server/helpers/mysqlHelper";
+import { getJobForUser, getQueryResultSetRows } from "~~/server/helpers/mysqlHelper";
 
 import { eq } from "drizzle-orm";
 import * as z from "zod";
@@ -12,9 +12,10 @@ const paramSchema = z.object({
 });
 
 export default defineEventHandler(async event => {
+  const { user } = await requireUserSession(event);
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
   console.log("Deleting job with ID:", jobId);
-  const job = await getJobById(jobId);
+  const job = await getJobForUser(jobId, user.id);
   if (job.status === JobStatus.QUEUED) {
     await mysqlDb.delete(jobTable).where(eq(jobTable.id, job.id));
     return;

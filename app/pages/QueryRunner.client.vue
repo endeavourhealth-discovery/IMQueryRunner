@@ -267,9 +267,6 @@ function onConnect() {
   websocketIsConnected.value = true;
   transport.value = socket.io.engine.transport.name;
   socket.emit("joinRoom");
-  socket.on("message", function (data) {
-    alert(data);
-  });
   socket.emit("hello");
   socket.io.engine.on("upgrade", rawTransport => {
     transport.value = rawTransport.name;

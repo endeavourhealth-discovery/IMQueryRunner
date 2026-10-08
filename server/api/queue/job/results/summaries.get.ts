@@ -1,6 +1,6 @@
 import Logger from "#shared/logger";
 import type { QueryResultSummary } from "~~/models";
-import { getJobById, getJobResultSummaries } from "~~/server/helpers/mysqlHelper";
+import { getJobForUser, getJobResultSummaries } from "~~/server/helpers/mysqlHelper";
 
 import { IMQType } from "@endeavour/vue-library";
 
@@ -12,6 +12,7 @@ const querySchema = z.object({
 
 export default defineEventHandler(async event => {
   const LOG = Logger("api/queue/job/results/summaries");
+  const { user } = await requireUserSession(event);
   const accessToken = await getAccessToken(event);
   const { jobIds } = await getValidatedQuery(event, querySchema.parse);
 
@@ -26,7 +27,7 @@ export default defineEventHandler(async event => {
       const jobResults: QueryResultSummary[] = [];
       let jobError: string | undefined;
       try {
-        const job = await getJobById(jobId);
+        const job = await getJobForUser(jobId, user.id);
         jobResults.push(...(await getJobResultSummaries(accessToken, job)));
       } catch (error: any) {
         jobError = error?.message ?? String(error);
