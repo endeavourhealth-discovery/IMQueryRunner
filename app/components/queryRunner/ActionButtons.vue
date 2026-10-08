@@ -203,7 +203,8 @@ function getResultDetails(queryIri: string):
   const details = results;
   const primaryQueryResultsDetails = details.find(d => d.queryIri === queryIri);
   if (!primaryQueryResultsDetails) return undefined;
-  const subQueryResultsDetails = details.filter(d => d.queryIri !== queryIri);
+  const subQueryIris = new Set(primaryQueryResultsDetails.subQueryIris ?? []);
+  const subQueryResultsDetails = details.filter(d => subQueryIris.has(d.queryIri));
   return {
     primaryQueryResultsDetails: primaryQueryResultsDetails,
     subQueryResultsDetails: subQueryResultsDetails

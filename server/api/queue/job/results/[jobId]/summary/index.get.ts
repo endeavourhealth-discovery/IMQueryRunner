@@ -1,5 +1,5 @@
 import type { QueryResultSummary } from "~~/models";
-import { getJobById, getQueryResultRows, getQueryResultSetRows, getQueryResultSummary } from "~~/server/helpers/mysqlHelper";
+import { getJobById, getJobResultSummaries } from "~~/server/helpers/mysqlHelper";
 
 import { z } from "zod";
 
@@ -11,16 +11,7 @@ export default defineEventHandler(async event => {
   const accessToken = await getAccessToken(event);
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
 
-  const results: QueryResultSummary[] = [];
-
   const job = await getJobById(jobId);
-
-  const queryResultSetRows = await getQueryResultSetRows(job);
-  for (const queryResultSet of queryResultSetRows) {
-    const queryResultRows = await getQueryResultRows(queryResultSet.id);
-    for (const queryResultRow of queryResultRows) {
-      results.push(await getQueryResultSummary(accessToken, queryResultSet.id, queryResultRow.id, queryResultRow.queryIri, queryResultRow.queryType));
-    }
-  }
+  const results: QueryResultSummary[] = await getJobResultSummaries(accessToken, job);
   return results;
 });

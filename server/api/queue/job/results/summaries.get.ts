@@ -1,6 +1,6 @@
 import Logger from "#shared/logger";
 import type { QueryResultSummary } from "~~/models";
-import { getJobById, getQueryResultRows, getQueryResultSetRows, getQueryResultSummary } from "~~/server/helpers/mysqlHelper";
+import { getJobById, getJobResultSummaries } from "~~/server/helpers/mysqlHelper";
 
 import { IMQType } from "@endeavour/vue-library";
 
@@ -27,14 +27,7 @@ export default defineEventHandler(async event => {
       let jobError: string | undefined;
       try {
         const job = await getJobById(jobId);
-
-        const queryResultSetRows = await getQueryResultSetRows(job);
-        for (const queryResultSet of queryResultSetRows) {
-          const queryResultRows = await getQueryResultRows(queryResultSet.id);
-          for (const queryResultRow of queryResultRows) {
-            jobResults.push(await getQueryResultSummary(accessToken, queryResultSet.id, queryResultRow.id, queryResultRow.queryIri, queryResultRow.queryType));
-          }
-        }
+        jobResults.push(...(await getJobResultSummaries(accessToken, job)));
       } catch (error: any) {
         jobError = error?.message ?? String(error);
         LOG.error(`Failed to get result summaries for job ${jobId}: ${jobError}`);

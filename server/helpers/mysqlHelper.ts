@@ -1,5 +1,6 @@
 import { emitQueueUpdate } from "#server/utils/queueEvents.ts";
 import { ErrorCode, JobStatus } from "~~/enums";
+import { type QueryResultSummary } from "~~/models";
 import { type JobRequest } from "~~/models/JobRequest";
 import { type IndicatorResult } from "~~/models/indicatorResult.schema";
 import { type Job } from "~~/models/job.schema";
@@ -182,6 +183,55 @@ export async function getQueryResultSummary(accessToken: string, queryResultSetI
     throw createError({ status: 400, statusText: ErrorCode.InvalidRequestError, message: "Query type is invalid" });
   }
   return result;
+}
+
+export async function getJobResultSummaries(accessToken: string, job: Job): Promise<QueryResultSummary[]> {
+  const results: QueryResultSummary[] = [];
+  const queryResultSetRows = await getQueryResultSetRows(job);
+  if (!isArrayHasLength(queryResultSetRows)) return results;
+
+  const subQueryIrisByQueryIri = await getJobSubQueryIris(accessToken, job);
+  for (const queryResultSet of queryResultSetRows) {
+    const queryResultRows = await getQueryResultRows(queryResultSet.id);
+    for (const queryResultRow of queryResultRows) {
+      const summary: QueryResultSummary = await getQueryResultSummary(
+        accessToken,
+        queryResultSet.id,
+        queryResultRow.id,
+        queryResultRow.queryIri,
+        queryResultRow.queryType
+      );
+      const subQueryIris = subQueryIrisByQueryIri.get(queryResultRow.queryIri);
+      if (subQueryIris) summary.subQueryIris = subQueryIris;
+      results.push(summary);
+    }
+  }
+  return results;
+}
+
+async function getJobSubQueryIris(accessToken: string, job: Job): Promise<Map<string, string[]>> {
+  const subQueryIrisByQueryIri = new Map<string, string[]>();
+  for (const queryRequest of job.queryRequests) {
+    const queryIri = queryRequest.query?.iri;
+    if (!queryIri) continue;
+    const isIndicator = queryRequest.query.queryType === IMQType.INDICATOR;
+    const subQueryIris = await getSubQueryIriList(accessToken, queryIri, isIndicator);
+    if (isIndicator) {
+      for (const indicatorSubQueryIri of [...subQueryIris]) {
+        subQueryIris.push(...(await getSubQueryIriList(accessToken, indicatorSubQueryIri)));
+      }
+    }
+    subQueryIrisByQueryIri.set(
+      queryIri,
+      [...new Set(subQueryIris)].filter(iri => iri !== queryIri)
+    );
+  }
+  return subQueryIrisByQueryIri;
+}
+
+async function getSubQueryIriList(accessToken: string, queryIri: string, isIndicator: boolean = false): Promise<string[]> {
+  const subQueries = await QueryService.getSubqueryIris(accessToken, queryIri, isIndicator);
+  return subQueries.map(subQuery => subQuery.iri).filter((iri): iri is string => !!iri);
 }
 
 export async function updateJobStatus(jobId: number, jobStatus: JobStatus, userId: string, error: any = null) {
