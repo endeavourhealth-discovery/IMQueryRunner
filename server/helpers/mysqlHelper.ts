@@ -11,7 +11,7 @@ import { isArrayHasLength } from "@endeavour/vue-library";
 import { IMQType } from "@endeavour/vue-library/enums";
 import { type QueryRequest } from "@endeavour/vue-library/models";
 
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, inArray } from "drizzle-orm";
 import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 
 import { mysqlDb } from "../db/mysql";
@@ -79,6 +79,53 @@ export async function getJobForUser(jobId: number, userId: string): Promise<Job>
     throw createError({ status: 404, statusText: ErrorCode.MissingDataError, message: "Queue job not found" });
   }
   return job;
+}
+
+/** Rows removed per statement when clearing result tables, so a large cohort never holds one long lock. */
+export const DELETE_BATCH_SIZE = 10000;
+
+async function deleteResultRowsInBatches(table: typeof cohortResultsTable | typeof datasetResultsTable, queryResultIds: number[]) {
+  while (true) {
+    const [header] = await mysqlDb.delete(table).where(inArray(table.queryResultId, queryResultIds)).limit(DELETE_BATCH_SIZE);
+    if (header.affectedRows < DELETE_BATCH_SIZE) return;
+  }
+}
+
+/**
+ * Deletes a job and everything it produced (result rows, results, indicator results, result sets).
+ * The bulk result rows are removed in batches first; each batch is its own statement and the job still exists
+ * until the end, so a failure part-way can simply be retried. The remaining metadata is removed in one transaction.
+ * A RUNNING job is refused because the worker is still writing to it: cancel it first.
+ */
+export async function deleteJobData(job: Job) {
+  if (job.status === JobStatus.RUNNING) {
+    throw createError({ status: 409, statusText: ErrorCode.InvalidRequestError, message: "Cancel the job before deleting it" });
+  }
+
+  const resultSetIds = (await mysqlDb.select({ id: queryResultSetTable.id }).from(queryResultSetTable).where(eq(queryResultSetTable.jobId, job.id))).map(
+    r => r.id
+  );
+
+  if (resultSetIds.length) {
+    const queryResultIds = (
+      await mysqlDb.select({ id: queryResultTable.id }).from(queryResultTable).where(inArray(queryResultTable.queryResultSetId, resultSetIds))
+    ).map(r => r.id);
+
+    if (queryResultIds.length) {
+      await deleteResultRowsInBatches(cohortResultsTable, queryResultIds);
+      await deleteResultRowsInBatches(datasetResultsTable, queryResultIds);
+    }
+  }
+
+  // Child tables first: query_result references indicator_result and query_result_set, indicator_result references query_result_set
+  await mysqlDb.transaction(async tx => {
+    if (resultSetIds.length) {
+      await tx.delete(queryResultTable).where(inArray(queryResultTable.queryResultSetId, resultSetIds));
+      await tx.delete(indicatorResultTable).where(inArray(indicatorResultTable.queryResultSetId, resultSetIds));
+      await tx.delete(queryResultSetTable).where(inArray(queryResultSetTable.id, resultSetIds));
+    }
+    await tx.delete(jobTable).where(eq(jobTable.id, job.id));
+  });
 }
 
 export async function getQueryResultSetRows(job: Job) {
