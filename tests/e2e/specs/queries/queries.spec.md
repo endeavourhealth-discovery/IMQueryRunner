@@ -9,7 +9,7 @@ This specification describes the query running functionality of IMQueryRunner.
 * Click "Add to queue" button
 * Click "Run queue" button
 * Click "Run" button
-* Wait "20" seconds
+* Wait for job to complete
 * Click "Refresh" button
 * Wait for datatable to finish loading
 * Open results page
@@ -25,7 +25,7 @@ This specification describes the query running functionality of IMQueryRunner.
 * Click "Add to queue" button
 * Click "Run queue" button
 * Click "Run" button
-* Wait "10" seconds
+* Wait for job to complete
 * Click "Refresh" button
 * Wait for datatable to finish loading
 * Open results page
@@ -41,7 +41,7 @@ This specification describes the query running functionality of IMQueryRunner.
 * Click "Add to queue" button
 * Click "Run queue" button
 * Click "Run" button
-* Wait "10" seconds
+* Wait for job to complete
 * Click "Refresh" button
 * Wait for datatable to finish loading
 * Open results page
