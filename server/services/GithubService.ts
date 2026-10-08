@@ -7,24 +7,18 @@ import z from "zod";
 const API_URL = `${useRuntimeConfig().public.imapiUrl}github`;
 
 const GithubService = {
-  async getLatestRelease(sessionId: string, repositoryName: REPO): Promise<GithubRelease> {
+  async getLatestRelease(repositoryName: REPO): Promise<GithubRelease> {
     const result = await $fetch(API_URL + "/public/githubLatest", {
-      headers: {
-        cookie: `session_id=${sessionId}`,
-        "Content-Type": "text/plain"
-      },
+      headers: { "Content-Type": "text/plain" },
       params: { repositoryName: repositoryName },
       method: "GET"
     });
     return parseApiResponse(result, GithubReleaseSchema);
   },
 
-  async getAllReleases(sessionId: string, repositoryName: REPO): Promise<GithubRelease[]> {
+  async getAllReleases(repositoryName: REPO): Promise<GithubRelease[]> {
     const result = await $fetch(API_URL + "/public/githubAllReleases", {
-      headers: {
-        cookie: `session_id=${sessionId}`,
-        "Content-Type": "text/plain"
-      },
+      headers: { "Content-Type": "text/plain" },
       params: { repositoryName: repositoryName },
       method: "GET"
     });

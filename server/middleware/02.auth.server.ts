@@ -1,9 +1,9 @@
 export default defineEventHandler(async event => {
-  // Ignore ui routes, public api's and auth api's
+  // Ignore ui routes, public api's and the session api's
   const path = getRequestURL(event).pathname;
-  if (!path.startsWith("/api") || path.startsWith("/api/public") || path.startsWith("/api/auth")) {
+  if (!path.startsWith("/api") || path.startsWith("/api/public") || path.startsWith("/api/_auth")) {
     return;
   }
 
-  await globalThis.apiGuard.checkPermissions(event);
+  await requireUserSession(event);
 });

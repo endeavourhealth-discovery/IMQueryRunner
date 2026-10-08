@@ -2,7 +2,7 @@ import { ErrorCode, JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
 
 import { IMQType } from "@endeavour/vue-library/enums";
-import { type QueryRequest, type User } from "@endeavour/vue-library/models";
+import { type QueryRequest } from "@endeavour/vue-library/models";
 
 import { Connection } from "rabbitmq-client";
 
@@ -14,26 +14,14 @@ const rabbit = new Connection(process.env.RABBITMQ_URL);
 rabbit.on("error", (err: Error) => {});
 rabbit.on("connection", () => {});
 
-let sessionId: string | undefined = undefined;
-async function getSession() {
-  if (!sessionId) {
-    try {
-      const response = await $fetch<{ sessionId: string; user: User }>("/api/auth/machineLogin", {
-        query: {
-          clientId: process.env.CLIENT_ID,
-          clientSecret: process.env.CLIENT_SECRET
-        },
-        headers: {
-          "X-IGNORE-IP": "true"
-        }
-      });
-      sessionId = response.sessionId;
-    } catch (err: unknown) {
-      if (isError(err)) throw createError({ statusCode: 401, statusMessage: ErrorCode.AuthorisationError, message: err.message });
-      else throw createError({ statusCode: 500, statusMessage: ErrorCode.InternalServerError, message: err instanceof Error ? err.message : "Unknown error" });
-    }
+/** The worker calls IMAPI as this application (client credentials), not as the user who queued the job. */
+async function getWorkerAccessToken() {
+  try {
+    return await getMachineAccessToken();
+  } catch (err: unknown) {
+    if (isError(err)) throw createError({ statusCode: 401, statusMessage: ErrorCode.AuthorisationError, message: err.message });
+    else throw createError({ statusCode: 500, statusMessage: ErrorCode.InternalServerError, message: err instanceof Error ? err.message : "Unknown error" });
   }
-  return sessionId;
 }
 
 const sub = rabbit.createConsumer(
@@ -56,7 +44,7 @@ const sub = rabbit.createConsumer(
     let job: Job | undefined;
 
     try {
-      const session = await getSession();
+      const accessToken = await getWorkerAccessToken();
       job = await getJobById(Number(msg.messageId!));
 
       if (job.status === JobStatus.CANCELLED) {
@@ -67,7 +55,7 @@ const sub = rabbit.createConsumer(
       await updateJobStatus(job.id, JobStatus.RUNNING, job.userId);
 
       for (const queryRequest of job.queryRequests) {
-        const sql = await getValidatedSQL(queryRequest, session, job.id);
+        const sql = await getValidatedSQL(queryRequest, accessToken, job.id);
         const queryResultSet = await createResultSetEntry(queryRequest, job);
 
         const queriesToRun: { sql: string; queryRequest: QueryRequest }[] = [];
@@ -76,7 +64,7 @@ const sub = rabbit.createConsumer(
         if (queryRequest.query.queryType === IMQType.INDICATOR) {
           indicatorId = await createIndicatorResultEntry(queryRequest, queryResultSet, hashQueryRequest(queryRequest));
 
-          queriesToRun.push(...(await getIndicatorSubQueryRequests(session, queryRequest, job.id)));
+          queriesToRun.push(...(await getIndicatorSubQueryRequests(accessToken, queryRequest, job.id)));
         } else {
           queriesToRun.push({ sql, queryRequest });
         }
@@ -84,7 +72,7 @@ const sub = rabbit.createConsumer(
         console.log("Queries to run:", queriesToRun.length);
 
         for (const item of queriesToRun) {
-          await executeQuery(session, item.sql, item.queryRequest, queryResultSet);
+          await executeQuery(accessToken, item.sql, item.queryRequest, queryResultSet);
         }
 
         await updateWithEndTime(queryResultSet.id!, queryResultSetTable);

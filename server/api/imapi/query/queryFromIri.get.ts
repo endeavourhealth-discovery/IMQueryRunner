@@ -12,7 +12,6 @@ defineRouteMeta({
     tags: ["query"],
     description: "Get query",
     parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
       {
         name: "iri",
         description: "Query iri",
@@ -23,7 +22,7 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event): Promise<any> => {
-  const sessionId = getCookie(event, "session_id")!;
+  const accessToken = await getAccessToken(event);
   const { queryIri } = await getQueryParams(event, paramSchema.parse);
-  return await QueryService.getQueryFromIri(sessionId, queryIri);
+  return await QueryService.getQueryFromIri(accessToken, queryIri);
 });

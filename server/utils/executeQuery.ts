@@ -13,7 +13,7 @@ import { patientExistsTable, queryResultSetTable, queryResultTable } from "../db
 import { createQueryResultEntry, getToday, updateWithEndTime, updateWithSQL } from "../helpers/mysqlHelper";
 import QueryService from "../services/QueryService";
 
-export async function executeQuery(sessionId: string, sql: string, queryRequest: QueryRequest, queryResultSet: QueryResultSet) {
+export async function executeQuery(accessToken: string, sql: string, queryRequest: QueryRequest, queryResultSet: QueryResultSet) {
   if (!queryRequest.query?.iri) throw new Error("Query IRI is required for execution");
   const hashCodeVersion = hashQueryRequest(queryRequest);
   const existingQueryResultId = await getQueryResultIdIfExists(queryResultSet.id!, hashCodeVersion, queryRequest.query.iri);
@@ -26,7 +26,7 @@ export async function executeQuery(sessionId: string, sql: string, queryRequest:
   const queryIrisToQueryResultIds = {} as { [key: string]: number };
   if (!debugPatientId) queryIrisToQueryResultIds[queryRequest.query.iri] = queryResultId;
 
-  await runSubQueries(sessionId, queryRequest, queryIrisToQueryResultIds, queryResultSet);
+  await runSubQueries(accessToken, queryRequest, queryIrisToQueryResultIds, queryResultSet);
 
   const resolvedSql = getResolvedSql(sql, queryRequest, queryIrisToQueryResultIds);
 
@@ -211,13 +211,13 @@ export async function isCached(hashCode: number, iri: string): Promise<boolean> 
   // }
 }
 
-async function runSubQueries(sessionId: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }, queryResultSet: QueryResultSet) {
-  const subQueries = await QueryService.getSubqueryIris(sessionId, queryRequest.query!.iri!);
+async function runSubQueries(accessToken: string, queryRequest: QueryRequest, queryIrisToHashCodes: { [key: string]: number }, queryResultSet: QueryResultSet) {
+  const subQueries = await QueryService.getSubqueryIris(accessToken, queryRequest.query!.iri!);
   console.log("Subqueries to run:", subQueries.length);
   if (subQueries.length)
     for (const subQuery of subQueries) {
       try {
-        const subQueryRequest = await QueryService.getQueryRequestForSQL(sessionId, {
+        const subQueryRequest = await QueryService.getQueryRequestForSQL(accessToken, {
           query: { iri: subQuery.iri },
           argument: queryRequest.argument
         } as QueryRequest);
@@ -230,7 +230,7 @@ async function runSubQueries(sessionId: string, queryRequest: QueryRequest, quer
         }
 
         queryIrisToHashCodes[subQuery.iri!] = await createQueryResultEntry(subQueryRequest, queryResultSet, hashCodeVersion);
-        const subQuerySql = await QueryService.getQuerySql(sessionId, subQueryRequest);
+        const subQuerySql = await QueryService.getQuerySql(accessToken, subQueryRequest);
         const resolvedSql = getResolvedSql(subQuerySql, subQueryRequest, queryIrisToHashCodes);
         await executeCohortQuery(resolvedSql, subQueryRequest, queryIrisToHashCodes[subQuery.iri!]!);
       } catch (err: any) {
@@ -240,7 +240,7 @@ async function runSubQueries(sessionId: string, queryRequest: QueryRequest, quer
     }
 }
 
-export async function sortQueryRequestsByDependency(sessionId: string, queryRequests: QueryRequest[]): Promise<QueryRequest[]> {
+export async function sortQueryRequestsByDependency(accessToken: string, queryRequests: QueryRequest[]): Promise<QueryRequest[]> {
   const iriToIndex = new Map<string, number>();
   queryRequests.forEach((queryRequest, index) => {
     if (queryRequest.query?.iri) iriToIndex.set(queryRequest.query.iri, index);
@@ -249,7 +249,7 @@ export async function sortQueryRequestsByDependency(sessionId: string, queryRequ
   const dependencyIndexes: number[][] = await Promise.all(
     queryRequests.map(async queryRequest => {
       if (!queryRequest.query?.iri) return [];
-      const subQueries = await QueryService.getSubqueryIris(sessionId, queryRequest.query.iri);
+      const subQueries = await QueryService.getSubqueryIris(accessToken, queryRequest.query.iri);
       return subQueries
         .map((subQuery: SubQueryDependency) => (subQuery.iri ? iriToIndex.get(subQuery.iri) : undefined))
         .filter((index): index is number => index !== undefined);
@@ -375,11 +375,11 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-export async function getValidatedSQL(queryRequest: QueryRequest, sessionId: string, jobId: number): Promise<string> {
+export async function getValidatedSQL(queryRequest: QueryRequest, accessToken: string, jobId: number): Promise<string> {
   const debugPatientId = getDebugPatientId(queryRequest);
   const sql = debugPatientId
-    ? await QueryService.getQuerySqlDebug(sessionId, queryRequest.query!.iri!, debugPatientId)
-    : await QueryService.getQuerySql(sessionId, queryRequest);
+    ? await QueryService.getQuerySqlDebug(accessToken, queryRequest.query!.iri!, debugPatientId)
+    : await QueryService.getQuerySql(accessToken, queryRequest);
   if (!sql) {
     throw new Error("Could not generate SQL for query: " + queryRequest?.query?.iri + ", for job: " + jobId);
   }
@@ -387,22 +387,22 @@ export async function getValidatedSQL(queryRequest: QueryRequest, sessionId: str
 }
 
 export async function getIndicatorSubQueryRequests(
-  session: string,
+  accessToken: string,
   queryRequest: QueryRequest,
   jobId: number
 ): Promise<{ sql: string; queryRequest: QueryRequest }[]> {
   if (!queryRequest.query?.iri) throw new Error("Query IRI is required to get indicator subqueries");
   const queriesToRun = [];
-  const subqueries = await QueryService.getSubqueryIris(session, queryRequest.query.iri!, true);
+  const subqueries = await QueryService.getSubqueryIris(accessToken, queryRequest.query.iri!, true);
   for (const subquery of subqueries) {
-    const subqueryRequest = await QueryService.getQueryRequestForSQL(session, {
+    const subqueryRequest = await QueryService.getQueryRequestForSQL(accessToken, {
       query: {
         iri: subquery.iri,
         queryType: IMQType.COHORT
       },
       argument: queryRequest.argument
     } as QueryRequest);
-    const subquerySql = await getValidatedSQL(subqueryRequest, session, jobId);
+    const subquerySql = await getValidatedSQL(subqueryRequest, accessToken, jobId);
     queriesToRun.push({
       sql: subquerySql,
       queryRequest: subqueryRequest

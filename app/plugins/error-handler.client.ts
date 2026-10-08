@@ -1,6 +1,6 @@
 import { FetchError } from "ofetch";
 
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin(nuxtApp => {
   let handling = false;
 
   window.addEventListener("unhandledrejection", async event => {
@@ -20,7 +20,7 @@ export default defineNuxtPlugin(() => {
     try {
       if (error.status === 401) {
         await clearError();
-        await globalThis.uiGuard.login();
+        await nuxtApp.runWithContext(() => useAuth().login());
         return;
       }
 

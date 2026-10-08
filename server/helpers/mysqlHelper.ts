@@ -27,14 +27,14 @@ import EntityService from "../services/EntityService";
 import QueryService from "../services/QueryService";
 import { resolveArgs, sortQueryRequestsByDependency } from "../utils/executeQuery";
 
-export async function createJobEntry(jobRequest: JobRequest, sessionId: string, userId: string): Promise<Job> {
+export async function createJobEntry(jobRequest: JobRequest, accessToken: string, userId: string): Promise<Job> {
   const queryRequestsForSql = [];
   for (const queryRequest of jobRequest.queryRequests) {
-    const getQueryRequestForSQL = await QueryService.getQueryRequestForSQL(sessionId!, queryRequest);
+    const getQueryRequestForSQL = await QueryService.getQueryRequestForSQL(accessToken!, queryRequest);
     resolveArgs(getQueryRequestForSQL);
     queryRequestsForSql.push(getQueryRequestForSQL);
   }
-  const orderedQueryRequests = await sortQueryRequestsByDependency(sessionId!, queryRequestsForSql);
+  const orderedQueryRequests = await sortQueryRequestsByDependency(accessToken!, queryRequestsForSql);
   const now = getNow();
   const queryJob = {
     jobName: jobRequest.jobName || queryRequestsForSql[0]?.query?.name || "Unnamed Job",
@@ -160,8 +160,8 @@ export async function getQueryResultSQL(queryResultSetId: number, queryIri: stri
   return queryResultRows[0].executedSql ?? "";
 }
 
-export async function getQueryResultSummary(sessionId: string, queryResultSetId: number, queryResultRowId: number, queryIri: string, queryType: IMQType) {
-  const name = (await EntityService.getEntitySummary(sessionId, queryIri)).name ?? "";
+export async function getQueryResultSummary(accessToken: string, queryResultSetId: number, queryResultRowId: number, queryIri: string, queryType: IMQType) {
+  const name = (await EntityService.getEntitySummary(accessToken, queryIri)).name ?? "";
   const result = { totalCount: 0, queryName: name, queryIri: queryIri, queryType: queryType };
   if (queryType === IMQType.COHORT) {
     const countResult = await mysqlDb.select({ count: count() }).from(cohortResultsTable).where(eq(cohortResultsTable.queryResultId, queryResultRowId));

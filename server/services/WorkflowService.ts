@@ -3,17 +3,17 @@ import { type BugReport, type RoleRequest } from "@endeavour/vue-library";
 const API_URL = `${useRuntimeConfig().public.imapiUrl}workflow/private`;
 
 const WorkflowService = {
-  async createBugReport(sessionId: string, bugReport: BugReport): Promise<void> {
+  async createBugReport(accessToken: string, bugReport: BugReport): Promise<void> {
     await $fetch(API_URL + "/createBugReport", {
-      headers: { cookie: `session_id=${sessionId}` },
+      headers: { Authorization: `Bearer ${accessToken}` },
       body: bugReport,
       method: "POST"
     });
   },
 
-  async createRoleRequest(sessionId: string, roleRequest: RoleRequest): Promise<void> {
+  async createRoleRequest(accessToken: string, roleRequest: RoleRequest): Promise<void> {
     await $fetch(API_URL + "/createRoleRequest", {
-      headers: { cookie: `session_id=${sessionId}` },
+      headers: { Authorization: `Bearer ${accessToken}` },
       body: roleRequest,
       method: "POST"
     });
