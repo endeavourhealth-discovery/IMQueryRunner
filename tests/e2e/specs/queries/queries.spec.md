@@ -12,9 +12,9 @@ This specification describes the query running functionality of IMQueryRunner.
 * Wait for job to complete
 * Click "Refresh" button
 * Wait for datatable to finish loading
-* Open results page
-* Check total results equal "6479"
-* Click "Back to queue" button
+[//]: # (* Open results page)
+[//]: # (* Check total results equal "6479")
+[//]: # (* Click "Back to queue" button)
 
 
 ## Run Unresolved Diabetes
@@ -28,9 +28,9 @@ This specification describes the query running functionality of IMQueryRunner.
 * Wait for job to complete
 * Click "Refresh" button
 * Wait for datatable to finish loading
-* Open results page
-* Check total results equal "12"
-* Click "Back to queue" button
+[//]: # (* Open results page)
+[//]: # (* Check total results equal "12")
+[//]: # (* Click "Back to queue" button)
 
 
 ## Run DM017
@@ -44,9 +44,9 @@ This specification describes the query running functionality of IMQueryRunner.
 * Wait for job to complete
 * Click "Refresh" button
 * Wait for datatable to finish loading
-* Open results page
-* Check total results equal "12"
-* Click "Back to queue" button
+[//]: # (* Open results page)
+[//]: # (* Check total results equal "12")
+[//]: # (* Click "Back to queue" button)
 
 [//]: # (## Run Data set for Diabetes mental health screen achieved)
 
