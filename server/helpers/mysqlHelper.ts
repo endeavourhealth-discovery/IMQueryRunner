@@ -139,15 +139,6 @@ export async function deleteJobData(job: Job) {
   });
 }
 
-export async function getQueryResultSetRows(job: Job) {
-  if (job.status !== JobStatus.COMPLETED) return [];
-  const queryResultSetRows = await mysqlDb.select().from(queryResultSetTable).where(eq(queryResultSetTable.jobId, job.id));
-  if (!isArrayHasLength(queryResultSetRows)) {
-    throw createError({ statusCode: 400, statusText: ErrorCode.MissingDataError, message: "Query result set not found" });
-  }
-  return queryResultSetRows;
-}
-
 /** Row counts of completed results. Keyed by result id only, so callers must check job ownership before asking for a page. */
 const resultCountCache = new TtlCache<number>(10 * 60 * 1000, 1000);
 
@@ -214,14 +205,19 @@ export async function getQueryResultRow(queryResultSetId: number, queryIri: stri
   return queryResultRows[0];
 }
 
-export async function getQueryResultSQL(queryResultSetId: number, queryIri: string) {
-  const queryResultRows = await mysqlDb
+/**
+ * The SQL that was run for `queryIri` in a job, taken from the earliest result set that has it (the same rule as
+ * `getQueryResultIdForJob`). Undefined when the job has no such result; an empty string when it has one with no SQL recorded.
+ */
+export async function getExecutedSqlForJob(jobId: number, queryIri: string): Promise<string | undefined> {
+  const rows = await mysqlDb
     .select({ executedSql: queryResultTable.executedSQL })
     .from(queryResultTable)
-    .where(and(eq(queryResultTable.queryIri, queryIri), eq(queryResultTable.queryResultSetId, queryResultSetId)));
-  if (!isArrayHasLength(queryResultRows))
-    throw createError({ status: 400, statusText: ErrorCode.MissingDataError, message: `Query result not found for query ${queryIri}` });
-  return queryResultRows[0].executedSql ?? "";
+    .innerJoin(queryResultSetTable, eq(queryResultTable.queryResultSetId, queryResultSetTable.id))
+    .where(and(eq(queryResultSetTable.jobId, jobId), eq(queryResultTable.queryIri, queryIri)))
+    .orderBy(asc(queryResultSetTable.id), asc(queryResultTable.id))
+    .limit(1);
+  return rows[0] ? (rows[0].executedSql ?? "") : undefined;
 }
 
 export async function updateJobStatus(jobId: number, jobStatus: JobStatus, userId: string, error: any = null) {

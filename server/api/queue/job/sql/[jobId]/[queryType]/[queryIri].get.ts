@@ -1,4 +1,5 @@
-import { getJobForUser, getQueryResultSQL, getQueryResultSetRows } from "~~/server/helpers/mysqlHelper";
+import { ErrorCode, JobStatus } from "~~/enums";
+import { getExecutedSqlForJob, getJobForUser } from "~~/server/helpers/mysqlHelper";
 
 import { IMQType } from "@endeavour/vue-library/enums";
 
@@ -14,24 +15,21 @@ export default defineEventHandler(async event => {
   const { user } = await requireUserSession(event);
   const { jobId, queryIri, queryType } = await getValidatedRouterParams(event, paramSchema.parse);
   const decodedQueryIri = decodeURIComponent(queryIri);
-  // TODO: Refactor to use a single query with joins instead of multiple queries
 
+  // Also the ownership check: a job that is not the caller's is a 404
   const job = await getJobForUser(jobId, user.id);
 
-  const queryResultSetRows = await getQueryResultSetRows(job);
-  const queryResultSet = queryResultSetRows[0];
+  // TODO: return indicator sql from imapi?
+  if (queryType === IMQType.INDICATOR) return { executedSQL: "" };
 
-  const returnObject = {
-    executedSQL: ""
-  };
-
-  if (queryType === IMQType.INDICATOR) {
-    // TODO: return indicator sql from imapi?
-    return returnObject;
-  } else {
-    const executedSql = await getQueryResultSQL(queryResultSet.id, decodedQueryIri);
-    returnObject.executedSQL = executedSql;
+  if (job.status !== JobStatus.COMPLETED) {
+    throw createError({ statusCode: 409, statusText: ErrorCode.InvalidRequestError, message: "Job has not completed" });
   }
 
-  return returnObject;
+  const executedSql = await getExecutedSqlForJob(job.id, decodedQueryIri);
+  if (executedSql === undefined) {
+    throw createError({ statusCode: 404, statusText: ErrorCode.MissingDataError, message: "Query result not found" });
+  }
+
+  return { executedSQL: executedSql };
 });
