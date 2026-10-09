@@ -138,13 +138,17 @@ step("Wait <time> seconds", async time => {
 
 step("Wait for job to submit", async () => {
   await pw.page.waitForSelector(".p-datatable", { state: "visible" });
-  // The queue page can show its datatable before the add request has responded, so wait for the response itself
-  pw.submittedJob = await withTimeout(pw.job, SUBMIT_TIMEOUT, `No job add request completed within ${SUBMIT_TIMEOUT}ms`);
+  // The queue page can show its datatable before the add request has responded. Building the job calls IMAPI for each query,
+  // which can be slow on the first run, so a late response is not an error here: "Wait for job to complete" keeps waiting for it
+  const started = Date.now();
+  pw.submittedJob = await withTimeout(pw.job, SUBMIT_TIMEOUT, "timeout").catch(() => null);
+  console.log(pw.submittedJob ? `Job add responded after ${Date.now() - started}ms` : `Job add had not responded after ${SUBMIT_TIMEOUT}ms`);
 });
 
 step("Wait for job to complete", async () => {
+  // Each step has its own timeout, so a slow add response gets a second full window here
+  const job = pw.submittedJob || (await withTimeout(pw.job, JOB_TIMEOUT, `No job add response within ${SUBMIT_TIMEOUT + JOB_TIMEOUT}ms of clicking Run`));
   const deadline = Date.now() + JOB_TIMEOUT;
-  const job = pw.submittedJob || (await withTimeout(pw.job, 5000, "No job was queued in this scenario"));
   assert.ok(job.id, `Queueing job "${job.name}" returned no jobId (HTTP ${job.status}); check the RabbitMQ connection`);
   let status;
   while (Date.now() < deadline) {
