@@ -12,8 +12,8 @@ importers:
         specifier: 7.1.2
         version: 7.1.2
       '@endeavour/vue-library':
-        specifier: 4.1.8
-        version: 4.1.8(@primeuix/themes@2.0.3)(@tailwindcss/vite@4.3.3(vite@8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.99.0)(terser@5.49.0)(yaml@2.9.0)))(axios@1.19.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2))(fuse.js@7.5.0)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(primevue@4.5.5(vue@3.5.43(typescript@5.9.3)))(tailwindcss-primeui@0.6.1(tailwindcss@4.3.3))(tailwindcss@4.3.3)(typescript-logging@2.2.0)(vue-router@5.2.0(@vue/compiler-sfc@3.5.43)(esbuild@0.28.1)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(rolldown@1.2.1)(rollup@4.62.3)(vite@8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.99.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.43(typescript@5.9.3)))(vue@3.5.43(typescript@5.9.3))
+        specifier: 5.0.0
+        version: 5.0.0(@primeuix/themes@2.0.3)(@tailwindcss/vite@4.3.3(vite@8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.99.0)(terser@5.49.0)(yaml@2.9.0)))(axios@1.18.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2))(fuse.js@7.5.0)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(primevue@4.5.5(vue@3.5.43(typescript@5.9.3)))(tailwindcss-primeui@0.6.1(tailwindcss@4.3.3))(tailwindcss@4.3.3)(typescript-logging@2.2.0)(vue-router@5.2.0(@vue/compiler-sfc@3.5.43)(esbuild@0.28.1)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(rolldown@1.2.1)(rollup@4.62.3)(vite@8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.99.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.43(typescript@5.9.3)))(vue@3.5.43(typescript@5.9.3))
       '@pinia/nuxt':
         specifier: 0.11.2
         version: 0.11.2(magicast@0.5.3)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))
@@ -447,8 +447,8 @@ packages:
   '@emnapi/wasi-threads@2.0.1':
     resolution: {integrity: sha512-9DsSk+o5NBX0CCJT8s0EROGSGxjR/tKu6aBTaVyq+SjAEQH4XcdcRxPBRzsBLizTTJ49MJjF+jgu3qnO9GLQcQ==}
 
-  '@endeavour/vue-library@4.1.8':
-    resolution: {integrity: sha512-rxgTARzqEggVfsOb9b03P5tP9hh/S3PNQMm27iGxJsNchgPgEHu2yThhfcWI8Efc4mSoyvvjrizIkK1EUYkbgA==}
+  '@endeavour/vue-library@5.0.0':
+    resolution: {integrity: sha512-93F6fQViT5JpBQKONsnMvlRrEuBs+f5CfrF0s82wgsFM3GO3yUc3DoCpiVznp4ge4rvhnb4AWcGEOADo24mNmg==}
     peerDependencies:
       '@primeuix/themes': 2.0.3
       '@tailwindcss/vite': 4.3.3
@@ -2207,9 +2207,6 @@ packages:
   axios@1.18.1:
     resolution: {integrity: sha512-3nTvFlvpn9Zu/RkHUqtc7/+al4UpRW5az71ap5zccp6e8RAYEzhMTecX8Dz1wWDYrPpUoB1HAQEGEAEvUr7S9g==}
 
-  axios@1.19.0:
-    resolution: {integrity: sha512-ht/iuYZXEjFxLH/Hkezgd7m6JKlHHXEUSneaDz8uZe1Gj5QZtCnpyDsckvAiEnT89OEbCLmnte4R4sn7P0EKFw==}
-
   b4a@1.8.1:
     resolution: {integrity: sha512-aiqre1Nr0B/6DgE2N5vwTc+2/oQZ4Wh1t4NznYY4E00y8LCt6NqdRv81so00oo27D8MVKTpUa/MwUUtBLXCoDw==}
     peerDependencies:
@@ -3071,9 +3068,6 @@ packages:
   globby@16.2.2:
     resolution: {integrity: sha512-NLvV9ubZ6NDsJaOpKPy3cQeJpKi9DcWiyCiFUpJPA0YihRqiE6RWaLUmgNNPr8MgPpLZjnBjSmou7uZBRJv9wA==}
     engines: {node: '>=20'}
-
-  google-palette@1.1.1:
-    resolution: {integrity: sha512-yZiM5oLl8lCZzf06IMOGdDkxqvCMd9HNFcCiOMqWgGGiGzC22vWBVhKJNvykXXbeC0NAElNH97jA/y0bq6TCrA==}
 
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
@@ -5784,17 +5778,15 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@endeavour/vue-library@4.1.8(@primeuix/themes@2.0.3)(@tailwindcss/vite@4.3.3(vite@8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.99.0)(terser@5.49.0)(yaml@2.9.0)))(axios@1.19.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2))(fuse.js@7.5.0)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(primevue@4.5.5(vue@3.5.43(typescript@5.9.3)))(tailwindcss-primeui@0.6.1(tailwindcss@4.3.3))(tailwindcss@4.3.3)(typescript-logging@2.2.0)(vue-router@5.2.0(@vue/compiler-sfc@3.5.43)(esbuild@0.28.1)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(rolldown@1.2.1)(rollup@4.62.3)(vite@8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.99.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.43(typescript@5.9.3)))(vue@3.5.43(typescript@5.9.3))':
+  '@endeavour/vue-library@5.0.0(@primeuix/themes@2.0.3)(@tailwindcss/vite@4.3.3(vite@8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.99.0)(terser@5.49.0)(yaml@2.9.0)))(axios@1.18.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2))(fuse.js@7.5.0)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(primevue@4.5.5(vue@3.5.43(typescript@5.9.3)))(tailwindcss-primeui@0.6.1(tailwindcss@4.3.3))(tailwindcss@4.3.3)(typescript-logging@2.2.0)(vue-router@5.2.0(@vue/compiler-sfc@3.5.43)(esbuild@0.28.1)(pinia@4.0.2(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3)))(rolldown@1.2.1)(rollup@4.62.3)(vite@8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.99.0)(terser@5.49.0)(yaml@2.9.0))(vue@3.5.43(typescript@5.9.3)))(vue@3.5.43(typescript@5.9.3))':
     dependencies:
       '@primeuix/themes': 2.0.3
       '@tailwindcss/vite': 4.3.3(vite@8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.99.0)(terser@5.49.0)(yaml@2.9.0))
       '@vueuse/core': 14.2.1(vue@3.5.43(typescript@5.9.3))
-      '@vueuse/integrations': 14.2.1(axios@1.19.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2))(fuse.js@7.5.0)(vue@3.5.43(typescript@5.9.3))
-      google-palette: 1.1.1
+      '@vueuse/integrations': 14.2.1(axios@1.18.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2))(fuse.js@7.5.0)(vue@3.5.43(typescript@5.9.3))
       lodash-es: 4.18.1
       pinia: 4.0.2(@vue/devtools-api@8.2.1)(typescript@5.9.3)(vue@3.5.43(typescript@5.9.3))
       primevue: 4.5.5(vue@3.5.43(typescript@5.9.3))
-      sass: 1.99.0
       tailwindcss: 4.3.3
       tailwindcss-primeui: 0.6.1(tailwindcss@4.3.3)
       typescript-logging-log4ts-style: 2.2.0(typescript-logging@2.2.0)
@@ -7428,13 +7420,13 @@ snapshots:
       '@vueuse/shared': 14.2.1(vue@3.5.43(typescript@5.9.3))
       vue: 3.5.43(typescript@5.9.3)
 
-  '@vueuse/integrations@14.2.1(axios@1.19.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2))(fuse.js@7.5.0)(vue@3.5.43(typescript@5.9.3))':
+  '@vueuse/integrations@14.2.1(axios@1.18.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2))(fuse.js@7.5.0)(vue@3.5.43(typescript@5.9.3))':
     dependencies:
       '@vueuse/core': 14.2.1(vue@3.5.43(typescript@5.9.3))
       '@vueuse/shared': 14.2.1(vue@3.5.43(typescript@5.9.3))
       vue: 3.5.43(typescript@5.9.3)
     optionalDependencies:
-      axios: 1.19.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
+      axios: 1.18.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       fuse.js: 7.5.0
 
   '@vueuse/metadata@14.2.1': {}
@@ -7558,17 +7550,6 @@ snapshots:
     transitivePeerDependencies:
       - debug
       - supports-color
-
-  axios@1.19.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2):
-    dependencies:
-      follow-redirects: 1.16.0(debug@4.4.3(supports-color@10.2.2))
-      form-data: 4.0.6
-      https-proxy-agent: 5.0.1(supports-color@10.2.2)
-      proxy-from-env: 2.1.0
-    transitivePeerDependencies:
-      - debug
-      - supports-color
-    optional: true
 
   b4a@1.8.1: {}
 
@@ -7713,6 +7694,7 @@ snapshots:
   chokidar@4.0.3:
     dependencies:
       readdirp: 4.1.2
+    optional: true
 
   chokidar@5.0.0:
     dependencies:
@@ -8339,8 +8321,6 @@ snapshots:
       slash: 5.1.0
       unicorn-magic: 0.4.0
 
-  google-palette@1.1.1: {}
-
   gopd@1.2.0: {}
 
   graceful-fs@4.2.11: {}
@@ -8437,7 +8417,8 @@ snapshots:
 
   image-meta@0.2.2: {}
 
-  immutable@5.1.9: {}
+  immutable@5.1.9:
+    optional: true
 
   impound@1.1.6(esbuild@0.28.1)(rolldown@1.2.1)(rollup@4.62.3)(vite@8.1.5(@types/node@25.9.5)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.99.0)(terser@5.49.0)(yaml@2.9.0)):
     dependencies:
@@ -9764,7 +9745,8 @@ snapshots:
     dependencies:
       picomatch: 2.3.2
 
-  readdirp@4.1.2: {}
+  readdirp@4.1.2:
+    optional: true
 
   readdirp@5.0.0: {}
 
@@ -9914,6 +9896,7 @@ snapshots:
       source-map-js: 1.2.2
     optionalDependencies:
       '@parcel/watcher': 2.6.0
+    optional: true
 
   sax@1.6.1: {}
 
