@@ -8,11 +8,18 @@ require("dotenv").config();
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 // Must stay below gauge's per-step test_timeout (40000ms in env/default)
+const SUBMIT_TIMEOUT = Number.parseInt(process.env.submit_timeout || "35000");
 const JOB_TIMEOUT = Number.parseInt(process.env.job_timeout || "35000");
 let currentSpec, currentScenario;
 
 function isJobAddResponse(response) {
   return response.request().method() === "POST" && response.url().includes("/api/queue/job/add");
+}
+
+function withTimeout(promise, ms, message) {
+  let timer;
+  const timeout = new Promise((_, reject) => (timer = setTimeout(() => reject(new Error(message)), ms)));
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
 function toJob(response) {
@@ -39,9 +46,10 @@ beforeScenario(async context => {
   });
   pw.context = await pw.browser.newContext();
   pw.page = await pw.context.newPage();
-  pw.job = null;
+  pw.submittedJob = null;
+  pw.job = new Promise(resolve => (pw.resolveJob = resolve));
   pw.page.on("response", response => {
-    if (isJobAddResponse(response)) pw.job = toJob(response);
+    if (isJobAddResponse(response)) pw.resolveJob(toJob(response));
   });
 });
 
@@ -130,18 +138,13 @@ step("Wait <time> seconds", async time => {
 
 step("Wait for job to submit", async () => {
   await pw.page.waitForSelector(".p-datatable", { state: "visible" });
+  // The queue page can show its datatable before the add request has responded, so wait for the response itself
+  pw.submittedJob = await withTimeout(pw.job, SUBMIT_TIMEOUT, `No job add request completed within ${SUBMIT_TIMEOUT}ms`);
 });
 
 step("Wait for job to complete", async () => {
   const deadline = Date.now() + JOB_TIMEOUT;
-  // "Click <text> button" returns before the add request completes (networkidle is a page-load state,
-  // already reached in the SPA), so wait for the response if the listener hasn't seen it yet
-  const job = await (pw.job ||
-    pw.page
-      .waitForResponse(isJobAddResponse, { timeout: 15000 })
-      .then(toJob)
-      .catch(() => null));
-  assert.ok(job, "No job was queued in this scenario");
+  const job = pw.submittedJob || (await withTimeout(pw.job, 5000, "No job was queued in this scenario"));
   assert.ok(job.id, `Queueing job "${job.name}" returned no jobId (HTTP ${job.status}); check the RabbitMQ connection`);
   let status;
   while (Date.now() < deadline) {
