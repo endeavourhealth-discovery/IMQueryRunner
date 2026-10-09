@@ -14,6 +14,7 @@
     "test:e2e:ci:smh-queries:parallel": "cross-env headless_chrome=true screenshot_on_failure=true gauge run --parallel -n 4 --tags smh-queries",
     "test:e2e:ci:reg-queries:parallel": "cross-env headless_chrome=true screenshot_on_failure=true gauge run --parallel -n 4 --tags reg-queries",
     "test:e2e:ci:parallel": "cross-env headless_chrome=true screenshot_on_failure=true gauge run --parallel -n 4 --tags \"!qof-queries & !smh-queries\"",
+    "test:queries": "node --env-file-if-exists=.env tests/queries/runQueries.js",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
