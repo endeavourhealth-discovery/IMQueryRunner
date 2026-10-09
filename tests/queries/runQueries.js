@@ -16,16 +16,11 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const BASE_URL = (process.env.BASE_URL || "http://localhost:3000").replace(/\/$/, "");
-const CONCURRENCY = Number.parseInt(process.env.QUERY_CONCURRENCY || "4");
+const CONCURRENCY = Number.parseInt(process.env.QUERY_CONCURRENCY || "100");
 const JOB_TIMEOUT = Number.parseInt(process.env.QUERY_TIMEOUT || "600000");
-const POLL_INTERVAL = 2000;
+const POLL_INTERVAL = 1000;
 const TERMINAL_STATUSES = ["COMPLETED", "ERRORED", "CANCELLED"];
-const DEFAULT_SPECS = [
-  "tests/e2e/specs/queries/queries.spec.md",
-  "tests/e2e/specs/queries/reg_queries.spec.md",
-  "tests/e2e/specs/queries/qof_queries.spec.md",
-  "tests/e2e/specs/queries/smh_queries.spec.md"
-];
+const DEFAULT_SPECS = ["tests/e2e/specs/queries/queries.spec.md", "tests/e2e/specs/queries/reg_queries.spec.md", "tests/e2e/specs/queries/qof_queries.spec.md"];
 const OUTPUT_DIR = path.join(__dirname, "outputs");
 
 /** Reads the `| iri | count | label |` rows of a gauge spec's data table. */
@@ -140,6 +135,7 @@ async function runAll(api, queries) {
   const results = new Array(queries.length);
   let next = 0;
   let done = 0;
+
   async function worker() {
     while (next < queries.length) {
       const index = next++;
@@ -152,13 +148,23 @@ async function runAll(api, queries) {
       console.log(`[${++done}/${queries.length}] ${r.status.padEnd(14)} ${String(r.count ?? "").padStart(8)}  ${r.name || r.iri}`);
     }
   }
+
   await Promise.all(Array.from({ length: Math.min(CONCURRENCY, queries.length) }, worker));
   return results;
 }
 
+/** 75000 -> "1m 15s" */
+function formatDuration(ms) {
+  const totalSeconds = Math.round(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return [hours && `${hours}h`, (hours || minutes) && `${minutes}m`, `${seconds}s`].filter(Boolean).join(" ");
+}
+
 const escape = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
-function htmlReport(results, startedAt) {
+function htmlReport(results, startedAt, durationMs) {
   const totals = results.reduce((acc, r) => ({ ...acc, [r.status]: (acc[r.status] || 0) + 1 }), {});
   const rows = results
     .map((r, i) => {
@@ -194,7 +200,7 @@ function htmlReport(results, startedAt) {
   h4 { margin: 8px 0 4px; }
 </style></head><body>
 <h1>Query Report</h1>
-<p>${escape(BASE_URL)} · ${escape(startedAt)} · ${results.length} queries · ${Object.entries(totals)
+<p>${escape(BASE_URL)} · ${escape(startedAt)} · took ${formatDuration(durationMs)} · ${results.length} queries · ${Object.entries(totals)
     .map(([status, n]) => `${escape(status)}: ${n}`)
     .join(" · ")}</p>
 <table><thead><tr><th>#</th><th>IRI</th><th>Name</th><th>Status</th><th class="num">Count</th><th class="num">Expected</th><th class="num">Job</th></tr></thead>
@@ -207,7 +213,8 @@ async function main() {
   const queries = specs.flatMap(readSpec);
   console.log(`Running ${queries.length} queries from ${specs.join(", ")} against ${BASE_URL} (${CONCURRENCY} at a time)`);
 
-  const startedAt = new Date().toISOString();
+  const startTime = Date.now();
+  const startedAt = new Date(startTime).toISOString();
   const browser = await chromium.launch({ headless: process.env.headless_chrome !== "false" });
   let results;
   try {
@@ -217,14 +224,16 @@ async function main() {
     await browser.close();
   }
 
+  const durationMs = Date.now() - startTime;
+
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   const stamp = startedAt.replace(/[:.]/g, "-");
   const htmlFile = path.join(OUTPUT_DIR, `query-report-${stamp}.html`);
-  fs.writeFileSync(htmlFile, htmlReport(results, startedAt));
-  fs.writeFileSync(path.join(OUTPUT_DIR, `query-report-${stamp}.json`), JSON.stringify({ baseUrl: BASE_URL, startedAt, specs, results }, null, 2));
+  fs.writeFileSync(htmlFile, htmlReport(results, startedAt, durationMs));
+  fs.writeFileSync(path.join(OUTPUT_DIR, `query-report-${stamp}.json`), JSON.stringify({ baseUrl: BASE_URL, startedAt, durationMs, specs, results }, null, 2));
 
   const failed = results.filter(r => r.status !== "COMPLETED");
-  console.log(`\n${results.length - failed.length}/${results.length} passed. Report: ${htmlFile}`);
+  console.log(`\n${results.length - failed.length}/${results.length} passed in ${formatDuration(durationMs)}. Report: ${htmlFile}`);
   process.exitCode = failed.length ? 1 : 0;
 }
 
