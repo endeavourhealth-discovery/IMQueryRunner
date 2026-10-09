@@ -11,7 +11,6 @@
 | "http://endhealth.info/qof#af79dc89-9e7e-4ccd-999a-4291972982d5"       |       | AF006 - Patients with AF and CHA2DS2-VASc score                                |
 | "http://endhealth.info/qof#fd3a4119-5a23-4c0c-b9e6-5b77dad9d0a1"       |       | DM035 - Diabetes with CVD                                                      |
 | "http://endhealth.info/qof#5a588247-94e8-4c1c-889b-b8bc7acbf7eb"       |       | VI001 - Three or more DTaP vaccine doses before 8 months                       |
-| "http://endhealth.info/qof#2185db11-16a8-4ceb-be77-945063438372"       |       | CHOL003 - Patients with CHD / PAD / TIA / CKD on statin/lipid-lowering therapy |
 
 ## Run query for <label>
 
