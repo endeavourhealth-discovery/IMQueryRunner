@@ -17,6 +17,7 @@
 * Click "Add to queue" button
 * Click "Run queue" button
 * Click "Run" button
+* Wait for job to submit
 * Wait for job to complete
 * Click "Refresh" button
 * Wait for datatable to finish loading

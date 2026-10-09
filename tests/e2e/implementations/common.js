@@ -128,6 +128,10 @@ step("Wait <time> seconds", async time => {
   await pw.page.waitForTimeout(Number.parseInt(time) * 1000);
 });
 
+step("Wait for job to submit", async () => {
+  await pw.page.waitForSelector(".p-datatable", { state: "visible" });
+});
+
 step("Wait for job to complete", async () => {
   const deadline = Date.now() + JOB_TIMEOUT;
   // "Click <text> button" returns before the add request completes (networkidle is a page-load state,
