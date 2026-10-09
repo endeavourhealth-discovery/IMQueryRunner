@@ -29,8 +29,14 @@ function toJob(response) {
     .then(body => ({ id: body && body.jobId, name: (response.request().postDataJSON() || {}).jobName, status: response.status() }));
 }
 
+function toFileName(text) {
+  return text.replace(/[^\w.-]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+// Rows of a table-driven scenario share its name, so the selected query and a timestamp keep each row's screenshot separate
 gauge.customScreenshotWriter = async function () {
-  const screenshotFilePath = path.join(process.env["gauge_screenshots_dir"], `${currentSpec.name}-${currentScenario.name}.png`);
+  const name = [currentSpec.name, currentScenario.name, pw.screenshotLabel, Date.now()].filter(Boolean).join("-");
+  const screenshotFilePath = path.join(process.env["gauge_screenshots_dir"], `${toFileName(name)}.png`);
   await pw.page.screenshot({ path: screenshotFilePath });
   return screenshotFilePath;
 };
@@ -47,6 +53,7 @@ beforeScenario(async context => {
   pw.context = await pw.browser.newContext();
   pw.page = await pw.context.newPage();
   pw.submittedJob = null;
+  pw.screenshotLabel = null;
   pw.job = new Promise(resolve => (pw.resolveJob = resolve));
   pw.page.on("response", response => {
     if (isJobAddResponse(response)) pw.resolveJob(toJob(response));
@@ -119,6 +126,7 @@ step("Click dialog confirm", async () => {
 });
 
 step("Search for <text> and select", async text => {
+  pw.screenshotLabel = text;
   await pw.page.waitForSelector("#autocomplete-search", { state: "visible" });
   await pw.page.locator("#autocomplete-search").nth(0).fill(text);
   await pw.page.locator(".p-listbox-option").filter({ hasText: text }).click();
@@ -126,6 +134,7 @@ step("Search for <text> and select", async text => {
 });
 
 step("Search for <search> and select <select>", async (search, select) => {
+  pw.screenshotLabel = select;
   await pw.page.waitForSelector("#autocomplete-search", { state: "visible" });
   await pw.page.locator("#autocomplete-search").nth(0).fill(search);
   await pw.page.locator(".p-listbox-option").filter({ hasText: select }).click();

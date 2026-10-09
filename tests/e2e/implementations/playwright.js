@@ -4,5 +4,6 @@ exports.pw = {
   page: null,
   job: null,
   resolveJob: null,
-  submittedJob: null
+  submittedJob: null,
+  screenshotLabel: null
 };
