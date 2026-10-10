@@ -3,8 +3,8 @@
  * a handler created once adds the scopes to the authorize request again on each request ("openid profile email openid openid profile email
  * ..."), until Casdoor can no longer store the scope. Creating the handler per request gives it a fresh `config` every time.
  */
-export default eventHandler(event =>
-  defineOAuthOidcEventHandler({
+export default eventHandler(async event => {
+  const result = await defineOAuthOidcEventHandler({
     async onSuccess(event, { user: claims, tokens }) {
       const { organisation } = useRuntimeConfig(event).casdoor;
       const name = claims.preferred_username;
@@ -19,5 +19,23 @@ export default eventHandler(event =>
       deleteCookie(event, "auth_return");
       return sendRedirect(event, returnTo);
     }
-  })(event)
-);
+  })(event);
+
+  // nuxt-auth-utils always marks its state/PKCE/nonce cookies Secure outside development, which a browser drops on a plain-http origin
+  // (login then fails with "state mismatch"). NUXT_SESSION_COOKIE_SECURE=false opts out, for http-only deployments.
+  // The generated runtime config type only knows the module's own cookie defaults, not the `secure` key set in nuxt.config.ts
+  const { cookie } = useRuntimeConfig(event).session as { cookie?: { secure?: boolean } | false };
+  if (cookie && cookie.secure === false) {
+    const setCookies = getResponseHeader(event, "set-cookie");
+    if (setCookies) {
+      const cookies = Array.isArray(setCookies) ? setCookies : [String(setCookies)];
+      setResponseHeader(
+        event,
+        "set-cookie",
+        cookies.map(c => c.replace(/;\s*Secure/i, ""))
+      );
+    }
+  }
+
+  return result;
+});

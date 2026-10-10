@@ -65,7 +65,9 @@ export default defineNuxtConfig({
       }
     },
     session: {
-      maxAge: 60 * 60 * 24 * 30
+      maxAge: 60 * 60 * 24 * 30,
+      // Set NUXT_SESSION_COOKIE_SECURE=false only when serving over plain http (browsers drop Secure cookies there, breaking login with "state mismatch")
+      cookie: { secure: true }
     },
     public: {
       casdoorUrl: process.env.CASDOOR_URL,
