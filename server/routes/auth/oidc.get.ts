@@ -3,8 +3,10 @@
  * a handler created once adds the scopes to the authorize request again on each request ("openid profile email openid openid profile email
  * ..."), until Casdoor can no longer store the scope. Creating the handler per request gives it a fresh `config` every time.
  */
-export default eventHandler(async event => {
-  const result = await defineOAuthOidcEventHandler({
+export default eventHandler(event => {
+  allowInsecureCookiesIfConfigured(event);
+
+  return defineOAuthOidcEventHandler({
     async onSuccess(event, { user: claims, tokens }) {
       const { organisation } = useRuntimeConfig(event).casdoor;
       const name = claims.preferred_username;
@@ -20,22 +22,23 @@ export default eventHandler(async event => {
       return sendRedirect(event, returnTo);
     }
   })(event);
+});
 
-  // nuxt-auth-utils always marks its state/PKCE/nonce cookies Secure outside development, which a browser drops on a plain-http origin
-  // (login then fails with "state mismatch"). NUXT_SESSION_COOKIE_SECURE=false opts out, for http-only deployments.
+/**
+ * nuxt-auth-utils always marks its state/PKCE/nonce cookies Secure outside development, which a browser drops on a plain-http origin (login
+ * then fails with "state mismatch"). NUXT_SESSION_COOKIE_SECURE=false opts out, for http-only deployments. The handler redirects (ending the
+ * response) from inside, so the flag is removed as each cookie header is written rather than afterwards.
+ */
+function allowInsecureCookiesIfConfigured(event: Parameters<Parameters<typeof eventHandler>[0]>[0]) {
   // The generated runtime config type only knows the module's own cookie defaults, not the `secure` key set in nuxt.config.ts
   const { cookie } = useRuntimeConfig(event).session as { cookie?: { secure?: boolean } | false };
-  if (cookie && cookie.secure === false) {
-    const setCookies = getResponseHeader(event, "set-cookie");
-    if (setCookies) {
-      const cookies = Array.isArray(setCookies) ? setCookies : [String(setCookies)];
-      setResponseHeader(
-        event,
-        "set-cookie",
-        cookies.map(c => c.replace(/;\s*Secure/i, ""))
-      );
-    }
-  }
+  if (!cookie || cookie.secure !== false) return;
 
-  return result;
-});
+  const res = event.node.res;
+  const setHeader = res.setHeader.bind(res);
+  res.setHeader = (name, value) => {
+    if (name.toLowerCase() !== "set-cookie") return setHeader(name, value);
+    const strip = (cookie: string) => cookie.replace(/;\s*Secure/i, "");
+    return setHeader(name, Array.isArray(value) ? value.map(strip) : strip(String(value)));
+  };
+}
