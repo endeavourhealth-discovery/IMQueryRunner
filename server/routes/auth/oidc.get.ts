@@ -23,7 +23,9 @@ export default eventHandler(async event => {
 
   // nuxt-auth-utils always marks its state/PKCE/nonce cookies Secure outside development, which a browser drops on a plain-http origin
   // (login then fails with "state mismatch"). NUXT_SESSION_COOKIE_SECURE=false opts out, for http-only deployments.
-  if (useRuntimeConfig(event).session.cookie?.secure === false) {
+  // The generated runtime config type only knows the module's own cookie defaults, not the `secure` key set in nuxt.config.ts
+  const { cookie } = useRuntimeConfig(event).session as { cookie?: { secure?: boolean } | false };
+  if (cookie && cookie.secure === false) {
     const setCookies = getResponseHeader(event, "set-cookie");
     if (setCookies) {
       const cookies = Array.isArray(setCookies) ? setCookies : [String(setCookies)];
