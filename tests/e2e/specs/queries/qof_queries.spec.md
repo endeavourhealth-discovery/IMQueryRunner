@@ -17,8 +17,6 @@ instead of its name, for every IRI in the table below.
 | "http://endhealth.info/qof#d453fa6c-8b7b-418f-80d0-789e303f13e8" |       | CD001 - CHD / stroke / TIA age <=79 and BP <=140/90                                                  |
 | "http://endhealth.info/qof#ae2af3e5-d9ba-470f-b274-c4b275037d79" |       | CD002 - CHD / stroke / TIA age >=80 and BP <=150/90                                                  |
 | "http://endhealth.info/qof#b4ab3ade-3814-483c-8f70-153be3db1bc4" |       | CHD_REG - Patients on the CHD register                                                               |
-| "http://endhealth.info/qof#296bcdcd-cdb3-4dd0-ab30-62fc0cd8a361" |       | CHD005 - CHD taking anti-platelet or anti-coagulant                                                  |
-| "http://endhealth.info/qof#6012a8ca-f822-479d-b0c4-4aedacd8792d" |       | CHOL2REG - Patients with CHD / PAD / TIA                                                             |
 | "http://endhealth.info/qof#44293066-0064-4eb2-9d94-cbc3a42df8a5" |       | CHOLREG - Patients with CHD / PAD / TIA or >=18 with CKD G3a to G5                                   |
 | "http://endhealth.info/qof#6fad2b05-d9ba-4a71-9f47-7f978999afad" |       | CHOL004 - Patients with LDL cholesterol <=2.0 or non-HDL <=2.6                                       |
 | "http://endhealth.info/qof#2185db11-16a8-4ceb-be77-945063438372" |       | CHOL003 - Patients with CHD / PAD / TIA / CKD on statin/lipid-lowering therapy                       |
@@ -30,9 +28,8 @@ instead of its name, for every IRI in the table below.
 | "http://endhealth.info/qof#d9249cfd-4a50-4390-a7df-35ebbdbfba5f" |       | DM020 - Diabetes no moderate/severe frailty IFCC-HbA1c is 58 mmol/mol or less                        |
 | "http://endhealth.info/qof#2cf8c038-2e3f-497d-af42-2509b289fe7f" |       | DM021 - Diabetes with frailty IFCC-HbA1c is 75 mmol/mol or less                                      |
 | "http://endhealth.info/qof#64cfb237-3b41-4339-ab0b-b5253d51681d" |       | DM006 - Diabetes and proteinuria or micro-albuminuria taking ACE-I or ARB                            |
-| "http://endhealth.info/qof#c07dbb19-b448-43a6-9052-946b2978c1fa" |       | DM014 - Newly diagnosed with diabetes referred to structured education programme                     |
 | "http://endhealth.info/qof#49c7bac7-a262-4ae6-8c1b-3fb038817cea" |       | DM034 - Diabetes aged >=40 no CVD/frailty on statin or lipid-lowering therapy                        |
-| "http://endhealth.info/qof#fd3a4119-5a23-4c0c-b9e6-5b77dad9d0a1" |       | DM035 - Diabetes with CVD (not haemorrhagic) on statin or lipid-lowering therapy                     |
+| "http://endhealth.info/qof#fd3a4119-5a23-4c0c-b9e6-5b77dad9d0a1" |       | DM035 - Diabetes with CVD                                                                            |
 | "http://endhealth.info/qof#ae1b3bfe-8004-40c4-92f3-21c001d0064a" |       | DM036 - Diabetes no moderate/severe frailty BP 140/90 mmHg or less                                   |
 | "http://endhealth.info/qof#22ce080f-9892-4509-8521-ec0ca0b85360" |       | DM037 - Diabetes with care processes performed in last 12 months                                     |
 | "http://endhealth.info/qof#12b62913-0b06-45b7-b20b-bc91049d3b65" |       | CAN_REG - Patients on the cancer register                                                            |
@@ -59,7 +56,7 @@ instead of its name, for every IRI in the table below.
 | "http://endhealth.info/qof#060dcebf-761d-48cc-8224-44549cb4062f" |       | MH007 - Mental health problems and alcohol recorded in last 12 months                                |
 | "http://endhealth.info/qof#62d9cdd1-f120-49f5-ac08-4f52e14943a9" |       | MH012 - Mental health problems and glucose/Hba1c recorded in last 12 months                          |
 | "http://endhealth.info/qof#6fe140ea-91ba-478b-9549-8053ff634d80" |       | MH011 - Mental health problems and lipids recorded in last 12 months                                 |
-| "http://endhealth.info/qof#692cf9df-6c19-4f92-bc65-5048290438e5" |       | Patients on NDH register (IMPORTANT: no results until update)                                        |
+| "http://endhealth.info/qof#692cf9df-6c19-4f92-bc65-5048290438e5" |       | Patients on NDH register                                                                             |
 | "http://endhealth.info/qof#7f4e269a-7ac6-4eeb-b39c-0d5a59f6c576" |       | STIA_REG - Patients on the stroke or TIA register                                                    |
 | "http://endhealth.info/qof#286416f9-56ea-4764-b34c-9c50014a9cf5" |       | STIA007 - Non-haemorrhagic stroke or TIA taking anti-platelet or anti-coagulant                      |
 | "http://endhealth.info/qof#5a588247-94e8-4c1c-889b-b8bc7acbf7eb" |       | VI001 - Three or more DTaP vaccine doses before 8 months                                             |
@@ -84,7 +81,7 @@ instead of its name, for every IRI in the table below.
 | "http://endhealth.info/qof#71f37802-5da2-4988-8673-bcebbc5dced8" |       | [AST014] - Asthma eligible for objective tests                                                       |
 | "http://endhealth.info/qof#8f173efa-d577-449f-a1fd-ee8623de2107" |       | Patient selected in Rule 2 of [AST014]                                                               |
 | "http://endhealth.info/qof#b955ede9-4ed2-41e2-94bf-79eae077d777" |       | Patient selected in Rule 3 of [AST014]                                                               |
-| "http://endhealth.info/qof#ada66482-16d3-4fb7-92d3-6869281086eb" |       | Patient had peak expiratory flow rate (PEFR) variability test in last 93 days                        |
+| "http://endhealth.info/qof#ada66482-16d3-4fb7-92d3-6869281086eb" |       | Patient had peak expiratory flow rate                                                                |
 | "http://endhealth.info/qof#0e614be1-3193-4c83-b46b-1d8da6fd36d3" |       | Patient had total IgE and eosinophil test in last 93 days                                            |
 | "http://endhealth.info/qof#40798e27-e7f9-4885-985c-fb5b4f29967e" |       | Patients on asthma register age >= 20                                                                |
 | "http://endhealth.info/qof#90f6f1c5-61cb-4d31-970e-4cecfdab3011" |       | Patients on the asthma register who don't have a latest code of resolved asthma                      |
@@ -97,7 +94,7 @@ instead of its name, for every IRI in the table below.
 | "http://endhealth.info/qof#b7addbf5-34b4-4379-a3ff-415765b6b4aa" |       | DOAC not indicated in QOF year or APL/DOAC contraindicated                                           |
 | "http://endhealth.info/qof#0cacc398-6624-46bd-b941-f717009bcc17" |       | AF Register in the 3 month period                                                                    |
 | "http://endhealth.info/qof#c347a250-8609-44d6-8039-366eaf672518" |       | DOAC not indicated within 1y and TTR >=65% within 6 mths before month end                            |
-| "http://endhealth.info/qof#0ee297a7-a8ac-4ace-94f1-7fe2b8763edb" |       | DOAC declined/not indicated (TTR>=65% in 6m) in mth end or APL contraindicated                       |
+| "http://endhealth.info/qof#0ee297a7-a8ac-4ace-94f1-7fe2b8763edb" |       | DOAC declined/not indicated                                                                          |
 | "http://endhealth.info/qof#a4d509f5-0d63-4409-aef9-9523cf485c86" |       | [CD001] - CHD or Stroke or TIA aged 79 years or under eligible for BP                                |
 | "http://endhealth.info/qof#ea44c692-bf35-42d8-9d3d-e105b030c361" |       | [CD002] - CHD or stroke or TIA aged 80 years or over eligible for BP                                 |
 | "http://endhealth.info/qof#7ba9d980-9ca2-48d4-bc12-5e4cb8f862f8" |       | Patients with Stroke/TIA or CHD and their quality care is deemed as unsuitable                       |
@@ -112,7 +109,6 @@ instead of its name, for every IRI in the table below.
 | "http://endhealth.info/qof#4accdcc4-54bf-4687-a2ff-aee80366d404" |       | Age <80y latest BP above target in QOF year                                                          |
 | "http://endhealth.info/qof#a9c1ea3b-3fc0-492b-acc1-63f488c778cd" |       | No BP recorded in last 12 months and 2 CHD invitations                                               |
 | "http://endhealth.info/qof#45a135f8-5f27-4992-9dc8-36d51b51278d" |       | No BP recorded in last 12 months and 2 stroke invitations                                            |
-| "http://endhealth.info/qof#773600bd-3726-4f73-9483-798023d5b83f" |       | [CHD005] - CHD and eligible for aspirin, anti-platelet or anti-coagulant                             |
 | "http://endhealth.info/qof#246a09cb-3384-435b-be70-016c93b74b89" |       | Patients Registered in the 3 month period                                                            |
 | "http://endhealth.info/qof#eeaf9cc0-eec8-4853-9a16-9ff589021143" |       | Patients Registered in the 9 month period                                                            |
 | "http://endhealth.info/qof#7804aa4d-cdb9-4781-bc67-78886130c054" |       | No BP recorded in last 12 months and 2 earliest CHD invitation                                       |
@@ -140,7 +136,7 @@ instead of its name, for every IRI in the table below.
 | "http://endhealth.info/qof#efab57f8-cd55-46a8-8013-9ff398f38c6f" |       | [DM006] - Proteinuria or microalbuminuria eligible for ACE-I or ARB                                  |
 | "http://endhealth.info/qof#838e772c-43c0-4f18-8c39-d67433a0ae91" |       | [DM014] - Newly diagnosed diabetes and eligible for a referral to a structured education programme   |
 | "http://endhealth.info/qof#b01ab112-096f-4b12-9d38-4df4d7120c5c" |       | [DM034] - Diabetes aged >=40 no CVD/frailty on statin or lipid-lowering therapy                      |
-| "http://endhealth.info/qof#53f436fa-112d-4aab-b75b-5ba6a0b97c15" |       | [DM035] - Diabetes with CVD (not haemorrhagic) on statin or lipid-lowering therapy                   |
+| "http://endhealth.info/qof#53f436fa-112d-4aab-b75b-5ba6a0b97c15" |       | [DM035] - Diabetes with CVD                                                                          |
 | "http://endhealth.info/qof#de449e98-d90c-4610-87a5-87dc0476a9a7" |       | [DM036] - Diabetes and no moderate/severe frailty eligible for BP                                    |
 | "http://endhealth.info/qof#62c2e8c2-b301-4821-9cac-9fb7d55bbb58" |       | [DM037] - Diabetes with care processes performed in last 12 months                                   |
 | "http://endhealth.info/qof#0302d204-a69d-45e3-9e4d-b5296b43f87b" |       | Patients with home BP reading as latest BP                                                           |
@@ -200,8 +196,8 @@ instead of its name, for every IRI in the table below.
 | "http://endhealth.info/qof#377e0a21-39e9-40cd-b36f-4dc8d11d75d4" |       | [MH007] - Eligible for alcohol recorded in the preceding 12 months                                   |
 | "http://endhealth.info/qof#f507e7fa-e26e-4f91-a057-490ab9981ca6" |       | [MH012] - Eligible for glucose/Hba1c recorded in the preceding 12 months                             |
 | "http://endhealth.info/qof#ada06d96-b02a-4ce1-aa54-71252a5db585" |       | [MH011] - Eligible for lipid profile recorded in the preceding 12 months                             |
-| "http://endhealth.info/qof#c082a9dc-23ad-464c-827f-56258ca40b57" |       | Antipsychotics in last 6m of QOF yr, CVS risk factor, smoker (DM earliest)                           |
-| "http://endhealth.info/qof#72627532-a436-446b-99eb-d48580c1fd10" |       | No antipsychotics in last 6m of QOF yr, CVS risk factor, smoker (DM earliest)                        |
+| "http://endhealth.info/qof#c082a9dc-23ad-464c-827f-56258ca40b57" |       | Antipsychotics in last 6m of QOF yr, CVS risk factor, smoker                                         |
+| "http://endhealth.info/qof#72627532-a436-446b-99eb-d48580c1fd10" |       | No antipsychotics in last 6m of QOF yr, CVS risk factor, smoker                                      |
 | "http://endhealth.info/qof#ac2781fa-8e28-485c-bb33-bce45b16afb1" |       | Not in remission and most recent code for schizophrenia/BPAD/other psychoses                         |
 | "http://endhealth.info/qof#7aa091dd-2414-4ae2-8105-4410c3b3b290" |       | Mental health quality indicator care deemed unsuitable within 1y before QOF year end                 |
 | "http://endhealth.info/qof#4b9f211a-5ab8-4015-8c89-4fe09556701a" |       | Declined mental health quality indicator within 1y before QOF year end                               |
@@ -239,8 +235,8 @@ instead of its name, for every IRI in the table below.
 | "http://endhealth.info/qof#1252b126-5ebb-4133-b35d-73b958154993" |       | Registered at 6m+ with 0-1 DTaP doses before registration                                            |
 | "http://endhealth.info/qof#07d0ac46-3d8a-475b-8b85-5f29aee6485c" |       | Registered at 5m+ with no DTaP doses before registration                                             |
 | "http://endhealth.info/qof#2a275f01-42eb-448f-8057-cb67cdeabaa3" |       | Patient aged 80 within the service year                                                              |
-| "http://endhealth.info/qof#95d2c986-4dfa-4965-b3aa-96736efaa36c" |       | Turned 81 this QOF year and had 1st shingles dose between ages 70-79 (inclusive)                     |
-| "http://endhealth.info/qof#fe648300-d880-41f6-841a-928d16026da2" |       | Turned 81 this QOF year and had 2nd shingles dose between ages 70-79 (inclusive)                     |
+| "http://endhealth.info/qof#95d2c986-4dfa-4965-b3aa-96736efaa36c" |       | Turned 81 this QOF year and had 1st shingles dose between ages 70-79                                 |
+| "http://endhealth.info/qof#fe648300-d880-41f6-841a-928d16026da2" |       | Turned 81 this QOF year and had 2nd shingles dose between ages 70-79                                 |
 | "http://endhealth.info/qof#0cd6b24e-2f55-4fd3-b37d-c8d6e36475f6" |       | Registered after 17m with no 1st MMR before registration                                             |
 | "http://endhealth.info/qof#10dac62a-d60f-467a-94ba-2c5bd7cca70c" |       | A dose of DTaP/IPV vaccine is contraindicated before the patient's 5th birthday.                     |
 | "http://endhealth.info/qof#a24c429e-df2c-44d6-baf3-dd856a4fa965" |       | Patients with 1 MMR dose before registration                                                         |
@@ -282,7 +278,7 @@ instead of its name, for every IRI in the table below.
 | "http://endhealth.info/qof#0e51815d-6436-4a68-98d1-4d7e02ffd3f7" |       | Earliest high BMI recorded in previous reporting year, before last 90 days                           |
 | "http://endhealth.info/qof#33b5ccd9-3697-4f9a-a8f5-f3a65bfbc6d1" |       | Earliest high BMI recorded in previous reporting year, within last 90 days                           |
 | "http://endhealth.info/qof#e037ec61-2601-4a35-b620-215782e37b91" |       | First BMI >=30 kg/m2 recorded in last 90 days of prior reporting year                                |
-| "http://endhealth.info/qof#7230eedf-e100-445b-bcda-eda1b7301a3e" |       | Legitimate PCA (for indicator OB004) recorded in the previous reporting year                         |
+| "http://endhealth.info/qof#7230eedf-e100-445b-bcda-eda1b7301a3e" |       | Legitimate PCA                                                                                       |
 | "http://endhealth.info/qof#1381c25b-a2a4-4bda-8619-03a1aa1a55a1" |       | No high BMI recorded within the previous reporting year                                              |
 | "http://endhealth.info/qof#a761817a-9a7d-4446-8610-452388319d9c" |       | Weight management referral within start to 90 days after prior-year high BMI                         |
 | "http://endhealth.info/qof#fedc55ef-ecff-474a-bb99-e19cc1da8628" |       | Prior-year earliest high BMI within last 6 months with achievement or PCA coded                      |
@@ -303,16 +299,21 @@ instead of its name, for every IRI in the table below.
 | "http://endhealth.info/qof#d4fea1d6-8f12-41de-aa94-c98d911716e4" |       | LTC Manager Search - PAD annual review absent in QOF 26-27                                           |
 | "http://endhealth.info/qof#e67ffe28-9e32-4cc8-bac5-05d70f88e81a" |       | LTC Manager Search - Stroke and TIA annual review absent in QOF 26-27                                |
 | "http://endhealth.info/qof#1f72e199-1a73-434f-9381-ee2308e6e651" |       | Palliative care commenced in last 2 years                                                            |
+| "http://endhealth.info/qof#c07dbb19-b448-43a6-9052-946b2978c1fa" |       | DM014 - Newly diagnosed with diabetes referred to structured education programme                     |
+| "http://endhealth.info/qof#296bcdcd-cdb3-4dd0-ab30-62fc0cd8a361" |       | CHD005 - CHD taking anti-platelet or anti-coagulant                                                  |
+| "http://endhealth.info/qof#6012a8ca-f822-479d-b0c4-4aedacd8792d" |       | CHOL2REG - Patients with CHD / PAD / TIA                                                             |
+| "http://endhealth.info/qof#773600bd-3726-4f73-9483-798023d5b83f" |       | [CHD005] - CHD and eligible for aspirin, anti-platelet or anti-coagulant                             |
 
 ## Run query for <iri>
 
 * Open IMQueryRunner
 * Login
-* Click "Run a query" button
+* Click "Search and run" button
 * Search for <iri> and select <label>
 * Click "Add to queue" button
 * Click "Run queue" button
-* Click "Select" button
-* Wait "10" seconds
+* Click "Run" button
+* Wait for job to complete
 * Click "Refresh" button
+* Wait for datatable to finish loading
 * Check results for <count>

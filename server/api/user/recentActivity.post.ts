@@ -5,7 +5,6 @@ defineRouteMeta({
   openAPI: {
     tags: ["query"],
     description: "Update user preset theme",
-    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
@@ -27,7 +26,5 @@ defineRouteMeta({
 export default defineEventHandler(async (event): Promise<any> => {
   const body = await readBody(event);
   const recentActivity = parseArray(body, RecentActivityItemSchema);
-  const user = await globalThis.apiGuard.getUser(event);
-  user.recentActivity = recentActivity;
-  return await globalThis.apiGuard.updateUser(event, user);
+  return await updateCurrentUserPreferences(event, { recentActivity });
 });

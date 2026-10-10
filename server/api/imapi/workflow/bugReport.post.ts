@@ -1,12 +1,11 @@
 import WorkflowService from "~~/server/services/WorkflowService";
 
-import { Browser, BugReportSchema, OperatingSystem, Severity, Status, TaskModule, TaskState, TaskType } from "@endeavour/vue-library";
+import { Browser, OperatingSystem, Severity, Status, TaskModule, TaskState, TaskType } from "@endeavour/vue-library";
 
 defineRouteMeta({
   openAPI: {
     tags: ["bugReport"],
     description: "Submit a bug report",
-    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
@@ -148,7 +147,7 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event): Promise<void> => {
-  const sessionId = getCookie(event, "session_id")!;
+  const accessToken = await getAccessToken(event);
   const bugReport = await readBody(event);
-  return await WorkflowService.createBugReport(sessionId, bugReport);
+  return await WorkflowService.createBugReport(accessToken, bugReport);
 });

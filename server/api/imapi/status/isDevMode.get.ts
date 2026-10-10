@@ -7,6 +7,6 @@ defineRouteMeta({
   }
 });
 
-export default defineEventHandler(async (event): Promise<any> => {
+export default defineEventHandler(async (): Promise<any> => {
   return await StatusService.isDevMode();
 });

@@ -55,6 +55,7 @@
               <template #body="slotProps">
                 <ActionButtons
                   :job="slotProps.data"
+                  :resultSummary="resultSummaries.find(rs => Number(rs.jobId) === slotProps.data.id)?.resultsSummary"
                   @cancel-query="cancelJob"
                   @go-to-query="goToQuery"
                   @view-query-results="viewQueryResults"
@@ -75,7 +76,7 @@
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
 import { JobStatus } from "~~/enums";
-import type { Job, JobRequest } from "~~/models";
+import type { Job, QueryResultSummary, QueueUpdate } from "~~/models";
 
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
@@ -83,7 +84,7 @@ import type { Ref } from "vue";
 import type { Argument } from "@endeavour/vue-library/models";
 import { useUserStore } from "@endeavour/vue-library/stores";
 
-import { io } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 
 definePageMeta({
   requiresAuth: true,
@@ -93,9 +94,12 @@ definePageMeta({
 const userStore = useUserStore();
 const confirm = useConfirm();
 
-const socket = io();
+// Created on demand: the library is only downloaded, and a connection only opened, when "auto" refresh is selected
+let socket: Socket | undefined;
+let disposed = false;
 
 const jobs: Ref<Job[]> = ref([]);
+const resultSummaries: Ref<{ jobId: number; resultsSummary: QueryResultSummary[]; error?: string }[]> = ref([]);
 const loading = ref(true);
 const searchLoading = ref(false);
 const totalCount = ref(0);
@@ -164,28 +168,55 @@ watch(selectedInterval, async () => {
 
 async function initSearch() {
   searchLoading.value = true;
-  const results = await useFetch<{
-    totalCount: number;
-    result: Job[];
-  }>("/api/queue", {
-    query: {
-      userId: userStore.currentUser?.id,
-      page: page.value,
-      size: rows.value
-    }
-  });
-  if (results.data.value) {
-    totalCount.value = results.data.value.totalCount;
-    jobs.value = results.data.value.result.sort((a, b) => {
-      if (!a.queueDate) return 1;
-      if (!b.queueDate) return -1;
-      return new Date(b.queueDate).getTime() - new Date(a.queueDate).getTime();
+  try {
+    const results = await $fetch<{
+      totalCount: number;
+      result: Job[];
+    }>("/api/queue", {
+      query: {
+        userId: userStore.currentUser?.id,
+        page: page.value,
+        size: rows.value
+      }
     });
-  } else {
-    totalCount.value = 0;
-    jobs.value = [];
+    if (results) {
+      resultSummaries.value = await loadResultSummaries(results.result);
+      totalCount.value = results.totalCount;
+      jobs.value = results.result.sort((a, b) => {
+        if (!a.queueDate) return 1;
+        if (!b.queueDate) return -1;
+        return new Date(b.queueDate).getTime() - new Date(a.queueDate).getTime();
+      });
+    } else {
+      totalCount.value = 0;
+      jobs.value = [];
+    }
+  } finally {
+    searchLoading.value = false;
   }
-  searchLoading.value = false;
+}
+
+type ResultSummaries = { jobId: number; resultsSummary: QueryResultSummary[]; error?: string };
+
+/**
+ * One summaries entry per job. A completed job's results never change, so summaries already held are kept and only the
+ * missing ones (or ones that failed last time) are requested. Jobs that are not completed have no summaries yet.
+ */
+async function loadResultSummaries(listedJobs: Job[]): Promise<ResultSummaries[]> {
+  const held = new Map(resultSummaries.value.map(summary => [Number(summary.jobId), summary]));
+  const isHeld = (job: Job) => {
+    const summary = held.get(job.id);
+    return job.status === JobStatus.COMPLETED && !!summary && !summary.error && summary.resultsSummary.length > 0;
+  };
+
+  const missing = listedJobs.filter(job => job.status === JobStatus.COMPLETED && !isHeld(job)).map(job => job.id);
+  const fetched = missing.length ? await $fetch<ResultSummaries[]>("/api/queue/job/results/summaries", { query: { jobIds: missing.join(",") } }) : [];
+  for (const summary of fetched) {
+    if (summary.error) console.warn(`Failed to get result summaries for job ${summary.jobId}: ${summary.error}`);
+  }
+  const fetchedById = new Map(fetched.map(summary => [Number(summary.jobId), summary]));
+
+  return listedJobs.map(job => fetchedById.get(job.id) ?? (isHeld(job) ? held.get(job.id)! : { jobId: job.id, resultsSummary: [] }));
 }
 
 function stopPolling() {
@@ -227,35 +258,71 @@ function handleVisibilityChange() {
   }
 }
 
-function connectWebSocket() {
-  if (socket.connected) return;
-  socket.on("connect", onConnect);
-  socket.on("disconnect", onDisconnect);
-  socket.on("queueUpdate", onQueueUpdate);
+async function connectWebSocket() {
+  if (socket?.connected) return;
+  if (!socket) {
+    let io: typeof import("socket.io-client").io;
+    try {
+      ({ io } = await import("socket.io-client"));
+    } catch (error) {
+      console.error("Could not load the live update library:", error);
+      return;
+    }
+    // The user may have left "auto" (or the page) while the library was loading
+    if (!isAuto.value || disposed) return;
+    socket ??= io({ autoConnect: false });
+  }
+  // off() first so repeated calls never register a handler twice
+  socket.off("connect", onConnect).on("connect", onConnect);
+  socket.off("disconnect", onDisconnect).on("disconnect", onDisconnect);
+  socket.off("queueUpdate", onQueueUpdate).on("queueUpdate", onQueueUpdate);
   socket.connect();
 }
 
 function disconnectWebSocket() {
-  socket.off("connect", onConnect);
-  socket.off("disconnect", onDisconnect);
-  socket.off("queueUpdate", onQueueUpdate);
-  if (socket.connected) socket.disconnect();
+  if (socket) {
+    socket.off("connect", onConnect);
+    socket.off("disconnect", onDisconnect);
+    socket.off("queueUpdate", onQueueUpdate);
+    if (socket.connected) socket.disconnect();
+  }
   websocketIsConnected.value = false;
   transport.value = "N/A";
 }
 
-async function onQueueUpdate() {
+async function onQueueUpdate(update?: QueueUpdate) {
   if (!isAuto.value) return;
-  await refresh();
+  // A change to a job already on screen only needs that job reloaded. Anything else (a new job, no detail) reloads the list.
+  if (update?.jobId !== undefined && jobs.value.some(job => job.id === update.jobId)) await refreshJob(update.jobId);
+  else await refresh();
+}
+
+async function refreshJob(jobId: number) {
+  try {
+    const job = await $fetch<Job>(`/api/queue/job/${jobId}`);
+    const index = jobs.value.findIndex(item => item.id === jobId);
+    if (index === -1) return; // removed from the list while the request was in flight
+    jobs.value.splice(index, 1, job);
+
+    if (job.status === JobStatus.COMPLETED) {
+      const resultsSummary = await $fetch<QueryResultSummary[]>(`/api/queue/job/results/${jobId}/summary`);
+      const entry = { jobId, resultsSummary };
+      const existing = resultSummaries.value.findIndex(summary => Number(summary.jobId) === jobId);
+      if (existing === -1) resultSummaries.value.push(entry);
+      else resultSummaries.value.splice(existing, 1, entry);
+    }
+  } catch (error) {
+    // For example the job was deleted in another tab: fall back to reloading the list
+    console.warn(`Could not refresh job ${jobId}, reloading the list:`, error);
+    await refresh();
+  }
 }
 
 function onConnect() {
+  if (!socket) return;
   websocketIsConnected.value = true;
   transport.value = socket.io.engine.transport.name;
   socket.emit("joinRoom");
-  socket.on("message", function (data) {
-    alert(data);
-  });
   socket.emit("hello");
   socket.io.engine.on("upgrade", rawTransport => {
     transport.value = rawTransport.name;
@@ -268,22 +335,7 @@ function onDisconnect() {
 }
 
 async function refresh() {
-  const foundJobs = await $fetch<{ totalCount: number; result: Job[] }>("/api/queue", {
-    query: {
-      userId: userStore.currentUser?.id,
-      page: page.value,
-      size: rows.value
-    }
-  });
-  if (foundJobs) {
-    totalCount.value = foundJobs.totalCount;
-    jobs.value = foundJobs.result;
-  } else {
-    totalCount.value = 0;
-    jobs.value = [];
-  }
-
-  searchLoading.value = false;
+  await initSearch();
 }
 
 function getStatusSeverity(status: JobStatus): "secondary" | "success" | "info" | "warn" | "danger" | "contrast" {
@@ -352,19 +404,18 @@ async function deleteJob(jobId: string) {
 async function requeueJob(jobId: string) {
   const found = getById(jobId);
   if (!found) {
-    console.error("Job not found for requeueing:", jobId);
+    console.error("Job not found for re-queueing:", jobId);
     return;
   }
-  if (found) {
-    const jobRequest = {
-      jobName: "Requeued " + (found?.jobName || "Requeued Job"),
-      queryRequests: found?.queryRequests
-    } as JobRequest;
-    await $fetch("/api/queue/job/add", {
-      method: "post",
-      body: jobRequest
-    });
-  }
+
+  await $fetch("/api/queue/job/add", {
+    method: "post",
+    body: {
+      jobName: "Re-queued " + (found.jobName || "Re-queued Job"),
+      queryRequests: found.queryRequests
+    }
+  });
+
   await refresh();
 }
 
@@ -402,6 +453,7 @@ function getDisplayDateTime(date: string) {
 }
 
 onBeforeUnmount(() => {
+  disposed = true;
   stopPolling();
   document.removeEventListener("visibilitychange", handleVisibilityChange);
   disconnectWebSocket();

@@ -1,12 +1,11 @@
 import WorkflowService from "~~/server/services/WorkflowService";
 
-import { Browser, BugReportSchema, OperatingSystem, Severity, Status, TaskModule, TaskState, TaskType } from "@endeavour/vue-library";
+import { TaskState, TaskType } from "@endeavour/vue-library";
 
 defineRouteMeta({
   openAPI: {
     tags: ["roleRequest"],
     description: "Submit a role request",
-    parameters: [{ name: "session_id", description: "User session id", in: "cookie" }],
     requestBody: {
       required: true,
       content: {
@@ -83,7 +82,7 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event): Promise<void> => {
-  const sessionId = getCookie(event, "session_id")!;
+  const accessToken = await getAccessToken(event);
   const roleRequest = await readBody(event);
-  return await WorkflowService.createRoleRequest(sessionId, roleRequest);
+  return await WorkflowService.createRoleRequest(accessToken, roleRequest);
 });

@@ -1,15 +1,42 @@
 /* globals gauge */
 
-const { chromium } = require("@playwright/test");
+const { chromium, expect } = require("@playwright/test");
 const { pw } = require("./playwright");
 const path = require("path");
+const assert = require("node:assert");
 require("dotenv").config();
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
+// Must stay below gauge's per-step test_timeout (40000ms in env/default)
+const SUBMIT_TIMEOUT = Number.parseInt(process.env.submit_timeout || "35000");
+const JOB_TIMEOUT = Number.parseInt(process.env.job_timeout || "35000");
 let currentSpec, currentScenario;
 
+function isJobAddResponse(response) {
+  return response.request().method() === "POST" && response.url().includes("/api/queue/job/add");
+}
+
+function withTimeout(promise, ms, message) {
+  let timer;
+  const timeout = new Promise((_, reject) => (timer = setTimeout(() => reject(new Error(message)), ms)));
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
+function toJob(response) {
+  return response
+    .json()
+    .catch(() => null)
+    .then(body => ({ id: body && body.jobId, name: (response.request().postDataJSON() || {}).jobName, status: response.status() }));
+}
+
+function toFileName(text) {
+  return text.replace(/[^\w.-]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+// Rows of a table-driven scenario share its name, so the selected query and a timestamp keep each row's screenshot separate
 gauge.customScreenshotWriter = async function () {
-  const screenshotFilePath = path.join(process.env["gauge_screenshots_dir"], `${currentSpec.name}-${currentScenario.name}.png`);
+  const name = [currentSpec.name, currentScenario.name, pw.screenshotLabel, Date.now()].filter(Boolean).join("-");
+  const screenshotFilePath = path.join(process.env["gauge_screenshots_dir"], `${toFileName(name)}.png`);
   await pw.page.screenshot({ path: screenshotFilePath });
   return screenshotFilePath;
 };
@@ -25,6 +52,12 @@ beforeScenario(async context => {
   });
   pw.context = await pw.browser.newContext();
   pw.page = await pw.context.newPage();
+  pw.submittedJob = null;
+  pw.screenshotLabel = null;
+  pw.job = new Promise(resolve => (pw.resolveJob = resolve));
+  pw.page.on("response", response => {
+    if (isJobAddResponse(response)) pw.resolveJob(toJob(response));
+  });
 });
 
 afterScenario(async () => {
@@ -47,7 +80,6 @@ step("Login", async () => {
   //dev login loop
   //pw.page.locator("button").filter({ hasText: "cypress" }).click();
 
-  await pw.page.waitForTimeout(5000);
   await pw.page.waitForSelector('[data-testid="accept-all-cookies"]', { state: "visible" });
   await pw.page.click('[data-testid="accept-all-cookies"]');
 });
@@ -63,7 +95,6 @@ step("Click logo to return to homepage", async () => {
 
 step("Click <text> button", async text => {
   await pw.page.getByRole("button", { name: text, exact: true }).click();
-  await pw.page.waitForLoadState("networkidle");
 });
 
 step("Type <text> into <input>", async (text, input) => {
@@ -95,21 +126,54 @@ step("Click dialog confirm", async () => {
 });
 
 step("Search for <text> and select", async text => {
+  pw.screenshotLabel = text;
   await pw.page.waitForSelector("#autocomplete-search", { state: "visible" });
   await pw.page.locator("#autocomplete-search").nth(0).fill(text);
-  await pw.page.waitForTimeout(3000);
   await pw.page.locator(".p-listbox-option").filter({ hasText: text }).click();
   await pw.page.waitForTimeout(2000);
 });
 
 step("Search for <search> and select <select>", async (search, select) => {
+  pw.screenshotLabel = select;
   await pw.page.waitForSelector("#autocomplete-search", { state: "visible" });
   await pw.page.locator("#autocomplete-search").nth(0).fill(search);
-  await pw.page.waitForTimeout(3000);
   await pw.page.locator(".p-listbox-option").filter({ hasText: select }).click();
   await pw.page.waitForTimeout(2000);
 });
 
 step("Wait <time> seconds", async time => {
   await pw.page.waitForTimeout(Number.parseInt(time) * 1000);
+});
+
+step("Wait for job to submit", async () => {
+  await pw.page.waitForSelector(".p-datatable", { state: "visible" });
+  // The queue page can show its datatable before the add request has responded. Building the job calls IMAPI for each query,
+  // which can be slow on the first run, so a late response is not an error here: "Wait for job to complete" keeps waiting for it
+  const started = Date.now();
+  pw.submittedJob = await withTimeout(pw.job, SUBMIT_TIMEOUT, "timeout").catch(() => null);
+  console.log(pw.submittedJob ? `Job add responded after ${Date.now() - started}ms` : `Job add had not responded after ${SUBMIT_TIMEOUT}ms`);
+});
+
+step("Wait for job to complete", async () => {
+  // Each step has its own timeout, so a slow add response gets a second full window here
+  const job = pw.submittedJob || (await withTimeout(pw.job, JOB_TIMEOUT, `No job add response within ${SUBMIT_TIMEOUT + JOB_TIMEOUT}ms of clicking Run`));
+  const deadline = Date.now() + JOB_TIMEOUT;
+  assert.ok(job.id, `Queueing job "${job.name}" returned no jobId (HTTP ${job.status}); check the RabbitMQ connection`);
+  let status;
+  while (Date.now() < deadline) {
+    const response = await pw.page.request.get(`${BASE_URL}/api/queue/job/${job.id}`);
+    status = (await response.json()).status;
+    if (["COMPLETED", "ERRORED", "CANCELLED"].includes(status)) {
+      console.log(`Job ${job.id} "${job.name}" finished with status ${status}`);
+      return;
+    }
+    await pw.page.waitForTimeout(1000);
+  }
+  assert.fail(`Job ${job.id} still "${status}" after ${JOB_TIMEOUT}ms`);
+});
+
+step("Wait for datatable to finish loading", async () => {
+  const loading = pw.page.locator(".p-datatable-loading-icon");
+  await expect(loading).toBeHidden({ timeout: 30000 });
+  await expect(pw.page.locator(".p-datatable")).toBeVisible();
 });

@@ -14,12 +14,12 @@ IMQueryRunner is a full-stack application built with **Nuxt 3** designed to mana
   - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
   - **State Management**: [Pinia](https://pinia.vuejs.org/)
 - **Backend**:
-  - **ORM**: [Drizzle ORM](https://orm.drizzle.team/) (MySQL & PostgreSQL support)
+  - **ORM**: [Drizzle ORM](https://orm.drizzle.team/) (MySQL)
   - **Queue**: [RabbitMQ](https://www.rabbitmq.com/) via `rabbitmq-client`
   - **API**: Nitro (built into Nuxt)
 - **Validation**: [Zod](https://zod.dev/)
 - **Testing**: [Vitest](https://vitest.dev/)
-- **Authentication**: Casdoor & AWS Cognito
+- **Authentication**: Casdoor
 
 ## Directory Structure
 
@@ -43,8 +43,8 @@ The application uses a producer-consumer pattern for long-running queries:
 - **Status Tracking**: Job states are updated in the database and can be monitored via [./server/api/queue/index.get.ts](./server/api/queue/index.get.ts).
 
 ### 2. Database Layer
-The project uses **Drizzle ORM** with support for multiple database engines. 
-- Schemas are defined in [./models/](./models/) (often using `drizzle-zod` for validation).
+The project uses **Drizzle ORM** with MySQL.
+- Shared Zod schemas are defined in [./models/](./models/); the Drizzle table schema lives in [./server/db/](./server/db/).
 - Connection configurations are located in [./server/db/](./server/db/).
 
 ### 3. API Integration (IMAPI)

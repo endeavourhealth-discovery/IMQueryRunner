@@ -1,4 +1,3 @@
-import { filterOptionsSchema } from "~~/models/filterOptions.schema";
 import { getQueryParams } from "~~/server/helpers/getQueryParams";
 import EntityService from "~~/server/services/EntityService";
 
@@ -14,7 +13,6 @@ defineRouteMeta({
     tags: ["query"],
     description: "Get children of a given entity with optional filters",
     parameters: [
-      { name: "session_id", description: "User session id", in: "cookie" },
       {
         name: "iri",
         description: "Entity iri",
@@ -30,7 +28,7 @@ defineRouteMeta({
 });
 
 export default defineEventHandler(async (event): Promise<any> => {
-  const sessionId = getCookie(event, "session_id")!;
+  const accessToken = await getAccessToken(event);
   const { iri, schemeIris } = await getQueryParams(event, paramSchema.parse);
-  return await EntityService.getEntityChildren(sessionId, iri, schemeIris?.split(","));
+  return await EntityService.getEntityChildren(accessToken, iri, schemeIris?.split(","));
 });

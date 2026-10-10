@@ -5,17 +5,14 @@ import { useUserStore } from "@endeavour/vue-library/stores";
 
 import { isArray } from "lodash-es";
 
-export default defineNuxtRouteMiddleware(async (to, from) => {
+export default defineNuxtRouteMiddleware(async to => {
   const { requiresAuth, requiresRole } = to.meta;
   const userStore = useUserStore(usePinia());
 
   if (requiresAuth || (isArray(requiresRole) && requiresRole.length > 0)) {
     if (!userStore.isLoggedIn) {
-      const result = await globalThis.uiGuard.isLoggedIn();
-      if (result) {
-        const user = await globalThis.uiGuard.getUser();
-        userStore.updateCurrentUser(user);
-      } else return globalThis.uiGuard.login();
+      const { load, login } = useAuth();
+      if (!(await load())) return login(to.fullPath);
     }
 
     if (!hasAnyRole(userStore.currentUser!, requiresRole as string[])) {

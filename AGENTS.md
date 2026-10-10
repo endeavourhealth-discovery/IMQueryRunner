@@ -18,9 +18,8 @@ Use `pnpm` as the package manager.
 - **Tests**: `pnpm test:unit`
 - **Type Check**: `npx vue-tsc`
 - **Database Schema Sync**:
-  - `pnpm drizzle-pull`: Pulls both Postgres and MySQL schemas.
-  - `pnpm drizzle-pull-postgres`: Pulls only Postgres.
-  - `pnpm drizzle-pull-mysql`: Pulls only MySQL.
+  - `pnpm drizzle-pull`: Pulls the MySQL schema (alias for `pnpm drizzle-pull-mysql`).
+  - `pnpm drizzle-pull-mysql`: Pulls the MySQL schema.
 
 ## Coding Style & Naming Conventions
 - **TypeScript**: Strictly enforced; `typescript.typeCheck` is enabled in `nuxt.config.ts`.

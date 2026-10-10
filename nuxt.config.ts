@@ -2,8 +2,14 @@
 import Aura from "@primeuix/themes/aura";
 import tailwindcss from "@tailwindcss/vite";
 
+const IM_FONTS_ORIGIN = "https://im.endhealth.co.uk";
+
+// Only the Font Awesome styles the app and @endeavour/vue-library actually use (solid, regular, duotone).
+// Each entry is a render-blocking request: before adding a style (light, brands, sharp-*, thin), check it is really used.
+const FONT_AWESOME_STYLES = ["fontawesome", "solid", "regular", "duotone"];
+
 export default defineNuxtConfig({
-  modules: ["@primevue/nuxt-module", "@pinia/nuxt"],
+  modules: ["@primevue/nuxt-module", "@pinia/nuxt", "nuxt-auth-utils"],
   primevue: {
     options: {
       theme: {
@@ -41,17 +47,30 @@ export default defineNuxtConfig({
     }
   },
   runtimeConfig: {
+    casdoor: {
+      url: process.env.CASDOOR_URL,
+      organisation: process.env.CASDOOR_ORGANISATION_NAME,
+      clientId: process.env.CASDOOR_CLIENT_ID,
+      clientSecret: process.env.CASDOOR_CLIENT_SECRET,
+      // Casdoor casbin enforcer (owner/name) consulted for authorisation, e.g. Endeavour/TestEnforcer
+      enforcerId: process.env.CASDOOR_ENFORCER_ID
+    },
+    oauth: {
+      oidc: {
+        clientId: process.env.CASDOOR_CLIENT_ID,
+        clientSecret: process.env.CASDOOR_CLIENT_SECRET,
+        openidConfig: `${process.env.CASDOOR_URL}/.well-known/openid-configuration`,
+        scope: ["openid", "profile", "email"],
+        redirectURL: process.env.CASDOOR_REDIRECT_URL
+      }
+    },
+    session: {
+      maxAge: 60 * 60 * 24 * 30
+    },
     public: {
       casdoorUrl: process.env.CASDOOR_URL,
-      casdoorOrganisationName: process.env.CASDOOR_ORGANISATION_NAME,
-      casdoorClientId: process.env.CASDOOR_CLIENT_ID,
-      casdoorClientSecret: process.env.CASDOOR_CLIENT_SECRET,
       imapiUrl: process.env.IMAPI_URL,
       imDirectoryUrl: process.env.IM_DIRECTORY_URL
-      // cognitoIdentityPoolId: process.env.COGNITO_IDENTITY_POOL,
-      // cognitoRegion: process.env.COGNITO_REGION,
-      // cognitoUserPool: process.env.COGNITO_USER_POOL,
-      // cognitoWebClient: process.env.COGNITO_WEB_CLIENT,
     }
   },
   typescript: {
@@ -63,46 +82,10 @@ export default defineNuxtConfig({
         lang: "en"
       },
       link: [
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/fontawesome.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/solid.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/regular.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/brands.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/duotone.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/light.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/sharp-light.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/sharp-regular.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/sharp-solid.css"
-        },
-        {
-          rel: "stylesheet",
-          href: "https://im.endhealth.co.uk/fonts/css/sharp-thin.css"
-        }
+        // The stylesheets and the font files they reference are fetched with different credential modes, which use separate connections
+        { rel: "preconnect", href: IM_FONTS_ORIGIN },
+        { rel: "preconnect", href: IM_FONTS_ORIGIN, crossorigin: "anonymous" },
+        ...FONT_AWESOME_STYLES.map(style => ({ rel: "stylesheet" as const, href: `${IM_FONTS_ORIGIN}/fonts/css/${style}.css` }))
       ]
     }
   }

@@ -1,11 +1,12 @@
 import Logger from "#shared/logger";
 
-import { type User } from "@endeavour/vue-library/models";
-
 import { Server as Engine } from "engine.io";
-import { defineEventHandler } from "h3";
+import { createEvent, defineEventHandler } from "h3";
 import type { NitroApp } from "nitropack";
+import { ServerResponse } from "node:http";
 import { Server } from "socket.io";
+
+import { fromCasdoorUser } from "../utils/casdoorUser";
 
 export default defineNitroPlugin((nitroApp: NitroApp) => {
   const LOG = Logger("server/plugins/socket");
@@ -17,21 +18,10 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
 
   io.use(async (socket, next) => {
     try {
-      const sessionId = socket.handshake.headers.cookie
-        ?.split(";")
-        .find(x => x.trim().startsWith("session_id="))
-        ?.split("=")[1];
-      const clientIp = socket.handshake.address;
-      const EndSecHost = process.env.ENDEAVOUR_SECURITY_HOST;
-      const EndSecApp = process.env.ENDEAVOUR_SECURITY_APPLICATION;
-
-      if (!sessionId) return next(new Error("Unauthorized session."));
-      socket.data.user = await $fetch<User>(`${EndSecHost}/api/${EndSecApp}/authn/getUser`, {
-        headers: { "x-client-ip": clientIp },
-        query: {
-          sessionId: sessionId
-        }
-      });
+      // Reuse the HTTP session: unseal the nuxt-auth-utils cookie from the handshake request
+      const event = createEvent(socket.request, new ServerResponse(socket.request));
+      const { user } = await requireUserSession(event);
+      socket.data.user = fromCasdoorUser(await getCasdoorUser(user.owner, user.name));
       next();
     } catch {
       next(new Error("Unauthorized user."));
@@ -46,18 +36,8 @@ export default defineNitroPlugin((nitroApp: NitroApp) => {
     socket.on("joinRoom", () => {
       socket.join(`queue:user:${socket.data.user.id}`);
     });
-    socket.on("leaveRoom", (room, user) => {
-      socket.leave(room);
-      socket.to(room).emit("leave", {
-        from_id: user.id,
-        from_name: user.name,
-        system: true,
-        content: `${user.name ?? user.id} left the room`
-      });
-    });
-    socket.on("message", (room, message) => {
-      socket.to(room).emit("message", message);
-    });
+    // Clients may only ever join their own room (above). Do not add handlers that relay client-supplied
+    // rooms or user details: any signed-in client could use them to emit into another user's room.
   });
 
   nitroApp.router.use(

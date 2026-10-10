@@ -72,16 +72,20 @@
 
 <script setup lang="ts">
 import { JobStatus } from "@@/enums";
-import type { Job } from "~~/models";
+import type { Job, QueryResultSummary } from "~~/models";
 
 import { ref } from "vue";
 
+import { isArrayHasLength } from "@endeavour/vue-library";
+
+import type { MenuItem } from "primevue/menuitem";
 import { useConfirm } from "primevue/useconfirm";
 
 import SQLViewer from "./SQLViewer.vue";
 
 interface Props {
   job: Job;
+  resultSummary: QueryResultSummary[] | undefined;
 }
 
 const props = defineProps<Props>();
@@ -99,20 +103,42 @@ const confirm = useConfirm();
 const showErrorDialog = ref(false);
 const viewResultsMenuItems: Ref<any[]> = ref([]);
 const viewResultsMenu = ref();
+const resultLoading = ref(false);
 
 function openViewResultsMenuItems(event: MouseEvent): void {
+  resultLoading.value = true;
   viewResultsMenuItems.value = [];
   for (const queryRequest of props.job.queryRequests) {
-    const item = {
-      label: `View results for "${queryRequest.query.name}"`,
-      icon: "fa-duotone fa-solid fa-table-list",
-      command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType),
-      visible: false
+    const details = getResultDetails(queryRequest.query.iri);
+    if (!details) {
+      console.warn(`No result summary found for job ${props.job.id} query ${queryRequest.query.iri}`);
+      continue;
+    }
+    const item: MenuItem = {
+      label: "Results",
+      items: [
+        {
+          label: `${details.primaryQueryResultsDetails.queryName} (${details.primaryQueryResultsDetails.totalCount})`,
+          icon: "fa-duotone fa-solid fa-table-list",
+          command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType)
+        }
+      ]
     };
-    item.visible = true;
     viewResultsMenuItems.value.push(item);
+    viewResultsMenuItems.value.push({ separator: true });
+    if (isArrayHasLength(details.subQueryResultsDetails)) {
+      const subMenuItems: MenuItem = {
+        label: "Sub queries",
+        items: details.subQueryResultsDetails.map(subQuery => ({
+          label: `    ${subQuery.queryName} (${subQuery.totalCount})`,
+          icon: "fa-duotone fa-solid fa-table-list",
+          command: () => viewQueryResults(encodeURIComponent(subQuery.queryIri), subQuery.queryType)
+        }))
+      };
+      viewResultsMenuItems.value.push(subMenuItems);
+    }
   }
-
+  resultLoading.value = false;
   viewResultsMenu.value.toggle(event);
 }
 
@@ -164,6 +190,25 @@ async function viewQueryResults(queryIri: string, queryType: string) {
 
 function requeueQuery() {
   emit("requeueQuery", props.job.id);
+}
+
+function getResultDetails(queryIri: string):
+  | {
+      primaryQueryResultsDetails: QueryResultSummary;
+      subQueryResultsDetails: QueryResultSummary[];
+    }
+  | undefined {
+  const results = props.resultSummary;
+  if (!results) return undefined;
+  const details = results;
+  const primaryQueryResultsDetails = details.find(d => d.queryIri === queryIri);
+  if (!primaryQueryResultsDetails) return undefined;
+  const subQueryIris = new Set(primaryQueryResultsDetails.subQueryIris ?? []);
+  const subQueryResultsDetails = details.filter(d => subQueryIris.has(d.queryIri));
+  return {
+    primaryQueryResultsDetails: primaryQueryResultsDetails,
+    subQueryResultsDetails: subQueryResultsDetails
+  };
 }
 
 function showErrorDetails() {}

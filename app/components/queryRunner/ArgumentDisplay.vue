@@ -13,7 +13,7 @@
             <OrganisationSelect v-model="data.valueDataList" />
           </div>
           <div v-else-if="editArguments && data.parameter === '$patientId'">
-            <PatientFilter v-model="data.valueDataList" />
+            <PatientFilter v-if="isArray(data.valueDataList)" v-model="data.valueDataList" />
           </div>
           <div v-else-if="editArguments && data.parameter === '$debugPatientId'" class="flex flex-col gap-2">
             <InputText type="text" v-model="data.valueData" placeholder="Enter patient id" data-testid="debug-patient-id-input" />
@@ -59,7 +59,7 @@ import { watch } from "vue";
 import { IM, XSD } from "@endeavour/vue-library/enums";
 import type { Argument, ArgumentReference } from "@endeavour/vue-library/models";
 
-import { cloneDeep } from "lodash-es";
+import { cloneDeep, isArray } from "lodash-es";
 import Column from "primevue/column";
 
 import PatientFilter from "./PatientFilter.vue";

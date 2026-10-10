@@ -2604,11 +2604,12 @@ instead of its name, for every IRI in the table below.
 
 * Open IMQueryRunner
 * Login
-* Click "Run a query" button
+* Click "Search and run" button
 * Search for <iri> and select <label>
 * Click "Add to queue" button
 * Click "Run queue" button
-* Click "Select" button
-* Wait "10" seconds
+* Click "Run" button
+* Wait for job to complete
 * Click "Refresh" button
+* Wait for datatable to finish loading
 * Check results for <count>

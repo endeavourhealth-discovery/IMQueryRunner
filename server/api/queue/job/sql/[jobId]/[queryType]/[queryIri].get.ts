@@ -1,59 +1,35 @@
-import { ErrorCode } from "~~/enums";
-import { mysqlDb } from "~~/server/db/mysql";
-import { cohortResultsTable, datasetResultsTable, indicatorResultTable, queryResultSetTable, queryResultTable } from "~~/server/db/mysql/schema";
+import { ErrorCode, JobStatus } from "~~/enums";
+import { getExecutedSqlForJob, getJobForUser } from "~~/server/helpers/mysqlHelper";
 
 import { IMQType } from "@endeavour/vue-library/enums";
 
-import { and, count, eq } from "drizzle-orm";
 import { z } from "zod";
 
 const paramSchema = z.object({
-  jobId: z.string(),
-  queryType: z.string(),
+  jobId: z.coerce.number(),
+  queryType: z.enum(IMQType),
   queryIri: z.string()
 });
 
-const querySchema = z.object({
-  page: z.coerce.number().default(1),
-  size: z.coerce.number().default(25)
-});
-
 export default defineEventHandler(async event => {
+  const { user } = await requireUserSession(event);
   const { jobId, queryIri, queryType } = await getValidatedRouterParams(event, paramSchema.parse);
-  const { page, size } = await getValidatedQuery(event, querySchema.parse);
   const decodedQueryIri = decodeURIComponent(queryIri);
-  // TODO: Refactor to use a single query with joins instead of multiple queries
 
-  const queryResultSetRows = await mysqlDb
-    .select()
-    .from(queryResultSetTable)
-    .where(and(eq(queryResultSetTable.jobId, Number(jobId)), eq(queryResultSetTable.queryIri, decodedQueryIri)));
-  const queryResultSet = queryResultSetRows[0];
-  if (!queryResultSet) {
-    throw createError({ statusCode: 404, statusText: ErrorCode.MissingDataError, message: "Query result set not found" });
+  // Also the ownership check: a job that is not the caller's is a 404
+  const job = await getJobForUser(jobId, user.id);
+
+  // TODO: return indicator sql from imapi?
+  if (queryType === IMQType.INDICATOR) return { executedSQL: "" };
+
+  if (job.status !== JobStatus.COMPLETED) {
+    throw createError({ statusCode: 409, statusText: ErrorCode.InvalidRequestError, message: "Job has not completed" });
   }
 
-  const returnObject = {
-    executedSQL: ""
-  };
-
-  if (queryType === IMQType.INDICATOR) {
-    // TODO: return indicator sql from imapi?
-    return returnObject;
-  } else {
-    const queryResultRows = await mysqlDb
-      .select({ executedSql: queryResultTable.executedSQL })
-      .from(queryResultTable)
-      .where(and(eq(queryResultTable.queryIri, decodedQueryIri), eq(queryResultTable.queryResultSetId, queryResultSet.id)));
-
-    const executedSql = queryResultRows[0]?.executedSql ?? null;
-
-    if (!executedSql) {
-      throw createError({ statusCode: 404, statusText: ErrorCode.MissingDataError, message: "Query SQL not found" });
-    }
-
-    returnObject.executedSQL = executedSql;
+  const executedSql = await getExecutedSqlForJob(job.id, decodedQueryIri);
+  if (executedSql === undefined) {
+    throw createError({ statusCode: 404, statusText: ErrorCode.MissingDataError, message: "Query result not found" });
   }
 
-  return returnObject;
+  return { executedSQL: executedSql };
 });
