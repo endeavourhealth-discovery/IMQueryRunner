@@ -27,7 +27,8 @@ export default eventHandler(event => {
 /**
  * nuxt-auth-utils always marks its state/PKCE/nonce cookies Secure outside development, which a browser drops on a plain-http origin (login
  * then fails with "state mismatch"). NUXT_SESSION_COOKIE_SECURE=false opts out, for http-only deployments. The handler redirects (ending the
- * response) from inside, so the flag is removed as each cookie header is written rather than afterwards.
+ * response) from inside, so the flag has to be removed when the headers are flushed (writeHead) rather than after the handler returns. Hooking
+ * setHeader instead misses cookies that h3 appends by other routes.
  */
 function allowInsecureCookiesIfConfigured(event: Parameters<Parameters<typeof eventHandler>[0]>[0]) {
   // The generated runtime config type only knows the module's own cookie defaults, not the `secure` key set in nuxt.config.ts
@@ -35,10 +36,13 @@ function allowInsecureCookiesIfConfigured(event: Parameters<Parameters<typeof ev
   if (!cookie || cookie.secure !== false) return;
 
   const res = event.node.res;
-  const setHeader = res.setHeader.bind(res);
-  res.setHeader = (name, value) => {
-    if (name.toLowerCase() !== "set-cookie") return setHeader(name, value);
-    const strip = (cookie: string) => cookie.replace(/;\s*Secure/i, "");
-    return setHeader(name, Array.isArray(value) ? value.map(strip) : strip(String(value)));
-  };
+  const writeHead = res.writeHead.bind(res) as (...args: unknown[]) => typeof res;
+  res.writeHead = ((...args: unknown[]) => {
+    const setCookie = res.getHeader("set-cookie");
+    if (setCookie) {
+      const strip = (cookie: string) => cookie.replace(/;\s*Secure\s*(?=;|$)/i, "");
+      res.setHeader("set-cookie", Array.isArray(setCookie) ? setCookie.map(strip) : strip(String(setCookie)));
+    }
+    return writeHead(...args);
+  }) as typeof res.writeHead;
 }

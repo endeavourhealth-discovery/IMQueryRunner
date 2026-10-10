@@ -3,9 +3,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 describe("auth/oidc route", () => {
   const createdHandlers: ReturnType<typeof vi.fn>[] = [];
   // The real handler writes its cookies via res.setHeader, then redirects (ending the response)
+  type Res = { setHeader: (name: string, value: unknown) => void; getHeader: (name: string) => unknown; writeHead: () => void };
   const defineOAuthOidcEventHandler = vi.fn(() => {
-    const handler = vi.fn((event: { node: { res: { setHeader: (name: string, value: string[]) => void } } }) => {
-      event.node?.res.setHeader("set-cookie", ["nuxt-auth-state=abc; Max-Age=600; Path=/; HttpOnly; Secure; SameSite=Lax", "other=1; Path=/; HttpOnly"]);
+    const handler = vi.fn((event: { node: { res: Res } }) => {
+      const res = event.node?.res;
+      if (!res) return "handled";
+      // h3 adds cookies one at a time, and the response is then flushed by the redirect
+      res.setHeader("set-cookie", "nuxt-auth-state=abc; Max-Age=600; Path=/; HttpOnly; Secure; SameSite=Lax");
+      res.setHeader("set-cookie", [res.getHeader("set-cookie"), "nuxt-auth-pkce=def; Max-Age=600; Path=/; HttpOnly; Secure; SameSite=Lax"].flat());
+      res.setHeader("set-cookie", [res.getHeader("set-cookie"), "other=1; Path=/; HttpOnly"].flat());
+      res.writeHead();
       return "handled";
     });
     createdHandlers.push(handler);
@@ -13,15 +20,26 @@ describe("auth/oidc route", () => {
   });
 
   let secureCookie: boolean;
-  let written: unknown[];
-  const makeEvent = () => ({ node: { res: { setHeader: vi.fn((_name: string, value: unknown) => written.push(value)) } } });
+  let written: unknown;
+  const makeEvent = () => {
+    const headers = new Map<string, unknown>();
+    const res: Res = {
+      setHeader: (name, value) => void headers.set(name, value),
+      getHeader: name => headers.get(name),
+      // Records what is actually sent
+      writeHead: () => {
+        written = headers.get("set-cookie");
+      }
+    };
+    return { node: { res } };
+  };
 
   beforeEach(() => {
     vi.resetModules();
     createdHandlers.length = 0;
     defineOAuthOidcEventHandler.mockClear();
     secureCookie = true;
-    written = [];
+    written = undefined;
     // Nitro auto-imports these in the real app
     vi.stubGlobal("eventHandler", (handler: unknown) => handler);
     vi.stubGlobal("defineOAuthOidcEventHandler", defineOAuthOidcEventHandler);
@@ -51,13 +69,17 @@ describe("auth/oidc route", () => {
   });
 
   // Browsers drop Secure cookies on a plain-http origin, so the OIDC state cookie never comes back ("state mismatch").
-  it("strips Secure from cookies as they are written when secure cookies are switched off", async () => {
+  it("strips Secure from every cookie sent when secure cookies are switched off", async () => {
     secureCookie = false;
     const route = await loadRoute();
 
     route(makeEvent());
 
-    expect(written).toEqual([["nuxt-auth-state=abc; Max-Age=600; Path=/; HttpOnly; SameSite=Lax", "other=1; Path=/; HttpOnly"]]);
+    expect(written).toEqual([
+      "nuxt-auth-state=abc; Max-Age=600; Path=/; HttpOnly; SameSite=Lax",
+      "nuxt-auth-pkce=def; Max-Age=600; Path=/; HttpOnly; SameSite=Lax",
+      "other=1; Path=/; HttpOnly"
+    ]);
   });
 
   it("leaves the cookies alone by default", async () => {
@@ -65,7 +87,11 @@ describe("auth/oidc route", () => {
 
     route(makeEvent());
 
-    expect(written).toEqual([["nuxt-auth-state=abc; Max-Age=600; Path=/; HttpOnly; Secure; SameSite=Lax", "other=1; Path=/; HttpOnly"]]);
+    expect(written).toEqual([
+      "nuxt-auth-state=abc; Max-Age=600; Path=/; HttpOnly; Secure; SameSite=Lax",
+      "nuxt-auth-pkce=def; Max-Age=600; Path=/; HttpOnly; Secure; SameSite=Lax",
+      "other=1; Path=/; HttpOnly"
+    ]);
   });
 
   it("does not create any handler at import time", async () => {
