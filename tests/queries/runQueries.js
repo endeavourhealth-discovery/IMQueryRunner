@@ -2,7 +2,8 @@
  * Runs every query listed in one or more gauge spec tables straight against the API (no UI steps), then writes an HTML and JSON report
  * with each query's iri, name, status and result count, plus the definition, executed SQL and SQL error for any that errored.
  *
- * Usage: pnpm test:queries [spec.md ...]   (defaults to tests/e2e/specs/queries/queries.spec.md)
+ * Usage: pnpm test:queries [spec.md ...]   (defaults to queries.spec.md and reg_queries.spec.md)
+ *        pnpm test:queries:qof | test:queries:smh | test:queries:all
  *
  * Env: BASE_URL, TEST_USERNAME, TEST_PASSWORD, QUERY_CONCURRENCY (jobs in flight, default 4), QUERY_TIMEOUT (ms per job, default 600000),
  *      headless_chrome (set to "false" to watch the login)
@@ -20,7 +21,7 @@ const CONCURRENCY = Number.parseInt(process.env.QUERY_CONCURRENCY || "100");
 const JOB_TIMEOUT = Number.parseInt(process.env.QUERY_TIMEOUT || "600000");
 const POLL_INTERVAL = 1000;
 const TERMINAL_STATUSES = ["COMPLETED", "ERRORED", "CANCELLED"];
-const DEFAULT_SPECS = ["tests/e2e/specs/queries/queries.spec.md", "tests/e2e/specs/queries/reg_queries.spec.md", "tests/e2e/specs/queries/qof_queries.spec.md"];
+const DEFAULT_SPECS = ["tests/e2e/specs/queries/queries.spec.md", "tests/e2e/specs/queries/reg_queries.spec.md"];
 const OUTPUT_DIR = path.join(__dirname, "outputs");
 
 /** Reads the `| iri | count | label |` rows of a gauge spec's data table. */
