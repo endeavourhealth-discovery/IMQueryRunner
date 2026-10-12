@@ -1,4 +1,4 @@
-import { QueryRequestSchema } from "@endeavour/vue-library/models";
+import { type QueryRequest, QueryRequestSchema } from "@endeavour/vue-library/models";
 
 import * as z from "zod";
 
@@ -9,4 +9,11 @@ export const jobRequestSchema = z.object({
   persistent: z.boolean().default(false),
   useStartOfDaySnapshot: z.boolean().default(false)
 });
-export type JobRequest = z.infer<typeof jobRequestSchema>;
+
+export interface JobRequest {
+  jobName: string;
+  queryRequests: QueryRequest[];
+  startOfDaySnapshot: boolean;
+  persistent: boolean;
+  useStartOfDaySnapshot: boolean;
+}

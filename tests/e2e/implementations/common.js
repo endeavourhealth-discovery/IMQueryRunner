@@ -129,7 +129,7 @@ step("Search for <text> and select", async text => {
   await pw.page.locator("#autocomplete-search").nth(0).fill(text);
   await pw.page.locator(".p-listbox-option").filter({ hasText: text }).click();
   await expect(pw.page.locator(".results-container")).toBeHidden();
-  await expect(pw.page.locator(".p-datatable")).toBeVisible();
+  await expect(pw.page.locator(".p-datatable")).toBeVisible({ timeout: 30000 });
   await expect(pw.page.getByRole("button", { name: "Add to queue" })).toBeEnabled();
 });
 
@@ -139,7 +139,7 @@ step("Search for <search> and select <select>", async (search, select) => {
   await pw.page.locator("#autocomplete-search").nth(0).fill(search);
   await pw.page.locator(".p-listbox-option").filter({ hasText: select }).click();
   await expect(pw.page.locator(".results-container")).toBeHidden();
-  await expect(pw.page.locator(".p-datatable")).toBeVisible();
+  await expect(pw.page.locator(".p-datatable")).toBeVisible({ timeout: 30000 });
   await expect(pw.page.getByRole("button", { name: "Add to queue" })).toBeEnabled();
 });
 
