@@ -20,7 +20,7 @@
       />
     </div>
     <div class="m-2">
-      <Button icon="fa-solid fa-plus" label="Add to queue" :disabled="selected === undefined" @click="addToQueue" />
+      <Button icon="fa-solid fa-plus" label="Add to queue" :disabled="selected === undefined || loading" @click="addToQueue" />
     </div>
     <DataTable v-if="queuedQueries.length" class="m-2" :value="queuedQueries">
       <template #empty>None</template>
@@ -73,6 +73,7 @@ const selected: Ref<SearchResultSummary | undefined> = ref();
 const args: Ref<ArgumentSelection[] | undefined> = ref([]);
 const completedArguments: Ref<Argument[]> = ref([]);
 const queuedQueries: Ref<QueuedQuery[]> = ref([]);
+const loading = ref(false);
 
 const jobName = computed(() => {
   if (!queuedQueries.value.length) return "";
@@ -107,14 +108,16 @@ const disableRunButton = ref(false);
 
 watch(
   selected,
-  (newValue, oldValue) => {
+  async (newValue, oldValue) => {
+    loading.value = true;
     if (newValue !== oldValue && newValue) {
       args.value = [];
       const index = selected.value?.type.findIndex(tp => tp.iri === IM.INDICATOR);
       if (index === -1) {
-        getArguments();
+        await getArguments();
       }
     }
+    loading.value = false;
   },
   { deep: true }
 );
