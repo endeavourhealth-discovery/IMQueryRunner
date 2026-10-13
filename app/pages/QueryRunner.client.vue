@@ -8,6 +8,17 @@
             <Select v-model="selectedInterval" :options="intervalList" optionLabel="name" placeholder="Refresh options"></Select>
           </div>
           <Button class="flex" icon="fa-solid fa-magnifying-glass" label="Search and run" @click="runQuery" />
+          <Button
+            class="flex"
+            severity="secondary"
+            :icon="reportProgress ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-file-arrow-down'"
+            :label="reportProgress ? `Running report ${reportProgress.done}/${reportProgress.total}` : 'Query reports'"
+            :disabled="!!reportProgress"
+            aria-haspopup="true"
+            aria-controls="query-report-menu"
+            @click="reportMenu.toggle($event)"
+          />
+          <Menu ref="reportMenu" id="query-report-menu" :model="reportMenuItems" :popup="true" />
         </div>
         <transition name="fade">
           <DataTable
@@ -73,8 +84,11 @@
 </template>
 
 <script setup lang="ts">
+import { QUERY_REPORT_SUITES } from "#shared/queryReport";
+import type { QueryReportSuite } from "#shared/queryReport";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
+import { runQueryReport } from "~/utils/queryReport";
 import { JobStatus } from "~~/enums";
 import type { Job, QueryResultSummary, QueueUpdate } from "~~/models";
 
@@ -84,6 +98,7 @@ import type { Ref } from "vue";
 import type { Argument } from "@endeavour/vue-library/models";
 import { useUserStore } from "@endeavour/vue-library/stores";
 
+import type { MenuItem } from "primevue/menuitem";
 import type { Socket } from "socket.io-client";
 
 definePageMeta({
@@ -93,6 +108,7 @@ definePageMeta({
 
 const userStore = useUserStore();
 const confirm = useConfirm();
+const toast = useToast();
 
 // Created on demand: the library is only downloaded, and a connection only opened, when "auto" refresh is selected
 let socket: Socket | undefined;
@@ -112,6 +128,12 @@ const websocketIsConnected = ref(false);
 const transport = ref("N/A");
 const showArgumentDisplay = ref(false);
 const currentArguments: Ref<Argument[]> = ref([]);
+const reportMenu = ref();
+const reportProgress: Ref<{ done: number; total: number } | undefined> = ref();
+const reportMenuItems: MenuItem[] = (Object.keys(QUERY_REPORT_SUITES) as QueryReportSuite[]).map(suite => ({
+  label: QUERY_REPORT_SUITES[suite].label,
+  command: () => runReport(suite)
+}));
 const adminView = false; //TODO: determine admin view based on user role and preference
 
 interface IntervalOption {
@@ -392,6 +414,28 @@ async function viewArgumentDisplay(args: Argument[]) {
 
 function runQuery() {
   navigateTo("/run");
+}
+
+/** Runs one of the gauge query suites as jobs, downloads the HTML report when they have all finished. */
+async function runReport(suite: QueryReportSuite) {
+  const { label } = QUERY_REPORT_SUITES[suite];
+  reportProgress.value = { done: 0, total: 0 };
+  try {
+    const results = await runQueryReport(suite, (done, total) => (reportProgress.value = { done, total }));
+    const failed = results.filter(r => r.status !== "COMPLETED").length;
+    toast.add({
+      severity: failed ? "warn" : "success",
+      summary: `${label} report downloaded`,
+      detail: `${results.length - failed}/${results.length} passed`,
+      life: 10000
+    });
+  } catch (error) {
+    console.error("Query report failed:", error);
+    toast.add({ severity: "error", summary: `${label} report failed`, detail: String(error), life: 10000 });
+  } finally {
+    reportProgress.value = undefined;
+    await refresh();
+  }
 }
 
 async function deleteJob(jobId: string) {
