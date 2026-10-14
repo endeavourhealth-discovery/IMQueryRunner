@@ -57,6 +57,11 @@
                 <span>{{ data.finishDate ? getDisplayDateTime(data.finishDate) : "-" }}</span>
               </template>
             </Column>
+            <Column field="runTime" header="Run time">
+              <template #body="{ data }: { data: Job }">
+                <span>{{ data.finishDate ? getDisplayRunTime(data) : "-" }}</span>
+              </template>
+            </Column>
             <Column field="status" header="Status">
               <template #body="{ data }: { data: Job }">
                 <Tag :severity="data.status ? getStatusSeverity(data.status) : '-'" :value="data.status" />
@@ -92,8 +97,8 @@ import { runQueryReport } from "~/utils/queryReport";
 import { JobStatus } from "~~/enums";
 import type { Job, QueryResultSummary, QueueUpdate } from "~~/models";
 
-import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
+import { onMounted, ref } from "vue";
 
 import type { Argument } from "@endeavour/vue-library/models";
 import { useUserStore } from "@endeavour/vue-library/stores";
@@ -292,7 +297,7 @@ async function connectWebSocket() {
     }
     // The user may have left "auto" (or the page) while the library was loading
     if (!isAuto.value || disposed) return;
-    socket ??= io({ autoConnect: false });
+    socket ??= io({ autoConnect: false, transports: ["websocket"] });
   }
   // off() first so repeated calls never register a handler twice
   socket.off("connect", onConnect).on("connect", onConnect);
@@ -479,21 +484,32 @@ function scrollToTop() {
   scrollArea?.scrollIntoView({ block: "start", behavior: "smooth" });
 }
 
-function getDisplayDateTime(date: string) {
+function getDisplayDateTime(date: Date) {
   const d = new Date(date);
   return (
-    d.getUTCDate().toString().padStart(2, "0") +
+    d.getDate().toString().padStart(2, "0") +
     "/" +
-    (d.getUTCMonth() + 1).toString().padStart(2, "0") +
+    (d.getMonth() + 1).toString().padStart(2, "0") +
     "/" +
-    d.getUTCFullYear() +
+    d.getFullYear() +
     " " +
-    d.getUTCHours().toString().padStart(2, "0") +
+    d.getHours().toString().padStart(2, "0") +
     ":" +
-    d.getUTCMinutes().toString().padStart(2, "0") +
+    d.getMinutes().toString().padStart(2, "0") +
     ":" +
-    d.getUTCSeconds().toString().padStart(2, "0")
+    d.getSeconds().toString().padStart(2, "0")
   );
+}
+
+function getDisplayRunTime(data: Job) {
+  if (!data.runDate || !data.finishDate) return null;
+  const runDate = new Date(data.runDate);
+  const endDate = new Date(data.finishDate);
+  const timeDiffSeconds = (endDate.getTime() - runDate.getTime()) / 1000;
+
+  if (Math.floor(timeDiffSeconds / 60)) return Math.floor(timeDiffSeconds / 60) + "m " + Math.floor(timeDiffSeconds % 60) + "s";
+  if (Math.floor(timeDiffSeconds % 60)) return Math.floor(timeDiffSeconds % 60) + "s";
+  else return "<1s";
 }
 
 onBeforeUnmount(() => {

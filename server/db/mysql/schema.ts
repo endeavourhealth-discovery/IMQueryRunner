@@ -22,9 +22,9 @@ export const jobTable = dataset.table(
     persistent: tinyint("persistent").notNull(),
     useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
     userId: varchar("user_id", { length: 45 }).notNull(),
-    queueDate: datetime("queue_date", { mode: "string" }).notNull(),
-    runDate: datetime("run_date", { mode: "string" }).notNull(),
-    finishDate: datetime("finish_date", { mode: "string" }),
+    queueDate: datetime("queue_date", { mode: "date", fsp: 6 }).notNull(),
+    runDate: datetime("run_date", { mode: "date", fsp: 6 }).notNull(),
+    finishDate: datetime("finish_date", { mode: "date", fsp: 6 }),
     status: varchar("status", { length: 45 }).$type<JobStatus>().notNull(),
     error: json("error")
   },
@@ -33,14 +33,14 @@ export const jobTable = dataset.table(
 
 export const queryResultSetTable = dataset.table("query_result_set", {
   id: int("id").autoincrement().notNull().primaryKey(),
-  startTime: datetime("start_time", { mode: "string" }).notNull(),
-  endTime: datetime("end_time", { mode: "string" }),
+  startTime: datetime("start_time", { mode: "date", fsp: 6 }).notNull(),
+  endTime: datetime("end_time", { mode: "date", fsp: 6 }),
   startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
   persistent: tinyint("persistent").notNull(),
   useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
   queryIri: varchar("query_iri", { length: 255 }).notNull(),
-  searchDate: date("search_date", { mode: "string" }),
-  achievementDate: date("achievement_date", { mode: "string" }),
+  searchDate: date("search_date", { mode: "date" }),
+  achievementDate: date("achievement_date", { mode: "date" }),
   jobId: int("job_id").notNull()
 });
 
@@ -50,8 +50,8 @@ export const indicatorResultTable = dataset.table("indicator_result", {
   queryResultSetId: int("query_result_set_id"),
   searchDate: date("search_date"),
   achievementDate: date("achievement_date"),
-  startTime: datetime("start_time", { mode: "string" }),
-  endTime: datetime("end_time", { mode: "string" }),
+  startTime: datetime("start_time", { mode: "date", fsp: 6 }),
+  endTime: datetime("end_time", { mode: "date", fsp: 6 }),
   startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
   persistent: tinyint("persistent").notNull(),
   useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
@@ -67,8 +67,8 @@ export const queryResultTable = dataset.table(
     indicatorResultId: int("indicator_result_id"),
     searchDate: date("search_date"),
     achievementDate: date("achievement_date"),
-    startTime: datetime("start_time", { mode: "string" }),
-    endTime: datetime("end_time", { mode: "string" }),
+    startTime: datetime("start_time", { mode: "date", fsp: 6 }),
+    endTime: datetime("end_time", { mode: "date", fsp: 6 }),
     startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
     persistent: tinyint("persistent").notNull(),
     useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
