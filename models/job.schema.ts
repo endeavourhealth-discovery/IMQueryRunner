@@ -27,9 +27,9 @@ export interface Job {
   persistent: number;
   useStartOfDaySnapshot: number;
   userId: string;
-  queueDate: string;
-  runDate: string;
-  finishDate?: string | null;
+  queueDate: Date;
+  runDate: Date;
+  finishDate?: Date | null;
   status: JobStatus;
   error?: any;
 }
