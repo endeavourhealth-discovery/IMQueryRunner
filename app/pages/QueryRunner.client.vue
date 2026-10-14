@@ -297,7 +297,7 @@ async function connectWebSocket() {
     }
     // The user may have left "auto" (or the page) while the library was loading
     if (!isAuto.value || disposed) return;
-    socket ??= io({ autoConnect: false, transports: ["websocket"] });
+    socket ??= io({ autoConnect: false });
   }
   // off() first so repeated calls never register a handler twice
   socket.off("connect", onConnect).on("connect", onConnect);
