@@ -6,6 +6,8 @@ import { QUERY_REPORT_SUITES, fileStamp, htmlReport, readSpec, runQueries } from
 import type { QueryReportApi, QueryReportResult, QueryReportSuite } from "#shared/queryReport";
 import type { Job, QueryResultSummary } from "~~/models";
 
+import type { Query } from "@endeavour/vue-library";
+
 const CONCURRENCY = 10;
 const JOB_TIMEOUT = 60000;
 
@@ -21,7 +23,7 @@ const api: QueryReportApi = {
   addJob: body => $fetch<{ jobId: number } | undefined>("/api/queue/job/add", { method: "POST", body }),
   getJob: jobId => $fetch<Job>(`/api/queue/job/${jobId}`),
   getSummaries: jobId => $fetch<QueryResultSummary[]>(`/api/queue/job/results/${jobId}/summary`),
-  getDefinition: iri => $fetch("/api/imapi/query/queryFromIri", { query: { queryIri: iri } })
+  getDefinition: iri => $fetch<Query>("/api/imapi/query/queryFromIri", { query: { queryIri: iri } })
 };
 
 function download(fileName: string, content: string) {
