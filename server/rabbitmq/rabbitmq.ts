@@ -68,7 +68,7 @@ const sub = rabbit.createConsumer(
         const queriesToRun: { sql: string; queryRequest: QueryRequest }[] = [];
         let indicatorId: number | null = null;
 
-        if (queryRequest.query.queryType === IMQType.INDICATOR) {
+        if (queryRequest.query?.queryType === IMQType.INDICATOR) {
           indicatorId = await createIndicatorResultEntry(queryRequest, queryResultSet, hashQueryRequest(queryRequest));
 
           queriesToRun.push(...(await getIndicatorSubQueryRequests(accessToken, queryRequest, job.id, ctx)));

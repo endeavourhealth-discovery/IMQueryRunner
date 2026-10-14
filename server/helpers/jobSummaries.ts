@@ -53,7 +53,7 @@ async function getJobSubQueryIris(lookups: Lookups, job: Job): Promise<Map<strin
     job.queryRequests.map(async queryRequest => {
       const queryIri = queryRequest.query?.iri;
       if (!queryIri) return;
-      const isIndicator = queryRequest.query.queryType === IMQType.INDICATOR;
+      const isIndicator = queryRequest.query?.queryType === IMQType.INDICATOR;
       const subQueryIris = [...(await lookups.subQueryIris(queryIri, isIndicator))];
       if (isIndicator) {
         const nested = await Promise.all(subQueryIris.map(indicatorSubQueryIri => lookups.subQueryIris(indicatorSubQueryIri, false)));

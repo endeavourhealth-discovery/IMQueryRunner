@@ -7,6 +7,7 @@
       v-tooltip.top="'View query'"
       data-testid="view-query-button"
     />
+    <Menu ref="viewMultiQueryMenu" :model="viewMultiQueryMenuItems" popup class="w-40" />
     <Button
       v-if="job.status && [JobStatus.QUEUED, JobStatus.RUNNING].includes(job.status)"
       icon="fa-duotone fa-solid fa-ban"
@@ -72,7 +73,7 @@
 
 <script setup lang="ts">
 import { JobStatus } from "@@/enums";
-import type { Job, QueryResultSummary } from "~~/models";
+import type { Job, JobRequest, QueryResultSummary } from "~~/models";
 
 import { ref } from "vue";
 
@@ -104,14 +105,20 @@ const showErrorDialog = ref(false);
 const viewResultsMenuItems: Ref<any[]> = ref([]);
 const viewResultsMenu = ref();
 const resultLoading = ref(false);
+const viewMultiQueryMenu = ref();
+const viewMultiQueryMenuItems: Ref<MenuItem[]> = ref([]);
 
 function openViewResultsMenuItems(event: MouseEvent): void {
   resultLoading.value = true;
   viewResultsMenuItems.value = [];
   for (const queryRequest of props.job.queryRequests) {
-    const details = getResultDetails(queryRequest.query.iri);
+    const iri = queryRequest.query?.iri;
+    const queryType = queryRequest.query?.queryType;
+    if (!iri) throw createError(`Query iri is required`);
+    if (!queryType) throw createError(`Query type is required`);
+    const details = getResultDetails(iri);
     if (!details) {
-      console.warn(`No result summary found for job ${props.job.id} query ${queryRequest.query.iri}`);
+      console.warn(`No result summary found for job ${props.job.id} query ${iri}`);
       continue;
     }
     const item: MenuItem = {
@@ -120,7 +127,7 @@ function openViewResultsMenuItems(event: MouseEvent): void {
         {
           label: `${details.primaryQueryResultsDetails.queryName} (${details.primaryQueryResultsDetails.totalCount})`,
           icon: "fa-duotone fa-solid fa-table-list",
-          command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType)
+          command: () => viewQueryResults(encodeURIComponent(iri), queryType)
         }
       ]
     };
@@ -142,8 +149,19 @@ function openViewResultsMenuItems(event: MouseEvent): void {
   viewResultsMenu.value.toggle(event);
 }
 
-function goToQuery() {
-  // emit("goToQuery", props.job.queryIri);
+function goToQuery(event: MouseEvent) {
+  if (!(isArrayHasLength(props.job.queryRequests) && props.job.queryRequests.every(qr => qr.query?.iri)))
+    throw createError("Job query requests must have an iri");
+  const queriesCount = props.job.queryRequests.length;
+  if (queriesCount > 1) {
+    viewMultiQueryMenuItems.value = props.job.queryRequests.map(qr => {
+      return {
+        label: qr.query?.name || "",
+        command: () => emit("goToQuery", qr.query?.iri)
+      };
+    });
+    viewMultiQueryMenu.value.toggle(event);
+  } else emit("goToQuery", props.job.queryRequests[0].query?.iri);
 }
 
 function cancelQuery() {

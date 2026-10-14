@@ -460,7 +460,7 @@ async function requeueJob(jobId: string) {
   await $fetch("/api/queue/job/add", {
     method: "post",
     body: {
-      jobName: "Re-queued " + (found.jobName || "Re-queued Job"),
+      jobName: found.jobName,
       queryRequests: found.queryRequests
     }
   });
