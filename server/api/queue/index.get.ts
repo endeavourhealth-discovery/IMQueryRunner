@@ -8,7 +8,7 @@ import * as z from "zod";
 const querySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   size: z.coerce.number().int().min(1).max(200).default(25),
-  date: z.iso.date().optional()
+  date: z.date().optional()
 });
 
 export default defineEventHandler(async event => {

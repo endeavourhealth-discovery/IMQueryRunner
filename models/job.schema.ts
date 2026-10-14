@@ -10,9 +10,9 @@ export const jobSchema = z.object({
   persistent: z.number().int(),
   useStartOfDaySnapshot: z.number().int(),
   userId: z.string(),
-  queueDate: z.string(),
-  runDate: z.string(),
-  finishDate: z.string().nullable().optional(),
+  queueDate: z.date(),
+  runDate: z.date(),
+  finishDate: z.date().nullable().optional(),
   status: z.enum(JobStatus),
   error: z.any().optional()
 });
