@@ -21,6 +21,10 @@ export async function deleteTokens(sessionId: string): Promise<void> {
 
 /** A valid Casdoor access token for the signed-in user, refreshed if it is about to expire. Throws 401 if there is no usable session. */
 export async function getAccessToken(event: H3Event): Promise<string> {
+  // A caller that came in with a Casdoor token uses it as is: it is already validated and is the identity IMAPI should see
+  const { bearerToken } = await requireAuth(event);
+  if (bearerToken) return bearerToken;
+
   const { id } = await requireUserSession(event);
   const tokens = await tokenStore().getItem(id);
   if (!tokens) return await endSession(event, "Your session has expired");

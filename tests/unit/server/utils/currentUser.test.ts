@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const casdoor = vi.hoisted(() => ({ getCasdoorUser: vi.fn(), updateCasdoorUser: vi.fn() }));
 vi.mock("~~/server/utils/casdoor", () => casdoor);
 
-vi.stubGlobal("requireUserSession", async () => ({ user: { owner: "org", name: "jbloggs", id: "u1" } }));
+vi.mock("~~/server/utils/auth", () => ({ requireAuth: async () => ({ user: { owner: "org", name: "jbloggs", id: "u1" }, machine: false }) }));
 
 const existing = {
   owner: "org",

@@ -28,7 +28,7 @@ const DEBUG_COLUMNS = ["query_iri", "patient_id", "step_no", "cte_name", "patien
 
 /** Streams a result as CSV, without loading it into memory. */
 export default defineEventHandler(async event => {
-  const { user } = await requireUserSession(event);
+  const { user } = await requireAuth(event);
   const { jobId, queryIri, queryType } = await getValidatedRouterParams(event, paramSchema.parse);
   const decodedQueryIri = decodeURIComponent(queryIri);
 

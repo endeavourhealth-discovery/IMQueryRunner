@@ -10,7 +10,7 @@ const paramSchema = z.object({
 const LOG = Logger("api/queue/job/delete");
 
 export default defineEventHandler(async event => {
-  const { user } = await requireUserSession(event);
+  const { user } = await requireAuth(event);
   const { jobId } = await getValidatedRouterParams(event, paramSchema.parse);
   LOG.info(`Deleting job with ID: ${jobId}`);
   const job = await getJobForUser(jobId, user.id);
