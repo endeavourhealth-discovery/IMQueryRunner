@@ -1,6 +1,7 @@
 # Gauge - metadata dir
 .gauge
 /tests/e2e/outputs/*
+/tests/queries/outputs/
 
 # Nuxt dev/build outputs
 .output

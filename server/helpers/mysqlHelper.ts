@@ -265,8 +265,8 @@ export async function createResultSetEntry(queryRequest: any, job: Job): Promise
     startTime: getNow(),
     jobId: job.id,
     queryIri: queryRequest.query.iri,
-    searchDate: queryRequest?.searchDate as any,
-    achievementDate: queryRequest?.achievementDate as any
+    searchDate: queryRequest?.argument.find((x: any) => x.parameter === "$searchDate").valueData as Date,
+    achievementDate: queryRequest?.argument.find((x: any) => x.parameter === "$achievementDate").valueData as Date
   } as QueryResultSet;
 
   const result = await mysqlDb.insert(queryResultSetTable).values(queryResultSet);
@@ -340,5 +340,5 @@ export function getToday() {
 }
 
 export function getNow() {
-  return new Date().toISOString().slice(0, 19).replace("T", " ");
+  return new Date();
 }

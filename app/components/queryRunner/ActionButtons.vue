@@ -7,6 +7,7 @@
       v-tooltip.top="'View query'"
       data-testid="view-query-button"
     />
+    <Menu ref="viewMultiQueryMenu" :model="viewMultiQueryMenuItems" popup class="w-40" />
     <Button
       v-if="job.status && [JobStatus.QUEUED, JobStatus.RUNNING].includes(job.status)"
       icon="fa-duotone fa-solid fa-ban"
@@ -52,14 +53,22 @@
       data-testid="delete-query-button"
     />
   </div>
-  <Dialog v-model:visible="showErrorDialog" modal maximizable header="Error details">
-    <div v-if="job.error.cause">
-      <div>SQL Error: {{ job.error.cause.sqlMessage }}</div>
-      <div>SQL Query:</div>
+  <Dialog
+    v-model:visible="showErrorDialog"
+    modal
+    maximizable
+    header="Error details"
+    :style="{ width: '75vw', maxHeight: '85vh' }"
+    :breakpoints="{ '1199px': '85vw', '575px': '95vw' }"
+    :contentStyle="{ overflow: 'auto' }"
+  >
+    <div v-if="job.error.cause" class="flex min-w-0 flex-col gap-2">
+      <div class="whitespace-pre-wrap break-words"><span class="font-semibold">SQL Error:</span> {{ job.error.cause.sqlMessage }}</div>
+      <div class="font-semibold">SQL Query:</div>
       <SQLViewer v-if="job.error.cause.sql" :sql="job.error.cause.sql" />
     </div>
 
-    <div v-else>{{ job.error }}</div>
+    <div v-else class="whitespace-pre-wrap break-words">{{ job.error }}</div>
     <template #footer>
       <div class="im-dialog-footer">
         <div class="button-footer">
@@ -72,7 +81,7 @@
 
 <script setup lang="ts">
 import { JobStatus } from "@@/enums";
-import type { Job, QueryResultSummary } from "~~/models";
+import type { Job, JobRequest, QueryResultSummary } from "~~/models";
 
 import { ref } from "vue";
 
@@ -104,14 +113,20 @@ const showErrorDialog = ref(false);
 const viewResultsMenuItems: Ref<any[]> = ref([]);
 const viewResultsMenu = ref();
 const resultLoading = ref(false);
+const viewMultiQueryMenu = ref();
+const viewMultiQueryMenuItems: Ref<MenuItem[]> = ref([]);
 
 function openViewResultsMenuItems(event: MouseEvent): void {
   resultLoading.value = true;
   viewResultsMenuItems.value = [];
   for (const queryRequest of props.job.queryRequests) {
-    const details = getResultDetails(queryRequest.query.iri);
+    const iri = queryRequest.query?.iri;
+    const queryType = queryRequest.query?.queryType;
+    if (!iri) throw createError(`Query iri is required`);
+    if (!queryType) throw createError(`Query type is required`);
+    const details = getResultDetails(iri);
     if (!details) {
-      console.warn(`No result summary found for job ${props.job.id} query ${queryRequest.query.iri}`);
+      console.warn(`No result summary found for job ${props.job.id} query ${iri}`);
       continue;
     }
     const item: MenuItem = {
@@ -120,7 +135,7 @@ function openViewResultsMenuItems(event: MouseEvent): void {
         {
           label: `${details.primaryQueryResultsDetails.queryName} (${details.primaryQueryResultsDetails.totalCount})`,
           icon: "fa-duotone fa-solid fa-table-list",
-          command: () => viewQueryResults(encodeURIComponent(queryRequest.query.iri), queryRequest.query.queryType)
+          command: () => viewQueryResults(encodeURIComponent(iri), queryType)
         }
       ]
     };
@@ -142,8 +157,19 @@ function openViewResultsMenuItems(event: MouseEvent): void {
   viewResultsMenu.value.toggle(event);
 }
 
-function goToQuery() {
-  // emit("goToQuery", props.job.queryIri);
+function goToQuery(event: MouseEvent) {
+  if (!(isArrayHasLength(props.job.queryRequests) && props.job.queryRequests.every(qr => qr.query?.iri)))
+    throw createError("Job query requests must have an iri");
+  const queriesCount = props.job.queryRequests.length;
+  if (queriesCount > 1) {
+    viewMultiQueryMenuItems.value = props.job.queryRequests.map(qr => {
+      return {
+        label: qr.query?.name || "",
+        command: () => emit("goToQuery", qr.query?.iri)
+      };
+    });
+    viewMultiQueryMenu.value.toggle(event);
+  } else emit("goToQuery", props.job.queryRequests[0].query?.iri);
 }
 
 function cancelQuery() {

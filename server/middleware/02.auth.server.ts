@@ -5,5 +5,6 @@ export default defineEventHandler(async event => {
     return;
   }
 
-  await requireUserSession(event);
+  // Accepts a Casdoor bearer token (machine-to-machine) or the session cookie
+  await requireAuth(event);
 });

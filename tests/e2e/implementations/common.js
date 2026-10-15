@@ -109,7 +109,6 @@ step("Search for <text>", async text => {
   } else {
     await pw.page.fill('[data-testid="search-input"]', text);
   }
-  await pw.page.waitForLoadState("networkidle");
   await pw.page.waitForSelector("#search-results-main-container >> tr");
 });
 
@@ -118,7 +117,6 @@ step("Select <text> result", async text => {
   await node.waitFor({ state: "visible" });
   await node.click();
   await pw.page.waitForSelector(".back-to-search", { state: "visible" });
-  await pw.page.waitForLoadState("networkidle");
 });
 
 step("Click dialog confirm", async () => {
@@ -130,7 +128,9 @@ step("Search for <text> and select", async text => {
   await pw.page.waitForSelector("#autocomplete-search", { state: "visible" });
   await pw.page.locator("#autocomplete-search").nth(0).fill(text);
   await pw.page.locator(".p-listbox-option").filter({ hasText: text }).click();
-  await pw.page.waitForTimeout(2000);
+  await expect(pw.page.locator(".results-container")).toBeHidden();
+  await expect(pw.page.locator(".p-datatable")).toBeVisible({ timeout: 30000 });
+  await expect(pw.page.getByRole("button", { name: "Add to queue" })).toBeEnabled();
 });
 
 step("Search for <search> and select <select>", async (search, select) => {
@@ -138,7 +138,9 @@ step("Search for <search> and select <select>", async (search, select) => {
   await pw.page.waitForSelector("#autocomplete-search", { state: "visible" });
   await pw.page.locator("#autocomplete-search").nth(0).fill(search);
   await pw.page.locator(".p-listbox-option").filter({ hasText: select }).click();
-  await pw.page.waitForTimeout(2000);
+  await expect(pw.page.locator(".results-container")).toBeHidden();
+  await expect(pw.page.locator(".p-datatable")).toBeVisible({ timeout: 30000 });
+  await expect(pw.page.getByRole("button", { name: "Add to queue" })).toBeEnabled();
 });
 
 step("Wait <time> seconds", async time => {
@@ -162,12 +164,20 @@ step("Wait for job to complete", async () => {
   let status;
   while (Date.now() < deadline) {
     const response = await pw.page.request.get(`${BASE_URL}/api/queue/job/${job.id}`);
-    status = (await response.json()).status;
+    assert.ok(response.ok(), `Job ${job.id} status request failed with HTTP ${response.status()}`);
+    const data = await response.json();
+    status = data.status;
     if (["COMPLETED", "ERRORED", "CANCELLED"].includes(status)) {
       console.log(`Job ${job.id} "${job.name}" finished with status ${status}`);
+      await pw.page.getByRole("button", { name: "Refresh", exact: true }).click();
+      const loading = pw.page.locator(".p-datatable-loading-icon");
+      await expect(loading).toBeHidden({ timeout: 30000 });
+      await expect(pw.page.locator(".p-datatable")).toBeVisible();
+      const row = pw.page.locator("table tbody tr").filter({ hasText: job.name }).nth(0);
+      await expect(row).toBeVisible();
+      await expect(row.locator(".p-tag")).toContainText(status);
       return;
     }
-    await pw.page.waitForTimeout(1000);
   }
   assert.fail(`Job ${job.id} still "${status}" after ${JOB_TIMEOUT}ms`);
 });
