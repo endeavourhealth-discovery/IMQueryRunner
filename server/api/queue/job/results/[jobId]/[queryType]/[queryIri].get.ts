@@ -19,7 +19,7 @@ const querySchema = z.object({
 });
 
 export default defineEventHandler(async event => {
-  const { user } = await requireUserSession(event);
+  const { user } = await requireAuth(event);
   const { jobId, queryIri, queryType } = await getValidatedRouterParams(event, paramSchema.parse);
   const { page, size } = await getValidatedQuery(event, querySchema.parse);
   const decodedQueryIri = decodeURIComponent(queryIri);

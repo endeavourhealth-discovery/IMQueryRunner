@@ -22,7 +22,7 @@ vi.mock("~~/server/utils/executeQuery", () => ({
 // defineEventHandler as soon as it is imported.
 vi.hoisted(() => {
   vi.stubGlobal("defineEventHandler", (handler: unknown) => handler);
-  vi.stubGlobal("requireUserSession", async () => ({ user: { id: "u1" } }));
+  vi.stubGlobal("requireAuth", async () => ({ user: { id: "u1" }, machine: false }));
   vi.stubGlobal("getValidatedRouterParams", async (event: any, parse: (v: unknown) => unknown) => parse(event.params));
   vi.stubGlobal("createError", (opts: { statusCode: number; message: string }) => Object.assign(new Error(opts.message), { statusCode: opts.statusCode }));
   vi.stubGlobal("setResponseHeaders", (_event: unknown, values: Record<string, string>) => Object.assign((globalThis as any).__headers, values));

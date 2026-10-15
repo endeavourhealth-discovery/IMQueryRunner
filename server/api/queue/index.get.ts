@@ -13,7 +13,7 @@ const querySchema = z.object({
 
 export default defineEventHandler(async event => {
   // The session already carries the user id (the same id stored on each job), so no Casdoor round trip is needed
-  const { user } = await requireUserSession(event);
+  const { user } = await requireAuth(event);
   // The list itself only needs the session cookie, but the Casdoor tokens can expire (or be lost on a restart) while the cookie is still valid.
   // Checking them here makes a stale session redirect to login on page load rather than on the first action that calls IMAPI.
   await getAccessToken(event);
