@@ -23,7 +23,7 @@ const querySchema = z.object({
 const LOG = Logger("api/queue/job/results/summaries");
 
 export default defineEventHandler(async event => {
-  const { user } = await requireUserSession(event);
+  const { user } = await requireAuth(event);
   const accessToken = await getAccessToken(event);
   const { jobIds } = await getValidatedQuery(event, querySchema.parse);
 

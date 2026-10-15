@@ -46,6 +46,24 @@ export async function casdoorEnforce(enforcerId: string, sub: object, obj: strin
   return results.length > 0 && results.every(Boolean);
 }
 
+/** RFC 7662 introspection result (the fields we use). Casdoor answers `{ active: false }` for an expired, revoked or unknown token. */
+export interface TokenIntrospection {
+  active: boolean;
+  exp?: number;
+  username?: string;
+  sub?: string;
+}
+
+/** Asks Casdoor whether an access token is valid. Unlike the other calls this is a plain form POST, not the { status, data } envelope. */
+export async function introspectAccessToken(token: string): Promise<TokenIntrospection> {
+  const { url, clientId, clientSecret } = useRuntimeConfig().casdoor;
+  return await ofetch<TokenIntrospection>(`${url}/api/login/oauth/introspect`, {
+    method: "POST",
+    headers: { Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}` },
+    body: new URLSearchParams({ token, token_type_hint: "access_token" })
+  });
+}
+
 /** An application access token for server-to-server calls (RabbitMQ worker, etc.). */
 export async function getClientCredentialsToken(clientId: string, clientSecret: string): Promise<{ access_token: string; expires_in: number }> {
   const { url } = useRuntimeConfig().casdoor;

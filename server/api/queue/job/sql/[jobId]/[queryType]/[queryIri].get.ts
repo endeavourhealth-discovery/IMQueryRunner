@@ -12,7 +12,7 @@ const paramSchema = z.object({
 });
 
 export default defineEventHandler(async event => {
-  const { user } = await requireUserSession(event);
+  const { user } = await requireAuth(event);
   const { jobId, queryIri, queryType } = await getValidatedRouterParams(event, paramSchema.parse);
   const decodedQueryIri = decodeURIComponent(queryIri);
 

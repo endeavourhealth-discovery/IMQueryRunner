@@ -4,12 +4,13 @@ import type { User } from "@endeavour/vue-library/models";
 
 import type { H3Event } from "h3";
 
+import { requireAuth } from "./auth";
 import { getCasdoorUser, updateCasdoorUser } from "./casdoor";
 import { fromCasdoorUser, toCasdoorProperties } from "./casdoorUser";
 
 /** The signed-in user, loaded fresh from Casdoor. Throws 401 if there is no session. */
 export async function getCurrentUser(event: H3Event): Promise<User> {
-  const { user } = await requireUserSession(event);
+  const { user } = await requireAuth(event);
   return fromCasdoorUser(await getCasdoorUser(user.owner, user.name));
 }
 
@@ -19,7 +20,7 @@ export async function getCurrentUser(event: H3Event): Promise<User> {
  * change, so concurrent saves of different preferences from the same page do not overwrite each other.
  */
 export async function updateCurrentUserPreferences(event: H3Event, preferences: UserPreferences): Promise<User> {
-  const { user: sessionUser } = await requireUserSession(event);
+  const { user: sessionUser } = await requireAuth(event);
   const existing = await getCasdoorUser(sessionUser.owner, sessionUser.name);
   const defined = Object.fromEntries(Object.entries(preferences).filter(([, value]) => value !== undefined));
   const merged = { ...fromCasdoorUser(existing), ...defined } as User;
@@ -30,7 +31,7 @@ export async function updateCurrentUserPreferences(event: H3Event, preferences: 
 
 /** Persists the user's preferences to Casdoor and returns the updated user. */
 export async function updateCurrentUser(event: H3Event, user: User): Promise<User> {
-  const { user: sessionUser } = await requireUserSession(event);
+  const { user: sessionUser } = await requireAuth(event);
   const existing = await getCasdoorUser(sessionUser.owner, sessionUser.name);
   const updated = { ...existing, properties: toCasdoorProperties(user, existing.properties ?? {}) };
   await updateCasdoorUser(updated);
