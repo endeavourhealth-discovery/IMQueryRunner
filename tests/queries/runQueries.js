@@ -19,8 +19,8 @@ const path = require("node:path");
 const { QUERY_REPORT_SUITES, fileStamp, formatDuration, htmlReport, readSpec, runQueries } = require("../../shared/queryReport.ts");
 
 const BASE_URL = (process.env.BASE_URL || "http://localhost:3000").replace(/\/$/, "");
-const CONCURRENCY = Number.parseInt(process.env.QUERY_CONCURRENCY || "100");
-const JOB_TIMEOUT = Number.parseInt(process.env.QUERY_TIMEOUT || "600000");
+const CONCURRENCY = Number.parseInt(process.env.QUERY_CONCURRENCY || "50");
+const JOB_TIMEOUT = Number.parseInt(process.env.QUERY_TIMEOUT || "120000");
 const SPEC_DIR = "tests/e2e/specs/queries";
 const OUTPUT_DIR = path.join(__dirname, "outputs");
 

@@ -8,8 +8,8 @@ import type { Job, QueryResultSummary } from "~~/models";
 
 import type { Query } from "@endeavour/vue-library";
 
-const CONCURRENCY = 10;
-const JOB_TIMEOUT = 60000;
+const CONCURRENCY = 50;
+const JOB_TIMEOUT = 120000;
 
 // Loaded only when a report is run, so the (large) spec tables are not part of the page bundle
 const SPECS: Record<string, () => Promise<string>> = {

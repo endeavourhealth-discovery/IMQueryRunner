@@ -192,13 +192,13 @@ export function htmlReport(results: QueryReportResult[], run: { baseUrl: string;
       const details =
         r.status === "COMPLETED"
           ? ""
-          : `<tr class="details"><td></td><td colspan="6">
-              ${r.error ? `<h4>Error</h4><pre>${escape(r.error)}</pre>` : ""}
-              ${r.sqlError ? `<h4>SQL error</h4><pre>${escape(r.sqlError)}</pre>` : ""}
-              ${r.executedSql ? `<details><summary>Executed SQL</summary><pre>${escape(r.executedSql)}</pre></details>` : ""}
-              ${r.definition ? `<details><summary>Definition</summary><pre>${escape(typeof r.definition === "string" ? r.definition : JSON.stringify(r.definition, null, 2))}</pre></details>` : ""}
+          : `<tr class="details" data-status="${escape(r.status)}"><td></td><td colspan="6">
+              ${r.sqlError ? `<h4>SQL error</h4><pre class="copy" title="Click to copy">${escape(r.sqlError)}</pre>` : ""}
+              ${r.error ? `<details><summary>Error</summary><pre class="copy" title="Click to copy">${escape(r.error)}</pre></details>` : ""}
+              ${r.executedSql ? `<details><summary>Executed SQL</summary><pre class="copy" title="Click to copy">${escape(r.executedSql)}</pre></details>` : ""}
+              ${r.definition ? `<details><summary>Definition</summary><pre class="copy" title="Click to copy">${escape(typeof r.definition === "string" ? r.definition : JSON.stringify(r.definition, null, 2))}</pre></details>` : ""}
             </td></tr>`;
-      return `<tr class="${r.status}">
+      return `<tr class="${r.status}" data-status="${escape(r.status)}">
           <td>${i + 1}</td><td><code>${escape(r.iri)}</code></td><td>${escape(r.name)}</td><td><span class="tag">${escape(r.status)}</span></td>
           <td class="num">${escape(r.count)}</td><td class="num">${escape(r.expectedCount)}</td><td class="num">${r.jobId ?? ""}</td>
         </tr>${details}`;
@@ -219,12 +219,66 @@ export function htmlReport(results: QueryReportResult[], run: { baseUrl: string;
   .details td { background: #fafafa; border-bottom: 2px solid #e5e7eb; }
   pre { white-space: pre-wrap; word-break: break-word; background: #f3f4f6; padding: 8px; max-height: 400px; overflow: auto; }
   h4 { margin: 8px 0 4px; }
+  pre.copy { cursor: pointer; }
+  pre.copy:hover { outline: 1px solid #9ca3af; }
+  .copied-badge { position: fixed; padding: 2px 6px; border-radius: 4px; font-size: 12px; background: #16a34a; color: #fff; pointer-events: none; transform: translateX(-100%); }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 12px; font-size: 14px; }
+  .filters label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+  .filters button { font: inherit; font-size: 12px; padding: 2px 8px; cursor: pointer; }
+  tr.hidden { display: none; }
 </style></head><body>
 <h1>Query Report</h1>
 <p>${escape(run.baseUrl)} · ${escape(run.startedAt)} · took ${formatDuration(run.durationMs)} · ${results.length} queries · ${Object.entries(totals)
     .map(([status, n]) => `${escape(status)}: ${n}`)
     .join(" · ")}</p>
+<div class="filters"><strong>Status:</strong>
+  ${Object.entries(totals)
+    .map(
+      ([status, n]) =>
+        `<label class="${escape(status)}"><input type="checkbox" value="${escape(status)}" checked><span class="tag">${escape(status)} (${n})</span></label>`
+    )
+    .join("\n  ")}
+  <button type="button" data-select="all">All</button>
+  <button type="button" data-select="failed">Failed only</button>
+</div>
 <table><thead><tr><th>#</th><th>IRI</th><th>Name</th><th>Status</th><th class="num">Count</th><th class="num">Expected</th><th class="num">Job</th></tr></thead>
 <tbody>${rows}</tbody></table>
+<script>
+  const boxes = [...document.querySelectorAll(".filters input")];
+  function applyFilter() {
+    const shown = new Set(boxes.filter(b => b.checked).map(b => b.value));
+    for (const row of document.querySelectorAll("tbody tr")) row.classList.toggle("hidden", !shown.has(row.dataset.status));
+  }
+  boxes.forEach(b => b.addEventListener("change", applyFilter));
+  document.querySelectorAll(".filters button").forEach(button =>
+    button.addEventListener("click", () => {
+      boxes.forEach(b => (b.checked = button.dataset.select === "all" || b.value !== "COMPLETED"));
+      applyFilter();
+    })
+  );
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const area = Object.assign(document.createElement("textarea"), { value: text });
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand("copy");
+      area.remove();
+    }
+  }
+  document.querySelectorAll("pre.copy").forEach(pre =>
+    pre.addEventListener("click", async () => {
+      if (String(window.getSelection())) return; // let the user select part of the text
+      await copyText(pre.textContent);
+      const rect = pre.getBoundingClientRect();
+      const badge = Object.assign(document.createElement("span"), { className: "copied-badge", textContent: "Copied!" });
+      Object.assign(badge.style, { top: Math.max(rect.top, 0) + 6 + "px", left: rect.right - 6 + "px" });
+      document.body.appendChild(badge);
+      setTimeout(() => badge.remove(), 1500);
+    })
+  );
+</script>
 </body></html>`;
 }
