@@ -53,14 +53,22 @@
       data-testid="delete-query-button"
     />
   </div>
-  <Dialog v-model:visible="showErrorDialog" modal maximizable header="Error details">
-    <div v-if="job.error.cause">
-      <div>SQL Error: {{ job.error.cause.sqlMessage }}</div>
-      <div>SQL Query:</div>
+  <Dialog
+    v-model:visible="showErrorDialog"
+    modal
+    maximizable
+    header="Error details"
+    :style="{ width: '75vw', maxHeight: '85vh' }"
+    :breakpoints="{ '1199px': '85vw', '575px': '95vw' }"
+    :contentStyle="{ overflow: 'auto' }"
+  >
+    <div v-if="job.error.cause" class="flex min-w-0 flex-col gap-2">
+      <div class="whitespace-pre-wrap break-words"><span class="font-semibold">SQL Error:</span> {{ job.error.cause.sqlMessage }}</div>
+      <div class="font-semibold">SQL Query:</div>
       <SQLViewer v-if="job.error.cause.sql" :sql="job.error.cause.sql" />
     </div>
 
-    <div v-else>{{ job.error }}</div>
+    <div v-else class="whitespace-pre-wrap break-words">{{ job.error }}</div>
     <template #footer>
       <div class="im-dialog-footer">
         <div class="button-footer">
