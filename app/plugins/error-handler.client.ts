@@ -1,3 +1,6 @@
+import { getErrorMessage, getErrorStatus, getErrorStatusText } from "~/helpers/errorDeconstructor";
+import { ErrorCode } from "~~/enums";
+
 import { FetchError } from "ofetch";
 
 export default defineNuxtPlugin(nuxtApp => {
@@ -11,7 +14,12 @@ export default defineNuxtPlugin(nuxtApp => {
     }
 
     if (!(error instanceof FetchError)) {
-      return;
+      showError({
+        status: getErrorStatus(error) ?? 500,
+        statusText: getErrorStatusText(error) ?? ErrorCode.InternalClientError,
+        message: getErrorMessage(error) || "Client error",
+        fatal: true
+      });
     }
 
     event.preventDefault();
@@ -25,8 +33,9 @@ export default defineNuxtPlugin(nuxtApp => {
       }
 
       showError({
-        statusCode: error.status ?? 500,
-        statusMessage: error.statusText || "Server Error",
+        status: getErrorStatus(error) ?? 500,
+        statusText: getErrorStatusText(error) ?? ErrorCode.InternalClientError,
+        message: getErrorMessage(error) || "Server error",
         fatal: true
       });
     } finally {
