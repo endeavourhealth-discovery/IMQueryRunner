@@ -1,35 +1,33 @@
-import { FetchError } from "ofetch";
+import { getErrorMessage, getErrorStatus, getErrorStatusText } from "~/helpers/errorDeconstructor";
+import { ErrorCode } from "~~/enums";
 
 export default defineNuxtPlugin(nuxtApp => {
-  const getStatus = (error: unknown): number | undefined => {
-    if (error instanceof FetchError) {
-      return error.status;
-    }
-    if (error && typeof error === "object" && "statusCode" in error && typeof error.statusCode === "number") {
-      return error.statusCode;
-    }
-    if (error && typeof error === "object" && "status" in error && typeof error.status === "number") {
-      return error.status;
-    }
-    return undefined;
-  };
-
   nuxtApp.hook("vue:error", async error => {
-    const status = getStatus(error);
+    const status = getErrorStatus(error);
     if (status === 401) {
       await clearError();
       await nuxtApp.runWithContext(() => useAuth().login());
       return;
     }
-    console.error(error);
+    showError(
+      createError({
+        status: status ?? 500,
+        statusText: getErrorStatusText(error) ?? ErrorCode.InternalClientError,
+        message: getErrorMessage(error) ?? "An unexpected client error has occurred"
+      })
+    );
   });
   nuxtApp.hook("app:error", async error => {
-    const status = getStatus(error);
+    const status = getErrorStatus(error);
     if (status === 401) {
       await clearError();
       await nuxtApp.runWithContext(() => useAuth().login());
       return;
     }
-    console.error(error);
+    createError({
+      status: status ?? 500,
+      statusText: getErrorStatusText(error) ?? ErrorCode.InternalClientError,
+      message: getErrorMessage(error) ?? "An unexpected client error has occurred"
+    });
   });
 });
