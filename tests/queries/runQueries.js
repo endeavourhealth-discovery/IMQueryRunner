@@ -82,7 +82,11 @@ async function main() {
     results = await runQueries(api, queries, {
       concurrency: CONCURRENCY,
       timeout: JOB_TIMEOUT,
-      onProgress: (done, total, r) => r && console.log(`[${done}/${total}] ${r.status.padEnd(14)} ${String(r.count ?? "").padStart(8)}  ${r.name || r.iri}`)
+      onProgress: (done, total, r) =>
+        r &&
+        console.log(
+          `[${done}/${total}] ${r.status.padEnd(14)} ${String(r.count ?? "").padStart(8)} ${(r.durationMs === null ? "-" : formatDuration(r.durationMs)).padStart(8)}  ${r.name || r.iri}`
+        )
     });
   } finally {
     await browser.close();
