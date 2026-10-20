@@ -78,7 +78,7 @@ CREATE TABLE
         persistent BIT (1),
         use_start_of_day_snapshot BIT (1),
         version BIGINT,
-        executed_sql TEXT,
+        executed_sql MEDIUMTEXT,
         FOREIGN KEY (query_result_set_id) REFERENCES query_result_set (id),
         FOREIGN KEY (indicator_result_id) REFERENCES indicator_result (id),
         query_type VARCHAR(255)

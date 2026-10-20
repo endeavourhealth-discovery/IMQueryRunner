@@ -3,7 +3,7 @@ import { JobStatus } from "~~/enums/JobStatus";
 import { IMQType } from "@endeavour/vue-library";
 import { type QueryRequest } from "@endeavour/vue-library/models";
 
-import { bigint, date, datetime, index, int, json, mysqlTable, text, tinyint, varchar } from "drizzle-orm/mysql-core";
+import { bigint, date, datetime, index, int, json, mediumtext, mysqlTable, tinyint, varchar } from "drizzle-orm/mysql-core";
 import { mysqlSchema } from "drizzle-orm/mysql-core";
 
 // Only the tables this application reads or writes. The source clinical tables (patient, observation, encounter and so on) are
@@ -72,7 +72,7 @@ export const queryResultTable = dataset.table(
     startOfDaySnapshot: tinyint("start_of_day_snapshot").notNull(),
     persistent: tinyint("persistent").notNull(),
     useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
-    executedSQL: text("executed_sql"),
+    executedSQL: mediumtext("executed_sql"),
     version: int("version").notNull(),
     queryType: varchar("query_type", { length: 255 }).$type<IMQType>().notNull()
   },
