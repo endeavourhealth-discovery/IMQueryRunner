@@ -11,7 +11,7 @@ import { isArrayHasLength } from "@endeavour/vue-library";
 import { IMQType } from "@endeavour/vue-library/enums";
 import { type QueryRequest } from "@endeavour/vue-library/models";
 
-import { and, asc, count, eq, inArray } from "drizzle-orm";
+import { and, asc, count, eq, inArray, or } from "drizzle-orm";
 import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 
 import { mysqlDb } from "../db/mysql";
@@ -21,6 +21,7 @@ import {
   indicatorResultTable,
   jobTable,
   patientExistsTable,
+  queryDependencyTable,
   queryResultSetTable,
   queryResultTable
 } from "../db/mysql/schema";
@@ -117,19 +118,23 @@ export async function deleteJobData(job: Job) {
     r => r.id
   );
 
-  if (resultSetIds.length) {
-    const queryResultIds = (
-      await mysqlDb.select({ id: queryResultTable.id }).from(queryResultTable).where(inArray(queryResultTable.queryResultSetId, resultSetIds))
-    ).map(r => r.id);
+  const queryResultIds = resultSetIds.length
+    ? (await mysqlDb.select({ id: queryResultTable.id }).from(queryResultTable).where(inArray(queryResultTable.queryResultSetId, resultSetIds))).map(r => r.id)
+    : [];
 
-    if (queryResultIds.length) {
-      await deleteResultRowsInBatches(cohortResultsTable, queryResultIds);
-      await deleteResultRowsInBatches(datasetResultsTable, queryResultIds);
-    }
+  if (queryResultIds.length) {
+    await deleteResultRowsInBatches(cohortResultsTable, queryResultIds);
+    await deleteResultRowsInBatches(datasetResultsTable, queryResultIds);
   }
 
-  // Child tables first: query_result references indicator_result and query_result_set, indicator_result references query_result_set
+  // Child tables first: query_dependency references query_result, query_result references indicator_result and query_result_set,
+  // indicator_result references query_result_set
   await mysqlDb.transaction(async tx => {
+    if (queryResultIds.length) {
+      await tx
+        .delete(queryDependencyTable)
+        .where(or(inArray(queryDependencyTable.parentQueryResultId, queryResultIds), inArray(queryDependencyTable.subQueryResultId, queryResultIds)));
+    }
     if (resultSetIds.length) {
       await tx.delete(queryResultTable).where(inArray(queryResultTable.queryResultSetId, resultSetIds));
       await tx.delete(indicatorResultTable).where(inArray(indicatorResultTable.queryResultSetId, resultSetIds));
@@ -299,6 +304,12 @@ export async function createQueryResultEntry(queryRequest: QueryRequest, queryRe
     default:
       throw new Error("Unsupported query type: " + queryRequest.query?.queryType);
   }
+}
+
+/** Records which query result used which sub query result. A pair already recorded (a result reused within the job) is skipped. */
+export async function createQueryDependencies(dependencies: { parentQueryResultId: number; subQueryResultId: number }[]) {
+  if (!dependencies.length) return;
+  await mysqlDb.insert(queryDependencyTable).ignore().values(dependencies);
 }
 
 export async function createIndicatorResultEntry(queryRequest: QueryRequest, queryResultSet: QueryResultSet, hashCodeVersion: number) {

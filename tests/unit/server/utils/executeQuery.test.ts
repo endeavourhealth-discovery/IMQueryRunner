@@ -12,6 +12,7 @@ const queryService = vi.hoisted(() => ({
   getQuerySqlDebug: vi.fn()
 }));
 const helper = vi.hoisted(() => ({
+  createQueryDependencies: vi.fn(),
   createQueryResultEntry: vi.fn(),
   getToday: vi.fn(() => "2026-01-01"),
   updateWithEndTime: vi.fn(),
@@ -38,6 +39,7 @@ describe("executeQuery per-job lookups", () => {
     calls.order.length = 0;
     let nextId = 100;
     helper.createQueryResultEntry.mockReset().mockImplementation(async () => nextId++);
+    helper.createQueryDependencies.mockReset().mockResolvedValue(undefined);
     helper.updateWithEndTime.mockReset().mockResolvedValue(undefined);
     helper.updateWithSQL.mockReset().mockResolvedValue(undefined);
     db.execute.mockReset().mockImplementation(async () => {
@@ -91,6 +93,24 @@ describe("executeQuery per-job lookups", () => {
     expect(executed[0]).toContain("from_subA");
     expect(executed[1]).toContain("from_subB");
     expect(executed[2]).toContain("SELECT main");
+  });
+
+  it("records each sub query's parents by result id, including parents listed after it", async () => {
+    const MAIN = "http://example.org/q1";
+    // subA is used by subB (listed after it) and by the main query; subB only by the main query
+    queryService.getSubqueryIris.mockResolvedValue([
+      { iri: SUB_A, parentIris: [SUB_B, MAIN] },
+      { iri: SUB_B, parentIris: [MAIN] }
+    ]);
+
+    // Result ids: main 100, subA 101, subB 102
+    await executeQuery("token", "SELECT 1", request(MAIN), resultSet, createExecutionContext());
+
+    expect(helper.createQueryDependencies).toHaveBeenCalledWith([
+      { parentQueryResultId: 102, subQueryResultId: 101 },
+      { parentQueryResultId: 100, subQueryResultId: 101 },
+      { parentQueryResultId: 100, subQueryResultId: 102 }
+    ]);
   });
 
   it("does not cache a failed lookup", async () => {

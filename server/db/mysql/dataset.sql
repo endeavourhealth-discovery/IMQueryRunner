@@ -6,6 +6,8 @@ DROP TABLE IF EXISTS dataset.cohort_results;
 
 DROP TABLE IF EXISTS dataset.dataset_results;
 
+DROP TABLE IF EXISTS dataset.query_dependency;
+
 DROP TABLE IF EXISTS dataset.query_result;
 
 DROP TABLE IF EXISTS dataset.indicator_result;
@@ -82,6 +84,16 @@ CREATE TABLE
         FOREIGN KEY (query_result_set_id) REFERENCES query_result_set (id),
         FOREIGN KEY (indicator_result_id) REFERENCES indicator_result (id),
         query_type VARCHAR(255)
+    );
+
+CREATE TABLE
+    query_dependency (
+        parent_query_result_id BIGINT NOT NULL,
+        sub_query_result_id BIGINT NOT NULL,
+        PRIMARY KEY (parent_query_result_id, sub_query_result_id),
+        INDEX idx_query_dependency_sub (sub_query_result_id),
+        FOREIGN KEY (parent_query_result_id) REFERENCES query_result (id),
+        FOREIGN KEY (sub_query_result_id) REFERENCES query_result (id)
     );
 
 CREATE TABLE

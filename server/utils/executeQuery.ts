@@ -2,16 +2,17 @@ import Logger from "#shared/logger";
 import { ErrorCode } from "~~/enums";
 import type { ResolvedSql } from "~~/models/ResolvedSql.ts";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
+import { type SubQueryDependency } from "~~/models/subQueryDependency.schema";
 
 import { IMQType } from "@endeavour/vue-library/enums";
-import { type Argument, type QueryRequest, type SubQueryDependency } from "@endeavour/vue-library/models";
+import { type Argument, type QueryRequest } from "@endeavour/vue-library/models";
 
 import { SQL, and, eq, sql } from "drizzle-orm";
 import murmurhash from "murmurhash";
 
 import { mysqlDb } from "../db/mysql";
 import { patientExistsTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
-import { createQueryResultEntry, getToday, updateWithEndTime, updateWithSQL } from "../helpers/mysqlHelper";
+import { createQueryDependencies, createQueryResultEntry, getToday, updateWithEndTime, updateWithSQL } from "../helpers/mysqlHelper";
 import QueryService from "../services/QueryService";
 import { createLimiter } from "./memoryCache";
 
@@ -275,6 +276,21 @@ async function runSubQueries(
       throw err;
     }
   }
+
+  await createQueryDependencies(getQueryDependencies(subQueries, queryIrisToHashCodes));
+}
+
+/** Parent and sub query result id pairs. Only once every sub query has a result id, as a parent can be listed after its sub query. */
+function getQueryDependencies(subQueries: SubQueryDependency[], queryIrisToResultIds: { [key: string]: number }) {
+  return subQueries.flatMap(subQuery => {
+    const subQueryResultId = queryIrisToResultIds[subQuery.iri!];
+    if (subQueryResultId === undefined) return [];
+    return (subQuery.parentIris ?? []).flatMap(parentIri => {
+      // The main query has no result id in debug runs
+      const parentQueryResultId = queryIrisToResultIds[parentIri];
+      return parentQueryResultId === undefined ? [] : [{ parentQueryResultId, subQueryResultId }];
+    });
+  });
 }
 
 export async function sortQueryRequestsByDependency(accessToken: string, queryRequests: QueryRequest[]): Promise<QueryRequest[]> {
