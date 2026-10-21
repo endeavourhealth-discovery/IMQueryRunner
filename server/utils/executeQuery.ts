@@ -12,7 +12,14 @@ import murmurhash from "murmurhash";
 
 import { mysqlDb } from "../db/mysql";
 import { patientExistsTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
-import { createQueryDependencies, createQueryResultEntry, getToday, updateWithEndTime, updateWithSQL } from "../helpers/mysqlHelper";
+import {
+  createQueryDependencies,
+  createQueryResultEntry,
+  getToday,
+  linkQueryResultsToIndicator,
+  updateWithEndTime,
+  updateWithSQL
+} from "../helpers/mysqlHelper";
 import QueryService from "../services/QueryService";
 import { createLimiter } from "./memoryCache";
 
@@ -439,6 +446,27 @@ export async function getValidatedSQL(queryRequest: QueryRequest, accessToken: s
   return sql;
 }
 
+function getIndicatorSubQueries(accessToken: string, indicatorIri: string, ctx: ExecutionContext): Promise<SubQueryDependency[]> {
+  return memo(ctx.subQueries, `indicator|${indicatorIri}`, () => ctx.limit(() => QueryService.getSubqueryIris(accessToken, indicatorIri, true)));
+}
+
+/**
+ * Links the indicator to the results of its direct sub queries, once they have all run. Deeper levels are already linked to their
+ * parents in query_dependency by each sub query's own run.
+ */
+export async function linkIndicatorSubQueries(
+  accessToken: string,
+  queryRequest: QueryRequest,
+  queryResultSet: QueryResultSet,
+  indicatorResultId: number,
+  ctx: ExecutionContext
+) {
+  const indicatorIri = queryRequest.query!.iri!;
+  const subQueries = await getIndicatorSubQueries(accessToken, indicatorIri, ctx);
+  const directIris = subQueries.filter(subQuery => subQuery.iri && subQuery.parentIris?.includes(indicatorIri)).map(subQuery => subQuery.iri!);
+  await linkQueryResultsToIndicator(indicatorResultId, queryResultSet.id!, directIris);
+}
+
 export async function getIndicatorSubQueryRequests(
   accessToken: string,
   queryRequest: QueryRequest,
@@ -446,9 +474,7 @@ export async function getIndicatorSubQueryRequests(
   ctx: ExecutionContext = createExecutionContext()
 ): Promise<{ sql: string; queryRequest: QueryRequest }[]> {
   if (!queryRequest.query?.iri) throw new Error("Query IRI is required to get indicator subqueries");
-  const subqueries = await memo(ctx.subQueries, `indicator|${queryRequest.query.iri}`, () =>
-    ctx.limit(() => QueryService.getSubqueryIris(accessToken, queryRequest.query!.iri!, true))
-  );
+  const subqueries = await getIndicatorSubQueries(accessToken, queryRequest.query.iri, ctx);
   // Independent of one another, so fetched together; Promise.all keeps the original order
   return Promise.all(
     subqueries.map(async subquery => {

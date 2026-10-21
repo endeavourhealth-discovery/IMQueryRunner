@@ -312,6 +312,15 @@ export async function createQueryDependencies(dependencies: { parentQueryResultI
   await mysqlDb.insert(queryDependencyTable).ignore().values(dependencies);
 }
 
+/** Marks the indicator's direct sub query results in its result set as belonging to that indicator. */
+export async function linkQueryResultsToIndicator(indicatorResultId: number, queryResultSetId: number, queryIris: string[]) {
+  if (!queryIris.length) return;
+  await mysqlDb
+    .update(queryResultTable)
+    .set({ indicatorResultId })
+    .where(and(eq(queryResultTable.queryResultSetId, queryResultSetId), inArray(queryResultTable.queryIri, queryIris)));
+}
+
 export async function createIndicatorResultEntry(queryRequest: QueryRequest, queryResultSet: QueryResultSet, hashCodeVersion: number) {
   const indicatorResult = {
     startOfDaySnapshot: queryResultSet.startOfDaySnapshot,

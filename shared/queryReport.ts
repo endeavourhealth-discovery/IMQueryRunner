@@ -135,7 +135,9 @@ async function runQuery(api: QueryReportApi, query: SpecQuery, timeout: number):
   if (result.status === "COMPLETED") {
     try {
       const summaries = await api.getSummaries(result.jobId);
-      const summary = summaries.find(s => s.queryIri === query.iri) || summaries[0];
+      // An indicator's own summary has no count, so it is read from its results as before
+      const counted = summaries.filter(s => s.totalCount !== null);
+      const summary = counted.find(s => s.queryIri === query.iri) || counted[0];
       if (summary) {
         result.count = summary.totalCount;
         result.name = summary.queryName || result.name;

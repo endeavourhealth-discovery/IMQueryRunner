@@ -1,4 +1,4 @@
-import { createExecutionContext, executeQuery, getIndicatorSubQueryRequests, hashQueryRequest } from "~~/server/utils/executeQuery";
+import { createExecutionContext, executeQuery, getIndicatorSubQueryRequests, hashQueryRequest, linkIndicatorSubQueries } from "~~/server/utils/executeQuery";
 
 import { IMQType } from "@endeavour/vue-library/enums";
 
@@ -14,6 +14,7 @@ const queryService = vi.hoisted(() => ({
 const helper = vi.hoisted(() => ({
   createQueryDependencies: vi.fn(),
   createQueryResultEntry: vi.fn(),
+  linkQueryResultsToIndicator: vi.fn(),
   getToday: vi.fn(() => "2026-01-01"),
   updateWithEndTime: vi.fn(),
   updateWithSQL: vi.fn()
@@ -138,6 +139,25 @@ describe("getIndicatorSubQueryRequests", () => {
 
     expect(result.map(r => r.queryRequest.query.iri)).toEqual([SUB_A, SUB_B]);
     expect(result.map(r => r.sql)).toEqual([`SQL for ${SUB_A}`, `SQL for ${SUB_B}`]);
+  });
+});
+
+describe("linkIndicatorSubQueries", () => {
+  it("links only the indicator's direct sub queries", async () => {
+    const INDICATOR = "http://example.org/indicator";
+    queryService.getSubqueryIris.mockReset().mockResolvedValue([
+      { iri: SUB_A, parentIris: [INDICATOR] },
+      { iri: SUB_B, parentIris: [SUB_A] },
+      { iri: "http://example.org/subC", parentIris: null }
+    ]);
+    helper.linkQueryResultsToIndicator.mockReset().mockResolvedValue(undefined);
+    const ctx = createExecutionContext();
+    const indicatorRequest = { query: { iri: INDICATOR, queryType: IMQType.INDICATOR } } as any;
+
+    await linkIndicatorSubQueries("token", indicatorRequest, resultSet, 5, ctx);
+
+    expect(helper.linkQueryResultsToIndicator).toHaveBeenCalledWith(5, 1, [SUB_A]);
+    expect(queryService.getSubqueryIris).toHaveBeenCalledWith("token", INDICATOR, true);
   });
 });
 

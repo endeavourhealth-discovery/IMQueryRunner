@@ -73,12 +73,15 @@ describe("getJobsResultSummaries", () => {
         { id: 100, total: 5 },
         { id: 200, total: 7 }
       ],
-      [{ id: 300, total: 9 }]
+      [{ id: 300, total: 9 }],
+      // sub query links, then indicator results
+      [],
+      []
     ];
 
     const results = await getJobsResultSummaries("token", newUser(), jobs);
 
-    expect(state.selectCalls).toBe(4);
+    expect(state.selectCalls).toBe(6);
     expect(entityMock.getEntitySummary).toHaveBeenCalledTimes(1);
     expect(queryMock.getSubqueryIris).toHaveBeenCalledTimes(1);
     expect(results.map(r => r.summaries.map(s => s.totalCount))).toEqual([[5], [7], [9], []]);
@@ -117,6 +120,51 @@ describe("getJobsResultSummaries", () => {
     state.responses = [[{ id: 10, jobId: 1 }], [{ id: 100, queryResultSetId: 10, queryIri: IRI_A, queryType: IMQType.COHORT }], [{ id: 100, total: 1 }]];
     const [result] = await getJobsResultSummaries("token", newUser(), [job(1)]);
     expect(result!.summaries[0]!.subQueryIris).toEqual([IRI_B]);
+  });
+
+  it("includes the result ids of each result's direct sub queries", async () => {
+    state.responses = [
+      [{ id: 10, jobId: 1 }],
+      [
+        { id: 100, queryResultSetId: 10, queryIri: IRI_A, queryType: IMQType.COHORT },
+        { id: 101, queryResultSetId: 10, queryIri: IRI_B, queryType: IMQType.COHORT }
+      ],
+      [
+        { id: 100, total: 1 },
+        { id: 101, total: 2 }
+      ],
+      [{ parentQueryResultId: 100, subQueryResultId: 101 }]
+    ];
+    const [result] = await getJobsResultSummaries("token", newUser(), [job(1)]);
+    expect(result!.summaries.map(s => [s.queryResultId, s.subQueryResultIds])).toEqual([
+      [100, [101]],
+      [101, undefined]
+    ]);
+  });
+
+  it("adds an uncounted summary for each indicator and marks the sub query results linked to it", async () => {
+    const IRI_IND = "http://example.org/indicator";
+    state.responses = [
+      [{ id: 10, jobId: 1 }],
+      [
+        { id: 100, queryResultSetId: 10, queryIri: IRI_A, queryType: IMQType.COHORT, indicatorResultId: 5 },
+        { id: 101, queryResultSetId: 10, queryIri: IRI_B, queryType: IMQType.COHORT, indicatorResultId: null }
+      ],
+      [
+        { id: 100, total: 1 },
+        { id: 101, total: 2 }
+      ],
+      [{ parentQueryResultId: 100, subQueryResultId: 101 }],
+      [{ id: 5, queryResultSetId: 10, queryIri: IRI_IND }]
+    ];
+    const [result] = await getJobsResultSummaries("token", newUser(), [job(1, JobStatus.COMPLETED, IRI_IND)]);
+    expect(result!.error).toBeUndefined();
+    expect(result!.summaries).toEqual([
+      expect.objectContaining({ indicatorResultId: 5, queryIri: IRI_IND, queryType: IMQType.INDICATOR, totalCount: null }),
+      expect.objectContaining({ queryResultId: 100, indicatorResultId: 5, totalCount: 1, subQueryResultIds: [101] }),
+      expect.not.objectContaining({ indicatorResultId: expect.anything() })
+    ]);
+    expect(result!.summaries[0]!.queryResultId).toBeUndefined();
   });
 
   it("does not share cached IMAPI answers between users", async () => {
