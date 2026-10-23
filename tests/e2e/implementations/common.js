@@ -148,7 +148,7 @@ step("Wait <time> seconds", async time => {
 });
 
 step("Wait for job to submit", async () => {
-  await pw.page.waitForSelector(".p-datatable", { state: "visible" });
+  await pw.page.waitForSelector(".p-datatable", { state: "visible", timeout: 10000 });
   // The queue page can show its datatable before the add request has responded. Building the job calls IMAPI for each query,
   // which can be slow on the first run, so a late response is not an error here: "Wait for job to complete" keeps waiting for it
   const started = Date.now();

@@ -88,19 +88,27 @@ export const queryDependencyTable = dataset.table(
   table => [primaryKey({ columns: [table.parentQueryResultId, table.subQueryResultId] }), index("idx_query_dependency_sub").on(table.subQueryResultId)]
 );
 
-export const datasetResultsTable = dataset.table("dataset_results", {
-  queryResultId: int("query_result_id").notNull(),
-  entityId: int("entity_id").notNull(),
-  columnGroup: varchar("column_group", { length: 255 }).notNull(),
-  json: json("json").notNull(),
-  entityOrgId: int("entity_org_id").notNull()
-});
+export const datasetResultsTable = dataset.table(
+  "dataset_results",
+  {
+    queryResultId: int("query_result_id").notNull(),
+    entityId: int("entity_id").notNull(),
+    columnGroup: varchar("column_group", { length: 255 }).notNull(),
+    json: json("json").notNull(),
+    entityOrgId: int("entity_org_id").notNull()
+  },
+  table => [index("idx_qr_entity").on(table.queryResultId, table.entityId)]
+);
 
-export const cohortResultsTable = dataset.table("cohort_results", {
-  queryResultId: int("query_result_id").notNull(),
-  entityId: int("entity_id").notNull(),
-  entityOrgId: int("entity_org_id").notNull()
-});
+export const cohortResultsTable = dataset.table(
+  "cohort_results",
+  {
+    queryResultId: int("query_result_id").notNull(),
+    entityId: int("entity_id").notNull(),
+    entityOrgId: int("entity_org_id").notNull()
+  },
+  table => [index("idx_qr_entity").on(table.queryResultId, table.entityId)]
+);
 
 export const patientExistsTable = dataset.table(
   "patient_exists",
