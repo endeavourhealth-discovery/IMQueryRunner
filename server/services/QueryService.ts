@@ -1,14 +1,7 @@
+import { type SubQueryDependency, subQueryDependencySchema } from "~~/models/subQueryDependency.schema";
+
 import { parseApiResponse } from "@endeavour/vue-library/helpers";
-import {
-  type Query,
-  type QueryRequest,
-  QueryRequestSchema,
-  QuerySchema,
-  type SearchResponse,
-  SearchResponseSchema,
-  type SubQueryDependency,
-  SubQueryDependencySchema
-} from "@endeavour/vue-library/models";
+import { type Query, type QueryRequest, QueryRequestSchema, QuerySchema, type SearchResponse, SearchResponseSchema } from "@endeavour/vue-library/models";
 
 import z from "zod";
 
@@ -58,7 +51,7 @@ const QueryService = {
       },
       method: "get"
     });
-    return parseApiResponse(result, z.array(SubQueryDependencySchema));
+    return parseApiResponse(result, z.array(subQueryDependencySchema));
   },
 
   async getQueryRequestForSQL(accessToken: string, queryRequest: QueryRequest): Promise<QueryRequest> {

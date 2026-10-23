@@ -3,7 +3,7 @@ import { JobStatus } from "~~/enums/JobStatus";
 import { IMQType } from "@endeavour/vue-library";
 import { type QueryRequest } from "@endeavour/vue-library/models";
 
-import { bigint, date, datetime, index, int, json, mediumtext, mysqlTable, tinyint, varchar } from "drizzle-orm/mysql-core";
+import { bigint, date, datetime, index, int, json, mediumtext, mysqlTable, primaryKey, tinyint, varchar } from "drizzle-orm/mysql-core";
 import { mysqlSchema } from "drizzle-orm/mysql-core";
 
 // Only the tables this application reads or writes. The source clinical tables (patient, observation, encounter and so on) are
@@ -77,6 +77,15 @@ export const queryResultTable = dataset.table(
     queryType: varchar("query_type", { length: 255 }).$type<IMQType>().notNull()
   },
   table => [index("idx_query_result_set_iri").on(table.queryResultSetId, table.queryIri)]
+);
+
+export const queryDependencyTable = dataset.table(
+  "query_dependency",
+  {
+    parentQueryResultId: int("parent_query_result_id").notNull(),
+    subQueryResultId: int("sub_query_result_id").notNull()
+  },
+  table => [primaryKey({ columns: [table.parentQueryResultId, table.subQueryResultId] }), index("idx_query_dependency_sub").on(table.subQueryResultId)]
 );
 
 export const datasetResultsTable = dataset.table("dataset_results", {

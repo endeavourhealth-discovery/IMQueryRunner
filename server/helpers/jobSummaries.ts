@@ -7,7 +7,7 @@ import { IMQType } from "@endeavour/vue-library/enums";
 import { asc, count, inArray } from "drizzle-orm";
 
 import { mysqlDb } from "../db/mysql";
-import { cohortResultsTable, datasetResultsTable, indicatorResultTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
+import { cohortResultsTable, datasetResultsTable, indicatorResultTable, queryDependencyTable, queryResultSetTable, queryResultTable } from "../db/mysql/schema";
 import EntityService from "../services/EntityService";
 import QueryService from "../services/QueryService";
 import { TtlCache, createLimiter } from "../utils/memoryCache";
@@ -74,7 +74,7 @@ function countsById(rows: { id: number | null; total: number }[]): Map<number, n
 
 /**
  * Builds result summaries for several jobs at once. The database is hit a fixed number of times however many jobs
- * there are (result sets, result rows, then one grouped count per result table), and each distinct IMAPI lookup is made at most once.
+ * there are (result sets, result rows, then one grouped count per result table and the sub query links), and each distinct IMAPI lookup is made at most once.
  * Jobs that are not COMPLETED get an empty summary list. A job that fails gets `error` set without affecting the others.
  */
 export async function getJobsResultSummaries(accessToken: string, userId: string, jobs: Job[]): Promise<JobSummaryResult[]> {
@@ -94,7 +94,7 @@ export async function getJobsResultSummaries(accessToken: string, userId: string
   const datasetIds = idsOfType(IMQType.DATASET);
   const indicatorSetIds = [...new Set(resultRows.filter(row => row.queryType === IMQType.INDICATOR).map(row => row.queryResultSetId!))];
 
-  const [cohortCounts, datasetCounts, indicatorCounts] = await Promise.all([
+  const [cohortCounts, datasetCounts, indicatorCounts, dependencies, indicatorResults] = await Promise.all([
     cohortIds.length
       ? mysqlDb
           .select({ id: cohortResultsTable.queryResultId, total: count() })
@@ -115,14 +115,30 @@ export async function getJobsResultSummaries(accessToken: string, userId: string
           .from(indicatorResultTable)
           .where(inArray(indicatorResultTable.queryResultSetId, indicatorSetIds))
           .groupBy(indicatorResultTable.queryResultSetId)
-      : []
+      : [],
+    resultRows.length
+      ? mysqlDb
+          .select()
+          .from(queryDependencyTable)
+          .where(
+            inArray(
+              queryDependencyTable.parentQueryResultId,
+              resultRows.map(row => row.id)
+            )
+          )
+      : [],
+    resultSetIds.length ? mysqlDb.select().from(indicatorResultTable).where(inArray(indicatorResultTable.queryResultSetId, resultSetIds)) : []
   ]);
   const cohortCountById = countsById(cohortCounts);
   const datasetCountById = countsById(datasetCounts);
   const indicatorCountBySetId = countsById(indicatorCounts);
+  const subQueryResultIdsById = new Map(
+    [...Map.groupBy(dependencies, dependency => dependency.parentQueryResultId)].map(([id, links]) => [id, links.map(link => link.subQueryResultId)])
+  );
 
   const setsByJobId = Map.groupBy(resultSets, set => set.jobId);
   const rowsBySetId = Map.groupBy(resultRows, row => row.queryResultSetId);
+  const indicatorsBySetId = Map.groupBy(indicatorResults, indicator => indicator.queryResultSetId);
   const lookups = createLookups(accessToken, userId);
 
   return Promise.all(
@@ -137,6 +153,23 @@ export async function getJobsResultSummaries(accessToken: string, userId: string
         for (const resultSet of jobSets) {
           const rows = rowsBySetId.get(resultSet.id);
           if (!rows?.length) throw createError({ status: 404, statusText: ErrorCode.MissingDataError, message: "Query result not found" });
+
+          const indicators = indicatorsBySetId.get(resultSet.id) ?? [];
+          const indicatorNames = await Promise.all(indicators.map(indicator => lookups.entityName(indicator.queryIri)));
+          indicators.forEach((indicator, index) => {
+            const summary: QueryResultSummary = {
+              indicatorResultId: indicator.id,
+              totalCount: null,
+              queryName: indicatorNames[index]!,
+              queryIri: indicator.queryIri,
+              queryType: IMQType.INDICATOR,
+              startTime: indicator.startTime,
+              endTime: indicator.endTime
+            };
+            const subQueryIris = subQueryIrisByQueryIri.get(indicator.queryIri);
+            if (subQueryIris) summary.subQueryIris = subQueryIris;
+            summaries.push(summary);
+          });
 
           const names = await Promise.all(rows.map(row => lookups.entityName(row.queryIri)));
           rows.forEach((row, index) => {
@@ -154,9 +187,20 @@ export async function getJobsResultSummaries(accessToken: string, userId: string
               default:
                 throw createError({ status: 400, statusText: ErrorCode.InvalidRequestError, message: "Query type is invalid" });
             }
-            const summary: QueryResultSummary = { totalCount, queryName: names[index]!, queryIri: row.queryIri, queryType: row.queryType };
+            const summary: QueryResultSummary = {
+              queryResultId: row.id,
+              totalCount,
+              queryName: names[index]!,
+              queryIri: row.queryIri,
+              queryType: row.queryType,
+              startTime: row.startTime,
+              endTime: row.endTime
+            };
             const subQueryIris = subQueryIrisByQueryIri.get(row.queryIri);
             if (subQueryIris) summary.subQueryIris = subQueryIris;
+            const subQueryResultIds = subQueryResultIdsById.get(row.id);
+            if (subQueryResultIds) summary.subQueryResultIds = subQueryResultIds;
+            if (row.indicatorResultId !== null) summary.indicatorResultId = row.indicatorResultId;
             summaries.push(summary);
           });
         }
