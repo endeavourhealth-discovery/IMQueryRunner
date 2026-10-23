@@ -172,7 +172,7 @@ step("Wait for job to complete", async () => {
       await pw.page.getByRole("button", { name: "Refresh", exact: true }).click();
       const loading = pw.page.locator(".p-datatable-loading-icon");
       await expect(loading).toBeHidden({ timeout: 30000 });
-      await expect(pw.page.locator(".p-datatable")).toBeVisible();
+      await expect(pw.page.locator('[data-testid="job-table"]')).toBeVisible();
       const row = pw.page.locator("table tbody tr").filter({ hasText: job.name }).nth(0);
       await expect(row).toBeVisible();
       await expect(row.locator(".p-tag")).toContainText(status);
@@ -182,8 +182,8 @@ step("Wait for job to complete", async () => {
   assert.fail(`Job ${job.id} still "${status}" after ${JOB_TIMEOUT}ms`);
 });
 
-step("Wait for datatable to finish loading", async () => {
+step("Wait for job table to finish loading", async () => {
   const loading = pw.page.locator(".p-datatable-loading-icon");
   await expect(loading).toBeHidden({ timeout: 30000 });
-  await expect(pw.page.locator(".p-datatable")).toBeVisible();
+  await expect(pw.page.locator('[data-testid="job-table"]')).toBeVisible();
 });

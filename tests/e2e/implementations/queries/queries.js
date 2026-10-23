@@ -7,10 +7,11 @@ const { pw } = require("../playwright");
 async function jobRow() {
   const job = await pw.job;
   assert.ok(job && job.name, "No job was queued in this scenario");
-  return pw.page
-    .locator(".p-datatable-tbody > tr")
-    .filter({ has: pw.page.getByRole("cell", { name: job.name, exact: true }) })
-    .first();
+  const table = pw.page.locator('[data-testid="job-table"]');
+  const allRows = table.locator("tr");
+  const rowsMatchingJobName = allRows.filter({ has: pw.page.getByRole("cell", { name: job.name, exact: true }) });
+  const firstMatch = rowsMatchingJobName.first();
+  return firstMatch;
 }
 
 const TERMINAL_STATUSES = ["COMPLETED", "ERRORED", "CANCELLED"];
@@ -37,6 +38,7 @@ async function terminalJobRow() {
 async function openResults() {
   const { row } = await terminalJobRow();
   await row.locator('[data-testid="view-query-results-button"]').click();
+  await pw.page.waitForSelector("#view-results-menu");
   await pw.page.locator(".p-menu-item").nth(0).click();
 }
 

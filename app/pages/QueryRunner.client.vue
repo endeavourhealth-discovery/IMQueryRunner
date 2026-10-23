@@ -34,6 +34,7 @@
             :rows-per-page-options="[rowsOriginal, rowsOriginal * 2, rowsOriginal * 4, rowsOriginal * 8]"
             :loading="searchLoading"
             :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
+            data-testid="job-table"
           >
             <template #empty>None</template>
             <Column field="name" header="Name" :expander="true">
