@@ -39,7 +39,9 @@ async function openResults() {
   const { row } = await terminalJobRow();
   await row.locator('[data-testid="view-query-results-button"]').click();
   await pw.page.waitForSelector("#view-results-menu");
-  await pw.page.locator(".p-menu-item").nth(0).click();
+  const menuItem = await pw.page.locator(".p-menu-item").nth(0);
+  await menuItem.waitFor({ state: "visible" });
+  await menuItem.click();
 }
 
 async function expectTotalResults(total) {
