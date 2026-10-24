@@ -26,7 +26,8 @@
     "format:check": "prettier --check \"{app,docs,enums,models,server,shared,types,tests}/**/*.{js,ts,vue,json,css,scss,md}\"",
     "prepare": "husky",
     "preinstall": "pnpm config set \"@endeavour:registry=https://artifactory.endhealth.co.uk/repository/npm/\"",
-    "sonar": "sonar-scanner-npm"
+    "sonar": "sonar-scanner-npm",
+    "recreate:dataset": "node scripts/run-dataset-sql.js"
   },
   "dependencies": {
     "@braintree/sanitize-url": "7.1.2",
