@@ -293,13 +293,16 @@ async function initSearch() {
       }
     });
     if (results) {
-      resultSummaries.value = await loadResultSummaries(results.result);
-      totalCount.value = results.totalCount;
-      jobs.value = results.result.sort((a, b) => {
+      const summaries = await loadResultSummaries(results.result);
+      const sortedJobs = results.result.sort((a, b) => {
         if (!a.queueDate) return 1;
         if (!b.queueDate) return -1;
         return new Date(b.queueDate).getTime() - new Date(a.queueDate).getTime();
       });
+      // Only replace what changed: reassigning identical data still re-renders the rows, which destroys any open results menu
+      if (JSON.stringify(summaries) !== JSON.stringify(resultSummaries.value)) resultSummaries.value = summaries;
+      totalCount.value = results.totalCount;
+      if (JSON.stringify(sortedJobs) !== JSON.stringify(jobs.value)) jobs.value = sortedJobs;
     } else {
       totalCount.value = 0;
       jobs.value = [];

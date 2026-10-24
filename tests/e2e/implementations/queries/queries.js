@@ -37,11 +37,14 @@ async function terminalJobRow() {
 
 async function openResults() {
   const { row } = await terminalJobRow();
-  await row.locator('[data-testid="view-query-results-button"]').click();
-  await pw.page.waitForSelector("#view-results-menu");
-  const menuItem = await pw.page.locator(".p-menu-item").nth(0);
-  await menuItem.waitFor({ state: "visible" });
-  await menuItem.click();
+  // A queue refresh can re-render the row and destroy the popup mid-click, so reopen the menu and retry the whole sequence
+  await expect(async () => {
+    await row.locator('[data-testid="view-query-results-button"]').click({ timeout: 5000 });
+    await pw.page.waitForSelector("#view-results-menu", { timeout: 5000 });
+    const menuItem = pw.page.locator(".p-menu-item").nth(0);
+    await menuItem.waitFor({ state: "visible", timeout: 5000 });
+    await menuItem.click({ timeout: 5000 });
+  }).toPass({ timeout: 25000 });
 }
 
 async function expectTotalResults(total) {
