@@ -30,7 +30,7 @@ export default defineEventHandler(async event => {
       .select()
       .from(jobTable)
       .where(and(...filters))
-      .orderBy(desc(jobTable.queueDate))
+      .orderBy(desc(jobTable.id))
       .offset((page - 1) * size)
       .limit(size)
   ]);
