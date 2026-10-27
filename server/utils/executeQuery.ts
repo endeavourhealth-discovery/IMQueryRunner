@@ -2,10 +2,9 @@ import Logger from "#shared/logger";
 import { ErrorCode } from "~~/enums";
 import type { ResolvedSql } from "~~/models/ResolvedSql.ts";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
-import { type SubQueryDependency } from "~~/models/subQueryDependency.schema";
 
 import { IMQType } from "@endeavour/vue-library/enums";
-import { type Argument, type QueryRequest } from "@endeavour/vue-library/models";
+import { type Argument, type QueryRequest, type SubQueryDependency } from "@endeavour/vue-library/models";
 
 import { SQL, and, eq, sql } from "drizzle-orm";
 import murmurhash from "murmurhash";
