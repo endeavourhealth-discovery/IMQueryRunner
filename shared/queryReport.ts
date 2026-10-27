@@ -63,6 +63,8 @@ export interface RunOptions {
   concurrency: number;
   /** ms per job */
   timeout: number;
+  /** yyyy-mm-dd sent as $searchDate; the server uses today when omitted */
+  searchDate?: string;
   onProgress?: (done: number, total: number, result?: QueryReportResult) => void;
 }
 
@@ -96,12 +98,13 @@ export function errorText(err: any): string {
   return err?.data?.message || err?.data?.statusMessage || err?.message || String(err);
 }
 
-async function runQuery(api: QueryReportApi, query: SpecQuery, timeout: number): Promise<QueryReportResult> {
+async function runQuery(api: QueryReportApi, query: SpecQuery, timeout: number, searchDate?: string): Promise<QueryReportResult> {
   const started = Date.now();
   const result: QueryReportResult = { ...query, name: query.label, status: "", count: null, jobId: null, durationMs: null, queuedMs: null };
 
   try {
-    const added = await api.addJob({ jobName: `[report] ${query.label || query.iri}`, queryRequests: [{ query: { iri: query.iri }, argument: [] }] });
+    const argument = searchDate ? [{ parameter: "$searchDate", valueData: searchDate }] : [];
+    const added = await api.addJob({ jobName: `[report] ${query.label || query.iri}`, queryRequests: [{ query: { iri: query.iri }, argument }] });
     if (!added?.jobId) {
       result.status = "SUBMIT_FAILED";
       result.error = "Job add returned no jobId (check the RabbitMQ connection)";
@@ -180,7 +183,7 @@ export async function runQueries(api: QueryReportApi, queries: SpecQuery[], opti
       const index = next++;
       const query = queries[index]!;
       try {
-        results[index] = await runQuery(api, query, options.timeout);
+        results[index] = await runQuery(api, query, options.timeout, options.searchDate);
       } catch (err: any) {
         results[index] = {
           ...query,

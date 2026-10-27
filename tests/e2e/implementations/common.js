@@ -29,6 +29,16 @@ function toJob(response) {
     .then(body => ({ id: body && body.jobId, name: (response.request().postDataJSON() || {}).jobName, status: response.status() }));
 }
 
+// Pins $searchDate so expected counts don't drift with the day the specs run; the date picker emits the argument as it is typed
+async function setSearchDate() {
+  const searchDate = (process.env.search_date || "").trim();
+  if (!searchDate) return;
+  const input = pw.page.locator('input[data-testid="search-date-input"], [data-testid="search-date-input"] input').first();
+  await input.fill(searchDate);
+  await input.press("Escape");
+  await expect(input).toHaveValue(searchDate);
+}
+
 function toFileName(text) {
   return text.replace(/[^\w.-]+/g, "_").replace(/^_+|_+$/g, "");
 }
@@ -130,6 +140,7 @@ step("Search for <text> and select", async text => {
   await pw.page.locator(".p-listbox-option").filter({ hasText: text }).click();
   await expect(pw.page.locator(".results-container")).toBeHidden();
   await expect(pw.page.locator(".p-datatable")).toBeVisible({ timeout: 30000 });
+  await setSearchDate();
   await expect(pw.page.getByRole("button", { name: "Add to queue" })).toBeEnabled();
 });
 
@@ -140,6 +151,7 @@ step("Search for <search> and select <select>", async (search, select) => {
   await pw.page.locator(".p-listbox-option").filter({ hasText: select }).click();
   await expect(pw.page.locator(".results-container")).toBeHidden();
   await expect(pw.page.locator(".p-datatable")).toBeVisible({ timeout: 30000 });
+  await setSearchDate();
   await expect(pw.page.getByRole("button", { name: "Add to queue" })).toBeEnabled();
 });
 
