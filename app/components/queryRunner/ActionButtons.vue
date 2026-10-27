@@ -86,6 +86,7 @@ import type { Job, JobRequest, QueryResultSummary } from "~~/models";
 import { ref } from "vue";
 
 import { isArrayHasLength } from "@endeavour/vue-library";
+import { IMQType } from "@endeavour/vue-library/enums";
 
 import type { MenuItem } from "primevue/menuitem";
 import { useConfirm } from "primevue/useconfirm";
@@ -133,8 +134,10 @@ function openViewResultsMenuItems(event: MouseEvent): void {
       label: "Results",
       items: [
         {
-          label: `${details.primaryQueryResultsDetails.queryName} (${details.primaryQueryResultsDetails.totalCount})`,
+          label: withCount(details.primaryQueryResultsDetails),
           icon: "fa-duotone fa-solid fa-table-list",
+          // An indicator has no result rows of its own, only its sub queries do
+          disabled: queryType === IMQType.INDICATOR,
           command: () => viewQueryResults(encodeURIComponent(iri), queryType)
         }
       ]
@@ -145,7 +148,7 @@ function openViewResultsMenuItems(event: MouseEvent): void {
       const subMenuItems: MenuItem = {
         label: "Sub queries",
         items: details.subQueryResultsDetails.map(subQuery => ({
-          label: `    ${subQuery.queryName} (${subQuery.totalCount})`,
+          label: `    ${withCount(subQuery)}`,
           icon: "fa-duotone fa-solid fa-table-list",
           command: () => viewQueryResults(encodeURIComponent(subQuery.queryIri), subQuery.queryType)
         }))
@@ -235,6 +238,10 @@ function getResultDetails(queryIri: string):
     primaryQueryResultsDetails: primaryQueryResultsDetails,
     subQueryResultsDetails: subQueryResultsDetails
   };
+}
+
+function withCount(summary: QueryResultSummary): string {
+  return summary.totalCount === null ? summary.queryName : `${summary.queryName} (${summary.totalCount})`;
 }
 
 function showErrorDetails() {}

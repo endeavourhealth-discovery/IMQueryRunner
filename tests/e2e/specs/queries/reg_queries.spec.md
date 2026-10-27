@@ -23,7 +23,7 @@ tags: reg-queries
 | "http://endhealth.info/qof#e6e5d441-77d5-4520-af34-ec209d62bccb" |       | HYP_REG - Patients on the hypertension register                            |
 | "http://endhealth.info/qof#7d57f834-3595-4834-ac29-4a2a33092339" |       | MH1_REG - Psychosis, schizophrenia or bipolar diagnosis                    |
 | "http://endhealth.info/qof#7f4e269a-7ac6-4eeb-b39c-0d5a59f6c576" |       | STIA_REG - Patients on the stroke or TIA register                          |
-| "http://endhealth.info/qof#3d88a9e9-9f41-48a0-bfa3-3d54d53499cb" | 5736  | SMOK2_REG: Patients aged 15 years and over for Smoking                     |
+| "http://endhealth.info/qof#3d88a9e9-9f41-48a0-bfa3-3d54d53499cb" | 5737  | SMOK2_REG: Patients aged 15 years and over for Smoking                     |
 | "http://endhealth.info/qof#a4d2d322-041d-4484-9fc2-eddd55a6eaf8" |       | OBES_REG - Patients age >=18 on obesity register                           |
 | "http://endhealth.info/qof#5d7112d7-8203-4878-b7e5-2de8bd3a5e93" |       | OBES2_REG - Patients age >=18 on obesity register with 4+ diagnoses        |
 | "http://endhealth.info/qof#f34d2ecd-3c8b-4367-9936-ec564a1cb9b7" | 42    | SMOK1_REG: Patients with Chronic Diseases                                  |
@@ -40,5 +40,5 @@ tags: reg-queries
 * Click "Run" button
 * Wait for job to complete
 * Click "Refresh" button
-* Wait for datatable to finish loading
+* Wait for job table to finish loading
 * Check results for <count>

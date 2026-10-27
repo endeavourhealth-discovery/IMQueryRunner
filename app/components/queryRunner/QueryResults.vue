@@ -25,6 +25,7 @@
           :rows-per-page-options="[originalSize, originalSize * 2, originalSize * 4, originalSize * 8]"
           :loading="loading"
           :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
+          data-testid="query-results-table"
         >
           <template #header>
             <div class="flex flex-wrap items-center justify-between gap-2">

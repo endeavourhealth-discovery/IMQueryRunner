@@ -21,66 +21,95 @@
           <Menu ref="reportMenu" id="query-report-menu" :model="reportMenuItems" :popup="true" />
         </div>
         <transition name="fade">
-          <DataTable
-            :value="jobs"
+          <TreeTable
+            v-model:expandedKeys="expandedKeys"
+            :value="nodes"
             :paginator="true"
             :rows="rows"
             :scrollable="true"
             scrollHeight="flex"
-            :autoLayout="true"
             @page="onPage($event)"
             :lazy="true"
             :totalRecords="totalCount"
             :rows-per-page-options="[rowsOriginal, rowsOriginal * 2, rowsOriginal * 4, rowsOriginal * 8]"
             :loading="searchLoading"
             :paginatorTemplate="'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown'"
+            data-testid="job-table"
           >
             <template #empty>None</template>
-            <Column field="jobName" header="Job name"></Column>
-            <Column>
-              <template #body="{ data }: { data: Job }">
-                <!-- <Button
-                :disabled="!data.queryDefinition.argument.length"
-                label="View arguments"
-                @click="viewArgumentDisplay(data.queryDefinition.argument)"
-              /> -->
+            <Column field="name" header="Name" :expander="true">
+              <template #body="{ node }: { node: QueueNode }">
+                <span v-if="node.data.kind === 'job'">{{ node.data.job.jobName }}</span>
+                <span v-else>{{ node.data.summary.queryName }}</span>
               </template>
             </Column>
-            <Column v-if="adminView" field="userId" header="User"></Column>
-            <Column field="queuedAt" header="Queued">
-              <template #body="{ data }: { data: Job }">
-                <span>{{ data.queueDate ? getDisplayDateTime(data.queueDate) : "-" }}</span>
+            <Column field="count" header="Count">
+              <template #body="{ node }: { node: QueueNode }">
+                <span v-if="node.data.kind === 'query'">{{ node.data.summary.totalCount }}</span>
+              </template>
+            </Column>
+            <Column v-if="adminView" header="User">
+              <template #body="{ node }: { node: QueueNode }">
+                <span v-if="node.data.kind === 'job'">{{ node.data.job.userId }}</span>
+              </template>
+            </Column>
+            <Column field="queuedAt" header="Queued/Started">
+              <template #body="{ node }: { node: QueueNode }">
+                <span v-if="node.data.kind === 'job'">{{ node.data.job.queueDate ? getDisplayDateTime(node.data.job.queueDate) : "-" }}</span>
+                <span v-else>{{ node.data.summary.startTime ? getDisplayDateTime(node.data.summary.startTime) : "-" }}</span>
               </template>
             </Column>
             <Column field="stoppedAt" header="Finished">
-              <template #body="{ data }: { data: Job }">
-                <span>{{ data.finishDate ? getDisplayDateTime(data.finishDate) : "-" }}</span>
+              <template #body="{ node }: { node: QueueNode }">
+                <span v-if="node.data.kind === 'job'">{{ node.data.job.finishDate ? getDisplayDateTime(node.data.job.finishDate) : "-" }}</span>
+                <span v-else>{{ node.data.summary.endTime ? getDisplayDateTime(node.data.summary.endTime) : "-" }}</span>
               </template>
             </Column>
             <Column field="runTime" header="Run time">
-              <template #body="{ data }: { data: Job }">
-                <span>{{ data.finishDate ? getDisplayRunTime(data) : "-" }}</span>
+              <template #body="{ node }: { node: QueueNode }">
+                <span v-if="node.data.kind === 'job'">{{ node.data.job.finishDate ? getDisplayRunTime(node.data.job) : "-" }}</span>
+                <span v-else>{{ getDisplayRunSeconds(node.data.summary) }}</span>
               </template>
             </Column>
             <Column field="status" header="Status">
-              <template #body="{ data }: { data: Job }">
-                <Tag :severity="data.status ? getStatusSeverity(data.status) : '-'" :value="data.status" />
+              <template #body="{ node }: { node: QueueNode }">
+                <Tag
+                  v-if="node.data.kind === 'job'"
+                  :severity="node.data.job.status ? getStatusSeverity(node.data.job.status) : '-'"
+                  :value="node.data.job.status"
+                />
               </template>
             </Column>
             <Column>
-              <template #body="slotProps">
+              <template #body="{ node }: { node: QueueNode }">
                 <ActionButtons
-                  :job="slotProps.data"
-                  :resultSummary="resultSummaries.find(rs => Number(rs.jobId) === slotProps.data.id)?.resultsSummary"
+                  v-if="node.data.kind === 'job'"
+                  :job="node.data.job"
+                  :resultSummary="getResultSummaries(node.data.job.id)"
                   @cancel-query="cancelJob"
                   @go-to-query="goToQuery"
                   @view-query-results="viewQueryResults"
                   @delete-query="deleteJob"
                   @requeue-query="requeueJob"
                 />
+                <div v-else class="flex items-center gap-1">
+                  <Button
+                    icon="fa-duotone fa-solid fa-magnifying-glass"
+                    class="p-button-rounded p-button-text p-button-plain"
+                    @click="goToQuery(node.data.summary.queryIri)"
+                    v-tooltip.top="'View query'"
+                  />
+                  <Button
+                    v-if="node.data.summary.queryType !== IMQType.INDICATOR"
+                    icon="fa-duotone fa-solid fa-list"
+                    class="p-button-rounded p-button-text p-button-plain"
+                    @click="viewSummaryResults(node.data.jobId, node.data.summary)"
+                    v-tooltip.left="'View results'"
+                  />
+                </div>
               </template>
             </Column>
-          </DataTable>
+          </TreeTable>
         </transition>
       </div>
     </div>
@@ -100,10 +129,12 @@ import type { Job, QueryResultSummary, QueueUpdate } from "~~/models";
 import type { Ref } from "vue";
 import { onMounted, ref } from "vue";
 
+import { IMQType } from "@endeavour/vue-library/enums";
 import type { Argument } from "@endeavour/vue-library/models";
 import { useUserStore } from "@endeavour/vue-library/stores";
 
 import type { MenuItem } from "primevue/menuitem";
+import type { TreeTableExpandedKeys } from "primevue/treetable";
 import type { Socket } from "socket.io-client";
 
 definePageMeta({
@@ -140,6 +171,61 @@ const reportMenuItems: MenuItem[] = (Object.keys(QUERY_REPORT_SUITES) as QueryRe
   command: () => runReport(suite)
 }));
 const adminView = false; //TODO: determine admin view based on user role and preference
+
+type QueueNodeData = { kind: "job"; job: Job } | { kind: "query"; jobId: number; summary: QueryResultSummary };
+interface QueueNode {
+  key: string;
+  data: QueueNodeData;
+  leaf: boolean;
+  children: QueueNode[];
+}
+
+const expandedKeys: Ref<TreeTableExpandedKeys> = ref({});
+
+// Children are only built for expanded nodes: a sub query shared by several queries appears under each of them, so building the whole
+// tree up front could be far larger than what is ever looked at. Keys are paths, so a shared sub query gets a different key under each parent.
+const nodes = computed(() => jobs.value.map(jobNode));
+
+function jobNode(job: Job): QueueNode {
+  const key = `job-${job.id}`;
+  const summaries = getResultSummaries(job.id) ?? [];
+  const summaryById = new Map(summaries.filter(summary => summary.queryResultId !== undefined).map(summary => [summary.queryResultId!, summary]));
+  // An indicator's sub queries are the results linked to it, any other query's are the sub query results it recorded
+  const subQueriesOf = (summary: QueryResultSummary) =>
+    summary.queryType === IMQType.INDICATOR
+      ? summaries.filter(sub => sub.queryResultId !== undefined && sub.indicatorResultId === summary.indicatorResultId)
+      : (summary.subQueryResultIds ?? []).map(id => summaryById.get(id)).filter((sub): sub is QueryResultSummary => !!sub);
+  // The job's own queries: one entry per query request, as the sub query results of one query can share its iri with another
+  const topLevel = [...new Set(job.queryRequests.map(queryRequest => queryRequest.query?.iri))]
+    .map(iri => summaries.find(summary => summary.queryIri === iri))
+    .filter((summary): summary is QueryResultSummary => !!summary);
+  return {
+    key,
+    data: { kind: "job", job },
+    leaf: !topLevel.length,
+    children: expandedKeys.value[key] ? topLevel.map(summary => queryNode(key, job.id, summary, subQueriesOf)) : []
+  };
+}
+
+function queryNode(
+  parentKey: string,
+  jobId: number,
+  summary: QueryResultSummary,
+  subQueriesOf: (summary: QueryResultSummary) => QueryResultSummary[]
+): QueueNode {
+  const key = `${parentKey}/${summary.queryResultId ?? `indicator-${summary.indicatorResultId}`}`;
+  const subQueries = subQueriesOf(summary);
+  return {
+    key,
+    data: { kind: "query", jobId, summary },
+    leaf: !subQueries.length,
+    children: expandedKeys.value[key] ? subQueries.map(sub => queryNode(key, jobId, sub, subQueriesOf)) : []
+  };
+}
+
+function getResultSummaries(jobId: number): QueryResultSummary[] | undefined {
+  return resultSummaries.value.find(summary => Number(summary.jobId) === jobId)?.resultsSummary;
+}
 
 interface IntervalOption {
   name: string;
@@ -207,13 +293,16 @@ async function initSearch() {
       }
     });
     if (results) {
-      resultSummaries.value = await loadResultSummaries(results.result);
-      totalCount.value = results.totalCount;
-      jobs.value = results.result.sort((a, b) => {
+      const summaries = await loadResultSummaries(results.result);
+      const sortedJobs = results.result.sort((a, b) => {
         if (!a.queueDate) return 1;
         if (!b.queueDate) return -1;
         return new Date(b.queueDate).getTime() - new Date(a.queueDate).getTime();
       });
+      // Only replace what changed: reassigning identical data still re-renders the rows, which destroys any open results menu
+      if (JSON.stringify(summaries) !== JSON.stringify(resultSummaries.value)) resultSummaries.value = summaries;
+      totalCount.value = results.totalCount;
+      if (JSON.stringify(sortedJobs) !== JSON.stringify(jobs.value)) jobs.value = sortedJobs;
     } else {
       totalCount.value = 0;
       jobs.value = [];
@@ -412,6 +501,10 @@ async function viewQueryResults(queryItem: Job) {
   showQueryResults.value = true;
 }
 
+async function viewSummaryResults(jobId: number, summary: QueryResultSummary) {
+  await navigateTo({ path: `/results/${jobId}/${summary.queryType}/${encodeURIComponent(summary.queryIri)}` });
+}
+
 async function viewArgumentDisplay(args: Argument[]) {
   currentArguments.value = args;
   showArgumentDisplay.value = true;
@@ -480,7 +573,7 @@ async function onPage(event: any) {
 }
 
 function scrollToTop() {
-  const scrollArea = document.getElementsByClassName("p-datatable-scrollable-table")[0] as HTMLElement;
+  const scrollArea = document.getElementsByClassName("p-treetable-scrollable-table")[0] as HTMLElement;
   scrollArea?.scrollIntoView({ block: "start", behavior: "smooth" });
 }
 
@@ -499,6 +592,13 @@ function getDisplayDateTime(date: Date) {
     ":" +
     d.getSeconds().toString().padStart(2, "0")
   );
+}
+
+function getDisplayRunSeconds(summary: QueryResultSummary) {
+  if (!summary.startTime || !summary.endTime) return "-";
+  const seconds = (new Date(summary.endTime).getTime() - new Date(summary.startTime).getTime()) / 1000;
+  // start_time and end_time are stored to the second
+  return `${Math.round(seconds)}s`;
 }
 
 function getDisplayRunTime(data: Job) {

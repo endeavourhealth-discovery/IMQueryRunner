@@ -9,7 +9,7 @@ import { Connection } from "rabbitmq-client";
 
 import { indicatorResultTable, queryResultSetTable } from "../db/mysql/schema";
 import { createIndicatorResultEntry, createResultSetEntry, getJobById, updateJobStatus, updateWithEndTime } from "../helpers/mysqlHelper";
-import { createExecutionContext, executeQuery, getIndicatorSubQueryRequests, getValidatedSQL } from "../utils/executeQuery";
+import { createExecutionContext, executeQuery, getIndicatorSubQueryRequests, getValidatedSQL, linkIndicatorSubQueries } from "../utils/executeQuery";
 
 const LOG = Logger("server/rabbitmq");
 
@@ -85,6 +85,7 @@ const sub = rabbit.createConsumer(
         await updateWithEndTime(queryResultSet.id!, queryResultSetTable);
 
         if (indicatorId) {
+          await linkIndicatorSubQueries(accessToken, queryRequest, queryResultSet, indicatorId, ctx);
           await updateWithEndTime(indicatorId, indicatorResultTable);
         }
       }

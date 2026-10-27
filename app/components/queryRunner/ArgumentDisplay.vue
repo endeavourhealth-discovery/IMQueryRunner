@@ -1,5 +1,5 @@
 <template>
-  <DataTable :value="argumentList" :lazy="true" :loading="loading">
+  <DataTable :value="argumentList" :lazy="true" :loading="loading" data-testid="parameter-table">
     <template #empty>None</template>
     <Column field="parameter" header="Parameter">
       <template #body="{ data }">{{ formatArgumentDisplayName(data) }} </template>

@@ -3,5 +3,6 @@ export enum ErrorCode {
   InternalServerError = "InternalServerError",
   RabbitMQConsumerError = "RabbitMQConsumerError",
   MissingDataError = "MissingDataError",
-  InvalidRequestError = "InvalidRequestError"
+  InvalidRequestError = "InvalidRequestError",
+  InternalClientError = "InternalClientError"
 }
