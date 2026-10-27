@@ -6,7 +6,8 @@
  * Usage: pnpm test:queries [suite | spec.md ...]   (suites: default, qof, smh, all; defaults to "default")
  *        pnpm test:queries:qof | test:queries:smh | test:queries:all
  *
- * Env: BASE_URL, TEST_USERNAME, TEST_PASSWORD, QUERY_CONCURRENCY (jobs in flight, default 100), QUERY_TIMEOUT (ms per job, default 600000),
+ * Env: BASE_URL, TEST_USERNAME, TEST_PASSWORD, QUERY_CONCURRENCY (jobs in flight, default 50), QUERY_TIMEOUT (ms per job, default 120000),
+ *      search_date (yyyy-mm-dd; defaults to search_date in env/default/default.properties, shared with the e2e specs),
  *      headless_chrome (set to "false" to watch the login)
  *
  * The API needs a nuxt-auth-utils session, which only the Casdoor OIDC flow can create, so a headless browser signs in once and its
