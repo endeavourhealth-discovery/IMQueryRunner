@@ -40,8 +40,9 @@ export async function createJobEntry(jobRequest: JobRequest, accessToken: string
   }
   const orderedQueryRequests = await sortQueryRequestsByDependency(accessToken!, queryRequestsForSql);
   const now = getNow();
+  const firstQueryName = queryRequestsForSql[0]?.query?.name;
   const queryJob = {
-    jobName: jobRequest.jobName || queryRequestsForSql[0]?.query?.name || "Unnamed Job",
+    jobName: jobRequest.jobName || (firstQueryName ? `Job ${firstQueryName}` : "Unnamed Job"),
     queryRequests: orderedQueryRequests,
     startOfDaySnapshot: jobRequest.startOfDaySnapshot ? 1 : 0,
     persistent: jobRequest.persistent ? 1 : 0,
