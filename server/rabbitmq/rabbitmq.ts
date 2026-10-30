@@ -1,6 +1,7 @@
 import Logger from "#shared/logger";
 import { ErrorCode, JobStatus } from "~~/enums";
 import type { Job } from "~~/models/job.schema";
+import type { QueryResultSet } from "~~/models/queryResultSet.schema";
 
 import { IMQType } from "@endeavour/vue-library/enums";
 import { type QueryRequest } from "@endeavour/vue-library/models";
@@ -8,8 +9,17 @@ import { type QueryRequest } from "@endeavour/vue-library/models";
 import { Connection } from "rabbitmq-client";
 
 import { indicatorResultTable, queryResultSetTable } from "../db/mysql/schema";
-import { createIndicatorResultEntry, createResultSetEntry, getJobById, updateJobStatus, updateWithEndTime } from "../helpers/mysqlHelper";
-import { createExecutionContext, executeQuery, getIndicatorSubQueryRequests, getValidatedSQL, linkIndicatorSubQueries } from "../utils/executeQuery";
+import {
+  closeOpenQueryResults,
+  createIndicatorResultEntry,
+  createQueryResultEntry,
+  createResultSetEntry,
+  getJobById,
+  updateJobStatus,
+  updateWithEndTime,
+  updateWithStartTime
+} from "../helpers/mysqlHelper";
+import { createExecutionContext, executeQuery, getIndicatorSubQueryRequests, getValidatedSQL, prepareIndicatorSubQueries } from "../utils/executeQuery";
 
 const LOG = Logger("server/rabbitmq");
 
@@ -61,17 +71,37 @@ const sub = rabbit.createConsumer(
       // Shared by every query in this job so a sub query used more than once is only looked up once
       const ctx = createExecutionContext();
 
+      // Every query gets its result before any of them runs, so the whole job shows from the start and a query that never gets to run still has a status
+      const planned: { queryRequest: QueryRequest; queryResultSet: QueryResultSet; indicatorId: number | null }[] = [];
       for (const queryRequest of job.queryRequests) {
-        const sql = await getValidatedSQL(queryRequest, accessToken, job.id);
         const queryResultSet = await createResultSetEntry(queryRequest, job);
-
-        const queriesToRun: { sql: string; queryRequest: QueryRequest }[] = [];
         let indicatorId: number | null = null;
-
         if (queryRequest.query?.queryType === IMQType.INDICATOR) {
           indicatorId = await createIndicatorResultEntry(queryRequest, queryResultSet, hashQueryRequest(queryRequest));
+        } else {
+          await createQueryResultEntry(queryRequest, queryResultSet, hashQueryRequest(queryRequest));
+        }
+        planned.push({ queryRequest, queryResultSet, indicatorId });
+      }
 
+      for (const { queryRequest, queryResultSet, indicatorId } of planned) {
+        await updateWithStartTime(queryResultSet.id!, queryResultSetTable);
+        if (indicatorId) await updateWithStartTime(indicatorId, indicatorResultTable);
+
+        const sql = await getValidatedSQL(queryRequest, accessToken, job.id);
+
+        const queriesToRun: { sql: string; queryRequest: QueryRequest }[] = [];
+
+        if (indicatorId) {
           queriesToRun.push(...(await getIndicatorSubQueryRequests(accessToken, queryRequest, job.id, ctx)));
+          await prepareIndicatorSubQueries(
+            accessToken,
+            queryRequest,
+            queriesToRun.map(item => item.queryRequest),
+            queryResultSet,
+            indicatorId,
+            ctx
+          );
         } else {
           queriesToRun.push({ sql, queryRequest });
         }
@@ -84,10 +114,7 @@ const sub = rabbit.createConsumer(
 
         await updateWithEndTime(queryResultSet.id!, queryResultSetTable);
 
-        if (indicatorId) {
-          await linkIndicatorSubQueries(accessToken, queryRequest, queryResultSet, indicatorId, ctx);
-          await updateWithEndTime(indicatorId, indicatorResultTable);
-        }
+        if (indicatorId) await updateWithEndTime(indicatorId, indicatorResultTable);
       }
 
       await updateJobStatus(job.id, JobStatus.COMPLETED, job.userId);
@@ -95,6 +122,8 @@ const sub = rabbit.createConsumer(
       LOG.error({ err, messageId: msg?.messageId }, "Consumer failed for message");
 
       if (job?.id) {
+        // First, so the page sees the final query statuses when it reloads for the job's status. Must not stop the job being marked as failed.
+        await closeOpenQueryResults(job.id).catch(statusErr => LOG.error({ err: statusErr, jobId: job?.id }, "Failed to close open query results"));
         try {
           await updateJobStatus(job.id, JobStatus.ERRORED, job.userId, err);
         } catch (statusErr) {

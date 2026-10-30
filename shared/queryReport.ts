@@ -56,7 +56,7 @@ export interface QueryReportResult extends SpecQuery {
   sqlError?: string;
   executedSql?: string;
   definition?: unknown;
-  /** The sub queries this query ran; unset if it had none, or if its job did not complete. */
+  /** The sub queries of this query, whether or not they all ran; unset if it had none, or if its job never started. */
   dependencies?: DependencyNode[];
 }
 
@@ -67,7 +67,8 @@ export interface QueryReportResult extends SpecQuery {
 export interface DependencyNode {
   iri: string;
   name: string;
-  /** null for an indicator: its results are its sub queries' */
+  status: string;
+  /** null until it has completed, and always for an indicator: its results are its sub queries' */
   count: number | null;
   durationMs: number | null;
   children: number[];
@@ -144,7 +145,7 @@ export function dependencyGraph(summaries: QueryResultSummary[], iri: string): D
       return indexes.get(sub)!;
     });
     const durationMs = summary.startTime && summary.endTime ? Math.max(new Date(summary.endTime).getTime() - new Date(summary.startTime).getTime(), 0) : null;
-    nodes.push({ iri: summary.queryIri, name: summary.queryName, count: summary.totalCount, durationMs, children });
+    nodes.push({ iri: summary.queryIri, name: summary.queryName, status: summary.status, count: summary.totalCount, durationMs, children });
   }
   return nodes;
 }
@@ -186,10 +187,12 @@ async function runQuery(api: QueryReportApi, query: SpecQuery, timeout: number, 
   else if (seenRunning !== undefined && result.status === "TIMEOUT") result.durationMs = now - seenRunning;
   result.queuedMs = queueDate !== undefined && runDate !== undefined ? Math.max(runDate - queueDate, 0) : (seenRunning ?? now) - started;
 
-  if (result.status === "COMPLETED") {
-    try {
-      const summaries = await api.getSummaries(result.jobId);
-      result.dependencies = dependencyGraph(summaries, query.iri);
+  // Every outcome, as a job that failed or timed out is where the status of its sub queries matters most
+  try {
+    const summaries = await api.getSummaries(result.jobId);
+    result.dependencies = dependencyGraph(summaries, query.iri);
+    result.name = summaries.find(s => s.queryIri === query.iri)?.queryName || result.name;
+    if (result.status === "COMPLETED") {
       // An indicator's own summary has no count, so it is read from its results as before
       const counted = summaries.filter(s => s.totalCount !== null);
       const summary = counted.find(s => s.queryIri === query.iri) || counted[0];
@@ -197,9 +200,12 @@ async function runQuery(api: QueryReportApi, query: SpecQuery, timeout: number, 
         result.count = summary.totalCount;
         result.name = summary.queryName || result.name;
       }
-    } catch (err) {
-      result.error = `Could not load result summary: ${errorText(err)}`;
     }
+  } catch (err) {
+    result.error = `Could not load result summary: ${errorText(err)}`;
+  }
+
+  if (result.status === "COMPLETED") {
     if (query.expectedCount !== "" && String(result.count) !== query.expectedCount) result.status = "COUNT_MISMATCH";
   } else if (result.status === "ERRORED") {
     const error = job?.error || {};
@@ -316,6 +322,9 @@ export function htmlReport(results: QueryReportResult[], run: { baseUrl: string;
   .tag { padding: 2px 6px; border-radius: 4px; font-size: 12px; font-weight: 600; background: #fee2e2; color: #991b1b; }
   .COMPLETED .tag { background: #dcfce7; color: #166534; }
   .COUNT_MISMATCH .tag, .TIMEOUT .tag { background: #fef3c7; color: #92400e; }
+  .RUNNING .tag, .tag.RUNNING { background: #dbeafe; color: #1e40af; }
+  .QUEUED .tag, .CANCELLED .tag, .tag.QUEUED, .tag.CANCELLED { background: #e5e7eb; color: #374151; }
+  .tag.COMPLETED { background: #dcfce7; color: #166534; }
   .details td { background: #fafafa; border-bottom: 2px solid #e5e7eb; }
   pre { white-space: pre-wrap; word-break: break-word; background: #f3f4f6; padding: 8px; max-height: 400px; overflow: auto; }
   h4 { margin: 8px 0 4px; }
@@ -397,7 +406,7 @@ export function htmlReport(results: QueryReportResult[], run: { baseUrl: string;
     })
   );
 
-  // A dependency row keeps the status of the query it is under, so the status filter shows and hides them together
+  // A dependency row shows its own status, but is filtered by the status of the query it is under, so the filter shows and hides them together
   const dependencies = JSON.parse(document.getElementById("dependencies").textContent);
   const depthOf = row => Number(row.dataset.depth || 0);
 
@@ -415,7 +424,9 @@ export function htmlReport(results: QueryReportResult[], run: { baseUrl: string;
     if (node.children.length) name.insertAdjacentHTML("beforeend", ${JSON.stringify(EXPANDER)});
     else name.appendChild(document.createElement("span")).className = "expander-space";
     name.append(node.name);
-    cell("");
+    const status = row.appendChild(document.createElement("td")).appendChild(document.createElement("span"));
+    status.className = "tag " + node.status;
+    status.textContent = node.status;
     for (const value of [node.count ?? "", "", "", node.duration, ""]) {
       const td = row.appendChild(document.createElement("td"));
       td.className = "num";

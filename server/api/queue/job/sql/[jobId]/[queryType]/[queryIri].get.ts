@@ -1,4 +1,4 @@
-import { ErrorCode, JobStatus } from "~~/enums";
+import { ErrorCode } from "~~/enums";
 import { getExecutedSqlForJob, getJobForUser } from "~~/server/helpers/mysqlHelper";
 
 import { IMQType } from "@endeavour/vue-library/enums";
@@ -21,10 +21,6 @@ export default defineEventHandler(async event => {
 
   // TODO: return indicator sql from imapi?
   if (queryType === IMQType.INDICATOR) return { executedSQL: "" };
-
-  if (job.status !== JobStatus.COMPLETED) {
-    throw createError({ statusCode: 409, statusText: ErrorCode.InvalidRequestError, message: "Job has not completed" });
-  }
 
   const executedSql = await getExecutedSqlForJob(job.id, decodedQueryIri);
   if (executedSql === undefined) {
