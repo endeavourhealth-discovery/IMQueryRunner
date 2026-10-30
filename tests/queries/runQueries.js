@@ -1,6 +1,7 @@
 /**
  * Runs every query listed in one or more gauge spec tables straight against the API (no UI steps), then writes an HTML and JSON report
- * with each query's iri, name, status and result count, plus the definition, executed SQL and SQL error for any that errored.
+ * with each query's iri, name, status and result count, plus the definition, executed SQL and SQL error for any that errored. Queries that
+ * ran can be expanded to their sub queries, as in the UI's job table.
  * The running and the report are shared with the UI's "Query reports" menu (shared/queryReport.ts).
  *
  * Usage: pnpm test:queries [suite | spec.md ...]   (suites: default, qof, smh, all; defaults to "default")

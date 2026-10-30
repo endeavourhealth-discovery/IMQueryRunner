@@ -118,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-import { QUERY_REPORT_SUITES } from "#shared/queryReport";
+import { QUERY_REPORT_SUITES, subQueryLookup } from "#shared/queryReport";
 import type { QueryReportSuite } from "#shared/queryReport";
 import ActionButtons from "~/components/queryRunner/ActionButtons.vue";
 import ArgumentDisplayDialog from "~/components/queryRunner/ArgumentDisplayDialog.vue";
@@ -189,12 +189,7 @@ const nodes = computed(() => jobs.value.map(jobNode));
 function jobNode(job: Job): QueueNode {
   const key = `job-${job.id}`;
   const summaries = getResultSummaries(job.id) ?? [];
-  const summaryById = new Map(summaries.filter(summary => summary.queryResultId !== undefined).map(summary => [summary.queryResultId!, summary]));
-  // An indicator's sub queries are the results linked to it, any other query's are the sub query results it recorded
-  const subQueriesOf = (summary: QueryResultSummary) =>
-    summary.queryType === IMQType.INDICATOR
-      ? summaries.filter(sub => sub.queryResultId !== undefined && sub.indicatorResultId === summary.indicatorResultId)
-      : (summary.subQueryResultIds ?? []).map(id => summaryById.get(id)).filter((sub): sub is QueryResultSummary => !!sub);
+  const subQueriesOf = subQueryLookup(summaries);
   // The job's own queries: one entry per query request, as the sub query results of one query can share its iri with another
   const topLevel = [...new Set(job.queryRequests.map(queryRequest => queryRequest.query?.iri))]
     .map(iri => summaries.find(summary => summary.queryIri === iri))
