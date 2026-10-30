@@ -101,14 +101,22 @@ describe("results download", () => {
     expect(helper.getJobForUser).toHaveBeenCalledWith(7, "u1");
   });
 
-  it("refuses indicators (400), unfinished jobs (409) and unknown results (404) before reading anything", async () => {
+  it("downloads a completed query of a job that failed or is still running", async () => {
+    for (const status of ["ERRORED", "RUNNING"]) {
+      helper.getJobForUser.mockResolvedValue({ ...completedJob, status });
+      await read(await run(eventFor()));
+    }
+    expect(db.streamRows).toHaveBeenCalledTimes(2);
+  });
+
+  it("refuses indicators (400), queries with no completed result (409 until the job has completed, then 404) before reading anything", async () => {
     await expect(run(eventFor("INDICATOR"))).rejects.toMatchObject({ statusCode: 400 });
 
-    helper.getJobForUser.mockResolvedValue({ ...completedJob, status: "RUNNING" });
+    helper.getQueryResultIdForJob.mockResolvedValue(undefined);
+    helper.getJobForUser.mockResolvedValue({ ...completedJob, status: "ERRORED" });
     await expect(run(eventFor())).rejects.toMatchObject({ statusCode: 409 });
 
     helper.getJobForUser.mockResolvedValue(completedJob);
-    helper.getQueryResultIdForJob.mockResolvedValue(undefined);
     await expect(run(eventFor())).rejects.toMatchObject({ statusCode: 404 });
 
     expect(db.streamRows).not.toHaveBeenCalled();

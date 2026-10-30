@@ -72,16 +72,26 @@ function countsById(rows: { id: number | null; total: number }[]): Map<number, n
   return new Map(rows.filter((row): row is { id: number; total: number } => row.id !== null).map(row => [row.id, row.total]));
 }
 
+/** An indicator has no status of its own, so it follows its results (every result in its result set) and its job. */
+function indicatorStatus(indicator: { endTime: Date | null }, rows: { status: JobStatus }[], job: Job): JobStatus {
+  if (indicator.endTime) return JobStatus.COMPLETED;
+  if (rows.some(row => row.status === JobStatus.ERRORED)) return JobStatus.ERRORED;
+  if (rows.some(row => row.status === JobStatus.RUNNING)) return JobStatus.RUNNING;
+  if (job.status === JobStatus.ERRORED || job.status === JobStatus.CANCELLED) return JobStatus.CANCELLED;
+  return rows.some(row => row.status === JobStatus.COMPLETED) ? JobStatus.RUNNING : JobStatus.QUEUED;
+}
+
 /**
  * Builds result summaries for several jobs at once. The database is hit a fixed number of times however many jobs
  * there are (result sets, result rows, then one grouped count per result table and the sub query links), and each distinct IMAPI lookup is made at most once.
- * Jobs that are not COMPLETED get an empty summary list. A job that fails gets `error` set without affecting the others.
+ * A QUEUED job has no results yet so gets an empty summary list. Only COMPLETED results are counted: the others have no total yet. A job
+ * that fails gets `error` set without affecting the others.
  */
 export async function getJobsResultSummaries(accessToken: string, userId: string, jobs: Job[]): Promise<JobSummaryResult[]> {
-  const completedJobIds = jobs.filter(job => job.status === JobStatus.COMPLETED).map(job => job.id);
+  const startedJobIds = jobs.filter(job => job.status !== JobStatus.QUEUED).map(job => job.id);
 
-  const resultSets = completedJobIds.length
-    ? await mysqlDb.select().from(queryResultSetTable).where(inArray(queryResultSetTable.jobId, completedJobIds)).orderBy(asc(queryResultSetTable.id))
+  const resultSets = startedJobIds.length
+    ? await mysqlDb.select().from(queryResultSetTable).where(inArray(queryResultSetTable.jobId, startedJobIds)).orderBy(asc(queryResultSetTable.id))
     : [];
   const resultSetIds = resultSets.map(set => set.id);
 
@@ -89,7 +99,7 @@ export async function getJobsResultSummaries(accessToken: string, userId: string
     ? await mysqlDb.select().from(queryResultTable).where(inArray(queryResultTable.queryResultSetId, resultSetIds)).orderBy(asc(queryResultTable.id))
     : [];
 
-  const idsOfType = (type: IMQType) => resultRows.filter(row => row.queryType === type).map(row => row.id);
+  const idsOfType = (type: IMQType) => resultRows.filter(row => row.queryType === type && row.status === JobStatus.COMPLETED).map(row => row.id);
   const cohortIds = idsOfType(IMQType.COHORT);
   const datasetIds = idsOfType(IMQType.DATASET);
   const indicatorSetIds = [...new Set(resultRows.filter(row => row.queryType === IMQType.INDICATOR).map(row => row.queryResultSetId!))];
@@ -143,16 +153,19 @@ export async function getJobsResultSummaries(accessToken: string, userId: string
 
   return Promise.all(
     jobs.map(async (job): Promise<JobSummaryResult> => {
-      if (job.status !== JobStatus.COMPLETED) return { job, summaries: [] };
+      if (job.status === JobStatus.QUEUED) return { job, summaries: [] };
+      // Only a completed job must have results: any other can have stopped, or not yet got to them
+      const isCompleted = job.status === JobStatus.COMPLETED;
       try {
-        const jobSets = setsByJobId.get(job.id);
-        if (!jobSets?.length) throw createError({ statusCode: 400, statusText: ErrorCode.MissingDataError, message: "Query result set not found" });
+        const jobSets = setsByJobId.get(job.id) ?? [];
+        if (isCompleted && !jobSets.length)
+          throw createError({ statusCode: 400, statusText: ErrorCode.MissingDataError, message: "Query result set not found" });
 
         const subQueryIrisByQueryIri = await getJobSubQueryIris(lookups, job);
         const summaries: QueryResultSummary[] = [];
         for (const resultSet of jobSets) {
-          const rows = rowsBySetId.get(resultSet.id);
-          if (!rows?.length) throw createError({ status: 404, statusText: ErrorCode.MissingDataError, message: "Query result not found" });
+          const rows = rowsBySetId.get(resultSet.id) ?? [];
+          if (isCompleted && !rows.length) throw createError({ status: 404, statusText: ErrorCode.MissingDataError, message: "Query result not found" });
 
           const indicators = indicatorsBySetId.get(resultSet.id) ?? [];
           const indicatorNames = await Promise.all(indicators.map(indicator => lookups.entityName(indicator.queryIri)));
@@ -163,6 +176,7 @@ export async function getJobsResultSummaries(accessToken: string, userId: string
               queryName: indicatorNames[index]!,
               queryIri: indicator.queryIri,
               queryType: IMQType.INDICATOR,
+              status: indicatorStatus(indicator, rows, job),
               startTime: indicator.startTime,
               endTime: indicator.endTime
             };
@@ -173,7 +187,7 @@ export async function getJobsResultSummaries(accessToken: string, userId: string
 
           const names = await Promise.all(rows.map(row => lookups.entityName(row.queryIri)));
           rows.forEach((row, index) => {
-            let totalCount: number;
+            let totalCount: number | null;
             switch (row.queryType) {
               case IMQType.COHORT:
                 totalCount = cohortCountById.get(row.id) ?? 0;
@@ -187,12 +201,14 @@ export async function getJobsResultSummaries(accessToken: string, userId: string
               default:
                 throw createError({ status: 400, statusText: ErrorCode.InvalidRequestError, message: "Query type is invalid" });
             }
+            if (row.status !== JobStatus.COMPLETED) totalCount = null;
             const summary: QueryResultSummary = {
               queryResultId: row.id,
               totalCount,
               queryName: names[index]!,
               queryIri: row.queryIri,
               queryType: row.queryType,
+              status: row.status,
               startTime: row.startTime,
               endTime: row.endTime
             };

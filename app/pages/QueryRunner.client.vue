@@ -78,6 +78,7 @@
                   :severity="node.data.job.status ? getStatusSeverity(node.data.job.status) : '-'"
                   :value="node.data.job.status"
                 />
+                <Tag v-else :severity="getStatusSeverity(node.data.summary.status)" :value="node.data.summary.status" />
               </template>
             </Column>
             <Column>
@@ -100,11 +101,18 @@
                     v-tooltip.top="'View query'"
                   />
                   <Button
-                    v-if="node.data.summary.queryType !== IMQType.INDICATOR"
+                    v-if="node.data.summary.queryType !== IMQType.INDICATOR && node.data.summary.status === JobStatus.COMPLETED"
                     icon="fa-duotone fa-solid fa-list"
                     class="p-button-rounded p-button-text p-button-plain"
-                    @click="viewSummaryResults(node.data.jobId, node.data.summary)"
+                    @click="viewSummaryResults(node.data.job.id, node.data.summary)"
                     v-tooltip.left="'View results'"
+                  />
+                  <Button
+                    v-if="node.data.summary.queryType !== IMQType.INDICATOR && node.data.summary.status === JobStatus.ERRORED"
+                    icon="fa-duotone fa-solid fa-code"
+                    class="p-button-rounded p-button-text p-button-plain"
+                    @click="viewSummaryResults(node.data.job.id, node.data.summary)"
+                    v-tooltip.left="'View executed SQL'"
                   />
                 </div>
               </template>
@@ -172,7 +180,7 @@ const reportMenuItems: MenuItem[] = (Object.keys(QUERY_REPORT_SUITES) as QueryRe
 }));
 const adminView = false; //TODO: determine admin view based on user role and preference
 
-type QueueNodeData = { kind: "job"; job: Job } | { kind: "query"; jobId: number; summary: QueryResultSummary };
+type QueueNodeData = { kind: "job"; job: Job } | { kind: "query"; job: Job; summary: QueryResultSummary };
 interface QueueNode {
   key: string;
   data: QueueNodeData;
@@ -198,23 +206,18 @@ function jobNode(job: Job): QueueNode {
     key,
     data: { kind: "job", job },
     leaf: !topLevel.length,
-    children: expandedKeys.value[key] ? topLevel.map(summary => queryNode(key, job.id, summary, subQueriesOf)) : []
+    children: expandedKeys.value[key] ? topLevel.map(summary => queryNode(key, job, summary, subQueriesOf)) : []
   };
 }
 
-function queryNode(
-  parentKey: string,
-  jobId: number,
-  summary: QueryResultSummary,
-  subQueriesOf: (summary: QueryResultSummary) => QueryResultSummary[]
-): QueueNode {
+function queryNode(parentKey: string, job: Job, summary: QueryResultSummary, subQueriesOf: (summary: QueryResultSummary) => QueryResultSummary[]): QueueNode {
   const key = `${parentKey}/${summary.queryResultId ?? `indicator-${summary.indicatorResultId}`}`;
   const subQueries = subQueriesOf(summary);
   return {
     key,
-    data: { kind: "query", jobId, summary },
+    data: { kind: "query", job, summary },
     leaf: !subQueries.length,
-    children: expandedKeys.value[key] ? subQueries.map(sub => queryNode(key, jobId, sub, subQueriesOf)) : []
+    children: expandedKeys.value[key] ? subQueries.map(sub => queryNode(key, job, sub, subQueriesOf)) : []
   };
 }
 
@@ -310,17 +313,25 @@ async function initSearch() {
 type ResultSummaries = { jobId: number; resultsSummary: QueryResultSummary[]; error?: string };
 
 /**
- * One summaries entry per job. A completed job's results never change, so summaries already held are kept and only the
- * missing ones (or ones that failed last time) are requested. Jobs that are not completed have no summaries yet.
+ * One summaries entry per job. A finished job's results stop changing, so summaries already held from when it was last seen in that same
+ * state are kept, as long as none of their queries were still open. Everything else is requested. Queued jobs have no summaries yet.
  */
 async function loadResultSummaries(listedJobs: Job[]): Promise<ResultSummaries[]> {
   const held = new Map(resultSummaries.value.map(summary => [Number(summary.jobId), summary]));
+  const statusWhenHeld = new Map(jobs.value.map(job => [job.id, job.status]));
   const isHeld = (job: Job) => {
     const summary = held.get(job.id);
-    return job.status === JobStatus.COMPLETED && !!summary && !summary.error && summary.resultsSummary.length > 0;
+    return (
+      [JobStatus.COMPLETED, JobStatus.ERRORED, JobStatus.CANCELLED].includes(job.status) &&
+      statusWhenHeld.get(job.id) === job.status &&
+      !!summary &&
+      !summary.error &&
+      summary.resultsSummary.length > 0 &&
+      !summary.resultsSummary.some(result => [JobStatus.QUEUED, JobStatus.RUNNING].includes(result.status))
+    );
   };
 
-  const missing = listedJobs.filter(job => job.status === JobStatus.COMPLETED && !isHeld(job)).map(job => job.id);
+  const missing = listedJobs.filter(job => job.status !== JobStatus.QUEUED && !isHeld(job)).map(job => job.id);
   const fetched = missing.length ? await $fetch<ResultSummaries[]>("/api/queue/job/results/summaries", { query: { jobIds: missing.join(",") } }) : [];
   for (const summary of fetched) {
     if (summary.error) console.warn(`Failed to get result summaries for job ${summary.jobId}: ${summary.error}`);
@@ -415,7 +426,7 @@ async function refreshJob(jobId: number) {
     if (index === -1) return; // removed from the list while the request was in flight
     jobs.value.splice(index, 1, job);
 
-    if (job.status === JobStatus.COMPLETED) {
+    if (job.status !== JobStatus.QUEUED && job.status !== JobStatus.RUNNING) {
       const resultsSummary = await $fetch<QueryResultSummary[]>(`/api/queue/job/results/${jobId}/summary`);
       const entry = { jobId, resultsSummary };
       const existing = resultSummaries.value.findIndex(summary => Number(summary.jobId) === jobId);

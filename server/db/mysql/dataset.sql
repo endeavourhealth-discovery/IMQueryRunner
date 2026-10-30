@@ -83,7 +83,8 @@ CREATE TABLE
         executed_sql MEDIUMTEXT,
         FOREIGN KEY (query_result_set_id) REFERENCES query_result_set (id),
         FOREIGN KEY (indicator_result_id) REFERENCES indicator_result (id),
-        query_type VARCHAR(255)
+        query_type VARCHAR(255),
+        `status` VARCHAR(45) NOT NULL
     );
 
 CREATE TABLE
@@ -156,6 +157,15 @@ CREATE INDEX idx_patient_exists_iri_patient ON dataset.patient_exists (query_iri
 -- CREATE INDEX idx_job_user_queue_date ON dataset.job (user_id, queue_date);
 -- CREATE INDEX idx_query_result_set_iri ON dataset.query_result (query_result_set_id, query_iri);
 -- ALTER TABLE dataset.query_result DROP INDEX query_result_set_id;  -- now redundant: idx_query_result_set_iri starts with the same column
+
+-- Status of each query result. Results that finished are COMPLETED; the rest take the status of their job.
+-- ALTER TABLE dataset.query_result ADD COLUMN `status` VARCHAR(45) NOT NULL DEFAULT 'COMPLETED';
+-- UPDATE dataset.query_result qr
+--   JOIN dataset.query_result_set qrs ON qrs.id = qr.query_result_set_id
+--   JOIN dataset.job j ON j.id = qrs.job_id
+--   SET qr.`status` = j.`status`
+--   WHERE qr.end_time IS NULL;
+-- ALTER TABLE dataset.query_result ALTER COLUMN `status` DROP DEFAULT;
 
 -- dataset.concept_tct is built outside this repository. These are the indexes in use on the live database, recorded so they are not lost:
 --   PRIMARY (dbid)

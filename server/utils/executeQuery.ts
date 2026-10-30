@@ -1,5 +1,5 @@
 import Logger from "#shared/logger";
-import { ErrorCode } from "~~/enums";
+import { ErrorCode, JobStatus } from "~~/enums";
 import type { ResolvedSql } from "~~/models/ResolvedSql.ts";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
@@ -16,7 +16,8 @@ import {
   createQueryResultEntry,
   getToday,
   linkQueryResultsToIndicator,
-  updateWithEndTime,
+  markQueryResultCompleted,
+  markQueryResultRunning,
   updateWithSQL
 } from "../helpers/mysqlHelper";
 import QueryService from "../services/QueryService";
@@ -63,10 +64,11 @@ export async function executeQuery(
 ) {
   if (!queryRequest.query?.iri) throw new Error("Query IRI is required for execution");
   const hashCodeVersion = hashQueryRequest(queryRequest);
-  const existingQueryResultId = await getQueryResultIdIfExists(queryResultSet.id!, hashCodeVersion, queryRequest.query.iri);
-  if (existingQueryResultId !== -1) return;
+  const existingQueryResult = await getQueryResultIfExists(queryResultSet.id!, hashCodeVersion, queryRequest.query.iri);
+  if (existingQueryResult && existingQueryResult.status !== JobStatus.QUEUED) return;
 
-  const queryResultId = await createQueryResultEntry(queryRequest, queryResultSet, hashCodeVersion);
+  const queryResultId = existingQueryResult?.id ?? (await createQueryResultEntry(queryRequest, queryResultSet, hashCodeVersion));
+  await markQueryResultRunning(queryResultId, queryResultSet);
 
   const debugPatientId = getDebugPatientId(queryRequest);
 
@@ -78,16 +80,16 @@ export async function executeQuery(
   const resolvedSql = getResolvedSql(sql, queryRequest, queryIrisToQueryResultIds);
 
   if (debugPatientId) {
-    await executeDebugQuery(resolvedSql, queryRequest.query.iri, debugPatientId, queryResultId);
+    await executeDebugQuery(resolvedSql, queryRequest.query.iri, debugPatientId, queryResultId, queryResultSet);
     return;
   }
 
   switch (queryRequest.query.queryType) {
     case IMQType.DATASET:
-      await executeDatasetQuery(sql, queryRequest, queryIrisToQueryResultIds, queryResultId);
+      await executeDatasetQuery(sql, queryRequest, queryIrisToQueryResultIds, queryResultId, queryResultSet);
       break;
     case IMQType.COHORT:
-      await executeCohortQuery(resolvedSql, queryRequest, queryResultId);
+      await executeCohortQuery(resolvedSql, queryRequest, queryResultId, queryResultSet);
       break;
     default:
       throw new Error("Unsupported query type: " + queryRequest.query.queryType);
@@ -98,11 +100,11 @@ export function getDebugPatientId(queryRequest: QueryRequest): string | undefine
   return queryRequest.argument?.find(arg => arg.parameter === "$debugPatientId")?.valueData;
 }
 
-export async function executeDebugQuery(resolvedSql: ResolvedSql, queryIri: string, patientId: string, queryResultId: number) {
+export async function executeDebugQuery(resolvedSql: ResolvedSql, queryIri: string, patientId: string, queryResultId: number, queryResultSet: QueryResultSet) {
   try {
     await mysqlDb.delete(patientExistsTable).where(and(eq(patientExistsTable.queryIri, queryIri), eq(patientExistsTable.patientId, patientId)));
     await mysqlDb.execute(resolvedSql.query);
-    await updateWithEndTime(queryResultId, queryResultTable);
+    await markQueryResultCompleted(queryResultId, queryResultSet);
   } catch (err) {
     LOG.error({ err, queryIri }, "Error executing debug query");
     throw err;
@@ -111,10 +113,10 @@ export async function executeDebugQuery(resolvedSql: ResolvedSql, queryIri: stri
   }
 }
 
-export async function executeCohortQuery(resolvedSql: ResolvedSql, queryRequest: QueryRequest, queryResultId: number) {
+export async function executeCohortQuery(resolvedSql: ResolvedSql, queryRequest: QueryRequest, queryResultId: number, queryResultSet: QueryResultSet) {
   try {
     await mysqlDb.execute(resolvedSql.query);
-    await updateWithEndTime(queryResultId, queryResultTable);
+    await markQueryResultCompleted(queryResultId, queryResultSet);
   } catch (err) {
     LOG.error({ err, queryIri: queryRequest.query?.iri }, "Error executing query");
     throw err;
@@ -127,7 +129,8 @@ export async function executeDatasetQuery(
   querySql: string,
   queryRequest: QueryRequest,
   queryIrisToQueryResultIds: { [key: string]: number },
-  queryResultId: number
+  queryResultId: number,
+  queryResultSet: QueryResultSet
 ) {
   const sqlParts = querySql
     .split("----------------------------------------")
@@ -142,16 +145,17 @@ export async function executeDatasetQuery(
   try {
     for (const sqlPart of sqlParts) {
       lastResolvedSql = getResolvedSql(sqlPart, queryRequest, queryIrisToQueryResultIds);
-      await mysqlDb.execute(lastResolvedSql.query);
+      // Recorded first, so a part that fails is in the SQL shown for the query
       resolvedSqlParts = resolvedSqlParts + lastResolvedSql.displaySql + "\n";
+      await mysqlDb.execute(lastResolvedSql.query);
     }
 
-    await updateWithEndTime(queryResultId, queryResultTable);
+    await markQueryResultCompleted(queryResultId, queryResultSet);
   } catch (err) {
     LOG.error({ err, sql: lastResolvedSql?.displaySql }, "Error executing SQL part");
     throw err;
   } finally {
-    await updateWithSQL(queryResultId, queryResultTable, resolvedSqlParts ?? querySql);
+    await updateWithSQL(queryResultId, queryResultTable, resolvedSqlParts || querySql);
   }
 }
 
@@ -210,27 +214,27 @@ function hashArgument(argument: Argument): string {
   return hashString;
 }
 
-export async function getQueryResultIdIfExists(resultSetId: number, hashCodeVersion: number, iri: string): Promise<number> {
+export async function getQueryResultIfExists(resultSetId: number, hashCodeVersion: number, iri: string) {
   const results = await mysqlDb
-    .select({ id: queryResultTable.id })
+    .select({ id: queryResultTable.id, status: queryResultTable.status })
     .from(queryResultTable)
     .where(and(eq(queryResultTable.queryResultSetId, resultSetId), eq(queryResultTable.version, hashCodeVersion), eq(queryResultTable.queryIri, iri)))
     .limit(1);
   const result = results[0];
   LOG.debug(`Cache context check (${!!result}): ${resultSetId} with hash: ${hashCodeVersion}, iri: ${iri}.`);
-  return result ? result.id! : -1;
+  return result;
 }
 
-export async function getQueryResultIdIfExistsInJob(jobId: number, hashCodeVersion: number, iri: string): Promise<number> {
+export async function getQueryResultIfExistsInJob(jobId: number, hashCodeVersion: number, iri: string) {
   const results = await mysqlDb
-    .select({ id: queryResultTable.id })
+    .select({ id: queryResultTable.id, status: queryResultTable.status })
     .from(queryResultTable)
     .innerJoin(queryResultSetTable, eq(queryResultTable.queryResultSetId, queryResultSetTable.id))
     .where(and(eq(queryResultSetTable.jobId, jobId), eq(queryResultTable.version, hashCodeVersion), eq(queryResultTable.queryIri, iri)))
     .limit(1);
   const result = results[0];
   LOG.debug(`Job cache context check (${!!result}): job ${jobId} with hash: ${hashCodeVersion}, iri: ${iri}.`);
-  return result ? result.id! : -1;
+  return result;
 }
 
 async function getSubQueryRequest(accessToken: string, iri: string, argument: Argument[] | undefined, ctx: ExecutionContext): Promise<QueryRequest> {
@@ -262,28 +266,36 @@ async function runSubQueries(
   // Running them stays strictly in order below: later ones use the result ids of earlier ones.
   const subQueryRequests = await Promise.all(subQueries.map(subQuery => getSubQueryRequest(accessToken, subQuery.iri!, queryRequest.argument, ctx)));
 
+  // Every sub query gets its result and links before any of them runs, so a job that stops part way still shows the whole tree
+  const resultIds = { ...queryIrisToHashCodes };
+  const waiting = new Set<number>();
+  for (const [index, subQuery] of subQueries.entries()) {
+    const subQueryRequest = subQueryRequests[index]!;
+    const hashCodeVersion = hashQueryRequest(subQueryRequest);
+    const existing = await getQueryResultIfExistsInJob(queryResultSet.jobId, hashCodeVersion, subQueryRequest.query!.iri!);
+    const resultId = existing?.id ?? (await createQueryResultEntry(subQueryRequest, queryResultSet, hashCodeVersion));
+    resultIds[subQuery.iri!] = resultId;
+    if (!existing || existing.status === JobStatus.QUEUED) waiting.add(resultId);
+  }
+  await createQueryDependencies(getQueryDependencies(subQueries, resultIds));
+
   for (const [index, subQuery] of subQueries.entries()) {
     try {
       const subQueryRequest = subQueryRequests[index]!;
-      const hashCodeVersion = hashQueryRequest(subQueryRequest);
+      const resultId = resultIds[subQuery.iri!]!;
+      // Only added here, so each sub query's SQL only ever resolves against the results of the ones that ran before it
+      queryIrisToHashCodes[subQuery.iri!] = resultId;
+      if (!waiting.delete(resultId)) continue;
 
-      const existingQueryResultId = await getQueryResultIdIfExistsInJob(queryResultSet.jobId, hashCodeVersion, subQueryRequest.query!.iri!);
-      if (existingQueryResultId !== -1) {
-        queryIrisToHashCodes[subQuery.iri!] = existingQueryResultId;
-        continue;
-      }
-
-      queryIrisToHashCodes[subQuery.iri!] = await createQueryResultEntry(subQueryRequest, queryResultSet, hashCodeVersion);
+      await markQueryResultRunning(resultId, queryResultSet);
       const subQuerySql = await getSubQuerySql(accessToken, subQueryRequest, ctx);
       const resolvedSql = getResolvedSql(subQuerySql, subQueryRequest, queryIrisToHashCodes);
-      await executeCohortQuery(resolvedSql, subQueryRequest, queryIrisToHashCodes[subQuery.iri!]!);
+      await executeCohortQuery(resolvedSql, subQueryRequest, resultId, queryResultSet);
     } catch (err: any) {
       LOG.error({ err, subQueryIri: subQuery.iri }, "Error running subquery sql");
       throw err;
     }
   }
-
-  await createQueryDependencies(getQueryDependencies(subQueries, queryIrisToHashCodes));
 }
 
 /** Parent and sub query result id pairs. Only once every sub query has a result id, as a parent can be listed after its sub query. */
@@ -450,9 +462,26 @@ function getIndicatorSubQueries(accessToken: string, indicatorIri: string, ctx: 
 }
 
 /**
- * Links the indicator to the results of its direct sub queries, once they have all run. Deeper levels are already linked to their
- * parents in query_dependency by each sub query's own run.
+ * Creates the results of an indicator's sub queries and links the indicator to its direct ones before any of them runs, so a job that
+ * stops part way still shows them. Deeper levels are linked to their parents in query_dependency by each sub query's own run.
  */
+export async function prepareIndicatorSubQueries(
+  accessToken: string,
+  queryRequest: QueryRequest,
+  subQueryRequests: QueryRequest[],
+  queryResultSet: QueryResultSet,
+  indicatorResultId: number,
+  ctx: ExecutionContext
+) {
+  for (const subQueryRequest of subQueryRequests) {
+    const hashCodeVersion = hashQueryRequest(subQueryRequest);
+    const existing = await getQueryResultIfExists(queryResultSet.id!, hashCodeVersion, subQueryRequest.query!.iri!);
+    if (!existing) await createQueryResultEntry(subQueryRequest, queryResultSet, hashCodeVersion);
+  }
+  await linkIndicatorSubQueries(accessToken, queryRequest, queryResultSet, indicatorResultId, ctx);
+}
+
+/** Links the indicator to the results of its direct sub queries. */
 export async function linkIndicatorSubQueries(
   accessToken: string,
   queryRequest: QueryRequest,
