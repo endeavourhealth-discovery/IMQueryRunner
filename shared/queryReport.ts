@@ -1,7 +1,7 @@
 /**
  * Runs every query listed in one or more gauge spec tables, each as its own job so one failing query does not take the others down,
  * and builds an HTML report with each query's iri, name, status and result count, plus the definition, executed SQL and SQL error for
- * any that did not pass.
+ * any that did not pass. Queries that ran can be expanded to the sub queries they depended on, as in the UI's job table.
  *
  * Shared by the `pnpm test:queries` script (tests/queries/runQueries.js) and the "Query reports" menu in the UI (app/utils/queryReport.ts),
  * which each supply a QueryReportApi for their own way of calling the API. Node loads this file directly (type stripping), so it must
@@ -56,6 +56,21 @@ export interface QueryReportResult extends SpecQuery {
   sqlError?: string;
   executedSql?: string;
   definition?: unknown;
+  /** The sub queries this query ran; unset if it had none, or if its job did not complete. */
+  dependencies?: DependencyNode[];
+}
+
+/**
+ * One result in a query's dependency graph. nodes[0] is the query itself and children are indexes into the same array: a sub query shared
+ * by several queries is stored once, as expanding it under every parent up front could be far larger than what is ever looked at.
+ */
+export interface DependencyNode {
+  iri: string;
+  name: string;
+  /** null for an indicator: its results are its sub queries' */
+  count: number | null;
+  durationMs: number | null;
+  children: number[];
 }
 
 export interface RunOptions {
@@ -98,6 +113,42 @@ export function errorText(err: any): string {
   return err?.data?.message || err?.data?.statusMessage || err?.message || String(err);
 }
 
+/** Looks up a result's direct sub queries among the summaries of its job. */
+export function subQueryLookup(summaries: QueryResultSummary[]): (summary: QueryResultSummary) => QueryResultSummary[] {
+  const summaryById = new Map(summaries.filter(summary => summary.queryResultId !== undefined).map(summary => [summary.queryResultId!, summary]));
+  // An indicator's sub queries are the results linked to it, any other query's are the sub query results it recorded.
+  // Compared as a string because this file cannot import the IMQType enum at runtime (see above).
+  return summary =>
+    String(summary.queryType) === "INDICATOR"
+      ? summaries.filter(sub => sub.queryResultId !== undefined && sub.indicatorResultId === summary.indicatorResultId)
+      : (summary.subQueryResultIds ?? []).map(id => summaryById.get(id)).filter((sub): sub is QueryResultSummary => !!sub);
+}
+
+/** The dependency graph of the query with this iri, or undefined if it has no sub queries. */
+export function dependencyGraph(summaries: QueryResultSummary[], iri: string): DependencyNode[] | undefined {
+  const root = summaries.find(summary => summary.queryIri === iri);
+  if (!root) return undefined;
+  const subQueriesOf = subQueryLookup(summaries);
+  if (!subQueriesOf(root).length) return undefined;
+
+  // Each result is visited once, so a cycle in the links ends here and only keeps expanding as far as someone clicks
+  const indexes = new Map([[root, 0]]);
+  const order = [root];
+  const nodes: DependencyNode[] = [];
+  for (const summary of order) {
+    const children = subQueriesOf(summary).map(sub => {
+      if (!indexes.has(sub)) {
+        indexes.set(sub, order.length);
+        order.push(sub);
+      }
+      return indexes.get(sub)!;
+    });
+    const durationMs = summary.startTime && summary.endTime ? Math.max(new Date(summary.endTime).getTime() - new Date(summary.startTime).getTime(), 0) : null;
+    nodes.push({ iri: summary.queryIri, name: summary.queryName, count: summary.totalCount, durationMs, children });
+  }
+  return nodes;
+}
+
 async function runQuery(api: QueryReportApi, query: SpecQuery, timeout: number, searchDate?: string): Promise<QueryReportResult> {
   const started = Date.now();
   const result: QueryReportResult = { ...query, name: query.label, status: "", count: null, jobId: null, durationMs: null, queuedMs: null };
@@ -138,6 +189,7 @@ async function runQuery(api: QueryReportApi, query: SpecQuery, timeout: number, 
   if (result.status === "COMPLETED") {
     try {
       const summaries = await api.getSummaries(result.jobId);
+      result.dependencies = dependencyGraph(summaries, query.iri);
       // An indicator's own summary has no count, so it is read from its results as before
       const counted = summaries.filter(s => s.totalCount !== null);
       const summary = counted.find(s => s.queryIri === query.iri) || counted[0];
@@ -218,10 +270,22 @@ export function fileStamp(isoDate: string): string {
   return isoDate.replace(/[:.]/g, "-");
 }
 
+const EXPANDER = '<button type="button" class="expander" aria-expanded="false" aria-label="Toggle dependencies"></button>';
+
 const escape = (value: unknown) => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 export function htmlReport(results: QueryReportResult[], run: { baseUrl: string; startedAt: string; durationMs: number }): string {
   const totals = results.reduce<Record<string, number>>((acc, r) => ({ ...acc, [r.status]: (acc[r.status] || 0) + 1 }), {});
+  // Rows for dependencies are only built when expanded. "<" is escaped so a name cannot end the script element this is embedded in.
+  const dependencies = JSON.stringify(
+    Object.fromEntries(
+      results.flatMap((r, i) =>
+        r.dependencies
+          ? [[i, r.dependencies.map(({ durationMs, ...node }) => ({ ...node, duration: durationMs === null ? "" : formatDuration(durationMs) }))]]
+          : []
+      )
+    )
+  ).replace(/</g, "\\u003c");
   const rows = results
     .map((r, i) => {
       const details =
@@ -234,7 +298,7 @@ export function htmlReport(results: QueryReportResult[], run: { baseUrl: string;
               ${r.definition ? `<details><summary>Definition</summary><pre class="copy" title="Click to copy">${escape(typeof r.definition === "string" ? r.definition : JSON.stringify(r.definition, null, 2))}</pre></details>` : ""}
             </td></tr>`;
       return `<tr class="${r.status}" data-status="${escape(r.status)}" data-index="${i}" data-duration="${r.durationMs ?? ""}" data-queued="${r.queuedMs ?? ""}">
-          <td>${i + 1}</td><td><code>${escape(r.iri)}</code></td><td>${escape(r.name)}</td><td><span class="tag">${escape(r.status)}</span></td>
+          <td>${i + 1}</td><td><code>${escape(r.iri)}</code></td><td class="name">${r.dependencies ? EXPANDER : '<span class="expander-space"></span>'}${escape(r.name)}</td><td><span class="tag">${escape(r.status)}</span></td>
           <td class="num">${escape(r.count)}</td><td class="num">${escape(r.expectedCount)}</td><td class="num">${r.jobId ?? ""}</td>
           <td class="num">${r.durationMs === null ? "" : formatDuration(r.durationMs)}</td><td class="num">${r.queuedMs === null ? "" : formatDuration(r.queuedMs)}</td>
         </tr>${details}`;
@@ -266,6 +330,13 @@ export function htmlReport(results: QueryReportResult[], run: { baseUrl: string;
   th.sortable:hover { background: #e5e7eb; }
   th[data-order="desc"]::after { content: " ▼"; }
   th[data-order="asc"]::after { content: " ▲"; }
+  td.name { padding-left: 32px; }
+  .expander, .expander-space { display: inline-block; width: 20px; margin: 0 4px 0 -24px; }
+  .expander { padding: 0; border: 0; background: none; color: #6b7280; font-size: 12px; cursor: pointer; }
+  .expander:hover { color: #1f2937; }
+  .expander::before { content: "▶"; }
+  .expander[aria-expanded="true"]::before { content: "▼"; }
+  tr.dep td { background: #f9fafb; }
 </style></head><body>
 <h1>Query Report</h1>
 <p>${escape(run.baseUrl)} · ${escape(run.startedAt)} · took ${formatDuration(run.durationMs)} · ${results.length} queries · ${Object.entries(totals)
@@ -283,6 +354,7 @@ export function htmlReport(results: QueryReportResult[], run: { baseUrl: string;
 </div>
 <table><thead><tr><th>#</th><th>IRI</th><th>Name</th><th>Status</th><th class="num">Count</th><th class="num">Expected</th><th class="num">Job</th><th class="num sortable" data-sort="duration" title="Time the query ran on the server (click to sort)">Duration</th><th class="num sortable" data-sort="queued" title="Time waiting in the queue for a consumer (click to sort)">Queued</th></tr></thead>
 <tbody>${rows}</tbody></table>
+<script type="application/json" id="dependencies">${dependencies}</script>
 <script>
   const boxes = [...document.querySelectorAll(".filters input")];
   function applyFilter() {
@@ -298,11 +370,16 @@ export function htmlReport(results: QueryReportResult[], run: { baseUrl: string;
   );
 
   // Each click on a sortable header cycles longest first -> shortest first -> report order. Rows without a value go last, and a
-  // query's details row moves with it.
+  // query's details and expanded dependency rows move with it.
   const tbody = document.querySelector("tbody");
-  const groups = [...tbody.querySelectorAll("tr:not(.details)")].map(row =>
-    row.nextElementSibling?.classList.contains("details") ? [row, row.nextElementSibling] : [row]
-  );
+  function rowGroups() {
+    const groups = [];
+    for (const row of tbody.children) {
+      if (row.matches(".details, .dep")) groups.at(-1).push(row);
+      else groups.push([row]);
+    }
+    return groups;
+  }
   const sortHeaders = [...document.querySelectorAll("th.sortable")];
   sortHeaders.forEach(th =>
     th.addEventListener("click", () => {
@@ -310,7 +387,7 @@ export function htmlReport(results: QueryReportResult[], run: { baseUrl: string;
       sortHeaders.forEach(other => delete other.dataset.order);
       if (order) th.dataset.order = order;
       const value = group => (group[0].dataset[th.dataset.sort] === "" ? null : Number(group[0].dataset[th.dataset.sort]));
-      const sorted = [...groups].sort((a, b) => {
+      const sorted = rowGroups().sort((a, b) => {
         if (!order) return a[0].dataset.index - b[0].dataset.index;
         const [x, y] = [value(a), value(b)];
         if (x === null || y === null) return (x === null) - (y === null);
@@ -319,6 +396,47 @@ export function htmlReport(results: QueryReportResult[], run: { baseUrl: string;
       tbody.append(...sorted.flat());
     })
   );
+
+  // A dependency row keeps the status of the query it is under, so the status filter shows and hides them together
+  const dependencies = JSON.parse(document.getElementById("dependencies").textContent);
+  const depthOf = row => Number(row.dataset.depth || 0);
+
+  function dependencyRow(parent, child) {
+    const node = dependencies[parent.dataset.index][child];
+    const row = document.createElement("tr");
+    row.className = "dep";
+    Object.assign(row.dataset, { index: parent.dataset.index, node: child, depth: depthOf(parent) + 1, status: parent.dataset.status });
+    const cell = text => row.appendChild(document.createElement("td")).append(text);
+    cell("");
+    row.appendChild(document.createElement("td")).appendChild(document.createElement("code")).textContent = node.iri;
+    const name = row.appendChild(document.createElement("td"));
+    name.className = "name";
+    name.style.paddingLeft = 32 + depthOf(row) * 24 + "px";
+    if (node.children.length) name.insertAdjacentHTML("beforeend", ${JSON.stringify(EXPANDER)});
+    else name.appendChild(document.createElement("span")).className = "expander-space";
+    name.append(node.name);
+    cell("");
+    for (const value of [node.count ?? "", "", "", node.duration, ""]) {
+      const td = row.appendChild(document.createElement("td"));
+      td.className = "num";
+      td.textContent = value;
+    }
+    return row;
+  }
+
+  tbody.addEventListener("click", event => {
+    const expander = event.target.closest(".expander");
+    if (!expander) return;
+    const row = expander.closest("tr");
+    const expanded = expander.getAttribute("aria-expanded") === "true";
+    expander.setAttribute("aria-expanded", String(!expanded));
+    if (expanded) {
+      while (row.nextElementSibling?.classList.contains("dep") && depthOf(row.nextElementSibling) > depthOf(row)) row.nextElementSibling.remove();
+    } else {
+      const node = dependencies[row.dataset.index][row.dataset.node || 0];
+      row.after(...node.children.map(child => dependencyRow(row, child)));
+    }
+  });
 
   async function copyText(text) {
     try {
