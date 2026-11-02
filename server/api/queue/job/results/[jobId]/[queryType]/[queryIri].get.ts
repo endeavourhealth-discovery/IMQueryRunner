@@ -21,7 +21,12 @@ const querySchema = z.object({
 export default defineEventHandler(async event => {
   const { user } = await requireAuth(event);
   const { jobId, queryIri, queryType } = await getValidatedRouterParams(event, paramSchema.parse);
-  const { page, size } = await getValidatedQuery(event, querySchema.parse);
+  const rawQuery = Object.fromEntries(new URL(event.node.req.url ?? "", "http://localhost").searchParams);
+  const query = querySchema.safeParse(rawQuery);
+  if (!query.success) {
+    throw createError({ statusCode: 400, statusText: ErrorCode.InvalidRequestError, message: "Invalid page or size" });
+  }
+  const { page, size } = query.data;
   const decodedQueryIri = decodeURIComponent(queryIri);
 
   // Also the ownership check: a job that is not the caller's is a 404

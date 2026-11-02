@@ -79,8 +79,8 @@ const jobName = computed(() => {
   if (!queuedQueries.value.length) return "";
   const first = queuedQueries.value[0]!.selected.name;
   const others = queuedQueries.value.length - 1;
-  if (!others) return first;
-  return `${first} and ${others} other ${others === 1 ? "query" : "queries"}`;
+  if (!others) return `Job: ${first}`;
+  return `Job: ${first} and ${others} other ${others === 1 ? "query" : "queries"}`;
 });
 const request: any = {
   query: {

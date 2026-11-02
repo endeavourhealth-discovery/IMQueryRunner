@@ -18,6 +18,10 @@ export const pool = mysql.createPool({
   keepAliveInitialDelay: 0
 });
 
+pool.pool.on("connection", conn => {
+  conn.query("SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED");
+});
+
 export const mysqlDb: MySql2Database<typeof schema> = drizzle({
   client: pool,
   schema,

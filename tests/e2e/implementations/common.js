@@ -29,6 +29,16 @@ function toJob(response) {
     .then(body => ({ id: body && body.jobId, name: (response.request().postDataJSON() || {}).jobName, status: response.status() }));
 }
 
+// Pins $searchDate so expected counts don't drift with the day the specs run; the date picker emits the argument as it is typed
+async function setSearchDate() {
+  const searchDate = (process.env.search_date || "").trim();
+  if (!searchDate) return;
+  const input = pw.page.locator('input[data-testid="search-date-input"], [data-testid="search-date-input"] input').first();
+  await input.fill(searchDate);
+  await input.press("Escape");
+  await expect(input).toHaveValue(searchDate);
+}
+
 function toFileName(text) {
   return text.replace(/[^\w.-]+/g, "_").replace(/^_+|_+$/g, "");
 }
@@ -130,6 +140,7 @@ step("Search for <text> and select", async text => {
   await pw.page.locator(".p-listbox-option").filter({ hasText: text }).click();
   await expect(pw.page.locator(".results-container")).toBeHidden();
   await expect(pw.page.locator(".p-datatable")).toBeVisible({ timeout: 30000 });
+  await setSearchDate();
   await expect(pw.page.getByRole("button", { name: "Add to queue" })).toBeEnabled();
 });
 
@@ -140,6 +151,7 @@ step("Search for <search> and select <select>", async (search, select) => {
   await pw.page.locator(".p-listbox-option").filter({ hasText: select }).click();
   await expect(pw.page.locator(".results-container")).toBeHidden();
   await expect(pw.page.locator(".p-datatable")).toBeVisible({ timeout: 30000 });
+  await setSearchDate();
   await expect(pw.page.getByRole("button", { name: "Add to queue" })).toBeEnabled();
 });
 
@@ -148,7 +160,7 @@ step("Wait <time> seconds", async time => {
 });
 
 step("Wait for job to submit", async () => {
-  await pw.page.waitForSelector(".p-datatable", { state: "visible" });
+  await pw.page.waitForSelector(".p-treetable", { state: "visible" });
   // The queue page can show its datatable before the add request has responded. Building the job calls IMAPI for each query,
   // which can be slow on the first run, so a late response is not an error here: "Wait for job to complete" keeps waiting for it
   const started = Date.now();
@@ -172,7 +184,7 @@ step("Wait for job to complete", async () => {
       await pw.page.getByRole("button", { name: "Refresh", exact: true }).click();
       const loading = pw.page.locator(".p-datatable-loading-icon");
       await expect(loading).toBeHidden({ timeout: 30000 });
-      await expect(pw.page.locator(".p-datatable")).toBeVisible();
+      await expect(pw.page.locator('[data-testid="job-table"]')).toBeVisible();
       const row = pw.page.locator("table tbody tr").filter({ hasText: job.name }).nth(0);
       await expect(row).toBeVisible();
       await expect(row.locator(".p-tag")).toContainText(status);
@@ -182,8 +194,8 @@ step("Wait for job to complete", async () => {
   assert.fail(`Job ${job.id} still "${status}" after ${JOB_TIMEOUT}ms`);
 });
 
-step("Wait for datatable to finish loading", async () => {
+step("Wait for job table to finish loading", async () => {
   const loading = pw.page.locator(".p-datatable-loading-icon");
   await expect(loading).toBeHidden({ timeout: 30000 });
-  await expect(pw.page.locator(".p-datatable")).toBeVisible();
+  await expect(pw.page.locator('[data-testid="job-table"]')).toBeVisible();
 });

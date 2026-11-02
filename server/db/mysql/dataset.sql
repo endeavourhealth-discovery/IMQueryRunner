@@ -6,6 +6,8 @@ DROP TABLE IF EXISTS dataset.cohort_results;
 
 DROP TABLE IF EXISTS dataset.dataset_results;
 
+DROP TABLE IF EXISTS dataset.query_dependency;
+
 DROP TABLE IF EXISTS dataset.query_result;
 
 DROP TABLE IF EXISTS dataset.indicator_result;
@@ -78,10 +80,20 @@ CREATE TABLE
         persistent BIT (1),
         use_start_of_day_snapshot BIT (1),
         version BIGINT,
-        executed_sql TEXT,
+        executed_sql MEDIUMTEXT,
         FOREIGN KEY (query_result_set_id) REFERENCES query_result_set (id),
         FOREIGN KEY (indicator_result_id) REFERENCES indicator_result (id),
         query_type VARCHAR(255)
+    );
+
+CREATE TABLE
+    query_dependency (
+        parent_query_result_id BIGINT NOT NULL,
+        sub_query_result_id BIGINT NOT NULL,
+        PRIMARY KEY (parent_query_result_id, sub_query_result_id),
+        INDEX idx_query_dependency_sub (sub_query_result_id),
+        FOREIGN KEY (parent_query_result_id) REFERENCES query_result (id),
+        FOREIGN KEY (sub_query_result_id) REFERENCES query_result (id)
     );
 
 CREATE TABLE
@@ -89,6 +101,7 @@ CREATE TABLE
         query_result_id BIGINT,
         entity_id BIGINT,
         entity_org_id BIGINT,
+        INDEX idx_qr_entity (query_result_id, entity_id),
         FOREIGN KEY (query_result_id) REFERENCES query_result (id)
     );
 
@@ -99,6 +112,7 @@ CREATE TABLE
         column_group VARCHAR(255),
         `json` JSON,
 		entity_org_id BIGINT,
+        INDEX idx_qr_entity (query_result_id, entity_id),
         FOREIGN KEY (query_result_id) REFERENCES query_result (id)
     );
 
@@ -110,11 +124,14 @@ CREATE TABLE patient_exists (
     patient_found TINYINT NOT NULL
 );
 
--- Indexes (existing databases: see dataset-indexes.sql)
 CREATE INDEX idx_job_user_queue_date ON dataset.job (user_id, queue_date);
 CREATE INDEX idx_query_result_set_iri ON dataset.query_result (query_result_set_id, query_iri);
 CREATE INDEX idx_patient_exists_iri_patient ON dataset.patient_exists (query_iri, patient_id);
 
+-- cohort_results and dataset_results carry a NON-unique idx_qr_entity (query_result_id, entity_id) (see CREATE TABLE above). It makes
+-- "WHERE query_result_id = ?" lookups covering for entity_id, and serves the entity_id joins in the generated indicator SQL. The unique
+-- version below stays disabled: the generated SQL can legitimately insert the same entity more than once for a query (for example when its
+-- last step is observation-rooted), which a unique index would reject.
 -- ALTER TABLE dataset.cohort_results DROP INDEX idx_cohort_query_entity;
 -- CREATE UNIQUE INDEX idx_cohort_query_entity ON dataset.cohort_results (query_result_id, entity_id);
 
@@ -123,3 +140,28 @@ CREATE INDEX idx_patient_exists_iri_patient ON dataset.patient_exists (query_iri
 
 -- ALTER TABLE compass.patient DROP INDEX idx_date_of_birth;
 -- CREATE INDEX idx_date_of_birth ON compass.patient(date_of_birth);
+
+-- ---------------------------------------------------------------------------------------------------------------------------------
+-- EXISTING DATABASES. This script DROPS and recreates the dataset tables, so never run it against live data. To bring a live database
+-- in line with it, run the statements below instead (each one only if the index is missing: SHOW INDEX FROM dataset.<table>).
+-- Test on a copy first. InnoDB builds these indexes online, but time it on a large table.
+-- ---------------------------------------------------------------------------------------------------------------------------------
+
+-- Covering lookup of results by query. The new index is added before the old one is dropped in the same statement, because the
+-- foreign key on query_result_id needs an index that starts with that column. `query_result_id` is the index MySQL created for the FK.
+-- ALTER TABLE dataset.cohort_results ADD INDEX idx_qr_entity (query_result_id, entity_id), DROP INDEX query_result_id;
+-- ALTER TABLE dataset.dataset_results ADD INDEX idx_qr_entity (query_result_id, entity_id), DROP INDEX query_result_id;
+
+-- The indexes defined near the top of this file, if a live database does not have them (check `SHOW INDEX` first):
+-- CREATE INDEX idx_job_user_queue_date ON dataset.job (user_id, queue_date);
+-- CREATE INDEX idx_query_result_set_iri ON dataset.query_result (query_result_set_id, query_iri);
+-- ALTER TABLE dataset.query_result DROP INDEX query_result_set_id;  -- now redundant: idx_query_result_set_iri starts with the same column
+
+-- dataset.concept_tct is built outside this repository. These are the indexes in use on the live database, recorded so they are not lost:
+--   PRIMARY (dbid)
+--   idx_set_self (parent, self)
+--   idx_csm (im1dbid, self)
+--   concept_tct (im1dbid, parent)
+-- Under review, not yet applied (see docs/IMQtoSQL-sql-baseline.md in the IMAPI repository): a single (im1dbid, parent, self) to replace
+-- idx_csm and concept_tct, and (parent, self, im1dbid) in place of idx_set_self. Confirm the live plan first. The generated SQL joins
+-- on im1dbid and filters on parent (and often self), and `parent` is a long VARCHAR(512) IRI, so these indexes are large.

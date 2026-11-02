@@ -1,12 +1,14 @@
 /**
  * Runs every query listed in one or more gauge spec tables straight against the API (no UI steps), then writes an HTML and JSON report
- * with each query's iri, name, status and result count, plus the definition, executed SQL and SQL error for any that errored.
+ * with each query's iri, name, status and result count, plus the definition, executed SQL and SQL error for any that errored. Queries that
+ * ran can be expanded to their sub queries, as in the UI's job table.
  * The running and the report are shared with the UI's "Query reports" menu (shared/queryReport.ts).
  *
  * Usage: pnpm test:queries [suite | spec.md ...]   (suites: default, qof, smh, all; defaults to "default")
  *        pnpm test:queries:qof | test:queries:smh | test:queries:all
  *
- * Env: BASE_URL, TEST_USERNAME, TEST_PASSWORD, QUERY_CONCURRENCY (jobs in flight, default 100), QUERY_TIMEOUT (ms per job, default 600000),
+ * Env: BASE_URL, TEST_USERNAME, TEST_PASSWORD, QUERY_CONCURRENCY (jobs in flight, default 50), QUERY_TIMEOUT (ms per job, default 120000),
+ *      search_date (yyyy-mm-dd; defaults to search_date in env/default/default.properties, shared with the e2e specs),
  *      headless_chrome (set to "false" to watch the login)
  *
  * The API needs a nuxt-auth-utils session, which only the Casdoor OIDC flow can create, so a headless browser signs in once and its
@@ -23,6 +25,18 @@ const CONCURRENCY = Number.parseInt(process.env.QUERY_CONCURRENCY || "50");
 const JOB_TIMEOUT = Number.parseInt(process.env.QUERY_TIMEOUT || "120000");
 const SPEC_DIR = "tests/e2e/specs/queries";
 const OUTPUT_DIR = path.join(__dirname, "outputs");
+const SEARCH_DATE = (process.env.search_date ?? gaugeProperty("search_date") ?? "").trim();
+
+/** A value from the gauge default env, so these runs use the same settings as test:e2e */
+function gaugeProperty(name) {
+  const file = path.join(__dirname, "../../env/default/default.properties");
+  if (!fs.existsSync(file)) return undefined;
+  const line = fs
+    .readFileSync(file, "utf8")
+    .split("\n")
+    .find(line => line.split("=")[0].trim() === name);
+  return line && line.slice(line.indexOf("=") + 1);
+}
 
 async function login(browser) {
   const context = await browser.newContext({ baseURL: BASE_URL });
@@ -71,7 +85,9 @@ function specFiles(args) {
 async function main() {
   const specs = specFiles(process.argv.slice(2));
   const queries = specs.flatMap(file => readSpec(path.basename(file), fs.readFileSync(file, "utf8")));
-  console.log(`Running ${queries.length} queries from ${specs.join(", ")} against ${BASE_URL} (${CONCURRENCY} at a time)`);
+  console.log(
+    `Running ${queries.length} queries from ${specs.join(", ")} against ${BASE_URL} (${CONCURRENCY} at a time, search date ${SEARCH_DATE || "today"})`
+  );
 
   const startTime = Date.now();
   const startedAt = new Date(startTime).toISOString();
@@ -82,7 +98,12 @@ async function main() {
     results = await runQueries(api, queries, {
       concurrency: CONCURRENCY,
       timeout: JOB_TIMEOUT,
-      onProgress: (done, total, r) => r && console.log(`[${done}/${total}] ${r.status.padEnd(14)} ${String(r.count ?? "").padStart(8)}  ${r.name || r.iri}`)
+      searchDate: SEARCH_DATE || undefined,
+      onProgress: (done, total, r) =>
+        r &&
+        console.log(
+          `[${done}/${total}] ${r.status.padEnd(14)} ${String(r.count ?? "").padStart(8)} ${(r.durationMs === null ? "-" : formatDuration(r.durationMs)).padStart(8)}  ${r.name || r.iri}`
+        )
     });
   } finally {
     await browser.close();
@@ -94,7 +115,10 @@ async function main() {
   const stamp = fileStamp(startedAt);
   const htmlFile = path.join(OUTPUT_DIR, `query-report-${stamp}.html`);
   fs.writeFileSync(htmlFile, htmlReport(results, { baseUrl: BASE_URL, startedAt, durationMs }));
-  fs.writeFileSync(path.join(OUTPUT_DIR, `query-report-${stamp}.json`), JSON.stringify({ baseUrl: BASE_URL, startedAt, durationMs, specs, results }, null, 2));
+  fs.writeFileSync(
+    path.join(OUTPUT_DIR, `query-report-${stamp}.json`),
+    JSON.stringify({ baseUrl: BASE_URL, startedAt, durationMs, searchDate: SEARCH_DATE || null, specs, results }, null, 2)
+  );
 
   const failed = results.filter(r => r.status !== "COMPLETED");
   console.log(`\n${results.length - failed.length}/${results.length} passed in ${formatDuration(durationMs)}. Report: ${htmlFile}`);

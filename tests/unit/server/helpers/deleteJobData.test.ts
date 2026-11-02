@@ -73,6 +73,6 @@ describe("deleteJobData", () => {
     state.batchAffected = [DELETE_BATCH_SIZE, 3, 0];
     await deleteJobData(job(JobStatus.COMPLETED));
     expect(state.deletes).toEqual(["cohort_results", "cohort_results", "dataset_results"]);
-    expect(state.transactionDeletes).toEqual(["query_result", "indicator_result", "query_result_set", "job"]);
+    expect(state.transactionDeletes).toEqual(["query_dependency", "query_result", "indicator_result", "query_result_set", "job"]);
   });
 });

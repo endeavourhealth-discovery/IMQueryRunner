@@ -10,7 +10,12 @@ const conn = vi.hoisted(() => ({
 }));
 
 vi.mock("mysql2/promise", () => ({
-  default: { createPool: () => ({ getConnection: async () => ({ release: conn.release, destroy: conn.destroy, connection: conn.connection }) }) }
+  default: {
+    createPool: () => ({
+      pool: { on: vi.fn() },
+      getConnection: async () => ({ release: conn.release, destroy: conn.destroy, connection: conn.connection })
+    })
+  }
 }));
 vi.mock("drizzle-orm/mysql2", () => ({ drizzle: () => ({}) }));
 

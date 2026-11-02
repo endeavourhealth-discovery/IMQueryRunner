@@ -7,6 +7,12 @@ export default defineConfig({
     env: {
       COMPASS_URL: "mysql://test:test@localhost:3306/test",
     },
+    coverage: {
+      provider: "v8",
+      reporter: ["text-summary", "lcov"],
+      reportsDirectory: "coverage",
+      include: ["app/**/*.ts", "server/**/*.ts", "shared/**/*.ts", "models/**/*.ts"],
+    },
   },
   resolve: {
     alias: {

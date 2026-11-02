@@ -25,5 +25,5 @@
 * Wait for job to submit
 * Wait for job to complete
 * Click "Refresh" button
-* Wait for datatable to finish loading
+* Wait for job table to finish loading
 * Check results for <count>

@@ -72,3 +72,8 @@ body {
     @apply my-1;
   }
 }
+
+.p-menu {
+  overflow-y: auto;
+  max-height: 100vh;
+}
