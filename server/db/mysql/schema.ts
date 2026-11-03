@@ -74,7 +74,8 @@ export const queryResultTable = dataset.table(
     useStartOfDaySnapshot: tinyint("use_start_of_day_snapshot").notNull(),
     executedSQL: mediumtext("executed_sql"),
     version: int("version").notNull(),
-    queryType: varchar("query_type", { length: 255 }).$type<IMQType>().notNull()
+    queryType: varchar("query_type", { length: 255 }).$type<IMQType>().notNull(),
+    status: varchar("status", { length: 45 }).$type<JobStatus>().notNull()
   },
   table => [index("idx_query_result_set_iri").on(table.queryResultSetId, table.queryIri)]
 );

@@ -6,11 +6,13 @@
           <Button icon="fa-solid fa-arrow-left" label="Back to queue" @click="backToQueue" />
         </div>
         <div v-if="executedSql" class="m-2 min-w-0">
-          <Panel header="Executed SQL" :toggleable="true" :collapsed="true">
+          <Panel header="Executed SQL" :toggleable="true" :collapsed="!resultsError">
             <SQLViewer :sql="executedSql" />
           </Panel>
         </div>
+        <Message v-if="resultsError" class="m-2" severity="warn" :closable="false" data-testid="query-results-error">{{ resultsError }}</Message>
         <DataTable
+          v-else
           ref="dt"
           :size="'small'"
           :value="queryResults"
@@ -82,9 +84,13 @@ const originalSize = ref(25);
 const totalCount = ref();
 const columns: Ref<any[]> = ref([]);
 const executedSql = ref<string | null>(null);
+const resultsError = ref<string | null>(null);
 
 onMounted(async () => {
-  await Promise.all([getQueryResults(), getExecutedSql()]);
+  // Independent: a query that failed has no results, but its SQL is what you came to see
+  const [results, sql] = await Promise.allSettled([getQueryResults(), getExecutedSql()]);
+  if (results.status === "rejected") resultsError.value = results.reason?.data?.message ?? "Could not load the results";
+  if (sql.status === "rejected") console.warn("Could not load the executed SQL:", sql.reason);
   formatResultsForTable();
 });
 
