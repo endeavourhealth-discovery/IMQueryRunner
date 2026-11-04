@@ -216,13 +216,13 @@ function hover(target: HTMLElement, entity: SearchResultSummary | ExtendedEntity
   max-height: none;
   margin: auto;
   padding: 0;
-  border: 1px solid var(--imsb-border);
-  border-radius: var(--imsb-radius-lg);
-  background: var(--imsb-surface);
-  color: var(--imsb-text);
-  box-shadow: var(--imsb-shadow-lg);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 8px;
+  background: var(--p-content-background);
+  color: var(--p-text-color);
+  box-shadow: 0 16px 48px rgb(0 0 0 / 0.2);
   font: inherit;
-  font-size: var(--imsb-font-size);
+  font-size: 1rem;
   line-height: 1.45;
 }
 .imsb-dialog[open] {
@@ -238,16 +238,16 @@ footer {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--imsb-border);
+  border-bottom: 1px solid var(--p-content-border-color);
 }
 footer {
   border-bottom: 0;
-  border-top: 1px solid var(--imsb-border);
+  border-top: 1px solid var(--p-content-border-color);
 }
 h2 {
   flex: 1;
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 600;
 }
 h3 {
@@ -256,7 +256,7 @@ h3 {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--imsb-text-muted);
+  color: var(--p-text-muted-color);
 }
 .body {
   flex: 1;
@@ -271,7 +271,7 @@ h3 {
   padding: 0.75rem 1rem;
 }
 .tree-pane {
-  border-right: 1px solid var(--imsb-border);
+  border-right: 1px solid var(--p-content-border-color);
 }
 .results-pane {
   display: flex;
@@ -291,17 +291,17 @@ h3 {
 .search-row input {
   flex: 1;
   min-width: 0;
-  padding: 0.45rem 0.6rem;
-  border: 1px solid var(--imsb-border);
-  border-radius: var(--imsb-radius);
-  background: var(--imsb-input-bg);
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 6px;
+  background: var(--p-form-field-background);
   color: inherit;
   font: inherit;
 }
 .search-row input:focus {
   outline: none;
-  border-color: var(--imsb-accent);
-  box-shadow: 0 0 0 3px var(--imsb-focus-ring);
+  border-color: var(--p-primary-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-primary-color) 25%, transparent);
 }
 .results {
   flex: 1;
@@ -312,18 +312,18 @@ h3 {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.45rem 0.5rem;
+  padding: 0.5rem;
   border-radius: 4px;
   cursor: pointer;
 }
 .results li:hover {
-  background: var(--imsb-hover);
+  background: var(--p-content-hover-background);
 }
 .results li.selected {
-  background: var(--imsb-selected);
+  background: var(--p-highlight-background);
 }
 .results li:focus-visible {
-  outline: 2px solid var(--imsb-accent);
+  outline: 2px solid var(--p-primary-color);
   outline-offset: -2px;
 }
 .meta {
@@ -332,8 +332,8 @@ h3 {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.8125rem;
-  color: var(--imsb-text-muted);
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
 }
 .pager {
   display: flex;
@@ -341,8 +341,8 @@ h3 {
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.8125rem;
-  color: var(--imsb-text-muted);
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
 }
 .pager-buttons {
   display: flex;
@@ -355,31 +355,31 @@ h3 {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
 }
 .status {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   margin: 0.5rem 0;
-  color: var(--imsb-text-muted);
+  color: var(--p-text-muted-color);
 }
 .status.error {
-  color: var(--imsb-danger);
+  color: var(--p-red-500);
 }
 .button {
   padding: 0.4rem 0.8rem;
-  border: 1px solid var(--imsb-border);
-  border-radius: var(--imsb-radius);
-  background: var(--imsb-surface);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 6px;
+  background: var(--p-content-background);
   color: inherit;
   font: inherit;
   cursor: pointer;
 }
 .button.primary {
-  background: var(--imsb-accent);
-  border-color: var(--imsb-accent);
-  color: var(--imsb-accent-contrast);
+  background: var(--p-primary-color);
+  border-color: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
 }
 .button:disabled {
   opacity: 0.5;
@@ -395,13 +395,13 @@ h3 {
   cursor: pointer;
 }
 .icon-button:hover {
-  background: var(--imsb-hover);
+  background: var(--p-content-hover-background);
 }
 .link {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--imsb-accent);
+  color: var(--p-primary-color);
   font: inherit;
   text-decoration: underline;
   cursor: pointer;

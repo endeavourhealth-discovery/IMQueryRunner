@@ -1,5 +1,5 @@
 <template>
-  <div ref="root" :class="{ disabled }" class="imsb imsb-theme" @focusout="onFocusOut">
+  <div ref="root" :class="{ disabled }" class="imsb" @focusout="onFocusOut">
     <div class="imsb-row">
       <div :class="{ 'has-error': !!error }" class="imsb-field">
         <svg aria-hidden="true" class="imsb-lead" height="16" viewBox="0 0 16 16" width="16">
@@ -431,42 +431,18 @@ defineExpose({ search, clear, text });
 </script>
 
 <style>
-/* Theme tokens shared by the search bar, its dialog and popovers, taken from the PrimeVue theme so light/dark mode follow the app */
-.imsb-theme {
-  --imsb-font-size: 0.9375rem;
-  --imsb-text: var(--p-text-color, #1f2933);
-  --imsb-text-muted: var(--p-text-muted-color, #57606a);
-  --imsb-surface: var(--p-content-background, #fff);
-  --imsb-input-bg: var(--p-form-field-background, #fff);
-  --imsb-border: var(--p-content-border-color, #d0d7de);
-  --imsb-hover: var(--p-content-hover-background, #f3f4f6);
-  --imsb-selected: var(--p-highlight-background, #dbeafe);
-  --imsb-accent: var(--p-primary-color, #2563eb);
-  --imsb-accent-contrast: var(--p-primary-contrast-color, #fff);
-  --imsb-focus-ring: color-mix(in srgb, var(--imsb-accent) 25%, transparent);
-  --imsb-danger: var(--p-red-500, #b42318);
-  --imsb-radius: 6px;
-  --imsb-radius-lg: 8px;
-  --imsb-height: 2.375rem;
-  --imsb-shadow: 0 8px 24px rgb(0 0 0 / 0.14);
-  --imsb-shadow-lg: 0 16px 48px rgb(0 0 0 / 0.2);
-}
-.my-app-dark .imsb-theme {
-  --imsb-danger: var(--p-red-400, #ff7a6b);
-  --imsb-shadow: 0 8px 24px rgb(0 0 0 / 0.5);
-  --imsb-shadow-lg: 0 16px 48px rgb(0 0 0 / 0.6);
-}
-.imsb-theme .imsb-spinner {
+/* Global so the dialog, popover and tree nodes can use it too */
+.imsb-spinner {
   display: inline-block;
   flex: none;
   width: 1rem;
   height: 1rem;
-  border: 2px solid var(--imsb-border);
-  border-top-color: var(--imsb-accent);
+  border: 2px solid var(--p-content-border-color);
+  border-top-color: var(--p-primary-color);
   border-radius: 50%;
   animation: imsb-spin 0.7s linear infinite;
 }
-.imsb-theme .imsb-spinner.small {
+.imsb-spinner.small {
   width: 0.8rem;
   height: 0.8rem;
 }
@@ -476,7 +452,7 @@ defineExpose({ search, clear, text });
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .imsb-theme .imsb-spinner {
+  .imsb-spinner {
     animation-duration: 2s;
   }
 }
@@ -486,16 +462,16 @@ defineExpose({ search, clear, text });
 .imsb {
   position: relative;
   width: 100%;
-  /* Fluid on narrow screens, capped on wide ones; set --imsb-max-width on a parent to change it (none for full width) */
-  max-width: var(--imsb-max-width, 40rem);
-  font-size: var(--imsb-font-size);
+  /* Fluid on narrow screens, capped on wide ones */
+  max-width: 40rem;
+  font-size: 1rem;
   line-height: 1.45;
-  color: var(--imsb-text);
+  color: var(--p-text-color);
 }
 .imsb-row {
   display: flex;
   align-items: stretch;
-  gap: 0.375rem;
+  gap: 0.4rem;
 }
 .imsb-field {
   position: relative;
@@ -503,25 +479,25 @@ defineExpose({ search, clear, text });
   min-width: 0;
   display: flex;
   align-items: center;
-  height: var(--imsb-height);
-  border: 1px solid var(--imsb-border);
-  border-radius: var(--imsb-radius);
-  background: var(--imsb-input-bg);
+  height: 2.5rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 6px;
+  background: var(--p-form-field-background);
   transition:
     border-color 0.12s,
     box-shadow 0.12s;
 }
 .imsb-field:focus-within {
-  border-color: var(--imsb-accent);
-  box-shadow: 0 0 0 3px var(--imsb-focus-ring);
+  border-color: var(--p-primary-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-primary-color) 25%, transparent);
 }
 .imsb-field.has-error {
-  border-color: var(--imsb-danger);
+  border-color: var(--p-red-500);
 }
 .imsb-lead {
   flex: none;
-  margin-left: 0.625rem;
-  color: var(--imsb-text-muted);
+  margin-left: 0.6rem;
+  color: var(--p-text-muted-color);
 }
 input {
   flex: 1;
@@ -535,34 +511,34 @@ input {
   font: inherit;
 }
 input::placeholder {
-  color: var(--imsb-text-muted);
+  color: var(--p-text-muted-color);
   opacity: 0.85;
 }
 .imsb-adornments {
   display: flex;
   align-items: center;
-  gap: 0.125rem;
-  padding-right: 0.375rem;
+  gap: 0.1rem;
+  padding-right: 0.4rem;
 }
 .imsb-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   border: 0;
   border-radius: 4px;
   background: none;
-  color: var(--imsb-text-muted);
+  color: var(--p-text-muted-color);
   cursor: pointer;
 }
 .imsb-icon:hover:not(:disabled) {
-  background: var(--imsb-hover);
-  color: var(--imsb-text);
+  background: var(--p-content-hover-background);
+  color: var(--p-text-color);
 }
 .imsb-icon.listening {
-  color: var(--imsb-danger);
+  color: var(--p-red-500);
   animation: imsb-pulse 1.2s ease-in-out infinite;
 }
 .imsb-advanced {
@@ -570,13 +546,13 @@ input::placeholder {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.375rem;
-  min-width: var(--imsb-height);
-  padding: 0 0.625rem;
-  border: 1px solid var(--imsb-accent);
-  border-radius: var(--imsb-radius);
-  background: var(--imsb-accent);
-  color: var(--imsb-accent-contrast);
+  gap: 0.4rem;
+  min-width: 2.5rem;
+  padding: 0 0.6rem;
+  border: 1px solid var(--p-primary-color);
+  border-radius: 6px;
+  background: var(--p-primary-color);
+  color: var(--p-primary-contrast-color);
   font: inherit;
   cursor: pointer;
 }
@@ -584,7 +560,7 @@ input::placeholder {
   filter: brightness(1.08);
 }
 button:focus-visible {
-  outline: 2px solid var(--imsb-accent);
+  outline: 2px solid var(--p-primary-color);
   outline-offset: 2px;
 }
 button:disabled,
@@ -599,10 +575,10 @@ button:disabled,
   left: 0;
   width: min(100%, 34rem);
   min-width: min(20rem, 100%);
-  border: 1px solid var(--imsb-border);
-  border-radius: var(--imsb-radius);
-  background: var(--imsb-surface);
-  box-shadow: var(--imsb-shadow);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 6px;
+  background: var(--p-content-background);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.14);
   overflow: hidden;
 }
 ul {
@@ -620,13 +596,13 @@ li {
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.45rem 0.6rem;
+  padding: 0.5rem 0.6rem;
   border-radius: 4px;
   cursor: pointer;
 }
 li.active {
-  background: var(--imsb-selected);
-  box-shadow: inset 3px 0 0 var(--imsb-accent);
+  background: var(--p-highlight-background);
+  box-shadow: inset 3px 0 0 var(--p-primary-color);
 }
 li.current {
   font-weight: 600;
@@ -641,34 +617,34 @@ li.current {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.8125rem;
-  color: var(--imsb-text-muted);
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
 }
 .imsb-message {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem;
-  color: var(--imsb-text-muted);
+  color: var(--p-text-muted-color);
 }
 .imsb-message.error {
-  color: var(--imsb-danger);
+  color: var(--p-red-500);
 }
 .imsb-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0.4rem 0.75rem;
-  border-top: 1px solid var(--imsb-border);
-  color: var(--imsb-text-muted);
+  border-top: 1px solid var(--p-content-border-color);
+  color: var(--p-text-muted-color);
 }
 .imsb-link {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--imsb-accent);
+  color: var(--p-primary-color);
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 0.8rem;
   text-decoration: underline;
   cursor: pointer;
 }

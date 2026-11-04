@@ -127,27 +127,27 @@ ul {
 .row {
   display: flex;
   align-items: center;
-  gap: 0.125rem;
+  gap: 0.1rem;
   border-radius: 4px;
 }
 .row:hover {
-  background: var(--imsb-hover);
+  background: var(--p-content-hover-background);
 }
 .row.selected {
-  background: var(--imsb-selected);
+  background: var(--p-highlight-background);
 }
 .toggle,
 .toggle-spacer {
   flex: none;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.2rem;
+  height: 1.2rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   border: 0;
   background: none;
-  color: var(--imsb-text-muted);
+  color: var(--p-text-muted-color);
   cursor: pointer;
 }
 .toggle svg {
@@ -161,8 +161,8 @@ ul {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0.375rem;
+  gap: 0.4rem;
+  padding: 0.25rem 0.4rem;
   border: 0;
   background: none;
   color: inherit;
@@ -172,7 +172,7 @@ ul {
   border-radius: 4px;
 }
 .label:focus-visible {
-  outline: 2px solid var(--imsb-accent);
+  outline: 2px solid var(--p-primary-color);
   outline-offset: -2px;
 }
 .icon {
@@ -186,19 +186,19 @@ ul {
 .status {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: 0.4rem;
   padding: 0.25rem 0;
-  font-size: 0.8125rem;
-  color: var(--imsb-text-muted);
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
 }
 .status.error {
-  color: var(--imsb-danger);
+  color: var(--p-red-500);
 }
 .link {
   padding: 0;
   border: 0;
   background: none;
-  color: var(--imsb-accent);
+  color: var(--p-primary-color);
   font: inherit;
   cursor: pointer;
   text-decoration: underline;

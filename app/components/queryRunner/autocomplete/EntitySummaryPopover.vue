@@ -136,13 +136,13 @@ defineExpose({ show, hide });
   width: min(400px, calc(100vw - 16px));
   max-height: 50vh;
   overflow: auto;
-  padding: 0.75rem 0.875rem;
-  background: var(--imsb-surface);
-  color: var(--imsb-text);
-  border: 1px solid var(--imsb-border);
-  border-radius: var(--imsb-radius);
-  box-shadow: var(--imsb-shadow);
-  font-size: 0.8125rem;
+  padding: 0.75rem 1rem;
+  background: var(--p-content-background);
+  color: var(--p-text-color);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.14);
+  font-size: 0.8rem;
   line-height: 1.45;
   pointer-events: none;
 }
@@ -157,7 +157,7 @@ dl {
 }
 dt {
   font-weight: 600;
-  color: var(--imsb-text-muted);
+  color: var(--p-text-muted-color);
 }
 dd {
   margin: 0;
@@ -168,12 +168,12 @@ dd {
   font-size: 0.75rem;
 }
 .muted {
-  color: var(--imsb-text-muted);
+  color: var(--p-text-muted-color);
 }
 .imsb-summary-loading {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--imsb-text-muted);
+  color: var(--p-text-muted-color);
 }
 </style>
