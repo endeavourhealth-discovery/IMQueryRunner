@@ -35,7 +35,6 @@ const EntityService = {
       },
       method: "GET"
     });
-    // IMAPI returns {} for entities it holds no summary for (e.g. QOF clauses); report just the IRI rather than failing validation
     if (!result || !Object.keys(result).length) return { iri } as EntitySummary;
     return parseApiResponse(result, EntitySummarySchema);
   },

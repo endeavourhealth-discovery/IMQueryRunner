@@ -21,7 +21,6 @@
 <script lang="ts">
 import type { SearchResultSummary } from "@endeavour/vue-library/models";
 
-// Shared across instances so repeated hovers don't refetch
 const summaryCache = new Map<string, Promise<SearchResultSummary>>();
 </script>
 
