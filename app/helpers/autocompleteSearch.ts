@@ -4,6 +4,10 @@ import { PageSchema, type QueryRequest, type SearchResponse, type SearchResultSu
 export const IM_FOLDER = "http://endhealth.info/im#Folder";
 export const IM_INFORMATION_MODEL = "http://endhealth.info/im#InformationModel";
 
+export const MIN_SEARCH_LENGTH = 3;
+export const SEARCH_DEBOUNCE_MS = 600;
+export const SEARCH_TIMEOUT_MS = 10000;
+
 export class SearchTimeoutError extends Error {
   constructor(readonly timeoutMs: number) {
     super(`Search timed out after ${Math.round(timeoutMs / 1000)} seconds`);

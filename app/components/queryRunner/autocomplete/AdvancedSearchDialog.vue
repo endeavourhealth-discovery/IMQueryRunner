@@ -1,7 +1,7 @@
 <template>
   <dialog ref="dialog" aria-labelledby="imsb-dialog-title" class="imsb-dialog" @cancel="summary?.hide()" @close="emit('close')">
     <header>
-      <h2 id="imsb-dialog-title">{{ title }}</h2>
+      <h2 id="imsb-dialog-title">Advanced search</h2>
       <button aria-label="Close" class="icon-button" type="button" @click="emit('close')">
         <svg aria-hidden="true" height="16" viewBox="0 0 16 16" width="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.75" /></svg>
       </button>
@@ -28,13 +28,13 @@
       <section aria-label="Search results" class="results-pane">
         <form class="search-row" @submit.prevent="runSearch(1)">
           <input v-model="term" aria-label="Search term" autocomplete="off" placeholder="Search by name or IRI" type="search" />
-          <button :disabled="term.trim().length < minSearchLength" class="button" type="submit">Search</button>
+          <button :disabled="term.trim().length < MIN_SEARCH_LENGTH" class="button" type="submit">Search</button>
         </form>
 
         <div :aria-busy="resultsLoading" class="results">
           <p v-if="resultsLoading" class="status"><span aria-hidden="true" class="imsb-spinner"></span> Searching…</p>
           <p v-else-if="resultsError" class="status error" role="alert">{{ resultsError }}</p>
-          <p v-else-if="!results" class="status">Enter at least {{ minSearchLength }} characters to search, or browse the hierarchy.</p>
+          <p v-else-if="!results" class="status">Enter at least {{ MIN_SEARCH_LENGTH }} characters to search, or browse the hierarchy.</p>
           <p v-else-if="!results.entities?.length" class="status">No results</p>
           <ul v-else aria-label="Results" role="listbox">
             <li
@@ -58,7 +58,7 @@
 
         <nav v-if="results?.totalCount" aria-label="Result pages" class="pager">
           <span>
-            Showing {{ (pageNumber - 1) * pageSize + 1 }}–{{ (pageNumber - 1) * pageSize + (results.entities?.length ?? 0) }} of {{ results.totalCount }}
+            Showing {{ (pageNumber - 1) * PAGE_SIZE + 1 }}–{{ (pageNumber - 1) * PAGE_SIZE + (results.entities?.length ?? 0) }} of {{ results.totalCount }}
           </span>
           <span class="pager-buttons">
             <button :disabled="pageNumber <= 1 || resultsLoading" class="button" type="button" @click="runSearch(pageNumber - 1)">Previous</button>
@@ -73,7 +73,7 @@
       <span :title="candidate?.iri" class="current">
         <template v-if="candidate">
           Selected: <strong>{{ displayName(candidate) }}</strong>
-          <em v-if="candidateIsFolder && !allowFolderSelection"> (folders cannot be selected)</em>
+          <em v-if="candidateIsFolder"> (folders cannot be selected)</em>
         </template>
         <template v-else>Nothing selected</template>
       </span>
@@ -88,7 +88,7 @@
 <script lang="ts" setup>
 import EntitySummaryPopover from "~/components/queryRunner/autocomplete/EntitySummaryPopover.vue";
 import EntityTreeNode from "~/components/queryRunner/autocomplete/EntityTreeNode.vue";
-import { IM_INFORMATION_MODEL, displayName, isAbortError, isFolder, searchEntities } from "~/helpers/autocompleteSearch";
+import { IM_INFORMATION_MODEL, MIN_SEARCH_LENGTH, SEARCH_TIMEOUT_MS, displayName, isAbortError, isFolder, searchEntities } from "~/helpers/autocompleteSearch";
 import EntityService from "~/services/EntityService";
 import QueryService from "~/services/QueryService";
 
@@ -96,27 +96,16 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 import type { ExtendedEntityReferenceNode, QueryRequest, SearchResponse, SearchResultSummary } from "@endeavour/vue-library/models";
 
+const PAGE_SIZE = 20;
+
 const props = withDefaults(
   defineProps<{
-    title?: string;
     rootEntities?: string[];
     imQuery?: QueryRequest;
     searchTerm?: string;
     selected?: SearchResultSummary;
-    pageSize?: number;
-    searchTimeoutMs?: number;
-    minSearchLength?: number;
-    allowFolderSelection?: boolean;
   }>(),
-  {
-    title: "Advanced search",
-    rootEntities: () => [],
-    searchTerm: "",
-    pageSize: 20,
-    searchTimeoutMs: 10000,
-    minSearchLength: 3,
-    allowFolderSelection: false
-  }
+  { rootEntities: () => [], searchTerm: "" }
 );
 
 const emit = defineEmits<{
@@ -137,14 +126,14 @@ const pageNumber = ref(1);
 const candidate = ref<SearchResultSummary | undefined>(props.selected);
 let controller: AbortController | undefined;
 
-const totalPages = computed(() => Math.max(1, Math.ceil((results.value?.totalCount ?? 0) / props.pageSize)));
+const totalPages = computed(() => Math.max(1, Math.ceil((results.value?.totalCount ?? 0) / PAGE_SIZE)));
 const candidateIsFolder = computed(() => isFolder(candidate.value?.type));
-const canSelect = computed(() => !!candidate.value && (props.allowFolderSelection || !candidateIsFolder.value));
+const canSelect = computed(() => !!candidate.value && !candidateIsFolder.value);
 
 onMounted(() => {
   dialog.value?.showModal();
   loadRoots();
-  if (term.value.trim().length >= props.minSearchLength) runSearch(1);
+  if (term.value.trim().length >= MIN_SEARCH_LENGTH) runSearch(1);
 });
 
 onBeforeUnmount(() => controller?.abort());
@@ -165,7 +154,7 @@ async function loadRoots() {
 
 async function runSearch(page: number) {
   const text = term.value.trim();
-  if (text.length < props.minSearchLength) {
+  if (text.length < MIN_SEARCH_LENGTH) {
     results.value = undefined;
     return;
   }
@@ -178,8 +167,8 @@ async function runSearch(page: number) {
     results.value = await searchEntities(QueryService.queryIMSearch, props.imQuery, {
       text,
       pageNumber: page,
-      pageSize: props.pageSize,
-      timeoutMs: props.searchTimeoutMs,
+      pageSize: PAGE_SIZE,
+      timeoutMs: SEARCH_TIMEOUT_MS,
       signal: current.signal
     });
   } catch (e) {
@@ -197,7 +186,7 @@ function nodeToSummary(node: ExtendedEntityReferenceNode): SearchResultSummary {
 
 function confirm(entity = candidate.value) {
   if (!entity) return;
-  if (isFolder(entity.type) && !props.allowFolderSelection) return;
+  if (isFolder(entity.type)) return;
   summary.value?.hide();
   emit("select", entity);
 }

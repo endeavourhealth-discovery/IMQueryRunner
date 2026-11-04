@@ -78,7 +78,6 @@ const totalCount = ref(0);
 let page = 0;
 
 const folder = computed(() => isFolder(props.node.type));
-// Same icon and colour per entity type as the IMDirectory NavTree
 const typeIcon = computed(() => getFAIconFromType((props.node.type ?? []) as TTIriRef[]));
 const typeColour = computed(() => getColourFromType((props.node.type ?? []) as TTIriRef[]));
 const canExpand = computed(() => props.node.hasChildren !== false);

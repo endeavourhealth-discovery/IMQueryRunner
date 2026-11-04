@@ -1,12 +1,9 @@
 <template>
-  <div ref="root" :class="{ disabled }" class="imsb" @focusout="onFocusOut">
+  <div ref="root" class="imsb" @focusout="onFocusOut">
     <div class="imsb-row">
-      <div :class="{ 'has-error': !!error }" class="imsb-field">
-        <svg aria-hidden="true" class="imsb-lead" height="16" viewBox="0 0 16 16" width="16">
-          <circle cx="7" cy="7" fill="none" r="4.5" stroke="currentColor" stroke-width="1.5" />
-          <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" />
-        </svg>
-        <input
+      <IconField class="imsb-field">
+        <InputIcon class="fa-solid fa-magnifying-glass" />
+        <InputText
           :id="id"
           ref="input"
           v-model="text"
@@ -14,15 +11,16 @@
           :aria-busy="loading"
           :aria-controls="listboxId"
           :aria-expanded="popupOpen"
-          :aria-label="label"
-          :autocomplete="allowBrowserAutocomplete ? 'on' : 'off'"
           :disabled="disabled"
-          :placeholder="speech.listening.value ? speech.interim.value || 'Listening…' : effectivePlaceholder"
+          :invalid="!!error"
+          :placeholder="speech.listening.value ? speech.interim.value || 'Listening…' : placeholder"
           aria-autocomplete="list"
+          aria-label="Search"
+          autocomplete="off"
           data-testid="search-input"
+          fluid
           role="combobox"
           spellcheck="false"
-          type="text"
           @focus="onFocus"
           @input="onInput"
           @keydown="onKeydown"
@@ -31,56 +29,46 @@
         />
         <span class="imsb-adornments">
           <span v-if="loading" aria-label="Searching" class="imsb-spinner" role="status"></span>
-          <button
+          <Button
             v-if="showClear"
             aria-label="Clear search"
-            class="imsb-icon"
             data-testid="clear-button"
+            icon="fa-solid fa-xmark"
+            rounded
+            severity="secondary"
+            size="small"
+            text
             title="Clear"
-            type="button"
             @click="clear"
             @mousedown.prevent
-          >
-            <svg aria-hidden="true" height="14" viewBox="0 0 16 16" width="14"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.75" /></svg>
-          </button>
-          <button
+          />
+          <Button
             v-if="enableVoiceSearch && speech.supported.value"
             :aria-label="speech.listening.value ? 'Stop voice search' : 'Voice search'"
             :aria-pressed="speech.listening.value"
             :class="{ listening: speech.listening.value }"
             :disabled="disabled"
+            :severity="speech.listening.value ? 'danger' : 'secondary'"
             :title="speech.error.value ? `Voice search unavailable: ${speech.error.value}` : speech.listening.value ? 'Stop listening' : 'Voice search'"
-            class="imsb-icon"
             data-testid="voice-button"
-            type="button"
+            icon="fa-solid fa-microphone"
+            rounded
+            size="small"
+            text
             @click="speech.toggle()"
-          >
-            <svg aria-hidden="true" height="15" viewBox="0 0 16 16" width="15">
-              <rect fill="none" height="8" rx="2.5" stroke="currentColor" stroke-width="1.4" width="5" x="5.5" y="1.5" />
-              <path d="M3 7.5a5 5 0 0010 0M8 12.5V15" fill="none" stroke="currentColor" stroke-width="1.4" />
-            </svg>
-          </button>
+          />
         </span>
-      </div>
+      </IconField>
 
-      <button
+      <Button
         v-if="enableAdvancedSearch"
-        :class="{ text: buttonStyle === 'text' }"
         :disabled="disabled"
-        :title="buttonStyle === 'icon' ? 'Advanced search' : undefined"
         aria-label="Advanced search"
-        class="imsb-advanced"
         data-testid="advanced-search-button"
-        type="button"
+        icon="fa-solid fa-list"
+        title="Advanced search"
         @click="openAdvancedSearch()"
-      >
-        <svg aria-hidden="true" height="15" viewBox="0 0 16 16" width="15">
-          <path d="M2 3.5h12M2 8h8M2 12.5h5" stroke="currentColor" stroke-width="1.5" />
-          <circle cx="12" cy="11" fill="none" r="2.25" stroke="currentColor" stroke-width="1.4" />
-          <path d="M13.6 12.6L15 14" stroke="currentColor" stroke-width="1.4" />
-        </svg>
-        <span v-if="buttonStyle === 'text'">Advanced search</span>
-      </button>
+      />
     </div>
 
     <div v-if="popupOpen" class="imsb-popup" data-testid="results-popup">
@@ -111,11 +99,9 @@
       </ul>
 
       <div v-if="!error && results" class="imsb-footer">
-        <small data-testid="results-count"
-          >Showing {{ entities.length ? 1 : 0 }}–{{ entities.length }} of {{ results.totalCount ?? entities.length }} results</small
-        >
+        <small data-testid="results-count">Showing {{ entities.length ? 1 : 0 }}–{{ entities.length }} of {{ totalCount }} results</small>
         <button
-          v-if="enableAdvancedSearch && (results.totalCount ?? 0) > entities.length"
+          v-if="enableAdvancedSearch && totalCount > entities.length"
           class="imsb-link"
           type="button"
           @click="openAdvancedSearch(text)"
@@ -130,12 +116,9 @@
 
     <AdvancedSearchDialog
       v-if="dialogOpen"
-      :allow-folder-selection="allowFolderSelection"
-      :im-query="dialogQuery"
-      :min-search-length="minSearchLength"
-      :root-entities="dialogRoots"
+      :im-query="imQuery"
+      :root-entities="rootEntities"
       :search-term="dialogTerm"
-      :search-timeout-ms="searchTimeoutMs"
       :selected="selected"
       @close="closeDialog"
       @select="onDialogSelect"
@@ -147,69 +130,46 @@
 import AdvancedSearchDialog from "~/components/queryRunner/autocomplete/AdvancedSearchDialog.vue";
 import EntitySummaryPopover from "~/components/queryRunner/autocomplete/EntitySummaryPopover.vue";
 import { useSpeechRecognition } from "~/composables/useSpeechRecognition";
-import { SearchTimeoutError, displayName, searchEntities } from "~/helpers/autocompleteSearch";
+import { MIN_SEARCH_LENGTH, SEARCH_DEBOUNCE_MS, SEARCH_TIMEOUT_MS, SearchTimeoutError, displayName, searchEntities } from "~/helpers/autocompleteSearch";
 import QueryService from "~/services/QueryService";
 
-import { computed, nextTick, onBeforeUnmount, ref, shallowRef, toRaw, useId, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, shallowRef, useId, watch } from "vue";
 
 import type { QueryRequest, SearchResponse, SearchResultSummary } from "@endeavour/vue-library/models";
 
-interface Props {
-  /** Base query (type/scheme/isA filters etc.). Text, paging and search style are applied on top. */
-  imQuery?: QueryRequest;
-  /** Lazily builds the base query when imQuery is not supplied. */
-  setupSearch?: () => QueryRequest | Promise<QueryRequest>;
-  /** Root IRIs of the advanced search tree. */
-  rootEntities?: string[];
-  setupRootEntities?: () => string[] | Promise<string[]>;
-  placeholder?: string;
-  disabled?: boolean;
-  minSearchLength?: number;
-  debounceMs?: number;
-  pageSize?: number;
-  searchTimeoutMs?: number;
-  allowBrowserAutocomplete?: boolean;
-  enableVoiceSearch?: boolean;
-  enableAdvancedSearch?: boolean;
-  showSummaryOnHover?: boolean;
-  /** "icon" shows icon buttons with tooltips; "text" shows labelled buttons. */
-  buttonStyle?: "icon" | "text";
-  /** Whether folders can be chosen from the advanced search tree. */
-  allowFolderSelection?: boolean;
-  id?: string;
-  label?: string;
-}
+const PAGE_SIZE = 10;
 
-const props = withDefaults(defineProps<Props>(), {
-  rootEntities: () => [],
-  disabled: false,
-  minSearchLength: 3,
-  debounceMs: 600,
-  pageSize: 10,
-  searchTimeoutMs: 10000,
-  allowBrowserAutocomplete: false,
-  enableVoiceSearch: true,
-  enableAdvancedSearch: true,
-  showSummaryOnHover: true,
-  buttonStyle: "icon",
-  allowFolderSelection: false,
-  label: "Search"
-});
+const props = withDefaults(
+  defineProps<{
+    imQuery?: QueryRequest;
+    rootEntities?: string[];
+    placeholder?: string;
+    disabled?: boolean;
+    enableVoiceSearch?: boolean;
+    enableAdvancedSearch?: boolean;
+    showSummaryOnHover?: boolean;
+    id?: string;
+  }>(),
+  {
+    rootEntities: () => [],
+    placeholder: "Search by name or IRI",
+    disabled: false,
+    enableVoiceSearch: true,
+    enableAdvancedSearch: true,
+    showSummaryOnHover: true
+  }
+);
 
-const emit = defineEmits<{
-  select: [entity: SearchResultSummary | undefined];
-  error: [error: Error];
-}>();
+const emit = defineEmits<{ error: [error: Error] }>();
 
 const selected = defineModel<SearchResultSummary | undefined>("selected");
 
 const generatedId = useId();
-const id = computed(() => props.id ?? `imsb-${generatedId.replace(/[^\w-]/g, "")}`);
+const id = computed(() => props.id ?? generatedId);
 const listboxId = computed(() => `${id.value}-listbox`);
-const effectivePlaceholder = computed(() => props.placeholder ?? "Search by name or IRI");
 
 const root = ref<HTMLDivElement>();
-const input = ref<HTMLInputElement>();
+const input = ref<{ $el: HTMLInputElement }>();
 const listbox = ref<HTMLUListElement>();
 const summary = ref<InstanceType<typeof EntitySummaryPopover>>();
 
@@ -220,14 +180,10 @@ const error = ref<string | undefined>();
 const popupOpen = ref(false);
 const activeIndex = ref(-1);
 const dialogOpen = ref(false);
-const dialogRoots = ref<string[]>([]);
-const dialogQuery = shallowRef<QueryRequest | undefined>();
 const dialogTerm = ref("");
 
 let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 let controller: AbortController | undefined;
-let resolvedQuery: QueryRequest | undefined;
-let syncedIri = selected.value?.iri;
 
 const speech = useSpeechRecognition(transcript => {
   text.value = transcript;
@@ -235,33 +191,20 @@ const speech = useSpeechRecognition(transcript => {
 });
 
 const entities = computed(() => results.value?.entities ?? []);
+const totalCount = computed(() => results.value?.totalCount ?? entities.value.length);
 const showClear = computed(() => !props.disabled && (text.value.length > 0 || !!selected.value));
 const activeId = computed(() => (activeIndex.value >= 0 ? `${id.value}-option-${activeIndex.value}` : undefined));
 
 watch(
   () => selected.value?.iri,
-  iri => {
-    if (iri !== syncedIri) {
-      syncedIri = iri;
-      text.value = displayName(selected.value);
-    }
-  }
+  () => (text.value = displayName(selected.value))
 );
 
 watch(activeIndex, index => {
-  if (index >= 0) nextTick(() => listbox.value?.querySelector(`#${CSS.escape(`${id.value}-option-${index}`)}`)?.scrollIntoView({ block: "nearest" }));
+  if (index >= 0) nextTick(() => listbox.value?.children[index]?.scrollIntoView({ block: "nearest" }));
 });
 
-onBeforeUnmount(() => {
-  clearTimeout(debounceTimer);
-  controller?.abort();
-});
-
-async function getBaseQuery(): Promise<QueryRequest | undefined> {
-  if (props.imQuery) return toRaw(props.imQuery);
-  if (!resolvedQuery && props.setupSearch) resolvedQuery = await props.setupSearch();
-  return resolvedQuery;
-}
+onBeforeUnmount(cancelPending);
 
 function cancelPending() {
   clearTimeout(debounceTimer);
@@ -272,24 +215,19 @@ function cancelPending() {
 function onInput() {
   error.value = undefined;
   clearTimeout(debounceTimer);
-  if (!text.value) {
+  if (text.value.trim().length < MIN_SEARCH_LENGTH) {
     cancelPending();
     closePopup();
-    if (selected.value) setSelected(undefined);
+    if (!text.value) selected.value = undefined;
     return;
   }
-  if (text.value.trim().length < props.minSearchLength) {
-    cancelPending();
-    closePopup();
-    return;
-  }
-  debounceTimer = setTimeout(search, props.debounceMs);
+  debounceTimer = setTimeout(search, SEARCH_DEBOUNCE_MS);
 }
 
 async function search() {
   clearTimeout(debounceTimer);
   const term = text.value.trim();
-  if (term.length < props.minSearchLength) return;
+  if (term.length < MIN_SEARCH_LENGTH) return;
   controller?.abort();
   const current = (controller = new AbortController());
   loading.value = true;
@@ -297,15 +235,13 @@ async function search() {
   popupOpen.value = true;
   activeIndex.value = -1;
   try {
-    const base = await getBaseQuery();
-    const response = await searchEntities(QueryService.queryIMSearch, base, {
+    const response = await searchEntities(QueryService.queryIMSearch, props.imQuery, {
       text: term,
-      pageSize: props.pageSize,
-      timeoutMs: props.searchTimeoutMs,
+      pageSize: PAGE_SIZE,
+      timeoutMs: SEARCH_TIMEOUT_MS,
       signal: current.signal
     });
-    if (controller !== current) return;
-    results.value = response;
+    if (controller === current) results.value = response;
   } catch (e) {
     if (controller !== current) return;
     results.value = undefined;
@@ -318,9 +254,7 @@ async function search() {
 
 function setSelected(entity: SearchResultSummary | undefined) {
   selected.value = entity;
-  syncedIri = entity?.iri;
   text.value = displayName(entity);
-  emit("select", entity);
 }
 
 function choose(entity: SearchResultSummary) {
@@ -334,14 +268,13 @@ function closePopup() {
   activeIndex.value = -1;
 }
 
-/** Clears the text and selection. */
 function clear() {
   cancelPending();
   results.value = undefined;
   error.value = undefined;
   closePopup();
   setSelected(undefined);
-  nextTick(() => input.value?.focus());
+  nextTick(() => input.value?.$el.focus());
 }
 
 function onKeydown(event: KeyboardEvent) {
@@ -350,8 +283,8 @@ function onKeydown(event: KeyboardEvent) {
     case "ArrowDown":
     case "ArrowUp": {
       event.preventDefault();
-      if (!popupOpen.value && count) popupOpen.value = true;
       if (!count) return;
+      popupOpen.value = true;
       const step = event.key === "ArrowDown" ? 1 : -1;
       activeIndex.value = activeIndex.value < 0 && step < 0 ? count - 1 : (activeIndex.value + step + count) % count;
       break;
@@ -396,42 +329,37 @@ function onFocusOut(event: FocusEvent) {
 }
 
 function onFocus() {
-  input.value?.select();
-  if (results.value && text.value.trim().length >= props.minSearchLength && text.value !== displayName(selected.value)) popupOpen.value = true;
+  input.value?.$el.select();
+  if (results.value && text.value.trim().length >= MIN_SEARCH_LENGTH && text.value !== displayName(selected.value)) popupOpen.value = true;
 }
 
-async function openAdvancedSearch(withTerm = text.value) {
+function openAdvancedSearch(withTerm = text.value) {
   cancelPending();
   closePopup();
   summary.value?.hide();
-  dialogRoots.value = props.rootEntities.length ? props.rootEntities : ((await props.setupRootEntities?.()) ?? []);
-  dialogQuery.value = await getBaseQuery();
   dialogTerm.value = withTerm === displayName(selected.value) ? "" : withTerm;
   dialogOpen.value = true;
 }
 
 function onDialogSelect(entity: SearchResultSummary) {
-  dialogOpen.value = false;
   setSelected(entity);
-  input.value?.focus();
+  closeDialog();
 }
 
 function closeDialog() {
   dialogOpen.value = false;
-  input.value?.focus();
+  input.value?.$el.focus();
 }
 
 function hoverSummary(target: HTMLElement, entity: SearchResultSummary | undefined) {
-  if (!props.showSummaryOnHover || !summary.value) return;
-  if (entity) summary.value.show(target, entity);
-  else summary.value.hide();
+  if (entity) summary.value?.show(target, entity);
+  else summary.value?.hide();
 }
 
 defineExpose({ search, clear, text });
 </script>
 
 <style>
-/* Global so the dialog, popover and tree nodes can use it too */
 .imsb-spinner {
   display: inline-block;
   flex: none;
@@ -462,111 +390,37 @@ defineExpose({ search, clear, text });
 .imsb {
   position: relative;
   width: 100%;
-  /* Fluid on narrow screens, capped on wide ones */
   max-width: 40rem;
-  font-size: 1rem;
-  line-height: 1.45;
-  color: var(--p-text-color);
 }
 .imsb-row {
   display: flex;
-  align-items: stretch;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 .imsb-field {
-  position: relative;
   flex: 1;
   min-width: 0;
-  display: flex;
-  align-items: center;
-  height: 2.5rem;
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 6px;
-  background: var(--p-form-field-background);
-  transition:
-    border-color 0.12s,
-    box-shadow 0.12s;
 }
-.imsb-field:focus-within {
-  border-color: var(--p-primary-color);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-primary-color) 25%, transparent);
-}
-.imsb-field.has-error {
-  border-color: var(--p-red-500);
-}
-.imsb-lead {
-  flex: none;
-  margin-left: 0.6rem;
-  color: var(--p-text-muted-color);
-}
-input {
-  flex: 1;
-  min-width: 0;
+.imsb-field :deep(input) {
+  display: block;
   height: 100%;
-  padding: 0 0.5rem;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
+  padding-right: 5rem;
 }
-input::placeholder {
-  color: var(--p-text-muted-color);
-  opacity: 0.85;
+.imsb-field :deep(.p-inputicon) {
+  height: 1rem;
+  margin-top: -0.5rem;
+  line-height: 1rem;
 }
 .imsb-adornments {
+  position: absolute;
+  top: 50%;
+  right: 0.25rem;
   display: flex;
   align-items: center;
   gap: 0.1rem;
-  padding-right: 0.4rem;
+  transform: translateY(-50%);
 }
-.imsb-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  background: none;
-  color: var(--p-text-muted-color);
-  cursor: pointer;
-}
-.imsb-icon:hover:not(:disabled) {
-  background: var(--p-content-hover-background);
-  color: var(--p-text-color);
-}
-.imsb-icon.listening {
-  color: var(--p-red-500);
+.listening {
   animation: imsb-pulse 1.2s ease-in-out infinite;
-}
-.imsb-advanced {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  min-width: 2.5rem;
-  padding: 0 0.6rem;
-  border: 1px solid var(--p-primary-color);
-  border-radius: 6px;
-  background: var(--p-primary-color);
-  color: var(--p-primary-contrast-color);
-  font: inherit;
-  cursor: pointer;
-}
-.imsb-advanced:hover:not(:disabled) {
-  filter: brightness(1.08);
-}
-button:focus-visible {
-  outline: 2px solid var(--p-primary-color);
-  outline-offset: 2px;
-}
-button:disabled,
-.disabled input {
-  cursor: not-allowed;
-  opacity: 0.55;
 }
 .imsb-popup {
   position: absolute;
@@ -578,6 +432,7 @@ button:disabled,
   border: 1px solid var(--p-content-border-color);
   border-radius: 6px;
   background: var(--p-content-background);
+  color: var(--p-text-color);
   box-shadow: 0 8px 24px rgb(0 0 0 / 0.14);
   overflow: hidden;
 }

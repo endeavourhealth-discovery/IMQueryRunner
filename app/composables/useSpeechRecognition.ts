@@ -1,13 +1,9 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 
-// Thin wrapper around the Web Speech API. The transcript is delivered through a callback when recognition ends, so callers can
-// trigger a search directly; the previous implementation only changed the text, and nothing ever searched.
 export function useSpeechRecognition(onTranscript: (text: string) => void) {
   const supported = ref(false);
   const listening = ref(false);
-  /** Live transcript while listening, useful as a placeholder. */
   const interim = ref("");
-  /** Last error reported by the recognition engine (e.g. "not-allowed"). */
   const error = ref<string | undefined>();
   let recognition: any;
   let transcript = "";
