@@ -80,6 +80,7 @@ const args: Ref<ArgumentSelection[] | undefined> = ref([]);
 const completedArguments: Ref<Argument[]> = ref([]);
 const queuedQueries: Ref<QueuedQuery[]> = ref([]);
 const loading = ref(false);
+const toast = useToast();
 
 const jobName = computed(() => {
   if (!queuedQueries.value.length) return "";
@@ -181,7 +182,14 @@ async function runQueries() {
 }
 
 async function getArguments() {
-  const query = await QueryService.getQueryFromIri(selected.value!.iri);
+  let query;
+  try {
+    query = await QueryService.getQueryFromIri(selected.value!.iri);
+  } catch (error: any) {
+    toast.add({ severity: "error", summary: `${selected.value!.name} can't be run`, detail: error?.data?.data?.message ?? String(error), life: 10000 });
+    selected.value = undefined;
+    return;
+  }
   query.iri = selected.value!.iri;
   // args.value = await QueryService.findMissingArguments({
   //   query: query

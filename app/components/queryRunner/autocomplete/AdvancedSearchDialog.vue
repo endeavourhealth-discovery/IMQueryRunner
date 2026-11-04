@@ -1,172 +1,174 @@
 <template>
-  <dialog ref="dialog" aria-labelledby="imsb-dialog-title" class="imsb-dialog" @cancel="summary?.hide()" @close="emit('close')">
-    <header>
-      <h2 id="imsb-dialog-title">Advanced search</h2>
-      <button aria-label="Close" class="icon-button" type="button" @click="emit('close')">
-        <svg aria-hidden="true" height="16" viewBox="0 0 16 16" width="16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.75" /></svg>
-      </button>
-    </header>
-
-    <div class="body">
-      <section aria-label="Hierarchy" class="tree-pane">
-        <h3>Browse</h3>
-        <p v-if="rootsLoading" class="status"><span aria-hidden="true" class="imsb-spinner"></span> Loading hierarchy…</p>
-        <p v-else-if="rootsError" class="status error">{{ rootsError }} <button class="link" type="button" @click="loadRoots">Retry</button></p>
-        <ul v-else aria-label="Entity hierarchy" role="tree">
-          <EntityTreeNode
-            v-for="root in roots"
-            :key="root.iri"
-            :node="root"
-            :selected-iri="candidate?.iri"
-            @activate="confirm(nodeToSummary($event))"
-            @hover="hover"
-            @select="candidate = nodeToSummary($event)"
-          />
-        </ul>
-      </section>
-
-      <section aria-label="Search results" class="results-pane">
-        <form class="search-row" @submit.prevent="runSearch(1)">
-          <input v-model="term" aria-label="Search term" autocomplete="off" placeholder="Search by name or IRI" type="search" />
-          <button :disabled="term.trim().length < MIN_SEARCH_LENGTH" class="button" type="submit">Search</button>
-        </form>
-
-        <div :aria-busy="resultsLoading" class="results">
-          <p v-if="resultsLoading" class="status"><span aria-hidden="true" class="imsb-spinner"></span> Searching…</p>
-          <p v-else-if="resultsError" class="status error" role="alert">{{ resultsError }}</p>
-          <p v-else-if="!results" class="status">Enter at least {{ MIN_SEARCH_LENGTH }} characters to search, or browse the hierarchy.</p>
-          <p v-else-if="!results.entities?.length" class="status">No results</p>
-          <ul v-else aria-label="Results" role="listbox">
-            <li
-              v-for="entity in results.entities"
-              :key="entity.iri"
-              :aria-selected="candidate?.iri === entity.iri"
-              :class="{ selected: candidate?.iri === entity.iri }"
-              role="option"
-              tabindex="0"
-              @click="candidate = entity"
-              @dblclick="confirm(entity)"
-              @keydown.enter="confirm(entity)"
-              @mouseenter="hover($event.currentTarget as HTMLElement, entity)"
-              @mouseleave="hover($event.currentTarget as HTMLElement, undefined)"
-            >
-              <span class="name">{{ displayName(entity) }}</span>
-              <span class="meta">{{ [entity.code, entity.scheme?.name].filter(Boolean).join(" · ") }}</span>
-            </li>
-          </ul>
-        </div>
-
-        <nav v-if="results?.totalCount" aria-label="Result pages" class="pager">
-          <span>
-            Showing {{ (pageNumber - 1) * PAGE_SIZE + 1 }}–{{ (pageNumber - 1) * PAGE_SIZE + (results.entities?.length ?? 0) }} of {{ results.totalCount }}
+  <Dialog :style="{ width: 'min(1100px, 92vw)' }" :visible="true" header="Advanced search" modal @update:visible="emit('close')">
+    <div class="flex h-[60vh] gap-4">
+      <Tree
+        v-model:selection-keys="selectionKeys"
+        :loading="rootsLoading"
+        :value="roots"
+        class="w-2/5 overflow-auto"
+        loading-mode="icon"
+        selection-mode="single"
+        @node-expand="expand"
+        @node-select="onNodeSelect"
+      >
+        <template #default="{ node }">
+          <span
+            :class="{ 'font-bold': node.loadMorePage }"
+            @dblclick="confirm(node.data)"
+            @mouseenter="node.data && summary?.showOverlayTreeNode($event, node.data)"
+            @mouseleave="summary?.hideOverlay()"
+          >
+            <IMFontAwesomeIcon v-if="node.data" :icon="getFAIconFromType(node.data.type)" :style="{ color: getColourFromType(node.data.type) }" fixed-width />
+            {{ node.label }}
           </span>
-          <span class="pager-buttons">
-            <button :disabled="pageNumber <= 1 || resultsLoading" class="button" type="button" @click="runSearch(pageNumber - 1)">Previous</button>
-            <span>Page {{ pageNumber }} of {{ totalPages }}</span>
-            <button :disabled="pageNumber >= totalPages || resultsLoading" class="button" type="button" @click="runSearch(pageNumber + 1)">Next</button>
-          </span>
-        </nav>
-      </section>
-    </div>
-
-    <footer>
-      <span :title="candidate?.iri" class="current">
-        <template v-if="candidate">
-          Selected: <strong>{{ displayName(candidate) }}</strong>
-          <em v-if="candidateIsFolder"> (folders cannot be selected)</em>
         </template>
+      </Tree>
+      <div class="flex min-w-0 flex-1 flex-col gap-2">
+        <form class="flex gap-2" @submit.prevent="runSearch(1)">
+          <InputText v-model="term" aria-label="Search term" class="flex-1" placeholder="Search by name or IRI" />
+          <Button :disabled="term.trim().length < MIN_SEARCH_LENGTH" :loading="searching" label="Search" type="submit" />
+        </form>
+        <Listbox
+          v-model="candidate"
+          :empty-message="error ?? (results ? 'No results' : `Enter at least ${MIN_SEARCH_LENGTH} characters to search, or browse the hierarchy`)"
+          :option-label="displayName"
+          :options="results?.entities ?? []"
+          class="min-h-0 flex-1"
+          data-key="iri"
+          scroll-height="100%"
+        >
+          <template #option="{ option }">
+            <div
+              class="flex w-full justify-between gap-4"
+              @dblclick="confirm(option)"
+              @mouseenter="summary?.showOverlayTreeNode($event, option)"
+              @mouseleave="summary?.hideOverlay()"
+            >
+              <span>{{ displayName(option) }}</span>
+              <span class="text-sm whitespace-nowrap text-[var(--p-text-muted-color)]">{{ option.scheme?.name }}</span>
+            </div>
+          </template>
+        </Listbox>
+        <Paginator
+          v-if="(results?.totalCount ?? 0) > PAGE_SIZE"
+          :first="(page - 1) * PAGE_SIZE"
+          :rows="PAGE_SIZE"
+          :total-records="results?.totalCount"
+          @page="runSearch($event.page + 1)"
+        />
+      </div>
+    </div>
+    <template #footer>
+      <span class="flex-1 truncate">
+        <template v-if="candidate"
+          >Selected: <strong>{{ displayName(candidate) }}</strong
+          ><em v-if="isFolder(candidate)"> (folders cannot be selected)</em></template
+        >
         <template v-else>Nothing selected</template>
       </span>
-      <button class="button" type="button" @click="emit('close')">Cancel</button>
-      <button :disabled="!canSelect" class="button primary" type="button" @click="confirm()">Select</button>
-    </footer>
-
-    <EntitySummaryPopover ref="summary" />
-  </dialog>
+      <Button label="Cancel" severity="secondary" @click="emit('close')" />
+      <Button :disabled="!candidate || isFolder(candidate)" label="Select" @click="confirm(candidate)" />
+    </template>
+    <OverlaySummary ref="summary" />
+  </Dialog>
 </template>
 
 <script lang="ts" setup>
-import EntitySummaryPopover from "~/components/queryRunner/autocomplete/EntitySummaryPopover.vue";
-import EntityTreeNode from "~/components/queryRunner/autocomplete/EntityTreeNode.vue";
-import { IM_INFORMATION_MODEL, MIN_SEARCH_LENGTH, SEARCH_TIMEOUT_MS, displayName, isAbortError, isFolder, searchEntities } from "~/helpers/autocompleteSearch";
+import { MIN_SEARCH_LENGTH, SEARCH_TIMEOUT_MS, SearchTimeoutError, displayName, isAbortError, searchEntities } from "~/helpers/autocompleteSearch";
 import EntityService from "~/services/EntityService";
 import QueryService from "~/services/QueryService";
 
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
+import { IMFontAwesomeIcon, OverlaySummary } from "@endeavour/vue-library/components";
+import { IM } from "@endeavour/vue-library/enums";
+import { getColourFromType, getFAIconFromType } from "@endeavour/vue-library/helpers";
 import type { ExtendedEntityReferenceNode, QueryRequest, SearchResponse, SearchResultSummary } from "@endeavour/vue-library/models";
 
-const PAGE_SIZE = 20;
+import type { TreeNode } from "primevue/treenode";
 
-const props = withDefaults(
-  defineProps<{
-    rootEntities?: string[];
-    imQuery?: QueryRequest;
-    searchTerm?: string;
-    selected?: SearchResultSummary;
-  }>(),
-  { rootEntities: () => [], searchTerm: "" }
-);
+const PAGE_SIZE = 20;
+const TREE_PAGE_SIZE = 50;
+
+const props = defineProps<{
+  rootEntities: string[];
+  imQuery?: QueryRequest;
+  searchTerm?: string;
+  selected?: SearchResultSummary;
+}>();
 
 const emit = defineEmits<{
   select: [entity: SearchResultSummary];
   close: [];
 }>();
 
-const dialog = ref<HTMLDialogElement>();
-const summary = ref<InstanceType<typeof EntitySummaryPopover>>();
-const term = ref(props.searchTerm);
-const roots = ref<ExtendedEntityReferenceNode[]>([]);
+const rootHolders = ref<TreeNode[]>(props.rootEntities.map(iri => ({ key: iri, children: [] })));
+const roots = computed(() => rootHolders.value.flatMap(holder => holder.children ?? []));
 const rootsLoading = ref(false);
-const rootsError = ref<string | undefined>();
+const selectionKeys = ref<Record<string, boolean>>({});
+const term = ref(props.searchTerm ?? "");
 const results = ref<SearchResponse | undefined>();
-const resultsLoading = ref(false);
-const resultsError = ref<string | undefined>();
-const pageNumber = ref(1);
+const searching = ref(false);
+const error = ref<string | undefined>();
+const page = ref(1);
 const candidate = ref<SearchResultSummary | undefined>(props.selected);
+const summary = ref<InstanceType<typeof OverlaySummary>>();
 let controller: AbortController | undefined;
 
-const totalPages = computed(() => Math.max(1, Math.ceil((results.value?.totalCount ?? 0) / PAGE_SIZE)));
-const candidateIsFolder = computed(() => isFolder(candidate.value?.type));
-const canSelect = computed(() => !!candidate.value && !candidateIsFolder.value);
-
-onMounted(() => {
-  dialog.value?.showModal();
-  loadRoots();
+onMounted(async () => {
+  rootsLoading.value = true;
+  await Promise.all(rootHolders.value.map(holder => loadChildren(holder, 1)));
+  rootsLoading.value = false;
   if (term.value.trim().length >= MIN_SEARCH_LENGTH) runSearch(1);
 });
 
-onBeforeUnmount(() => controller?.abort());
-
-async function loadRoots() {
-  rootsLoading.value = true;
-  rootsError.value = undefined;
-  try {
-    roots.value = props.rootEntities.length
-      ? await EntityService.getAsEntityReferenceNodes(props.rootEntities)
-      : (((await EntityService.getPagedChildren(IM_INFORMATION_MODEL, 1, 100)).result ?? []) as ExtendedEntityReferenceNode[]);
-  } catch (e) {
-    rootsError.value = e instanceof Error ? e.message : "Failed to load hierarchy";
-  } finally {
-    rootsLoading.value = false;
-  }
+function isFolder(entity: SearchResultSummary) {
+  return entity.type?.some(t => t.iri === IM.FOLDER) ?? false;
 }
 
-async function runSearch(page: number) {
-  const text = term.value.trim();
-  if (text.length < MIN_SEARCH_LENGTH) {
-    results.value = undefined;
-    return;
+async function loadChildren(parent: TreeNode, pageNumber: number) {
+  const response = await EntityService.getPagedChildren(parent.key, pageNumber, TREE_PAGE_SIZE);
+  const children = (parent.children ?? []).filter(child => !child.loadMorePage);
+  for (const entity of response.result as ExtendedEntityReferenceNode[]) {
+    children.push({ key: entity.iri, label: entity.name, data: entity, leaf: !entity.hasChildren, children: [] });
   }
+  if (children.length < response.totalCount) {
+    children.push({
+      key: `${parent.key}-more`,
+      label: `Load more (${response.totalCount - children.length} remaining)`,
+      leaf: true,
+      loadMorePage: pageNumber + 1,
+      parent
+    });
+  }
+  parent.children = children;
+}
+
+async function expand(node: TreeNode) {
+  if (node.children?.length) return;
+  node.loading = true;
+  await loadChildren(node, 1);
+  node.loading = false;
+}
+
+async function onNodeSelect(node: TreeNode) {
+  if (node.loadMorePage) {
+    selectionKeys.value = {};
+    await loadChildren(node.parent, node.loadMorePage);
+  } else candidate.value = node.data;
+}
+
+async function runSearch(pageNumber: number) {
+  if (term.value.trim().length < MIN_SEARCH_LENGTH) return;
   controller?.abort();
   const current = (controller = new AbortController());
-  resultsLoading.value = true;
-  resultsError.value = undefined;
-  pageNumber.value = page;
+  searching.value = true;
+  error.value = undefined;
+  page.value = pageNumber;
   try {
     results.value = await searchEntities(QueryService.queryIMSearch, props.imQuery, {
-      text,
-      pageNumber: page,
+      text: term.value.trim(),
+      pageNumber,
       pageSize: PAGE_SIZE,
       timeoutMs: SEARCH_TIMEOUT_MS,
       signal: current.signal
@@ -174,225 +176,15 @@ async function runSearch(page: number) {
   } catch (e) {
     if (isAbortError(e) && controller !== current) return;
     results.value = undefined;
-    resultsError.value = e instanceof Error && e.name === "SearchTimeoutError" ? e.message : "Search failed. Please try again.";
+    error.value = e instanceof SearchTimeoutError ? e.message : "Search failed. Please try again.";
   } finally {
-    if (controller === current) resultsLoading.value = false;
+    if (controller === current) searching.value = false;
   }
 }
 
-function nodeToSummary(node: ExtendedEntityReferenceNode): SearchResultSummary {
-  return { iri: node.iri, name: node.name, description: node.description, type: node.type, status: node.status, scheme: node.scheme } as SearchResultSummary;
-}
-
-function confirm(entity = candidate.value) {
-  if (!entity) return;
-  if (isFolder(entity.type)) return;
-  summary.value?.hide();
+function confirm(entity: SearchResultSummary | undefined) {
+  if (!entity || isFolder(entity)) return;
+  summary.value?.hideOverlay();
   emit("select", entity);
 }
-
-function hover(target: HTMLElement, entity: SearchResultSummary | ExtendedEntityReferenceNode | undefined) {
-  if (entity) summary.value?.show(target, entity as SearchResultSummary);
-  else summary.value?.hide();
-}
 </script>
-
-<style scoped>
-.imsb-dialog {
-  width: min(1100px, 92vw);
-  height: min(780px, 88vh);
-  max-width: none;
-  max-height: none;
-  margin: auto;
-  padding: 0;
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 8px;
-  background: var(--p-content-background);
-  color: var(--p-text-color);
-  box-shadow: 0 16px 48px rgb(0 0 0 / 0.2);
-  font: inherit;
-  font-size: 1rem;
-  line-height: 1.45;
-}
-.imsb-dialog[open] {
-  display: flex;
-  flex-direction: column;
-}
-.imsb-dialog::backdrop {
-  background: rgb(15 23 42 / 0.45);
-}
-header,
-footer {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--p-content-border-color);
-}
-footer {
-  border-bottom: 0;
-  border-top: 1px solid var(--p-content-border-color);
-}
-h2 {
-  flex: 1;
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-h3 {
-  margin: 0 0 0.5rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--p-text-muted-color);
-}
-.body {
-  flex: 1;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: minmax(220px, 2fr) 3fr;
-}
-.tree-pane,
-.results-pane {
-  min-height: 0;
-  overflow: auto;
-  padding: 0.75rem 1rem;
-}
-.tree-pane {
-  border-right: 1px solid var(--p-content-border-color);
-}
-.results-pane {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.tree-pane > ul,
-.results ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.search-row {
-  display: flex;
-  gap: 0.5rem;
-}
-.search-row input {
-  flex: 1;
-  min-width: 0;
-  padding: 0.5rem 0.6rem;
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 6px;
-  background: var(--p-form-field-background);
-  color: inherit;
-  font: inherit;
-}
-.search-row input:focus {
-  outline: none;
-  border-color: var(--p-primary-color);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-primary-color) 25%, transparent);
-}
-.results {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-}
-.results li {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.results li:hover {
-  background: var(--p-content-hover-background);
-}
-.results li.selected {
-  background: var(--p-highlight-background);
-}
-.results li:focus-visible {
-  outline: 2px solid var(--p-primary-color);
-  outline-offset: -2px;
-}
-.meta {
-  flex: none;
-  max-width: 45%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.8rem;
-  color: var(--p-text-muted-color);
-}
-.pager {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8rem;
-  color: var(--p-text-muted-color);
-}
-.pager-buttons {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.current {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.9rem;
-}
-.status {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0.5rem 0;
-  color: var(--p-text-muted-color);
-}
-.status.error {
-  color: var(--p-red-500);
-}
-.button {
-  padding: 0.4rem 0.8rem;
-  border: 1px solid var(--p-content-border-color);
-  border-radius: 6px;
-  background: var(--p-content-background);
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-}
-.button.primary {
-  background: var(--p-primary-color);
-  border-color: var(--p-primary-color);
-  color: var(--p-primary-contrast-color);
-}
-.button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.icon-button {
-  display: inline-flex;
-  padding: 0.25rem;
-  border: 0;
-  border-radius: 4px;
-  background: none;
-  color: inherit;
-  cursor: pointer;
-}
-.icon-button:hover {
-  background: var(--p-content-hover-background);
-}
-.link {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--p-primary-color);
-  font: inherit;
-  text-decoration: underline;
-  cursor: pointer;
-}
-</style>

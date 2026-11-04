@@ -1,9 +1,6 @@
 import { TextSearchStyle } from "@endeavour/vue-library/enums";
 import { PageSchema, type QueryRequest, type SearchResponse, type SearchResultSummary } from "@endeavour/vue-library/models";
 
-export const IM_FOLDER = "http://endhealth.info/im#Folder";
-export const IM_INFORMATION_MODEL = "http://endhealth.info/im#InformationModel";
-
 export const MIN_SEARCH_LENGTH = 3;
 export const SEARCH_DEBOUNCE_MS = 600;
 export const SEARCH_TIMEOUT_MS = 10000;
@@ -63,8 +60,4 @@ export function isAbortError(e: unknown): boolean {
 export function displayName(entity: Pick<SearchResultSummary, "iri" | "name" | "bestMatch" | "preferredName"> | undefined): string {
   if (!entity) return "";
   return entity.bestMatch || entity.name || entity.preferredName || entity.iri;
-}
-
-export function isFolder(types: readonly unknown[] | undefined): boolean {
-  return types?.some(t => (t as { iri?: string } | undefined)?.iri === IM_FOLDER) ?? false;
 }
