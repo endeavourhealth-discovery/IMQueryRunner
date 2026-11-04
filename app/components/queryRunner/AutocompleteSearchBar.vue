@@ -1,461 +1,680 @@
 <template>
-  <div class="search-container" ref="autocompleteRoot">
-    <IconField class="autocomplete-search" iconPosition="right">
-      <!--
-      <InputIcon v-if="!searchLoading && !listening" class="pi pi-microphone mic" :class="{ listening }" @click="toggleListen" />
--->
-      <InputText
-        id="autocomplete-search"
-        ref="searchInput"
-        :disabled="disabled"
-        v-model="searchText"
-        :placeholder="searchPlaceholder"
-        data-testid="search-input"
-        @input="debounceForSearch"
-        @keydown.down="select"
-        @keydown.enter="onEnter"
-        @keydown.up="select"
-        @focus="handleFocus"
-        @blur="editing = false"
-        @mouseover="selected?.iri != 'any'"
-        :pt="{
-          root: { autocomplete: allowBrowserAutocomplete ? 'on' : 'off' }
-        }"
-      />
-      <i v-if="editing" class="fa fa-times-circle clear-icon" @mousedown.prevent="clearSearch()"></i>
-    </IconField>
-    <Button
-      class="search-button px-2"
-      :disabled="disabled"
-      @click="advancedSearch"
-      data-testid="autocomplete-search-button"
-      icon="fa-solid fa-magnifying-glass"
-      label="Advanced"
-    />
-    <Popover ref="resultsOP" :breakpoints="{ '960px': '75vw', '640px': '100vw' }" :style="{ width: '450px' }" appendTo="body">
-      <div v-if="searchLoading" class="loading-container">
-        <ProgressSpinner />
+  <div ref="root" :class="{ disabled }" class="imsb imsb-theme" @focusout="onFocusOut">
+    <div class="imsb-row">
+      <div :class="{ 'has-error': !!error }" class="imsb-field">
+        <svg aria-hidden="true" class="imsb-lead" height="16" viewBox="0 0 16 16" width="16">
+          <circle cx="7" cy="7" fill="none" r="4.5" stroke="currentColor" stroke-width="1.5" />
+          <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+        <input
+          :id="id"
+          ref="input"
+          v-model="text"
+          :aria-activedescendant="popupOpen ? activeId : undefined"
+          :aria-busy="loading"
+          :aria-controls="listboxId"
+          :aria-expanded="popupOpen"
+          :aria-label="label"
+          :autocomplete="allowBrowserAutocomplete ? 'on' : 'off'"
+          :disabled="disabled"
+          :placeholder="speech.listening.value ? speech.interim.value || 'Listening…' : effectivePlaceholder"
+          aria-autocomplete="list"
+          data-testid="search-input"
+          role="combobox"
+          spellcheck="false"
+          type="text"
+          @focus="onFocus"
+          @input="onInput"
+          @keydown="onKeydown"
+          @mouseenter="selected && text === displayName(selected) && hoverSummary($event.currentTarget as HTMLElement, selected)"
+          @mouseleave="hoverSummary($event.currentTarget as HTMLElement, undefined)"
+        />
+        <span class="imsb-adornments">
+          <span v-if="loading" aria-label="Searching" class="imsb-spinner" role="status"></span>
+          <button
+            v-if="showClear"
+            aria-label="Clear search"
+            class="imsb-icon"
+            data-testid="clear-button"
+            title="Clear"
+            type="button"
+            @click="clear"
+            @mousedown.prevent
+          >
+            <svg aria-hidden="true" height="14" viewBox="0 0 16 16" width="14"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.75" /></svg>
+          </button>
+          <button
+            v-if="enableVoiceSearch && speech.supported.value"
+            :aria-label="speech.listening.value ? 'Stop voice search' : 'Voice search'"
+            :aria-pressed="speech.listening.value"
+            :class="{ listening: speech.listening.value }"
+            :disabled="disabled"
+            :title="speech.error.value ? `Voice search unavailable: ${speech.error.value}` : speech.listening.value ? 'Stop listening' : 'Voice search'"
+            class="imsb-icon"
+            data-testid="voice-button"
+            type="button"
+            @click="speech.toggle()"
+          >
+            <svg aria-hidden="true" height="15" viewBox="0 0 16 16" width="15">
+              <rect fill="none" height="8" rx="2.5" stroke="currentColor" stroke-width="1.4" width="5" x="5.5" y="1.5" />
+              <path d="M3 7.5a5 5 0 0010 0M8 12.5V15" fill="none" stroke="currentColor" stroke-width="1.4" />
+            </svg>
+          </button>
+        </span>
       </div>
-      <div v-else class="results-container" :tabindex="0">
-        <Listbox v-if="results?.entities" v-model="listBoxSelected" :options="results.entities">
-          <template #option="slotProps">
-            <div class="listbox-item" @mouseover="slotProps.option.iri != 'any'" @click="onListBoxOptionClick(slotProps.option)">
-              <span>{{ slotProps.option.bestMatch ? slotProps.option.bestMatch : slotProps.option.name }}</span>
-            </div>
-          </template>
-        </Listbox>
-        <div v-else>No results</div>
 
-        <div class="advanced-search-container">
-          <small>
-            Showing {{ results?.entities?.length ? 1 : 0 }}-{{ results?.entities?.length ? results.entities.length : 0 }} of
-            {{ results?.totalCount ? results.totalCount : 0 }} results
-          </small>
-        </div>
+      <button
+        v-if="enableAdvancedSearch"
+        :class="{ text: buttonStyle === 'text' }"
+        :disabled="disabled"
+        :title="buttonStyle === 'icon' ? 'Advanced search' : undefined"
+        aria-label="Advanced search"
+        class="imsb-advanced"
+        data-testid="advanced-search-button"
+        type="button"
+        @click="openAdvancedSearch()"
+      >
+        <svg aria-hidden="true" height="15" viewBox="0 0 16 16" width="15">
+          <path d="M2 3.5h12M2 8h8M2 12.5h5" stroke="currentColor" stroke-width="1.5" />
+          <circle cx="12" cy="11" fill="none" r="2.25" stroke="currentColor" stroke-width="1.4" />
+          <path d="M13.6 12.6L15 14" stroke="currentColor" stroke-width="1.4" />
+        </svg>
+        <span v-if="buttonStyle === 'text'">Advanced search</span>
+      </button>
+    </div>
+
+    <div v-if="popupOpen" class="imsb-popup" data-testid="results-popup">
+      <div v-if="loading && !results" class="imsb-message"><span aria-hidden="true" class="imsb-spinner"></span> Searching…</div>
+      <div v-else-if="error" class="imsb-message error" role="alert">
+        {{ error }}
+        <button class="imsb-link" type="button" @click="search" @mousedown.prevent>Retry</button>
       </div>
-    </Popover>
+      <div v-else-if="!entities.length" class="imsb-message" role="status">No results</div>
+
+      <ul :id="listboxId" ref="listbox" :class="{ stale: loading }" :hidden="!entities.length || !!error" aria-label="Search results" role="listbox">
+        <li
+          v-for="(entity, i) in entities"
+          :id="`${id}-option-${i}`"
+          :key="entity.iri"
+          :aria-selected="i === activeIndex"
+          :class="{ active: i === activeIndex, current: entity.iri === selected?.iri }"
+          role="option"
+          @click="choose(entity)"
+          @mousedown.prevent
+          @mouseenter="hoverSummary($event.currentTarget as HTMLElement, entity)"
+          @mouseleave="hoverSummary($event.currentTarget as HTMLElement, undefined)"
+          @mousemove="activeIndex = i"
+        >
+          <span class="imsb-name">{{ displayName(entity) }}</span>
+          <span v-if="entity.code || entity.scheme?.name" class="imsb-meta">{{ [entity.code, entity.scheme?.name].filter(Boolean).join(" · ") }}</span>
+        </li>
+      </ul>
+
+      <div v-if="!error && results" class="imsb-footer">
+        <small data-testid="results-count"
+          >Showing {{ entities.length ? 1 : 0 }}–{{ entities.length }} of {{ results.totalCount ?? entities.length }} results</small
+        >
+        <button
+          v-if="enableAdvancedSearch && (results.totalCount ?? 0) > entities.length"
+          class="imsb-link"
+          type="button"
+          @click="openAdvancedSearch(text)"
+          @mousedown.prevent
+        >
+          View all
+        </button>
+      </div>
+    </div>
+
+    <EntitySummaryPopover v-if="showSummaryOnHover" ref="summary" />
+
+    <AdvancedSearchDialog
+      v-if="dialogOpen"
+      :allow-folder-selection="allowFolderSelection"
+      :im-query="dialogQuery"
+      :min-search-length="minSearchLength"
+      :root-entities="dialogRoots"
+      :search-term="dialogTerm"
+      :search-timeout-ms="searchTimeoutMs"
+      :selected="selected"
+      @close="closeDialog"
+      @select="onDialogSelect"
+    />
   </div>
-  <Dialog v-model:visible="showDialog" modal :closable="false">
-    <Tree
-      v-model:expandedKeys="expandedKeys"
-      v-model:selectionKeys="selectedKeys"
-      selectionMode="single"
-      @nodeSelect="onNodeSelect"
-      :loading="loading"
-      loadingMode="icon"
-      :value="entities"
-      @nodeExpand="onNodeExpand"
-      class="dialog w-full md:w-[30rem]"
-    ></Tree>
-    <template #footer>
-      <Button class="m-1" label="Cancel" variant="outlined" @click="showDialog = false" />
-      <Button class="m-1" label="Select" :disabled="!isQuery" @click="setSelectedQuery" autofocus />
-    </template>
-  </Dialog>
 </template>
 
-<script setup lang="ts">
-import { useAutocompleteRegistry } from "~/composables/useAutocompleteRegistry";
-import EntityService from "~/services/EntityService";
+<script lang="ts" setup>
+import AdvancedSearchDialog from "~/components/queryRunner/autocomplete/AdvancedSearchDialog.vue";
+import EntitySummaryPopover from "~/components/queryRunner/autocomplete/EntitySummaryPopover.vue";
+import { useSpeechRecognition } from "~/composables/useSpeechRecognition";
+import { SearchTimeoutError, displayName, searchEntities } from "~/helpers/autocompleteSearch";
 import QueryService from "~/services/QueryService";
 
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, ref, shallowRef, toRaw, useId, watch } from "vue";
 
-import { IM, TextSearchStyle } from "@endeavour/vue-library/enums";
-import { PageSchema, type QueryRequest, type SearchResponse, type SearchResultSummary, type TTIriRef } from "@endeavour/vue-library/models";
-
-import { cloneDeep, debounce, isEqual } from "lodash-es";
-import type { TreeNode } from "primevue/treenode";
-
-const { registerAutocomplete, unregisterAutocomplete } = useAutocompleteRegistry();
+import type { QueryRequest, SearchResponse, SearchResultSummary } from "@endeavour/vue-library/models";
 
 interface Props {
-  selected?: SearchResultSummary;
-  disabled?: boolean;
+  /** Base query (type/scheme/isA filters etc.). Text, paging and search style are applied on top. */
+  imQuery?: QueryRequest;
+  /** Lazily builds the base query when imQuery is not supplied. */
+  setupSearch?: () => QueryRequest | Promise<QueryRequest>;
+  /** Root IRIs of the advanced search tree. */
   rootEntities?: string[];
-  searchPlaceholder?: string;
-  quickTypeFiltersAllowed?: string[];
-  selectedQuickTypeFilter?: string;
+  setupRootEntities?: () => string[] | Promise<string[]>;
+  placeholder?: string;
+  disabled?: boolean;
+  minSearchLength?: number;
+  debounceMs?: number;
+  pageSize?: number;
+  searchTimeoutMs?: number;
   allowBrowserAutocomplete?: boolean;
-  setupSearch?: () => Promise<QueryRequest>;
-  setupRootEntities?: () => Promise<string[]>;
-  validEntityQuery?: QueryRequest;
+  enableVoiceSearch?: boolean;
+  enableAdvancedSearch?: boolean;
+  showSummaryOnHover?: boolean;
+  /** "icon" shows icon buttons with tooltips; "text" shows labelled buttons. */
+  buttonStyle?: "icon" | "text";
+  /** Whether folders can be chosen from the advanced search tree. */
+  allowFolderSelection?: boolean;
+  id?: string;
+  label?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  rootEntities: () => [] as string[],
-  allowBrowserAutocomplete: false
+  rootEntities: () => [],
+  disabled: false,
+  minSearchLength: 3,
+  debounceMs: 600,
+  pageSize: 10,
+  searchTimeoutMs: 10000,
+  allowBrowserAutocomplete: false,
+  enableVoiceSearch: true,
+  enableAdvancedSearch: true,
+  showSummaryOnHover: true,
+  buttonStyle: "icon",
+  allowFolderSelection: false,
+  label: "Search"
 });
 
 const emit = defineEmits<{
-  "update:selected": [payload: SearchResultSummary | undefined];
-  openDialog: [];
+  select: [entity: SearchResultSummary | undefined];
+  error: [error: Error];
 }>();
 
-const imQuery = defineModel<any>("imQuery");
-const resultsOP = ref();
-const searchText = ref("");
-const results: Ref<SearchResponse | undefined> = ref();
-const showDialog = ref(false);
-const selectedLocal: Ref<SearchResultSummary | undefined> = ref();
-const searchLoading: Ref<boolean> = ref(false);
-const searchPlaceholder: Ref<string> = ref(props.searchPlaceholder ?? "Search");
-const selectedIndex: Ref<number> = ref(-1);
-const listBoxSelected: Ref<SearchResultSummary | undefined> = ref();
-const selectedQuery: Ref<TreeNode | undefined> = ref();
-const searchInput = ref<any>(null);
-const entities = ref<any[]>([]);
-const expandedKeys = ref({});
-const selectedKeys = ref({});
-const isQuery = ref(false);
+const selected = defineModel<SearchResultSummary | undefined>("selected");
+
+const generatedId = useId();
+const id = computed(() => props.id ?? `imsb-${generatedId.replace(/[^\w-]/g, "")}`);
+const listboxId = computed(() => `${id.value}-listbox`);
+const effectivePlaceholder = computed(() => props.placeholder ?? "Search by name or IRI");
+
+const root = ref<HTMLDivElement>();
+const input = ref<HTMLInputElement>();
+const listbox = ref<HTMLUListElement>();
+const summary = ref<InstanceType<typeof EntitySummaryPopover>>();
+
+const text = ref(displayName(selected.value));
+const results = shallowRef<SearchResponse | undefined>();
 const loading = ref(false);
-let searchDebounce: any;
-const editing = ref(false);
-const autocompleteRoot = ref<HTMLElement | null>(null);
+const error = ref<string | undefined>();
+const popupOpen = ref(false);
+const activeIndex = ref(-1);
+const dialogOpen = ref(false);
+const dialogRoots = ref<string[]>([]);
+const dialogQuery = shallowRef<QueryRequest | undefined>();
+const dialogTerm = ref("");
 
-defineExpose({ searchText });
-watch(
-  () => cloneDeep(props.selected),
-  (newValue, oldValue) => {
-    if (!isEqual(newValue, oldValue)) {
-      searchLoading.value = true;
-      if (newValue && (newValue.name || newValue.bestMatch)) {
-        searchText.value = newValue.bestMatch ? newValue.bestMatch : newValue.name!;
-        selectedLocal.value = newValue;
-      } else {
-        searchText.value = "";
-        selectedLocal.value = undefined;
-      }
-      searchLoading.value = false;
-    }
-  }
-);
+let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+let controller: AbortController | undefined;
+let resolvedQuery: QueryRequest | undefined;
+let syncedIri = selected.value?.iri;
 
-watch(
-  selectedKeys,
-  (newValue, oldValue) => {
-    if (newValue !== oldValue) {
-    }
-  },
-  { deep: true }
-);
-
-watch(
-  selectedLocal,
-  (newValue, oldValue) => {
-    if (newValue?.iri !== oldValue?.iri) {
-      if (newValue?.name) {
-        searchText.value = newValue!.name ? newValue!.name : "";
-      }
-      emit("update:selected", newValue);
-    }
-  },
-  { deep: true }
-);
-
-watch(searchText, newValue => {
-  if (!newValue) {
-    selectedLocal.value = undefined;
-  }
+const speech = useSpeechRecognition(transcript => {
+  text.value = transcript;
+  search();
 });
 
-onMounted(async () => {
-  searchLoading.value = true;
-  if (props.selected?.name) {
-    searchText.value = props.selected.name;
-    selectedLocal.value = props.selected;
+const entities = computed(() => results.value?.entities ?? []);
+const showClear = computed(() => !props.disabled && (text.value.length > 0 || !!selected.value));
+const activeId = computed(() => (activeIndex.value >= 0 ? `${id.value}-option-${activeIndex.value}` : undefined));
+
+watch(
+  () => selected.value?.iri,
+  iri => {
+    if (iri !== syncedIri) {
+      syncedIri = iri;
+      text.value = displayName(selected.value);
+    }
   }
-  if (autocompleteRoot.value) {
-    registerAutocomplete({
-      element: autocompleteRoot.value,
-      reset: () => {
-        searchText.value = props.selected && props.selected.name ? props.selected.name : "";
-      }
-    });
-  }
-  searchLoading.value = false;
-  await getInitialTreeEntities();
+);
+
+watch(activeIndex, index => {
+  if (index >= 0) nextTick(() => listbox.value?.querySelector(`#${CSS.escape(`${id.value}-option-${index}`)}`)?.scrollIntoView({ block: "nearest" }));
 });
 
 onBeforeUnmount(() => {
-  if (autocompleteRoot.value) {
-    unregisterAutocomplete(autocompleteRoot.value);
-  }
+  clearTimeout(debounceTimer);
+  controller?.abort();
 });
 
-function handleGlobalFocus(event: FocusEvent) {
-  const root = autocompleteRoot.value;
-  if (!root) return;
-  const target = event.target as Node;
-  if (!root.contains(target)) {
-    if (props.selected && props.selected.name) searchText.value = props.selected.name;
-    else searchText.value = "";
-  }
-}
-function clearSearch() {
-  searchText.value = "";
-  selectedLocal.value = undefined;
-  nextTick(() => {
-    searchInput.value.$el.focus();
-  });
-}
-function handleFocus(event: FocusEvent) {
-  if (!editing.value) {
-    editing.value = true;
-    (event.target as HTMLInputElement).select();
-  }
+async function getBaseQuery(): Promise<QueryRequest | undefined> {
+  if (props.imQuery) return toRaw(props.imQuery);
+  if (!resolvedQuery && props.setupSearch) resolvedQuery = await props.setupSearch();
+  return resolvedQuery;
 }
 
-async function advancedSearch() {
-  showDialog.value = !showDialog.value;
-}
-
-async function getInitialTreeEntities() {
-  loading.value = true;
-  const retrievedEntities = await EntityService.getEntityChildren("http://endhealth.info/im#Q_Queries");
-  for (const entity of retrievedEntities) {
-    const type = entity.type as TTIriRef[];
-    entities.value.push({
-      key: entity.iri,
-      label: entity.name,
-      data: type[0]!.iri,
-      icon: "fa-solid fa-folder",
-      children: [],
-      loading: false
-    });
-    if (entity.hasChildren) {
-      const retrievedChildEntities = await EntityService.getEntityChildren(entity.iri);
-      for (const childEntity of retrievedChildEntities) {
-        let icon = "fa-magnifying-glass";
-        if (childEntity.hasChildren) icon = "fa-folder";
-        const childType = childEntity.type as TTIriRef[];
-        const found = entities.value.find(e => e.key === entity.iri);
-        found.children.push({
-          key: childEntity.iri,
-          label: childEntity.name,
-          data: childType[0]!.iri,
-          icon: "fa-solid " + icon,
-          children: [],
-          loading: false
-        });
-      }
-    }
-  }
+function cancelPending() {
+  clearTimeout(debounceTimer);
+  controller?.abort();
   loading.value = false;
 }
 
-const onNodeExpand = async (node: any) => {
-  for (const child in node.children) {
-    if (node.children[child].children.length === 0 && node.children[child].icon === "fa-solid fa-folder") {
-      node.children[child].loading = true;
-      const retrievedEntities = await EntityService.getEntityChildren(node.children[child].key);
-      let children = [];
-      for (const entity of retrievedEntities) {
-        let icon = "fa-magnifying-glass";
-        if (entity.hasChildren) icon = "fa-folder";
-        const type = entity.type as TTIriRef[];
-        children.push({
-          key: entity.iri,
-          label: entity.name,
-          data: type[0]!.iri,
-          icon: "fa-solid " + icon,
-          children: [],
-          loading: false
-        });
-      }
-      node.children[child].children = children;
-      node.children[child].loading = false;
-    }
+function onInput() {
+  error.value = undefined;
+  clearTimeout(debounceTimer);
+  if (!text.value) {
+    cancelPending();
+    closePopup();
+    if (selected.value) setSelected(undefined);
+    return;
   }
-};
-
-function onNodeSelect(node: TreeNode) {
-  isQuery.value = node.data === IM.QUERY;
-  selectedQuery.value = node;
-}
-
-function setSelectedQuery() {
-  selectedLocal.value = {
-    iri: selectedQuery.value?.key,
-    scheme: { iri: "" } as TTIriRef,
-    status: { iri: "" } as TTIriRef,
-    type: [] as TTIriRef[],
-    name: selectedQuery.value?.label
-  } as SearchResultSummary;
-  showDialog.value = false;
-}
-
-function debounceForSearch(event: Event): void {
-  if (!searchText.value) {
-    selectedLocal.value = undefined;
-    editing.value = false;
-  } else if (!searchLoading.value && searchText.value != props.selected?.name) {
-    editing.value = true;
-    if (searchDebounce) searchDebounce.cancel();
-    searchDebounce = debounce(async () => {
-      await doSearch(event);
-    }, 600);
-    searchDebounce();
+  if (text.value.trim().length < props.minSearchLength) {
+    cancelPending();
+    closePopup();
+    return;
   }
-}
-
-async function doSearch(event: any) {
-  showResultsOverlay(event);
-  results.value = await search();
-}
-
-async function onEnter(event: KeyboardEvent) {
-  if (listBoxSelected.value) onListBoxOptionClick(listBoxSelected.value);
-  else await doSearch(event);
-}
-function select(event: KeyboardEvent) {
-  if (results.value?.entities && results.value?.entities.length)
-    if (event.key === "ArrowDown") {
-      if (selectedIndex.value < results.value!.entities!.length - 1) listBoxSelected.value = results.value?.entities?.[++selectedIndex.value];
-      else {
-        selectedIndex.value = 0;
-        listBoxSelected.value = results.value?.entities?.[selectedIndex.value];
-      }
-    } else if (event.key === "ArrowUp") {
-      if (selectedIndex.value > 0) listBoxSelected.value = results.value?.entities?.[--selectedIndex.value];
-      else {
-        selectedIndex.value = results.value!.entities!.length - 1;
-        listBoxSelected.value = results.value?.entities?.[selectedIndex.value];
-      }
-    }
+  debounceTimer = setTimeout(search, props.debounceMs);
 }
 
 async function search() {
-  if (searchText.value && searchText.value.length > 2) {
-    let imQueryCopy: QueryRequest | undefined = undefined;
-    if (imQuery.value) {
-      imQueryCopy = cloneDeep(imQuery.value);
-    }
-    if (!imQueryCopy) {
-      if (props.setupSearch) imQueryCopy = await props.setupSearch();
-    }
-    if (imQueryCopy) {
-      searchLoading.value = true;
-      imQueryCopy.textSearch = searchText.value;
-      imQueryCopy.page = PageSchema.parse({ pageNumber: 1, pageSize: 10 });
-      imQueryCopy.textSearchStyle = TextSearchStyle.autocomplete;
-      const response = await QueryService.queryIMSearch(imQueryCopy);
-      searchLoading.value = false;
-      return response;
-    }
+  clearTimeout(debounceTimer);
+  const term = text.value.trim();
+  if (term.length < props.minSearchLength) return;
+  controller?.abort();
+  const current = (controller = new AbortController());
+  loading.value = true;
+  error.value = undefined;
+  popupOpen.value = true;
+  activeIndex.value = -1;
+  try {
+    const base = await getBaseQuery();
+    const response = await searchEntities(QueryService.queryIMSearch, base, {
+      text: term,
+      pageSize: props.pageSize,
+      timeoutMs: props.searchTimeoutMs,
+      signal: current.signal
+    });
+    if (controller !== current) return;
+    results.value = response;
+  } catch (e) {
+    if (controller !== current) return;
+    results.value = undefined;
+    error.value = e instanceof SearchTimeoutError ? e.message : "Search failed. Please try again.";
+    emit("error", e instanceof Error ? e : new Error(String(e)));
+  } finally {
+    if (controller === current) loading.value = false;
   }
 }
 
-function showResultsOverlay(event: any) {
-  if (resultsOP.value) resultsOP.value.show(event, event.target);
+function setSelected(entity: SearchResultSummary | undefined) {
+  selected.value = entity;
+  syncedIri = entity?.iri;
+  text.value = displayName(entity);
+  emit("select", entity);
 }
 
-function hideResultsOverlay() {
-  if (resultsOP.value) resultsOP.value.hide();
+function choose(entity: SearchResultSummary) {
+  setSelected(entity);
+  closePopup();
+  summary.value?.hide();
 }
 
-function onListBoxOptionClick(selected: SearchResultSummary) {
-  selectedLocal.value = selected;
-  hideResultsOverlay();
-  editing.value = false;
+function closePopup() {
+  popupOpen.value = false;
+  activeIndex.value = -1;
 }
+
+/** Clears the text and selection. */
+function clear() {
+  cancelPending();
+  results.value = undefined;
+  error.value = undefined;
+  closePopup();
+  setSelected(undefined);
+  nextTick(() => input.value?.focus());
+}
+
+function onKeydown(event: KeyboardEvent) {
+  const count = entities.value.length;
+  switch (event.key) {
+    case "ArrowDown":
+    case "ArrowUp": {
+      event.preventDefault();
+      if (!popupOpen.value && count) popupOpen.value = true;
+      if (!count) return;
+      const step = event.key === "ArrowDown" ? 1 : -1;
+      activeIndex.value = activeIndex.value < 0 && step < 0 ? count - 1 : (activeIndex.value + step + count) % count;
+      break;
+    }
+    case "Home":
+    case "End":
+      if (popupOpen.value && count) {
+        event.preventDefault();
+        activeIndex.value = event.key === "Home" ? 0 : count - 1;
+      }
+      break;
+    case "Enter": {
+      event.preventDefault();
+      const active = entities.value[activeIndex.value];
+      if (popupOpen.value && active) choose(active);
+      else search();
+      break;
+    }
+    case "Escape":
+      if (popupOpen.value) {
+        event.preventDefault();
+        cancelPending();
+        closePopup();
+      }
+      break;
+    case "Tab":
+      closePopup();
+      break;
+  }
+}
+
+function onFocusOut(event: FocusEvent) {
+  if (dialogOpen.value) return;
+  const next = event.relatedTarget as Node | null;
+  if (next && root.value?.contains(next)) return;
+  closePopup();
+  summary.value?.hide();
+  if (text.value !== displayName(selected.value)) {
+    cancelPending();
+    text.value = displayName(selected.value);
+  }
+}
+
+function onFocus() {
+  input.value?.select();
+  if (results.value && text.value.trim().length >= props.minSearchLength && text.value !== displayName(selected.value)) popupOpen.value = true;
+}
+
+async function openAdvancedSearch(withTerm = text.value) {
+  cancelPending();
+  closePopup();
+  summary.value?.hide();
+  dialogRoots.value = props.rootEntities.length ? props.rootEntities : ((await props.setupRootEntities?.()) ?? []);
+  dialogQuery.value = await getBaseQuery();
+  dialogTerm.value = withTerm === displayName(selected.value) ? "" : withTerm;
+  dialogOpen.value = true;
+}
+
+function onDialogSelect(entity: SearchResultSummary) {
+  dialogOpen.value = false;
+  setSelected(entity);
+  input.value?.focus();
+}
+
+function closeDialog() {
+  dialogOpen.value = false;
+  input.value?.focus();
+}
+
+function hoverSummary(target: HTMLElement, entity: SearchResultSummary | undefined) {
+  if (!props.showSummaryOnHover || !summary.value) return;
+  if (entity) summary.value.show(target, entity);
+  else summary.value.hide();
+}
+
+defineExpose({ search, clear, text });
 </script>
 
+<style>
+/* Theme tokens shared by the search bar, its dialog and popovers, taken from the PrimeVue theme so light/dark mode follow the app */
+.imsb-theme {
+  --imsb-font-size: 0.9375rem;
+  --imsb-text: var(--p-text-color, #1f2933);
+  --imsb-text-muted: var(--p-text-muted-color, #57606a);
+  --imsb-surface: var(--p-content-background, #fff);
+  --imsb-input-bg: var(--p-form-field-background, #fff);
+  --imsb-border: var(--p-content-border-color, #d0d7de);
+  --imsb-hover: var(--p-content-hover-background, #f3f4f6);
+  --imsb-selected: var(--p-highlight-background, #dbeafe);
+  --imsb-accent: var(--p-primary-color, #2563eb);
+  --imsb-accent-contrast: var(--p-primary-contrast-color, #fff);
+  --imsb-focus-ring: color-mix(in srgb, var(--imsb-accent) 25%, transparent);
+  --imsb-danger: var(--p-red-500, #b42318);
+  --imsb-radius: 6px;
+  --imsb-radius-lg: 8px;
+  --imsb-height: 2.375rem;
+  --imsb-shadow: 0 8px 24px rgb(0 0 0 / 0.14);
+  --imsb-shadow-lg: 0 16px 48px rgb(0 0 0 / 0.2);
+}
+.my-app-dark .imsb-theme {
+  --imsb-danger: var(--p-red-400, #ff7a6b);
+  --imsb-shadow: 0 8px 24px rgb(0 0 0 / 0.5);
+  --imsb-shadow-lg: 0 16px 48px rgb(0 0 0 / 0.6);
+}
+.imsb-theme .imsb-spinner {
+  display: inline-block;
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--imsb-border);
+  border-top-color: var(--imsb-accent);
+  border-radius: 50%;
+  animation: imsb-spin 0.7s linear infinite;
+}
+.imsb-theme .imsb-spinner.small {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+@keyframes imsb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .imsb-theme .imsb-spinner {
+    animation-duration: 2s;
+  }
+}
+</style>
+
 <style scoped>
-.search-container {
-  flex: 1 0 auto;
-  padding: 0 0.2rem;
+.imsb {
+  position: relative;
+  width: 100%;
+  /* Fluid on narrow screens, capped on wide ones; set --imsb-max-width on a parent to change it (none for full width) */
+  max-width: var(--imsb-max-width, 40rem);
+  font-size: var(--imsb-font-size);
+  line-height: 1.45;
+  color: var(--imsb-text);
+}
+.imsb-row {
   display: flex;
-  flex-flow: row nowrap;
-  justify-content: flex-start;
+  align-items: stretch;
+  gap: 0.375rem;
+}
+.imsb-field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
   align-items: center;
-  gap: 0.2rem;
-  overflow: auto;
-  width: 40%;
+  height: var(--imsb-height);
+  border: 1px solid var(--imsb-border);
+  border-radius: var(--imsb-radius);
+  background: var(--imsb-input-bg);
+  transition:
+    border-color 0.12s,
+    box-shadow 0.12s;
 }
-
-#autocomplete-search {
-  font-size: 1rem;
-  height: 2.25rem;
-  flex: 1 1 auto;
-  width: 100%;
+.imsb-field:focus-within {
+  border-color: var(--imsb-accent);
+  box-shadow: 0 0 0 3px var(--imsb-focus-ring);
 }
-
-.autocomplete-search {
-  font-size: 1rem;
-  height: 2.25rem;
-  flex: 1 1 auto;
-  width: 100%;
+.imsb-field.has-error {
+  border-color: var(--imsb-danger);
 }
-
-.results-container {
+.imsb-lead {
+  flex: none;
+  margin-left: 0.625rem;
+  color: var(--imsb-text-muted);
+}
+input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 0.5rem;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+input::placeholder {
+  color: var(--imsb-text-muted);
+  opacity: 0.85;
+}
+.imsb-adornments {
   display: flex;
-  flex-flow: column nowrap;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.125rem;
+  padding-right: 0.375rem;
 }
-
-.advanced-search-container {
+.imsb-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--imsb-text-muted);
+  cursor: pointer;
+}
+.imsb-icon:hover:not(:disabled) {
+  background: var(--imsb-hover);
+  color: var(--imsb-text);
+}
+.imsb-icon.listening {
+  color: var(--imsb-danger);
+  animation: imsb-pulse 1.2s ease-in-out infinite;
+}
+.imsb-advanced {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-width: var(--imsb-height);
+  padding: 0 0.625rem;
+  border: 1px solid var(--imsb-accent);
+  border-radius: var(--imsb-radius);
+  background: var(--imsb-accent);
+  color: var(--imsb-accent-contrast);
+  font: inherit;
+  cursor: pointer;
+}
+.imsb-advanced:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+button:focus-visible {
+  outline: 2px solid var(--imsb-accent);
+  outline-offset: 2px;
+}
+button:disabled,
+.disabled input {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.imsb-popup {
+  position: absolute;
+  z-index: 1000;
+  top: calc(100% + 4px);
+  left: 0;
+  width: min(100%, 34rem);
+  min-width: min(20rem, 100%);
+  border: 1px solid var(--imsb-border);
+  border-radius: var(--imsb-radius);
+  background: var(--imsb-surface);
+  box-shadow: var(--imsb-shadow);
+  overflow: hidden;
+}
+ul {
+  max-height: 18rem;
+  margin: 0;
+  padding: 0.25rem;
+  overflow-y: auto;
+  list-style: none;
+}
+ul.stale {
+  opacity: 0.6;
+}
+li {
   display: flex;
-  flex-flow: row;
   align-items: baseline;
   justify-content: space-between;
-}
-
-.loading-container {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-}
-
-.listbox-item {
-  width: 100%;
-}
-.listbox-item:focus {
-  outline: none;
-}
-
-.clear-icon {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #999;
+  gap: 1rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 1.1rem;
-  z-index: 10;
-  pointer-events: auto;
 }
-
-.clear-icon:hover {
-  color: #555;
+li.active {
+  background: var(--imsb-selected);
+  box-shadow: inset 3px 0 0 var(--imsb-accent);
 }
-
-.search-button {
-  height: 35px;
+li.current {
+  font-weight: 600;
 }
-
-.dialog {
-  height: 700px;
+.imsb-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.imsb-meta {
+  flex: none;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  color: var(--imsb-text-muted);
+}
+.imsb-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  color: var(--imsb-text-muted);
+}
+.imsb-message.error {
+  color: var(--imsb-danger);
+}
+.imsb-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.75rem;
+  border-top: 1px solid var(--imsb-border);
+  color: var(--imsb-text-muted);
+}
+.imsb-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--imsb-accent);
+  font: inherit;
+  font-size: 0.8125rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+@keyframes imsb-pulse {
+  50% {
+    opacity: 0.45;
+  }
 }
 </style>

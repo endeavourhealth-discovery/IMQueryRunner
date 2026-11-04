@@ -7,7 +7,7 @@
     </div>
     <div class="m-2">
       <span class="m-2">Find a query:</span>
-      <AutocompleteSearchBar v-model:selected="selected" :im-query="request" :search-placeholder="'Search queries'" />
+      <AutocompleteSearchBar v-model:selected="selected" :im-query="request" :root-entities="[IM.MODULE_QUERIES]" placeholder="Search queries" />
     </div>
     <div>
       <ArgumentDisplay
