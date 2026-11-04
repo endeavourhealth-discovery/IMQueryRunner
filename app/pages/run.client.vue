@@ -5,8 +5,8 @@
         <Button icon="fa-solid fa-arrow-left" label="Back to queue" severity="secondary" @click="backToQueue" />
       </div>
     </div>
-    <div class="m-2">
-      <span class="m-2">Find a query:</span>
+    <div class="m-6">
+      <div class="m-2">Find a query:</div>
       <AutocompleteSearchBar v-model:selected="selected" :im-query="request" :root-entities="[IM.MODULE_QUERIES]" placeholder="Search queries" />
     </div>
     <div>
@@ -19,10 +19,10 @@
         @arguments-completed="passArguments"
       />
     </div>
-    <div class="m-2">
+    <div class="mx-6 my-2">
       <Button icon="fa-solid fa-plus" label="Add to queue" :disabled="selected === undefined || loading" @click="addToQueue" />
     </div>
-    <DataTable v-if="queuedQueries.length" class="m-2" :value="queuedQueries">
+    <DataTable v-if="queuedQueries.length" class="m-6" :value="queuedQueries">
       <template #empty>None</template>
       <Column header="Query">
         <template #body="{ data }: { data: QueuedQuery }">{{ data.selected.name }}</template>
@@ -33,7 +33,7 @@
         </template>
       </Column>
     </DataTable>
-    <div class="m-2">
+    <div class="mx-6">
       <Button icon="fa-solid fa-play" label="Run queue" :disabled="!queuedQueries.length" @click="showDialog = true" />
     </div>
     <Dialog v-model:visible="showDialog" :closable="false" modal>
