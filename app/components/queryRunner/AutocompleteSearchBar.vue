@@ -1,461 +1,117 @@
 <template>
-  <div class="search-container" ref="autocompleteRoot">
-    <IconField class="autocomplete-search" iconPosition="right">
-      <!--
-      <InputIcon v-if="!searchLoading && !listening" class="pi pi-microphone mic" :class="{ listening }" @click="toggleListen" />
--->
-      <InputText
-        id="autocomplete-search"
-        ref="searchInput"
-        :disabled="disabled"
-        v-model="searchText"
-        :placeholder="searchPlaceholder"
-        data-testid="search-input"
-        @input="debounceForSearch"
-        @keydown.down="select"
-        @keydown.enter="onEnter"
-        @keydown.up="select"
-        @focus="handleFocus"
-        @blur="editing = false"
-        @mouseover="selected?.iri != 'any'"
-        :pt="{
-          root: { autocomplete: allowBrowserAutocomplete ? 'on' : 'off' }
-        }"
-      />
-      <i v-if="editing" class="fa fa-times-circle clear-icon" @mousedown.prevent="clearSearch()"></i>
-    </IconField>
-    <Button
-      class="search-button px-2"
-      :disabled="disabled"
-      @click="advancedSearch"
-      data-testid="autocomplete-search-button"
-      icon="fa-solid fa-magnifying-glass"
-      label="Advanced"
-    />
-    <Popover ref="resultsOP" :breakpoints="{ '960px': '75vw', '640px': '100vw' }" :style="{ width: '450px' }" appendTo="body">
-      <div v-if="searchLoading" class="loading-container">
-        <ProgressSpinner />
-      </div>
-      <div v-else class="results-container" :tabindex="0">
-        <Listbox v-if="results?.entities" v-model="listBoxSelected" :options="results.entities">
-          <template #option="slotProps">
-            <div class="listbox-item" @mouseover="slotProps.option.iri != 'any'" @click="onListBoxOptionClick(slotProps.option)">
-              <span>{{ slotProps.option.bestMatch ? slotProps.option.bestMatch : slotProps.option.name }}</span>
-            </div>
-          </template>
-        </Listbox>
-        <div v-else>No results</div>
-
-        <div class="advanced-search-container">
-          <small>
-            Showing {{ results?.entities?.length ? 1 : 0 }}-{{ results?.entities?.length ? results.entities.length : 0 }} of
-            {{ results?.totalCount ? results.totalCount : 0 }} results
-          </small>
+  <div class="flex w-full max-w-[40rem] gap-2">
+    <AutoComplete
+      v-model="value"
+      :delay="SEARCH_DEBOUNCE_MS"
+      :empty-search-message="error ?? 'No results'"
+      :input-id="id"
+      :min-length="MIN_SEARCH_LENGTH"
+      :option-label="displayName"
+      :placeholder="placeholder"
+      :suggestions="results?.entities ?? []"
+      class="min-w-0 flex-1"
+      fluid
+      show-clear
+      @blur="onBlur"
+      @clear="selected = undefined"
+      @complete="search($event.query)"
+      @option-select="selected = $event.value"
+    >
+      <template #option="{ option }">
+        <div class="flex w-full justify-between gap-4" @mouseenter="summary?.showOverlayTreeNode($event, option)" @mouseleave="summary?.hideOverlay()">
+          <span>{{ displayName(option) }}</span>
+          <span class="text-sm whitespace-nowrap text-[var(--p-text-muted-color)]">{{ option.scheme?.name }}</span>
         </div>
-      </div>
-    </Popover>
+      </template>
+      <template #footer>
+        <div v-if="results?.entities?.length" class="flex items-center justify-between px-3 py-2 text-sm text-[var(--p-text-muted-color)]">
+          <span>Showing {{ results.entities.length }} of {{ results.totalCount }} results</span>
+          <Button v-if="(results.totalCount ?? 0) > results.entities.length" label="View all" link size="small" @click="openDialog(term)" />
+        </div>
+      </template>
+    </AutoComplete>
+    <Button aria-label="Advanced search" data-testid="advanced-search-button" icon="fa-solid fa-list" title="Advanced search" @click="openDialog()" />
+    <OverlaySummary ref="summary" />
+    <AdvancedSearchDialog
+      v-if="dialogOpen"
+      :im-query="imQuery"
+      :root-entities="rootEntities"
+      :search-term="dialogTerm"
+      :selected="selected"
+      @close="dialogOpen = false"
+      @select="onDialogSelect"
+    />
   </div>
-  <Dialog v-model:visible="showDialog" modal :closable="false">
-    <Tree
-      v-model:expandedKeys="expandedKeys"
-      v-model:selectionKeys="selectedKeys"
-      selectionMode="single"
-      @nodeSelect="onNodeSelect"
-      :loading="loading"
-      loadingMode="icon"
-      :value="entities"
-      @nodeExpand="onNodeExpand"
-      class="dialog w-full md:w-[30rem]"
-    ></Tree>
-    <template #footer>
-      <Button class="m-1" label="Cancel" variant="outlined" @click="showDialog = false" />
-      <Button class="m-1" label="Select" :disabled="!isQuery" @click="setSelectedQuery" autofocus />
-    </template>
-  </Dialog>
 </template>
 
-<script setup lang="ts">
-import { useAutocompleteRegistry } from "~/composables/useAutocompleteRegistry";
-import EntityService from "~/services/EntityService";
+<script lang="ts" setup>
+import AdvancedSearchDialog from "~/components/queryRunner/autocomplete/AdvancedSearchDialog.vue";
+import {
+  MIN_SEARCH_LENGTH,
+  SEARCH_DEBOUNCE_MS,
+  SEARCH_TIMEOUT_MS,
+  SearchTimeoutError,
+  displayName,
+  isAbortError,
+  searchEntities
+} from "~/helpers/autocompleteSearch";
 import QueryService from "~/services/QueryService";
 
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { ref, shallowRef, watch } from "vue";
 
-import { IM, TextSearchStyle } from "@endeavour/vue-library/enums";
-import { PageSchema, type QueryRequest, type SearchResponse, type SearchResultSummary, type TTIriRef } from "@endeavour/vue-library/models";
+import { OverlaySummary } from "@endeavour/vue-library/components";
+import type { QueryRequest, SearchResponse, SearchResultSummary } from "@endeavour/vue-library/models";
 
-import { cloneDeep, debounce, isEqual } from "lodash-es";
-import type { TreeNode } from "primevue/treenode";
-
-const { registerAutocomplete, unregisterAutocomplete } = useAutocompleteRegistry();
-
-interface Props {
-  selected?: SearchResultSummary;
-  disabled?: boolean;
-  rootEntities?: string[];
-  searchPlaceholder?: string;
-  quickTypeFiltersAllowed?: string[];
-  selectedQuickTypeFilter?: string;
-  allowBrowserAutocomplete?: boolean;
-  setupSearch?: () => Promise<QueryRequest>;
-  setupRootEntities?: () => Promise<string[]>;
-  validEntityQuery?: QueryRequest;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  rootEntities: () => [] as string[],
-  allowBrowserAutocomplete: false
-});
-
-const emit = defineEmits<{
-  "update:selected": [payload: SearchResultSummary | undefined];
-  openDialog: [];
-}>();
-
-const imQuery = defineModel<any>("imQuery");
-const resultsOP = ref();
-const searchText = ref("");
-const results: Ref<SearchResponse | undefined> = ref();
-const showDialog = ref(false);
-const selectedLocal: Ref<SearchResultSummary | undefined> = ref();
-const searchLoading: Ref<boolean> = ref(false);
-const searchPlaceholder: Ref<string> = ref(props.searchPlaceholder ?? "Search");
-const selectedIndex: Ref<number> = ref(-1);
-const listBoxSelected: Ref<SearchResultSummary | undefined> = ref();
-const selectedQuery: Ref<TreeNode | undefined> = ref();
-const searchInput = ref<any>(null);
-const entities = ref<any[]>([]);
-const expandedKeys = ref({});
-const selectedKeys = ref({});
-const isQuery = ref(false);
-const loading = ref(false);
-let searchDebounce: any;
-const editing = ref(false);
-const autocompleteRoot = ref<HTMLElement | null>(null);
-
-defineExpose({ searchText });
-watch(
-  () => cloneDeep(props.selected),
-  (newValue, oldValue) => {
-    if (!isEqual(newValue, oldValue)) {
-      searchLoading.value = true;
-      if (newValue && (newValue.name || newValue.bestMatch)) {
-        searchText.value = newValue.bestMatch ? newValue.bestMatch : newValue.name!;
-        selectedLocal.value = newValue;
-      } else {
-        searchText.value = "";
-        selectedLocal.value = undefined;
-      }
-      searchLoading.value = false;
-    }
-  }
+const props = withDefaults(
+  defineProps<{
+    imQuery?: QueryRequest;
+    rootEntities: string[];
+    placeholder?: string;
+    id?: string;
+  }>(),
+  { placeholder: "Search by name or IRI" }
 );
 
-watch(
-  selectedKeys,
-  (newValue, oldValue) => {
-    if (newValue !== oldValue) {
-    }
-  },
-  { deep: true }
-);
+const selected = defineModel<SearchResultSummary | undefined>("selected");
 
-watch(
-  selectedLocal,
-  (newValue, oldValue) => {
-    if (newValue?.iri !== oldValue?.iri) {
-      if (newValue?.name) {
-        searchText.value = newValue!.name ? newValue!.name : "";
-      }
-      emit("update:selected", newValue);
-    }
-  },
-  { deep: true }
-);
+const value = ref<SearchResultSummary | string | undefined>(selected.value);
+const term = ref("");
+const results = shallowRef<SearchResponse | undefined>();
+const error = ref<string | undefined>();
+const summary = ref<InstanceType<typeof OverlaySummary>>();
+const dialogOpen = ref(false);
+const dialogTerm = ref("");
+let controller: AbortController | undefined;
 
-watch(searchText, newValue => {
-  if (!newValue) {
-    selectedLocal.value = undefined;
-  }
-});
+watch(selected, entity => (value.value = entity));
 
-onMounted(async () => {
-  searchLoading.value = true;
-  if (props.selected?.name) {
-    searchText.value = props.selected.name;
-    selectedLocal.value = props.selected;
-  }
-  if (autocompleteRoot.value) {
-    registerAutocomplete({
-      element: autocompleteRoot.value,
-      reset: () => {
-        searchText.value = props.selected && props.selected.name ? props.selected.name : "";
-      }
-    });
-  }
-  searchLoading.value = false;
-  await getInitialTreeEntities();
-});
-
-onBeforeUnmount(() => {
-  if (autocompleteRoot.value) {
-    unregisterAutocomplete(autocompleteRoot.value);
-  }
-});
-
-function handleGlobalFocus(event: FocusEvent) {
-  const root = autocompleteRoot.value;
-  if (!root) return;
-  const target = event.target as Node;
-  if (!root.contains(target)) {
-    if (props.selected && props.selected.name) searchText.value = props.selected.name;
-    else searchText.value = "";
-  }
-}
-function clearSearch() {
-  searchText.value = "";
-  selectedLocal.value = undefined;
-  nextTick(() => {
-    searchInput.value.$el.focus();
-  });
-}
-function handleFocus(event: FocusEvent) {
-  if (!editing.value) {
-    editing.value = true;
-    (event.target as HTMLInputElement).select();
+async function search(query: string) {
+  term.value = query;
+  error.value = undefined;
+  controller?.abort();
+  const current = (controller = new AbortController());
+  try {
+    results.value = await searchEntities(QueryService.queryIMSearch, props.imQuery, { text: query, timeoutMs: SEARCH_TIMEOUT_MS, signal: current.signal });
+  } catch (e) {
+    if (isAbortError(e) && controller !== current) return;
+    results.value = { entities: [] } as SearchResponse;
+    error.value = e instanceof SearchTimeoutError ? e.message : "Search failed. Please try again.";
   }
 }
 
-async function advancedSearch() {
-  showDialog.value = !showDialog.value;
+function onBlur() {
+  if (value.value === "") selected.value = undefined;
+  else if (typeof value.value === "string") value.value = selected.value;
 }
 
-async function getInitialTreeEntities() {
-  loading.value = true;
-  const retrievedEntities = await EntityService.getEntityChildren("http://endhealth.info/im#Q_Queries");
-  for (const entity of retrievedEntities) {
-    const type = entity.type as TTIriRef[];
-    entities.value.push({
-      key: entity.iri,
-      label: entity.name,
-      data: type[0]!.iri,
-      icon: "fa-solid fa-folder",
-      children: [],
-      loading: false
-    });
-    if (entity.hasChildren) {
-      const retrievedChildEntities = await EntityService.getEntityChildren(entity.iri);
-      for (const childEntity of retrievedChildEntities) {
-        let icon = "fa-magnifying-glass";
-        if (childEntity.hasChildren) icon = "fa-folder";
-        const childType = childEntity.type as TTIriRef[];
-        const found = entities.value.find(e => e.key === entity.iri);
-        found.children.push({
-          key: childEntity.iri,
-          label: childEntity.name,
-          data: childType[0]!.iri,
-          icon: "fa-solid " + icon,
-          children: [],
-          loading: false
-        });
-      }
-    }
-  }
-  loading.value = false;
+function openDialog(withTerm = "") {
+  summary.value?.hideOverlay();
+  dialogTerm.value = withTerm;
+  dialogOpen.value = true;
 }
 
-const onNodeExpand = async (node: any) => {
-  for (const child in node.children) {
-    if (node.children[child].children.length === 0 && node.children[child].icon === "fa-solid fa-folder") {
-      node.children[child].loading = true;
-      const retrievedEntities = await EntityService.getEntityChildren(node.children[child].key);
-      let children = [];
-      for (const entity of retrievedEntities) {
-        let icon = "fa-magnifying-glass";
-        if (entity.hasChildren) icon = "fa-folder";
-        const type = entity.type as TTIriRef[];
-        children.push({
-          key: entity.iri,
-          label: entity.name,
-          data: type[0]!.iri,
-          icon: "fa-solid " + icon,
-          children: [],
-          loading: false
-        });
-      }
-      node.children[child].children = children;
-      node.children[child].loading = false;
-    }
-  }
-};
-
-function onNodeSelect(node: TreeNode) {
-  isQuery.value = node.data === IM.QUERY;
-  selectedQuery.value = node;
-}
-
-function setSelectedQuery() {
-  selectedLocal.value = {
-    iri: selectedQuery.value?.key,
-    scheme: { iri: "" } as TTIriRef,
-    status: { iri: "" } as TTIriRef,
-    type: [] as TTIriRef[],
-    name: selectedQuery.value?.label
-  } as SearchResultSummary;
-  showDialog.value = false;
-}
-
-function debounceForSearch(event: Event): void {
-  if (!searchText.value) {
-    selectedLocal.value = undefined;
-    editing.value = false;
-  } else if (!searchLoading.value && searchText.value != props.selected?.name) {
-    editing.value = true;
-    if (searchDebounce) searchDebounce.cancel();
-    searchDebounce = debounce(async () => {
-      await doSearch(event);
-    }, 600);
-    searchDebounce();
-  }
-}
-
-async function doSearch(event: any) {
-  showResultsOverlay(event);
-  results.value = await search();
-}
-
-async function onEnter(event: KeyboardEvent) {
-  if (listBoxSelected.value) onListBoxOptionClick(listBoxSelected.value);
-  else await doSearch(event);
-}
-function select(event: KeyboardEvent) {
-  if (results.value?.entities && results.value?.entities.length)
-    if (event.key === "ArrowDown") {
-      if (selectedIndex.value < results.value!.entities!.length - 1) listBoxSelected.value = results.value?.entities?.[++selectedIndex.value];
-      else {
-        selectedIndex.value = 0;
-        listBoxSelected.value = results.value?.entities?.[selectedIndex.value];
-      }
-    } else if (event.key === "ArrowUp") {
-      if (selectedIndex.value > 0) listBoxSelected.value = results.value?.entities?.[--selectedIndex.value];
-      else {
-        selectedIndex.value = results.value!.entities!.length - 1;
-        listBoxSelected.value = results.value?.entities?.[selectedIndex.value];
-      }
-    }
-}
-
-async function search() {
-  if (searchText.value && searchText.value.length > 2) {
-    let imQueryCopy: QueryRequest | undefined = undefined;
-    if (imQuery.value) {
-      imQueryCopy = cloneDeep(imQuery.value);
-    }
-    if (!imQueryCopy) {
-      if (props.setupSearch) imQueryCopy = await props.setupSearch();
-    }
-    if (imQueryCopy) {
-      searchLoading.value = true;
-      imQueryCopy.textSearch = searchText.value;
-      imQueryCopy.page = PageSchema.parse({ pageNumber: 1, pageSize: 10 });
-      imQueryCopy.textSearchStyle = TextSearchStyle.autocomplete;
-      const response = await QueryService.queryIMSearch(imQueryCopy);
-      searchLoading.value = false;
-      return response;
-    }
-  }
-}
-
-function showResultsOverlay(event: any) {
-  if (resultsOP.value) resultsOP.value.show(event, event.target);
-}
-
-function hideResultsOverlay() {
-  if (resultsOP.value) resultsOP.value.hide();
-}
-
-function onListBoxOptionClick(selected: SearchResultSummary) {
-  selectedLocal.value = selected;
-  hideResultsOverlay();
-  editing.value = false;
+function onDialogSelect(entity: SearchResultSummary) {
+  selected.value = entity;
+  dialogOpen.value = false;
 }
 </script>
-
-<style scoped>
-.search-container {
-  flex: 1 0 auto;
-  padding: 0 0.2rem;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 0.2rem;
-  overflow: auto;
-  width: 40%;
-}
-
-#autocomplete-search {
-  font-size: 1rem;
-  height: 2.25rem;
-  flex: 1 1 auto;
-  width: 100%;
-}
-
-.autocomplete-search {
-  font-size: 1rem;
-  height: 2.25rem;
-  flex: 1 1 auto;
-  width: 100%;
-}
-
-.results-container {
-  display: flex;
-  flex-flow: column nowrap;
-  gap: 0.5rem;
-}
-
-.advanced-search-container {
-  display: flex;
-  flex-flow: row;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.loading-container {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-}
-
-.listbox-item {
-  width: 100%;
-}
-.listbox-item:focus {
-  outline: none;
-}
-
-.clear-icon {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #999;
-  cursor: pointer;
-  font-size: 1.1rem;
-  z-index: 10;
-  pointer-events: auto;
-}
-
-.clear-icon:hover {
-  color: #555;
-}
-
-.search-button {
-  height: 35px;
-}
-
-.dialog {
-  height: 700px;
-}
-</style>

@@ -5,9 +5,15 @@
         <Button icon="fa-solid fa-arrow-left" label="Back to queue" severity="secondary" @click="backToQueue" />
       </div>
     </div>
-    <div class="m-2">
-      <span class="m-2">Find a query:</span>
-      <AutocompleteSearchBar v-model:selected="selected" :im-query="request" :search-placeholder="'Search queries'" />
+    <div class="m-6">
+      <div class="m-2">Find a query:</div>
+      <AutocompleteSearchBar
+        id="autocomplete-search"
+        v-model:selected="selected"
+        :im-query="request"
+        :root-entities="[IM.MODULE_QUERIES]"
+        placeholder="Search queries"
+      />
     </div>
     <div>
       <ArgumentDisplay
@@ -19,10 +25,10 @@
         @arguments-completed="passArguments"
       />
     </div>
-    <div class="m-2">
+    <div class="mx-6 my-2">
       <Button icon="fa-solid fa-plus" label="Add to queue" :disabled="selected === undefined || loading" @click="addToQueue" />
     </div>
-    <DataTable v-if="queuedQueries.length" class="m-2" :value="queuedQueries">
+    <DataTable v-if="queuedQueries.length" class="m-6" :value="queuedQueries">
       <template #empty>None</template>
       <Column header="Query">
         <template #body="{ data }: { data: QueuedQuery }">{{ data.selected.name }}</template>
@@ -33,7 +39,7 @@
         </template>
       </Column>
     </DataTable>
-    <div class="m-2">
+    <div class="mx-6">
       <Button icon="fa-solid fa-play" label="Run queue" :disabled="!queuedQueries.length" @click="showDialog = true" />
     </div>
     <Dialog v-model:visible="showDialog" :closable="false" modal>
@@ -74,6 +80,7 @@ const args: Ref<ArgumentSelection[] | undefined> = ref([]);
 const completedArguments: Ref<Argument[]> = ref([]);
 const queuedQueries: Ref<QueuedQuery[]> = ref([]);
 const loading = ref(false);
+const toast = useToast();
 
 const jobName = computed(() => {
   if (!queuedQueries.value.length) return "";
@@ -175,7 +182,14 @@ async function runQueries() {
 }
 
 async function getArguments() {
-  const query = await QueryService.getQueryFromIri(selected.value!.iri);
+  let query;
+  try {
+    query = await QueryService.getQueryFromIri(selected.value!.iri);
+  } catch (error: any) {
+    toast.add({ severity: "error", summary: `${selected.value!.name} can't be run`, detail: error?.data?.data?.message ?? String(error), life: 10000 });
+    selected.value = undefined;
+    return;
+  }
   query.iri = selected.value!.iri;
   // args.value = await QueryService.findMissingArguments({
   //   query: query

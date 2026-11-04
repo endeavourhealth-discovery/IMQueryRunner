@@ -2,6 +2,8 @@ import { parseApiResponse } from "@endeavour/vue-library/helpers";
 import {
   type ExtendedEntityReferenceNode,
   ExtendedEntityReferenceNodeSchema,
+  type PageableEntityReferenceNode,
+  PageableEntityReferenceNodeSchema,
   type SearchResultSummary,
   SearchResultSummarySchema
 } from "@endeavour/vue-library/models";
@@ -32,6 +34,15 @@ const EntityService = {
       method: "GET"
     });
     return parseApiResponse(result, SearchResultSummarySchema);
+  },
+
+  async getPagedChildren(accessToken: string, iri: string, page: number, size: number): Promise<PageableEntityReferenceNode> {
+    const result = await $fetch(`${useRuntimeConfig().public.imapiUrl}entity/protected/childrenPaged`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      params: { iri, page, size },
+      method: "GET"
+    });
+    return parseApiResponse(result, PageableEntityReferenceNodeSchema);
   }
 };
 
