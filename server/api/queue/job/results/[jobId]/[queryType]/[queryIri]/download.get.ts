@@ -48,11 +48,11 @@ export default defineEventHandler(async event => {
     if (queryType === IMQType.INDICATOR) {
       throw createError({ statusCode: 400, statusText: ErrorCode.InvalidRequestError, message: "Indicator results cannot be downloaded" });
     }
-    if (job.status !== JobStatus.COMPLETED) {
-      throw createError({ statusCode: 409, statusText: ErrorCode.InvalidRequestError, message: "Job has not completed" });
-    }
     const queryResultId = await getQueryResultIdForJob(job.id, decodedQueryIri);
     if (queryResultId === undefined) {
+      if (job.status !== JobStatus.COMPLETED) {
+        throw createError({ statusCode: 409, statusText: ErrorCode.InvalidRequestError, message: "This query has not completed, so it has no results" });
+      }
       throw createError({ statusCode: 404, statusText: ErrorCode.MissingDataError, message: "Query result not found" });
     }
 

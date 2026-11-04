@@ -11,7 +11,7 @@ import { isArrayHasLength } from "@endeavour/vue-library";
 import { IMQType } from "@endeavour/vue-library/enums";
 import { type QueryRequest } from "@endeavour/vue-library/models";
 
-import { and, asc, count, eq, inArray, or } from "drizzle-orm";
+import { and, asc, count, eq, inArray, isNull, or } from "drizzle-orm";
 import { type MySqlTableWithColumns } from "drizzle-orm/mysql-core";
 
 import { mysqlDb } from "../db/mysql";
@@ -155,15 +155,15 @@ export interface PagedResults {
 }
 
 /**
- * Id of the result for `queryIri` in a job, taken from the earliest result set that has one. Joins through
- * query_result_set in a single query rather than loading the result sets first.
+ * Id of the completed result for `queryIri` in a job, taken from the earliest result set that has one. A job that stopped part way still has
+ * the results of the queries that finished. Joins through query_result_set in a single query rather than loading the result sets first.
  */
 export async function getQueryResultIdForJob(jobId: number, queryIri: string): Promise<number | undefined> {
   const rows = await mysqlDb
     .select({ id: queryResultTable.id })
     .from(queryResultTable)
     .innerJoin(queryResultSetTable, eq(queryResultTable.queryResultSetId, queryResultSetTable.id))
-    .where(and(eq(queryResultSetTable.jobId, jobId), eq(queryResultTable.queryIri, queryIri)))
+    .where(and(eq(queryResultSetTable.jobId, jobId), eq(queryResultTable.queryIri, queryIri), eq(queryResultTable.status, JobStatus.COMPLETED)))
     .orderBy(asc(queryResultSetTable.id), asc(queryResultTable.id))
     .limit(1);
   return rows[0]?.id;
@@ -212,8 +212,8 @@ export async function getQueryResultRow(queryResultSetId: number, queryIri: stri
 }
 
 /**
- * The SQL that was run for `queryIri` in a job, taken from the earliest result set that has it (the same rule as
- * `getQueryResultIdForJob`). Undefined when the job has no such result; an empty string when it has one with no SQL recorded.
+ * The SQL that was run for `queryIri` in a job, taken from the earliest result set that has it: a query that never ran shares its iri with one
+ * that did, but has no SQL. Undefined when the job has no such result; an empty string when it has one with no SQL recorded.
  */
 export async function getExecutedSqlForJob(jobId: number, queryIri: string): Promise<string | undefined> {
   const rows = await mysqlDb
@@ -221,7 +221,7 @@ export async function getExecutedSqlForJob(jobId: number, queryIri: string): Pro
     .from(queryResultTable)
     .innerJoin(queryResultSetTable, eq(queryResultTable.queryResultSetId, queryResultSetTable.id))
     .where(and(eq(queryResultSetTable.jobId, jobId), eq(queryResultTable.queryIri, queryIri)))
-    .orderBy(asc(queryResultSetTable.id), asc(queryResultTable.id))
+    .orderBy(isNull(queryResultTable.executedSQL), asc(queryResultSetTable.id), asc(queryResultTable.id))
     .limit(1);
   return rows[0] ? (rows[0].executedSql ?? "") : undefined;
 }
@@ -290,14 +290,14 @@ export async function createQueryResultEntry(queryRequest: QueryRequest, queryRe
         startOfDaySnapshot: queryResultSet.startOfDaySnapshot,
         persistent: queryResultSet.persistent,
         useStartOfDaySnapshot: queryResultSet.useStartOfDaySnapshot,
-        startTime: getNow(),
         queryIri: queryRequest.query.iri,
         searchDate: queryResultSet.searchDate ? new Date(queryResultSet.searchDate) : null,
         achievementDate: queryResultSet.achievementDate ? new Date(queryResultSet.achievementDate) : null,
         indicatorResultId: indicatorId,
         queryResultSetId: queryResultSet.id,
         version: hashCodeVersion,
-        queryType: queryRequest.query.queryType
+        queryType: queryRequest.query.queryType,
+        status: JobStatus.QUEUED
       } as QueryResult;
       const result = await mysqlDb.insert(queryResultTable).values(queryResult);
       return result?.[0]?.insertId;
@@ -327,7 +327,6 @@ export async function createIndicatorResultEntry(queryRequest: QueryRequest, que
     startOfDaySnapshot: queryResultSet.startOfDaySnapshot,
     persistent: queryResultSet.persistent,
     useStartOfDaySnapshot: queryResultSet.useStartOfDaySnapshot,
-    startTime: getNow(),
     queryIri: queryRequest.query?.iri,
     searchDate: queryResultSet.searchDate ? new Date(queryResultSet.searchDate) : null,
     achievementDate: queryResultSet.achievementDate ? new Date(queryResultSet.achievementDate) : null,
@@ -336,6 +335,42 @@ export async function createIndicatorResultEntry(queryRequest: QueryRequest, que
   } as IndicatorResult;
   const result = await mysqlDb.insert(indicatorResultTable).values(indicatorResult);
   return result?.[0]?.insertId;
+}
+
+export async function markQueryResultRunning(id: number, queryResultSet: QueryResultSet) {
+  await mysqlDb.update(queryResultTable).set({ status: JobStatus.RUNNING, startTime: getNow() }).where(eq(queryResultTable.id, id));
+  emitQueueUpdate(queryResultSet.userId, { jobId: queryResultSet.jobId });
+}
+
+export async function markQueryResultCompleted(id: number, queryResultSet: QueryResultSet) {
+  await mysqlDb.update(queryResultTable).set({ status: JobStatus.COMPLETED, endTime: getNow() }).where(eq(queryResultTable.id, id));
+  emitQueueUpdate(queryResultSet.userId, { jobId: queryResultSet.jobId });
+}
+
+/** After a job has failed: what was running failed with it, what was still waiting never ran. */
+export async function closeOpenQueryResults(jobId: number) {
+  const resultSetIds = (await mysqlDb.select({ id: queryResultSetTable.id }).from(queryResultSetTable).where(eq(queryResultSetTable.jobId, jobId))).map(
+    r => r.id
+  );
+  if (!resultSetIds.length) return;
+  const inJob = inArray(queryResultTable.queryResultSetId, resultSetIds);
+  await mysqlDb
+    .update(queryResultTable)
+    .set({ status: JobStatus.ERRORED, endTime: getNow() })
+    .where(and(inJob, eq(queryResultTable.status, JobStatus.RUNNING)));
+  await mysqlDb
+    .update(queryResultTable)
+    .set({ status: JobStatus.CANCELLED })
+    .where(and(inJob, eq(queryResultTable.status, JobStatus.QUEUED)));
+}
+
+export async function updateWithStartTime(id: number, table: MySqlTableWithColumns<any>) {
+  await mysqlDb
+    .update(table)
+    .set({
+      startTime: getNow()
+    })
+    .where(eq(table.id, id));
 }
 
 export async function updateWithEndTime(id: number, table: MySqlTableWithColumns<any>) {
