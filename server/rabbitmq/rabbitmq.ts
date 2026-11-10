@@ -1,25 +1,9 @@
 import Logger from "#shared/logger";
-import { ErrorCode, JobStatus } from "~~/enums";
-import type { Job } from "~~/models/job.schema";
-import type { QueryResultSet } from "~~/models/queryResultSet.schema";
-
-import { IMQType } from "@endeavour/vue-library/enums";
-import { type QueryRequest } from "@endeavour/vue-library/models";
+import type { JobQueueMessage, PlannedQueryRequest } from "~~/models/jobQueueMessage.schema";
 
 import { Connection } from "rabbitmq-client";
 
-import { indicatorResultTable, queryResultSetTable } from "../db/mysql/schema";
-import {
-  closeOpenQueryResults,
-  createIndicatorResultEntry,
-  createQueryResultEntry,
-  createResultSetEntry,
-  getJobById,
-  updateJobStatus,
-  updateWithEndTime,
-  updateWithStartTime
-} from "../helpers/mysqlHelper";
-import { createExecutionContext, executeQuery, getIndicatorSubQueryRequests, getValidatedSQL, prepareIndicatorSubQueries } from "../utils/executeQuery";
+import { handleJobMessage } from "./jobConsumer";
 
 const LOG = Logger("server/rabbitmq");
 
@@ -28,16 +12,8 @@ const rabbit = new Connection(process.env.RABBITMQ_URL);
 rabbit.on("error", (err: Error) => LOG.error({ err }, "Connection error"));
 rabbit.on("connection", () => LOG.info("Connected"));
 
-/** The worker calls IMAPI as this application (client credentials), not as the user who queued the job. */
-async function getWorkerAccessToken() {
-  try {
-    return await getMachineAccessToken();
-  } catch (err: unknown) {
-    if (isError(err)) throw createError({ statusCode: 401, statusMessage: ErrorCode.AuthorisationError, message: err.message });
-    else throw createError({ statusCode: 500, statusMessage: ErrorCode.InternalServerError, message: err instanceof Error ? err.message : "Unknown error" });
-  }
-}
-
+// One message at a time, in the order sent: a job's requests are sent in dependency order and each relies on the ones before it having run.
+// Running a job's messages on several consumers at once would break that.
 const sub = rabbit.createConsumer(
   {
     queue: "query.execute",
@@ -54,85 +30,7 @@ const sub = rabbit.createConsumer(
       }
     ]
   },
-  async (msg: any) => {
-    let job: Job | undefined;
-
-    try {
-      const accessToken = await getWorkerAccessToken();
-      job = await getJobById(Number(msg.messageId!));
-
-      if (job.status === JobStatus.CANCELLED) {
-        LOG.warn(`Job ${job.id} is cancelled. Query rejected.`);
-        return;
-      }
-
-      await updateJobStatus(job.id, JobStatus.RUNNING, job.userId);
-
-      // Shared by every query in this job so a sub query used more than once is only looked up once
-      const ctx = createExecutionContext();
-
-      // Every query gets its result before any of them runs, so the whole job shows from the start and a query that never gets to run still has a status
-      const planned: { queryRequest: QueryRequest; queryResultSet: QueryResultSet; indicatorId: number | null }[] = [];
-      for (const queryRequest of job.queryRequests) {
-        const queryResultSet = await createResultSetEntry(queryRequest, job);
-        let indicatorId: number | null = null;
-        if (queryRequest.query?.queryType === IMQType.INDICATOR) {
-          indicatorId = await createIndicatorResultEntry(queryRequest, queryResultSet, hashQueryRequest(queryRequest));
-        } else {
-          await createQueryResultEntry(queryRequest, queryResultSet, hashQueryRequest(queryRequest));
-        }
-        planned.push({ queryRequest, queryResultSet, indicatorId });
-      }
-
-      for (const { queryRequest, queryResultSet, indicatorId } of planned) {
-        await updateWithStartTime(queryResultSet.id!, queryResultSetTable);
-        if (indicatorId) await updateWithStartTime(indicatorId, indicatorResultTable);
-
-        const sql = await getValidatedSQL(queryRequest, accessToken, job.id);
-
-        const queriesToRun: { sql: string; queryRequest: QueryRequest }[] = [];
-
-        if (indicatorId) {
-          queriesToRun.push(...(await getIndicatorSubQueryRequests(accessToken, queryRequest, job.id, ctx)));
-          await prepareIndicatorSubQueries(
-            accessToken,
-            queryRequest,
-            queriesToRun.map(item => item.queryRequest),
-            queryResultSet,
-            indicatorId,
-            ctx
-          );
-        } else {
-          queriesToRun.push({ sql, queryRequest });
-        }
-
-        LOG.debug(`Queries to run: ${queriesToRun.length}`);
-
-        for (const item of queriesToRun) {
-          await executeQuery(accessToken, item.sql, item.queryRequest, queryResultSet, ctx);
-        }
-
-        await updateWithEndTime(queryResultSet.id!, queryResultSetTable);
-
-        if (indicatorId) await updateWithEndTime(indicatorId, indicatorResultTable);
-      }
-
-      await updateJobStatus(job.id, JobStatus.COMPLETED, job.userId);
-    } catch (err: unknown) {
-      LOG.error({ err, messageId: msg?.messageId }, "Consumer failed for message");
-
-      if (job?.id) {
-        // First, so the page sees the final query statuses when it reloads for the job's status. Must not stop the job being marked as failed.
-        await closeOpenQueryResults(job.id).catch(statusErr => LOG.error({ err: statusErr, jobId: job?.id }, "Failed to close open query results"));
-        try {
-          await updateJobStatus(job.id, JobStatus.ERRORED, job.userId, err);
-        } catch (statusErr) {
-          LOG.error({ err: statusErr, jobId: job.id }, "Failed to update job status to ERRORED");
-        }
-      }
-      throw createError({ statusCode: 500, statusMessage: ErrorCode.RabbitMQConsumerError, message: "[RabbitMQ] consumer error", cause: err });
-    }
-  }
+  handleJobMessage
 );
 sub.on("error", (err: Error) => {
   LOG.error({ err }, "Queue error");
@@ -144,17 +42,22 @@ const pub = rabbit.createPublisher({
   exchanges: [{ exchange: "query_runner", type: "topic", durable: true }]
 });
 
-export async function sendMessage(userId: string, message: Job) {
-  await pub.send(
-    {
-      messageId: "" + message.id,
-      exchange: "query_runner",
-      routingKey: "query.execute." + userId,
-      durable: true
-    },
-    JSON.stringify(message)
-  );
-  return message.id;
+/** Sends each request of a job as its own message, in order, all carrying the job's id. Plan the job (`planJob`) first. */
+export async function sendJobRequests(userId: string, jobId: number, planned: PlannedQueryRequest[]) {
+  for (const [index, item] of planned.entries()) {
+    const message: JobQueueMessage = { jobId, index, total: planned.length, ...item };
+    await pub.send(
+      {
+        messageId: `${jobId}.${index}`,
+        correlationId: String(jobId),
+        exchange: "query_runner",
+        routingKey: "query.execute." + userId,
+        durable: true
+      },
+      message
+    );
+  }
+  return jobId;
 }
 
 async function onShutdown() {

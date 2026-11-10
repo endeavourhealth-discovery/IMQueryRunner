@@ -4,6 +4,7 @@ import { ErrorCode, JobStatus } from "~~/enums";
 import { type JobRequest } from "~~/models/JobRequest";
 import { type IndicatorResult } from "~~/models/indicatorResult.schema";
 import { type Job } from "~~/models/job.schema";
+import { type PlannedQueryRequest } from "~~/models/jobQueueMessage.schema";
 import { type QueryResult } from "~~/models/queryResult.schema";
 import { type QueryResultSet } from "~~/models/queryResultSet.schema";
 
@@ -26,7 +27,7 @@ import {
   queryResultTable
 } from "../db/mysql/schema";
 import QueryService from "../services/QueryService";
-import { resolveArgs, sortQueryRequestsByDependency } from "../utils/executeQuery";
+import { hashQueryRequest, resolveArgs, sortQueryRequestsByDependency } from "../utils/executeQuery";
 import { TtlCache } from "../utils/memoryCache";
 
 const LOG = Logger("server/helpers/mysqlHelper");
@@ -60,9 +61,14 @@ export async function createJobEntry(jobRequest: JobRequest, accessToken: string
   return queryJob;
 }
 
-export async function getJobById(jobId: number): Promise<Job> {
+/** The job, or undefined when there is none (e.g. it was deleted while its messages were still queued). For the queue consumer. */
+export async function findJobById(jobId: number): Promise<Job | undefined> {
   const jobs = await mysqlDb.select().from(jobTable).where(eq(jobTable.id, jobId));
-  const job = jobs[0];
+  return jobs[0];
+}
+
+export async function getJobById(jobId: number): Promise<Job> {
+  const job = await findJobById(jobId);
   if (!job) {
     throw createError({ status: 400, statusText: ErrorCode.MissingDataError, message: "Queue job not found" });
   }
@@ -280,6 +286,47 @@ export async function createResultSetEntry(queryRequest: any, job: Job): Promise
   queryResultSet.id = queryResultSetId!;
   LOG.debug(`Inserted query result set ${queryResultSet.id} for job ${job.id}`);
   return queryResultSet;
+}
+
+/**
+ * Creates every request's result set and result (or indicator result) before any of them runs, so the whole job shows from the start, a
+ * request that never gets to run still has a status, and each request can find the results of the job's other requests whatever order
+ * they run in. Done once per job, before its requests are sent to the queue one message each.
+ */
+export async function planJob(job: Job): Promise<PlannedQueryRequest[]> {
+  const planned: PlannedQueryRequest[] = [];
+  for (const queryRequest of job.queryRequests) {
+    const queryResultSet = await createResultSetEntry(queryRequest, job);
+    const hashCodeVersion = hashQueryRequest(queryRequest);
+    let indicatorResultId: number | null = null;
+    if (queryRequest.query?.queryType === IMQType.INDICATOR) {
+      indicatorResultId = await createIndicatorResultEntry(queryRequest, queryResultSet, hashCodeVersion);
+    } else {
+      await createQueryResultEntry(queryRequest, queryResultSet, hashCodeVersion);
+    }
+    planned.push({ queryRequest, queryResultSetId: queryResultSet.id!, indicatorResultId });
+  }
+  return planned;
+}
+
+/** A result set of the job, in the shape the runner works with. Fails if it does not belong to the job. */
+export async function getResultSetForJob(queryResultSetId: number, job: Job): Promise<QueryResultSet> {
+  const rows = await mysqlDb
+    .select()
+    .from(queryResultSetTable)
+    .where(and(eq(queryResultSetTable.id, queryResultSetId), eq(queryResultSetTable.jobId, job.id)));
+  const row = rows[0];
+  if (!row) throw new Error(`Query result set ${queryResultSetId} not found for job ${job.id}`);
+  return { ...row, userId: job.userId } as QueryResultSet;
+}
+
+/** Whether any of the job's result sets has not finished yet. A job is complete once none has. */
+export async function hasOpenResultSets(jobId: number): Promise<boolean> {
+  const rows = await mysqlDb
+    .select({ total: count() })
+    .from(queryResultSetTable)
+    .where(and(eq(queryResultSetTable.jobId, jobId), isNull(queryResultSetTable.endTime)));
+  return (rows[0]?.total ?? 0) > 0;
 }
 
 export async function createQueryResultEntry(queryRequest: QueryRequest, queryResultSet: QueryResultSet, hashCodeVersion: number, indicatorId?: number) {
