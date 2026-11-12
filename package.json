@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@braintree/sanitize-url": "7.1.2",
-    "@endeavour/vue-library": "6.0.7",
+    "@endeavour/vue-library": "6.0.8",
     "@pinia/nuxt": "0.11.2",
     "@primeuix/themes": "2.0.3",
     "@tailwindcss/vite": "4.3.3",

@@ -67,6 +67,7 @@ const QueryService = {
       body: queryRequest,
       method: "post"
     });
+    console.log("result", result);
     return parseApiResponse(result, QueryRequestSchema);
   }
 };
