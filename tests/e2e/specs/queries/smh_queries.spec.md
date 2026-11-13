@@ -7,7 +7,7 @@ instead of its name, for every IRI in the table below.
 
 | iri                                                                    | count | label                                                                             |
 |------------------------------------------------------------------------|-------|-----------------------------------------------------------------------------------|
-| "http://smartlifehealth.info/smh#27c295c3-4887-4fab-a203-5abb303bf38c" |       | All patients excluding private patients                                           |
+| "http://smartlifehealth.info/smh#27c295c3-4887-4fab-a203-5abb303bf38c" | 3     | All patients excluding private patients                                           |
 | "http://smartlifehealth.info/smh#593715fb-08cb-4251-a8af-3d5265602621" |       | PT02-Demographics                                                                 |
 | "http://smartlifehealth.info/smh#50599c88-c206-4423-9fac-1afa2ced61b5" |       | Male                                                                              |
 | "http://smartlifehealth.info/smh#ccbadd86-e22b-43ee-af01-5794f6e54b61" |       | Female                                                                            |
@@ -199,9 +199,9 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#deabedbc-7b4e-4ac7-b456-5a85c91530d0" |       | EMAS07N -report                                                                   |
 | "http://smartlifehealth.info/smh#c4d31cea-b7d6-403b-b547-7b121233211f" |       | AS07N-ES-Patients with Care Plan recorded                                         |
 | "http://smartlifehealth.info/smh#e93e30c0-7a3a-40b5-b286-927714290c48" |       | Care Plan - NHS NUMBERS -report                                                   |
-| "http://smartlifehealth.info/smh#c9fa5d68-9c44-4e2e-89ce-9a1e9e02f032" |       | CRM01AD                                                                           | AF | DENOMINATOR | Eligible for ECG or Pulse Rhythm Check |
+| "http://smartlifehealth.info/smh#c9fa5d68-9c44-4e2e-89ce-9a1e9e02f032" | 16    | CRM01AD                                                                           | AF | DENOMINATOR | Eligible for ECG or Pulse Rhythm Check |
 | "http://smartlifehealth.info/smh#c655add0-da4b-49a9-b4c3-7780e88929f4" |       | CRM01A                                                                            | AF | ACHIEVEMENT | THIS FY | ECG or Pulse Rhythm recorded |
-| "http://smartlifehealth.info/smh#f63542b3-f667-4a1f-ba79-a2046dce3e7c" |       | NHS NUMBERS                                                                       | EMCRM01A | AF screening -report |
+| "http://smartlifehealth.info/smh#f63542b3-f667-4a1f-ba79-a2046dce3e7c" | 16    | NHS NUMBERS                                                                       | EMCRM01A | AF screening -report |
 | "http://smartlifehealth.info/smh#b798b70d-df8f-42c8-a603-fb1e6b27cda0" |       | CRM01D                                                                            | HYP | ACHIEVEMENT | BP>=140/90 & HYP OR BP<130/80 OR DABP<135/85 |
 | "http://smartlifehealth.info/smh#583c3f13-091f-46a1-962f-93ffcb778f19" |       | CRM01E                                                                            | NDH | ACHIEVEMENT | THIS FY | NDH or Diabetes Diagnosis or HbA1c<42 |
 | "http://smartlifehealth.info/smh#923a57a3-a2cf-4276-9dbc-ee679c324295" |       | CRM01DD                                                                           | HYP | DEN | BP>=140/90 or DABP>=135/85 & AGED <80 or No Mod/Sev Frail |
@@ -217,53 +217,53 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#acf3f4f4-0ab1-45f6-b81d-81b9868615bb" |       | NHS NUMBERS                                                                       | EMCRM01ED | NDH Detection -report |
 | "http://smartlifehealth.info/smh#52bf7a39-2bb7-475f-b712-e8c6c0995a35" |       | NHS NUMBERS                                                                       | EMCRM01C | Diabetes detection -report |
 | "http://smartlifehealth.info/smh#0c1ad10b-c3bd-42dc-acc0-3a33fc12f056" |       | NHS NUMBERS                                                                       | EMCRM01B | CKD Detection -report |
-| "http://smartlifehealth.info/smh#2a9bc0e3-7532-4966-aeff-fe415e1a2bb7" |       | *CRM02D                                                                           | DENOMINATOR | Patients on CRM Register |
+| "http://smartlifehealth.info/smh#2a9bc0e3-7532-4966-aeff-fe415e1a2bb7" | 38    | *CRM02D                                                                           | DENOMINATOR | Patients on CRM Register |
 | "http://smartlifehealth.info/smh#ad328211-0be2-4d27-89fc-fea533588d50" |       | CRM02a                                                                            | All CRM | LAST 15M | HbA1c |
 | "http://smartlifehealth.info/smh#f10d2df6-3656-415d-a5cd-d4682d0fab1a" |       | CRM02b                                                                            | All CRM | LAST 15M | Blood Pressure |
 | "http://smartlifehealth.info/smh#3e67d344-fb8f-4551-b579-50fe8ce202a0" |       | CRM02c                                                                            | All CRM | LAST 15M | Lipids |
 | "http://smartlifehealth.info/smh#b2d6f989-29b6-41db-ac67-a00a82117dde" |       | CRM02d                                                                            | All CRM | LAST 15M | Urine ACR |
 | "http://smartlifehealth.info/smh#a2faea5e-17f3-40eb-af55-b7057a26a7c0" |       | CRM02e                                                                            | All CRM | LAST 15M | eGFR |
-| "http://smartlifehealth.info/smh#43895f79-580b-4848-8fc1-144d7a1f4765" |       | CRM02f                                                                            | All CRM | LAST 15M | BMI |
+| "http://smartlifehealth.info/smh#43895f79-580b-4848-8fc1-144d7a1f4765" | 63    | CRM02f                                                                            | All CRM | LAST 15M | BMI |
 | "http://smartlifehealth.info/smh#abbee954-9b9e-45c3-a757-cd331c1ac416" |       | CRM02g                                                                            | All CRM | LAST 15M | Waist circumference |
 | "http://smartlifehealth.info/smh#1be0f2bb-cba6-4ea3-8d39-0e806fd7dedf" |       | CRM02h                                                                            | All CRM | LAST 15M | Smoking Status |
-| "http://smartlifehealth.info/smh#6d88227b-9085-4216-af5a-bbedcf17484e" |       | Diabetic Patients                                                                 |
+| "http://smartlifehealth.info/smh#6d88227b-9085-4216-af5a-bbedcf17484e" | 11    | Diabetic Patients                                                                 |
 | "http://smartlifehealth.info/smh#48425802-972d-4c4c-bc09-66c5145dd587" |       | Metabolic dysfunction-associated steototic disease patients                       |
-| "http://smartlifehealth.info/smh#1fdf5d33-fdd7-4003-878d-2ffb667d6ce2" |       | CRM02i                                                                            | Diabetes & Mental Health Screening in last 15m OR No Diabetes |
-| "http://smartlifehealth.info/smh#1945ac6c-0fb2-49d6-a398-5e6cf5965f49" |       | CRM02j                                                                            | Diabetes & Right & Left Feet Risk Checks in last 15m OR No Diabetes |
-| "http://smartlifehealth.info/smh#49b07a95-e77a-4d9c-b2f0-3600bb9dc972" |       | CRM02k                                                                            | Diabetes and Retinal Screening in last 27m OR No Diabetes |
-| "http://smartlifehealth.info/smh#6c126411-9c3e-48a8-9186-fdeb62fc6eb4" |       | CRM02l                                                                            | Diabetes or MASLD & FIB-4 in last 39m OR NO Diabetes or MASLD |
-| "http://smartlifehealth.info/smh#83b3e5e8-41e3-48cf-b310-e3045564f9ab" |       | NO Diabetes or Metabolic dysfunction-associated steototic disease                 |
-| "http://smartlifehealth.info/smh#cb463941-7bbe-40fb-ac56-571b969e48d8" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes (more detailed) -report |
+| "http://smartlifehealth.info/smh#1fdf5d33-fdd7-4003-878d-2ffb667d6ce2" | 27    | CRM02i                                                                            | Diabetes & Mental Health Screening in last 15m OR No Diabetes |
+| "http://smartlifehealth.info/smh#1945ac6c-0fb2-49d6-a398-5e6cf5965f49" | 27    | CRM02j                                                                            | Diabetes & Right & Left Feet Risk Checks in last 15m OR No Diabetes |
+| "http://smartlifehealth.info/smh#49b07a95-e77a-4d9c-b2f0-3600bb9dc972" | 27    | CRM02k                                                                            | Diabetes and Retinal Screening in last 27m OR No Diabetes |
+| "http://smartlifehealth.info/smh#6c126411-9c3e-48a8-9186-fdeb62fc6eb4" | 27    | CRM02l                                                                            | Diabetes or MASLD & FIB-4 in last 39m OR NO Diabetes or MASLD |
+| "http://smartlifehealth.info/smh#83b3e5e8-41e3-48cf-b310-e3045564f9ab" | 27    | NO Diabetes or Metabolic dysfunction-associated steototic disease                 |
+| "http://smartlifehealth.info/smh#cb463941-7bbe-40fb-ac56-571b969e48d8" | 22    | NHS NUMBERS                                                                       | CRM02 | Key Care Processes (more detailed) -report |
 | "http://smartlifehealth.info/smh#4cba279b-4ac2-41ce-b473-bab138b7305b" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes (more detailed) -report |
 | "http://smartlifehealth.info/smh#87b5d79f-88d2-4876-8605-60f6dcad2a83" |       | CRM02                                                                             | ACHIEVEMENT | Care Process Completed |
-| "http://smartlifehealth.info/smh#9264437d-fedc-4518-a4fd-483ba367f1b0" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes (more detailed) -report |
-| "http://smartlifehealth.info/smh#43c6845b-0744-47fa-a330-9603f4cc9e48" |       | *CRM03D                                                                           | DENOMINATOR | CKD, Diabetes or Hypertension |
-| "http://smartlifehealth.info/smh#437e911c-9b00-4cb2-a2ee-f85176bcccd2" |       | Patients with Moderate or Severe Frailty or aged >= 80                            |
-| "http://smartlifehealth.info/smh#3be6546c-6c98-4203-b390-ab5ba35bdd07" |       | Patients with no Moderate or Severe Frailty or aged < 80                          |
+| "http://smartlifehealth.info/smh#9264437d-fedc-4518-a4fd-483ba367f1b0" | 35    | NHS NUMBERS                                                                       | CRM02 | Key Care Processes (more detailed) -report |
+| "http://smartlifehealth.info/smh#43c6845b-0744-47fa-a330-9603f4cc9e48" | 11    | *CRM03D                                                                           | DENOMINATOR | CKD, Diabetes or Hypertension |
+| "http://smartlifehealth.info/smh#437e911c-9b00-4cb2-a2ee-f85176bcccd2" | 1     | Patients with Moderate or Severe Frailty or aged >= 80                            |
+| "http://smartlifehealth.info/smh#3be6546c-6c98-4203-b390-ab5ba35bdd07" | 10    | Patients with no Moderate or Severe Frailty or aged < 80                          |
 | "http://smartlifehealth.info/smh#eb5de83a-3a1f-4f8d-a9d6-1a99ad7f0c7e" |       | CRM03A                                                                            | NOT FRAIL or AGED < 80 | LAST 15M | Latest BP <= 130/80 |
 | "http://smartlifehealth.info/smh#912c76d3-7e72-4ca1-aa1e-a242071b99ea" |       | CRM03B                                                                            | FRAIL or AGED >= 80 | LAST 15M | Latest BP <= 150/90 |
-| "http://smartlifehealth.info/smh#a86515e9-b100-46cb-acd8-8370e7cf7952" |       | CRM03                                                                             | NHS NUMBERS | Blood Pressure Checklist -report |
-| "http://smartlifehealth.info/smh#8ca5459a-b6bb-48ea-b622-3e04f0d377d9" |       | CRM03                                                                             | NHS NUMBERS | Blood Pressure Checklist -report |
+| "http://smartlifehealth.info/smh#a86515e9-b100-46cb-acd8-8370e7cf7952" | 1     | CRM03                                                                             | NHS NUMBERS | Blood Pressure Checklist -report |
+| "http://smartlifehealth.info/smh#8ca5459a-b6bb-48ea-b622-3e04f0d377d9" | 10    | CRM03                                                                             | NHS NUMBERS | Blood Pressure Checklist -report |
 | "http://smartlifehealth.info/smh#81a56002-dace-4c1a-9d0a-53419dc6798c" |       | *CRM03                                                                            | ACHIEVEMENT | LAST 15M | Latest BP <= appropriate target |
-| "http://smartlifehealth.info/smh#0c1f48fe-2aab-470f-9586-03203efeca50" |       | CRM04D                                                                            | DEN | Either CKD, CVD, DM, HF or AF, HYP, MASLD NDH & QRISK>10% |
-| "http://smartlifehealth.info/smh#3877b7d2-e65c-47be-bdc9-d161b952c383" |       | NHS NUMBERS                                                                       | CRM04 | Moderate or High Intensity statins -report |
+| "http://smartlifehealth.info/smh#0c1f48fe-2aab-470f-9586-03203efeca50" | 37    | CRM04D                                                                            | DEN | Either CKD, CVD, DM, HF or AF, HYP, MASLD NDH & QRISK>10% |
+| "http://smartlifehealth.info/smh#3877b7d2-e65c-47be-bdc9-d161b952c383" | 37    | NHS NUMBERS                                                                       | CRM04 | Moderate or High Intensity statins -report |
 | "http://smartlifehealth.info/smh#f31b3f41-dd62-4205-ad06-95b97ba6d3e3" |       | CRM04                                                                             | ACHIEVEMENT | LAST 6M | Moderate or High Intensity Statin |
-| "http://smartlifehealth.info/smh#539364c8-1682-40bb-9f3e-46cc170f5ee4" |       | CRM05D                                                                            | CKD & uACR >= 30 OR Diabetes & uACR >= 3 or eGFR < 60 |
-| "http://smartlifehealth.info/smh#b0231981-bbaf-487c-b72d-8fc84916da38" |       | NHS NUMBERS                                                                       | CRM05 | ACE Inhibitor/Angiotensin Receptor Blocker -report |
+| "http://smartlifehealth.info/smh#539364c8-1682-40bb-9f3e-46cc170f5ee4" | 1     | CRM05D                                                                            | CKD & uACR >= 30 OR Diabetes & uACR >= 3 or eGFR < 60 |
+| "http://smartlifehealth.info/smh#b0231981-bbaf-487c-b72d-8fc84916da38" | 1     | NHS NUMBERS                                                                       | CRM05 | ACE Inhibitor/Angiotensin Receptor Blocker -report |
 | "http://smartlifehealth.info/smh#d10c64f8-4fa7-4501-88ff-d2dc7f3d80ff" |       | CRM05                                                                             | ACHIEVE | LAST 6M | ACE inhibitor/Angiotensin Receptor Blocker |
 | "http://smartlifehealth.info/smh#db1de4ea-08a1-40d4-bf9f-8fc9aade0da8" |       | CRM06N                                                                            | ACHIEVE | LAST 6M | SGLT-2 inhibitors |
 | "http://smartlifehealth.info/smh#719152d3-7e1e-4a37-9213-85250267572a" |       | CRM06D                                                                            | CKD & eGFR btwn 20&45 OR CKD & uACR>=22.6 & eGFR btn 45&90 OR T2D OR HF |
 | "http://smartlifehealth.info/smh#7c733b2f-eb1b-42e5-af52-158d8f061b3b" |       | NHS NUMBERS                                                                       | CRM06 | SGLT-2 inhibitors -report |
-| "http://smartlifehealth.info/smh#eaca07b5-5972-4dfa-9a94-69b154518b6a" |       | CRM07D                                                                            | DEN | Groups 1 or 2 CRM |
+| "http://smartlifehealth.info/smh#eaca07b5-5972-4dfa-9a94-69b154518b6a" | 35    | CRM07D                                                                            | DEN | Groups 1 or 2 CRM |
 | "http://smartlifehealth.info/smh#a7823e4a-a61b-4cf5-bd57-5777ac3a36b5" |       | CRM07                                                                             | ACHIEVEMENT | LAST 15M | Holistic Care Plan completed |
 | "http://smartlifehealth.info/smh#614d961c-5c38-4c61-8b62-6ac9371617bb" |       | CRM07a                                                                            | LAST 15M | Care Plan |
-| "http://smartlifehealth.info/smh#9504019c-d00c-47ff-ad85-373af9c29677" |       | CRM07b                                                                            | LAST 15M | Eat |
+| "http://smartlifehealth.info/smh#9504019c-d00c-47ff-ad85-373af9c29677" | 2     | CRM07b                                                                            | LAST 15M | Eat |
 | "http://smartlifehealth.info/smh#6754d426-c1ca-442a-ad2a-267d5bbe0f34" |       | CRM07c                                                                            | LAST 15M | Physical Activity |
 | "http://smartlifehealth.info/smh#63914384-f053-4d26-986b-cb79342bb541" |       | CRM07d                                                                            | LAST 15M | Sleep Pattern |
 | "http://smartlifehealth.info/smh#bc1b2492-5af3-4475-9b07-bfb8f828bda2" |       | CRM07e                                                                            | LAST 15M | Relax |
 | "http://smartlifehealth.info/smh#6e1300ee-e649-4e8b-beea-24f83fd9890a" |       | CRM07f                                                                            | LAST 15M | Connect |
 | "http://smartlifehealth.info/smh#8b9e693f-cb97-4995-8bf0-92fb6ecb4418" |       | CRM07g                                                                            | LAST 15M | Avoid harmful substances |
-| "http://smartlifehealth.info/smh#553196e7-1d8b-47f9-80f1-3e75fd8e07a1" |       | NHS NUMBERS                                                                       | CRM07 | Holistic Care Plan -report |
+| "http://smartlifehealth.info/smh#553196e7-1d8b-47f9-80f1-3e75fd8e07a1" | 46    | NHS NUMBERS                                                                       | CRM07 | Holistic Care Plan -report |
 | "http://smartlifehealth.info/smh#f1aed0a3-a316-4dba-be09-3e24987e9da5" |       | CRM08                                                                             | ACHIEVEMENT | Improvement in Exercise status, BMI or Smoker |
 | "http://smartlifehealth.info/smh#f4b9df1b-534f-4b3d-8650-790acb4f36f8" |       | CRM08A                                                                            | ACHIEVEMENT | Latest Active codes recorded after inactive codes |
 | "http://smartlifehealth.info/smh#1f174683-13d4-4100-b638-7442195e9034" |       | CRM08B                                                                            | ACHIEVEMENT | Latest BMI recorded after earliest one |
@@ -275,16 +275,16 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#e7a8903a-d67a-4522-aae6-82b2e97d784f" |       | NHS NUMBERS                                                                       | CRM08C | Smoking -report |
 | "http://smartlifehealth.info/smh#5f508a55-4aba-4b45-9392-36e19287f447" |       | NHS NUMBERS                                                                       | CRM08B | BMI -report |
 | "http://smartlifehealth.info/smh#c4fbe72d-2ca6-4d07-8bb2-2e086f6fed5a" |       | NHS NUMBERS                                                                       | CRM08A | Exercise -report |
-| "http://smartlifehealth.info/smh#0d8ab159-6798-47f8-9ace-360fc747df80" |       | CRM09D                                                                            | DEN | Groups 1 or 2 |
-| "http://smartlifehealth.info/smh#d9534621-e66e-42e7-b068-c8d5a354fc1a" |       | NHS NUMBERS                                                                       | CRM09 | 2 Health Confidence Scores -report |
+| "http://smartlifehealth.info/smh#0d8ab159-6798-47f8-9ace-360fc747df80" | 35    | CRM09D                                                                            | DEN | Groups 1 or 2 |
+| "http://smartlifehealth.info/smh#d9534621-e66e-42e7-b068-c8d5a354fc1a" | 35    | NHS NUMBERS                                                                       | CRM09 | 2 Health Confidence Scores -report |
 | "http://smartlifehealth.info/smh#5d52c359-b420-426a-88eb-3626e7660ba7" |       | CRM09                                                                             | ACHIEVEMENT | 2 Health Confidence Score recorded at least 1 month apart |
 | "http://smartlifehealth.info/smh#26b0862e-10c8-433b-ac0e-05ec9347429f" |       | CRM10b                                                                            | NUMERATOR | LAST 15M | Latest BP <= appropriate target |
-| "http://smartlifehealth.info/smh#3dbfad09-6d97-4e40-bab0-7cadf1f49d85" |       | CRM10                                                                             | DENOMINATOR | Diabetes QOF Register |
+| "http://smartlifehealth.info/smh#3dbfad09-6d97-4e40-bab0-7cadf1f49d85" | 11    | CRM10                                                                             | DENOMINATOR | Diabetes QOF Register |
 | "http://smartlifehealth.info/smh#e56f5d89-a104-45db-941d-4f708e301520" |       | CRM10c                                                                            | NUMERATOR | LAST 15M | Latest Non HDL Cholesterol Ratio<=3 |
-| "http://smartlifehealth.info/smh#07cc945c-961e-40e5-9281-40ca78719c42" |       | Patients with Moderate/Severe Frailty or aged >= 80                               |
-| "http://smartlifehealth.info/smh#d3235e78-9e65-4cc4-9a68-8586027dd680" |       | Patients with no Moderate/Severe Frailty or aged < 80                             |
-| "http://smartlifehealth.info/smh#0a6df3e9-534f-4af5-805d-8a0573cfdb9b" |       | NHS NUMBERS                                                                       | Patients with 3 Treatment Targets Checklist -report |
-| "http://smartlifehealth.info/smh#e5acafda-8143-43d3-99b5-e87fd76148b1" |       | NHS NUMBERS                                                                       | Patients with 3 Treatment Targets Checklist -report |
+| "http://smartlifehealth.info/smh#07cc945c-961e-40e5-9281-40ca78719c42" | 1     | Patients with Moderate/Severe Frailty or aged >= 80                               |
+| "http://smartlifehealth.info/smh#d3235e78-9e65-4cc4-9a68-8586027dd680" | 10    | Patients with no Moderate/Severe Frailty or aged < 80                             |
+| "http://smartlifehealth.info/smh#0a6df3e9-534f-4af5-805d-8a0573cfdb9b" | 1     | NHS NUMBERS                                                                       | Patients with 3 Treatment Targets Checklist -report |
+| "http://smartlifehealth.info/smh#e5acafda-8143-43d3-99b5-e87fd76148b1" | 10    | NHS NUMBERS                                                                       | Patients with 3 Treatment Targets Checklist -report |
 | "http://smartlifehealth.info/smh#4dd41c0b-b555-4b11-b18f-24fbc2b8f941" |       | *CRM10                                                                            | ACHIEVEMENT | 3 Treatment Targets Achieved |
 | "http://smartlifehealth.info/smh#db20c30f-34b4-41d5-a2cd-85680102ac43" |       | CRM10a                                                                            | NUMERATOR | LAST 15M | Latest HbA1c <= appropriate target |
 | "http://smartlifehealth.info/smh#06532979-87f6-4e17-a7f9-2d7189d2848e" |       | CRM11D                                                                            | DENOMINATOR | Aged | 17-70 | Diabetic patients diagnosed in last 2 yrs |
@@ -299,10 +299,10 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#03415229-0460-4c36-a59a-d432027191a7" |       | NDH01 -report                                                                     |
 | "http://smartlifehealth.info/smh#4d837438-fd40-4b54-9047-0b335ccd320e" |       | NDH01 - Female                                                                    |
 | "http://smartlifehealth.info/smh#237bbcd3-4a9c-4b5d-9a53-9ed3d194ee4e" |       | NDH01 - Male                                                                      |
-| "http://smartlifehealth.info/smh#0b18fbfa-4f42-4070-9101-c197e99b93be" |       | DM017a -report                                                                    |
-| "http://smartlifehealth.info/smh#c921c53a-ea46-4ae4-9a94-0465a6ce0770" |       | DM017 - Female                                                                    |
-| "http://smartlifehealth.info/smh#2d841af6-9f02-453c-b90a-818ba166df21" |       | DM017b -report                                                                    |
-| "http://smartlifehealth.info/smh#c85a794b-44bb-477e-8c7d-faeb04b0cbba" |       | DM017 - Male                                                                      |
+| "http://smartlifehealth.info/smh#0b18fbfa-4f42-4070-9101-c197e99b93be" | 3     | DM017a -report                                                                    |
+| "http://smartlifehealth.info/smh#c921c53a-ea46-4ae4-9a94-0465a6ce0770" | 3     | DM017 - Female                                                                    |
+| "http://smartlifehealth.info/smh#2d841af6-9f02-453c-b90a-818ba166df21" | 8     | DM017b -report                                                                    |
+| "http://smartlifehealth.info/smh#c85a794b-44bb-477e-8c7d-faeb04b0cbba" | 8     | DM017 - Male                                                                      |
 | "http://smartlifehealth.info/smh#e0124425-19a4-4771-8458-1add6952f5e4" |       | EMCRM06 -report                                                                   |
 | "http://smartlifehealth.info/smh#9afc067e-f008-4197-b27b-861634e2e615" |       | EMCRM06 - Female                                                                  |
 | "http://smartlifehealth.info/smh#56ded1a5-cb71-47fa-a68d-7076ef4bceea" |       | EMCRM06 - Male                                                                    |
@@ -320,69 +320,69 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#dc73e365-3105-4b67-8ab5-27b66cc21cd2" |       | Age < 60                                                                          |
 | "http://smartlifehealth.info/smh#16aa87eb-d623-4cd9-8ef4-538827e2bc1e" |       | Age >= 60                                                                         |
 | "http://smartlifehealth.info/smh#f9bb1b15-7fbd-4b03-8e03-ce562c4bdae8" |       | NDH01b -report                                                                    |
-| "http://smartlifehealth.info/smh#99d4a965-02f3-4d9b-986f-70841af246cd" |       | EMCRM01AD -report                                                                 |
-| "http://smartlifehealth.info/smh#15f8176b-bf33-4235-b370-8a327899c7bd" |       | EMCRM01AD - Female                                                                |
-| "http://smartlifehealth.info/smh#16a26faa-66f4-4158-83ff-cbd716d5ea1b" |       | EMCRM01AD - Male                                                                  |
-| "http://smartlifehealth.info/smh#ff027cf4-20d0-4996-bcb5-feb6a604f831" |       | EMCRM03 -report                                                                   |
-| "http://smartlifehealth.info/smh#63e3309d-6c7c-4b42-85b2-3d963bc0ccd0" |       | EMCRM03 - Female                                                                  |
-| "http://smartlifehealth.info/smh#c4cc0736-9fa5-4af2-8473-413358f2fa2a" |       | EMCRM03 - Male                                                                    |
+| "http://smartlifehealth.info/smh#99d4a965-02f3-4d9b-986f-70841af246cd" | 16    | EMCRM01AD -report                                                                 |
+| "http://smartlifehealth.info/smh#15f8176b-bf33-4235-b370-8a327899c7bd" | 7     | EMCRM01AD - Female                                                                |
+| "http://smartlifehealth.info/smh#16a26faa-66f4-4158-83ff-cbd716d5ea1b" | 9     | EMCRM01AD - Male                                                                  |
+| "http://smartlifehealth.info/smh#ff027cf4-20d0-4996-bcb5-feb6a604f831" | 11    | EMCRM03 -report                                                                   |
+| "http://smartlifehealth.info/smh#63e3309d-6c7c-4b42-85b2-3d963bc0ccd0" | 3     | EMCRM03 - Female                                                                  |
+| "http://smartlifehealth.info/smh#c4cc0736-9fa5-4af2-8473-413358f2fa2a" | 8     | EMCRM03 - Male                                                                    |
 | "http://smartlifehealth.info/smh#25ac9c76-367d-466c-b97a-4bf97e29cd0d" |       | EMCRM01AN -report                                                                 |
-| "http://smartlifehealth.info/smh#ac1ce4c3-bc26-4c97-95f7-578675373ca5" |       | Age < 70                                                                          |
-| "http://smartlifehealth.info/smh#0866d85c-c638-42c3-97b9-a4b6132b1ce5" |       | Age >= 70                                                                         |
-| "http://smartlifehealth.info/smh#dd108264-93ea-4876-b0bb-50f91df8929c" |       | EMCRM01ADa -report                                                                |
-| "http://smartlifehealth.info/smh#5eb08f8d-58fa-4806-8907-cb14042aa70a" |       | Age < 70                                                                          |
-| "http://smartlifehealth.info/smh#a4311665-1def-423c-94e7-1af577bd2d72" |       | Age >= 70                                                                         |
-| "http://smartlifehealth.info/smh#9450f88b-0868-4312-845c-f519e45b19d5" |       | EMCRM01ADb -report                                                                |
-| "http://smartlifehealth.info/smh#3b8fadf0-468b-4eef-8fc4-f8c5c34420ae" |       | Age < 65                                                                          |
-| "http://smartlifehealth.info/smh#09ec2b6e-1958-4f08-8765-35a100464a29" |       | Age >= 65                                                                         |
-| "http://smartlifehealth.info/smh#b1cbcd25-a78a-47bb-b133-156caa582571" |       | EMCRM03a -report                                                                  |
-| "http://smartlifehealth.info/smh#ba2a7987-918b-4b1c-95ab-1ccd94e55fd2" |       | Age < 65                                                                          |
-| "http://smartlifehealth.info/smh#75a937e7-339b-4fa1-a3af-734f27e2b20c" |       | Age >= 65                                                                         |
-| "http://smartlifehealth.info/smh#11a20bd4-c9df-4d69-8341-1877600d9964" |       | EMCRM03b -report                                                                  |
-| "http://smartlifehealth.info/smh#e53c4fdf-aab6-408e-96a7-d05b7626cf83" |       | Age < 70                                                                          |
-| "http://smartlifehealth.info/smh#2dcf6722-db0e-427f-b1f2-ee54567e309b" |       | EMCRM04 - Female                                                                  |
-| "http://smartlifehealth.info/smh#ae0e0e1b-c707-4f38-b3de-a07e0d303b58" |       | Age >= 70                                                                         |
-| "http://smartlifehealth.info/smh#794cfbb1-39f2-489a-9306-876fce95f33b" |       | EMCRM04a -report                                                                  |
-| "http://smartlifehealth.info/smh#b936801b-942f-4ab4-9e20-5b617815841c" |       | Age < 70                                                                          |
-| "http://smartlifehealth.info/smh#8166f6d2-5329-4168-9104-fcd857ef312f" |       | EMCRM04 - Male                                                                    |
-| "http://smartlifehealth.info/smh#63f28d79-3a5c-4a39-bf26-4c2dfcc92c9a" |       | EMCRM01ADaa -report                                                               |
-| "http://smartlifehealth.info/smh#856ddbe1-6bf3-47a5-bd05-fadd09ba986a" |       | EMCRM01ADab -report                                                               |
-| "http://smartlifehealth.info/smh#064d237e-8f8b-4764-89f8-5046a26a96dc" |       | EMCRM01ADba -report                                                               |
-| "http://smartlifehealth.info/smh#3dfde08c-15f4-45e1-888e-b6681275f5b0" |       | EMCRM01ADbb -report                                                               |
-| "http://smartlifehealth.info/smh#ef60915c-a810-49d3-b487-f151d9422174" |       | EMCRM03aa -report                                                                 |
-| "http://smartlifehealth.info/smh#7fe26623-5534-45dc-885f-91adf72cf770" |       | EMCRM03ab -report                                                                 |
-| "http://smartlifehealth.info/smh#87dbbaa8-643e-48a5-a496-7320a014722a" |       | EMCRM03ba -report                                                                 |
-| "http://smartlifehealth.info/smh#8a1639da-07d3-4950-94b9-36b09a6423c2" |       | EMCRM09 -report                                                                   |
+| "http://smartlifehealth.info/smh#ac1ce4c3-bc26-4c97-95f7-578675373ca5" | 3     | Age < 70                                                                          |
+| "http://smartlifehealth.info/smh#0866d85c-c638-42c3-97b9-a4b6132b1ce5" | 4     | Age >= 70                                                                         |
+| "http://smartlifehealth.info/smh#dd108264-93ea-4876-b0bb-50f91df8929c" | 7     | EMCRM01ADa -report                                                                |
+| "http://smartlifehealth.info/smh#5eb08f8d-58fa-4806-8907-cb14042aa70a" | 6     | Age < 70                                                                          |
+| "http://smartlifehealth.info/smh#a4311665-1def-423c-94e7-1af577bd2d72" | 3     | Age >= 70                                                                         |
+| "http://smartlifehealth.info/smh#9450f88b-0868-4312-845c-f519e45b19d5" | 9     | EMCRM01ADb -report                                                                |
+| "http://smartlifehealth.info/smh#3b8fadf0-468b-4eef-8fc4-f8c5c34420ae" | 2     | Age < 65                                                                          |
+| "http://smartlifehealth.info/smh#09ec2b6e-1958-4f08-8765-35a100464a29" | 1     | Age >= 65                                                                         |
+| "http://smartlifehealth.info/smh#b1cbcd25-a78a-47bb-b133-156caa582571" | 3     | EMCRM03a -report                                                                  |
+| "http://smartlifehealth.info/smh#ba2a7987-918b-4b1c-95ab-1ccd94e55fd2" | 7     | Age < 65                                                                          |
+| "http://smartlifehealth.info/smh#75a937e7-339b-4fa1-a3af-734f27e2b20c" | 7     | Age >= 65                                                                         |
+| "http://smartlifehealth.info/smh#11a20bd4-c9df-4d69-8341-1877600d9964" | 8     | EMCRM03b -report                                                                  |
+| "http://smartlifehealth.info/smh#e53c4fdf-aab6-408e-96a7-d05b7626cf83" | 12    | Age < 70                                                                          |
+| "http://smartlifehealth.info/smh#2dcf6722-db0e-427f-b1f2-ee54567e309b" | 16    | EMCRM04 - Female                                                                  |
+| "http://smartlifehealth.info/smh#ae0e0e1b-c707-4f38-b3de-a07e0d303b58" | 4     | Age >= 70                                                                         |
+| "http://smartlifehealth.info/smh#794cfbb1-39f2-489a-9306-876fce95f33b" | 16    | EMCRM04a -report                                                                  |
+| "http://smartlifehealth.info/smh#b936801b-942f-4ab4-9e20-5b617815841c" | 18    | Age < 70                                                                          |
+| "http://smartlifehealth.info/smh#8166f6d2-5329-4168-9104-fcd857ef312f" | 21    | EMCRM04 - Male                                                                    |
+| "http://smartlifehealth.info/smh#63f28d79-3a5c-4a39-bf26-4c2dfcc92c9a" | 3     | EMCRM01ADaa -report                                                               |
+| "http://smartlifehealth.info/smh#856ddbe1-6bf3-47a5-bd05-fadd09ba986a" | 4     | EMCRM01ADab -report                                                               |
+| "http://smartlifehealth.info/smh#064d237e-8f8b-4764-89f8-5046a26a96dc" | 6     | EMCRM01ADba -report                                                               |
+| "http://smartlifehealth.info/smh#3dfde08c-15f4-45e1-888e-b6681275f5b0" | 3     | EMCRM01ADbb -report                                                               |
+| "http://smartlifehealth.info/smh#ef60915c-a810-49d3-b487-f151d9422174" | 2     | EMCRM03aa -report                                                                 |
+| "http://smartlifehealth.info/smh#7fe26623-5534-45dc-885f-91adf72cf770" | 1     | EMCRM03ab -report                                                                 |
+| "http://smartlifehealth.info/smh#87dbbaa8-643e-48a5-a496-7320a014722a" | 7     | EMCRM03ba -report                                                                 |
+| "http://smartlifehealth.info/smh#8a1639da-07d3-4950-94b9-36b09a6423c2" | 35    | EMCRM09 -report                                                                   |
 | "http://smartlifehealth.info/smh#af09d744-4796-4aab-9e8b-7d6fc49104ae" |       | EMCRM08C -report                                                                  |
 | "http://smartlifehealth.info/smh#92c18a0d-c7fa-4add-95c9-ea0b63e1dcaf" |       | EMCRM08B -report                                                                  |
 | "http://smartlifehealth.info/smh#e39beaef-77ed-456c-b1e1-6b091c351b86" |       | EMCRM08A -report                                                                  |
-| "http://smartlifehealth.info/smh#95ed2088-cf7e-491f-93a3-60a38916a18a" |       | EMCRM07 -report                                                                   |
+| "http://smartlifehealth.info/smh#95ed2088-cf7e-491f-93a3-60a38916a18a" | 46    | EMCRM07 -report                                                                   |
 | "http://smartlifehealth.info/smh#ab99cdf7-30fc-4170-b616-6fcb65e1adc9" |       | EMCRM01DN -report                                                                 |
-| "http://smartlifehealth.info/smh#645d9e2a-9297-4389-8aea-140d773171fe" |       | EMCRM04bb -report                                                                 |
-| "http://smartlifehealth.info/smh#062642a7-d661-434d-ab69-9ec6ba0bbae1" |       | Age >= 70                                                                         |
-| "http://smartlifehealth.info/smh#5dba2e4e-1b3e-4353-a3fd-7dc7ed7b8857" |       | EMCRM04ba -report                                                                 |
-| "http://smartlifehealth.info/smh#f5eaa060-db5b-49f9-a04c-423c8921f1d6" |       | EMCRM04ab -report                                                                 |
-| "http://smartlifehealth.info/smh#ab4eb0ca-a4bd-45dc-a324-0366b392c3f0" |       | EMCRM04aa -report                                                                 |
-| "http://smartlifehealth.info/smh#ce5e23c4-7756-4532-b1a9-1c949481ae17" |       | EMCRM03bb -report                                                                 |
+| "http://smartlifehealth.info/smh#645d9e2a-9297-4389-8aea-140d773171fe" | 3     | EMCRM04bb -report                                                                 |
+| "http://smartlifehealth.info/smh#062642a7-d661-434d-ab69-9ec6ba0bbae1" | 3     | Age >= 70                                                                         |
+| "http://smartlifehealth.info/smh#5dba2e4e-1b3e-4353-a3fd-7dc7ed7b8857" | 18    | EMCRM04ba -report                                                                 |
+| "http://smartlifehealth.info/smh#f5eaa060-db5b-49f9-a04c-423c8921f1d6" | 4     | EMCRM04ab -report                                                                 |
+| "http://smartlifehealth.info/smh#ab4eb0ca-a4bd-45dc-a324-0366b392c3f0" | 12    | EMCRM04aa -report                                                                 |
+| "http://smartlifehealth.info/smh#ce5e23c4-7756-4532-b1a9-1c949481ae17" | 7     | EMCRM03bb -report                                                                 |
 | "http://smartlifehealth.info/smh#f8f92021-9cda-44ee-b2d3-17b4b6d7be17" |       | EMCRM01DDb -report                                                                |
 | "http://smartlifehealth.info/smh#7cb190f8-6af8-438d-9dde-c338962e9338" |       | EMCRM01DD - Male                                                                  |
 | "http://smartlifehealth.info/smh#f795be10-2f8b-4777-b0e1-aba9fac0fc7a" |       | EMCRM01DDa -report                                                                |
 | "http://smartlifehealth.info/smh#ebc9b915-fabb-4bf5-a125-53b3bee965e0" |       | EMCRM01DD - Female                                                                |
 | "http://smartlifehealth.info/smh#ed1634ed-395b-4800-9896-7a482e959203" |       | EMCRM01EN -report                                                                 |
-| "http://smartlifehealth.info/smh#0deff1c7-afd9-465f-bc8f-db94b1d4c441" |       | EMCRM04b -report                                                                  |
+| "http://smartlifehealth.info/smh#0deff1c7-afd9-465f-bc8f-db94b1d4c441" | 21    | EMCRM04b -report                                                                  |
 | "http://smartlifehealth.info/smh#a20473e9-82af-4bfd-9a65-ee079056eaa6" |       | EMCRM01DD -report                                                                 |
 | "http://smartlifehealth.info/smh#af86811b-9499-4345-b5aa-40eb10b62d92" |       | EMCRM01CN -report                                                                 |
 | "http://smartlifehealth.info/smh#6a87b847-d1a9-41c3-a653-5aeec27c9e2e" |       | EMCRM01ED -report                                                                 |
 | "http://smartlifehealth.info/smh#d44f7e1f-b6c5-4cd3-ac45-3597fdc311d0" |       | EMCRM01BN -report                                                                 |
-| "http://smartlifehealth.info/smh#93a7fa0b-a071-45e7-824a-59b5545f1037" |       | EMCRM04 -report                                                                   |
+| "http://smartlifehealth.info/smh#93a7fa0b-a071-45e7-824a-59b5545f1037" | 37    | EMCRM04 -report                                                                   |
 | "http://smartlifehealth.info/smh#61e3ac94-0bde-4d82-b01a-8710e40647d6" |       | NDH01bb -report                                                                   |
 | "http://smartlifehealth.info/smh#53a3966f-d95b-4ca1-9877-fe4470887ab9" |       | NDH01ba -report                                                                   |
 | "http://smartlifehealth.info/smh#b48c7d79-53eb-4366-bb4d-d24b644c2ddd" |       | NDH01ab -report                                                                   |
 | "http://smartlifehealth.info/smh#aea3d275-4894-4610-9231-6d0930176161" |       | NDH01aa -report                                                                   |
 | "http://smartlifehealth.info/smh#1fe7a2dd-88cd-4dc3-b725-3ddbc949ba6a" |       | EMCRM05b -report                                                                  |
 | "http://smartlifehealth.info/smh#f4d03758-1ec2-4ee9-b94a-da68b1af8779" |       | EMCRM05 - Male                                                                    |
-| "http://smartlifehealth.info/smh#be391f59-1bb1-4ad2-bc6e-4918571f1b37" |       | EMCRM05a -report                                                                  |
-| "http://smartlifehealth.info/smh#543e7caa-04ce-4f69-99ab-93149dbbfd65" |       | EMCRM05 - Female                                                                  |
+| "http://smartlifehealth.info/smh#be391f59-1bb1-4ad2-bc6e-4918571f1b37" | 1     | EMCRM05a -report                                                                  |
+| "http://smartlifehealth.info/smh#543e7caa-04ce-4f69-99ab-93149dbbfd65" | 1     | EMCRM05 - Female                                                                  |
 | "http://smartlifehealth.info/smh#5d40cbf8-ce6b-4222-b7c4-92b8e46d082e" |       | EMCRM01CD -report                                                                 |
 | "http://smartlifehealth.info/smh#e687308a-de57-4792-a9b1-18d5ecf01b11" |       | EMCRM01BD -report                                                                 |
 | "http://smartlifehealth.info/smh#02662ddd-9f29-45e5-884b-c7cab0e4f561" |       | HYP001bb -report                                                                  |
@@ -393,13 +393,13 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#60d747fe-3a2d-43e2-9eee-15535c20faff" |       | EMCRM12N -report                                                                  |
 | "http://smartlifehealth.info/smh#d2c32dca-b446-42b0-bde9-5bd6253bb873" |       | EMCRM06b -report                                                                  |
 | "http://smartlifehealth.info/smh#28bca437-8169-466a-a83d-39f1e64922c8" |       | EMCRM06a -report                                                                  |
-| "http://smartlifehealth.info/smh#22790022-dd6f-4681-bb77-254133e12ef1" |       | EMCRM05 -report                                                                   |
+| "http://smartlifehealth.info/smh#22790022-dd6f-4681-bb77-254133e12ef1" | 1     | EMCRM05 -report                                                                   |
 | "http://smartlifehealth.info/smh#ad5d767e-e287-4477-82bb-173374a326a6" |       | HYP001b -report                                                                   |
 | "http://smartlifehealth.info/smh#6eb99e71-cc81-4b21-89db-ce9808171a6d" |       | HF1 -report                                                                       |
-| "http://smartlifehealth.info/smh#06a4597f-4ebb-40b1-9af1-b2739b84421f" |       | DM017 -report                                                                     |
-| "http://smartlifehealth.info/smh#ef05a9aa-0ac0-41d3-bd1b-aabdcd2b3267" |       | CKD005 -report                                                                    |
-| "http://smartlifehealth.info/smh#2319f740-2ded-4749-8bdc-40416cedb838" |       | CHD001 -report                                                                    |
-| "http://smartlifehealth.info/smh#a4250ea9-2eda-4cfa-846b-e92735d66db3" |       | AF001 -report                                                                     |
+| "http://smartlifehealth.info/smh#06a4597f-4ebb-40b1-9af1-b2739b84421f" | 11    | DM017 -report                                                                     |
+| "http://smartlifehealth.info/smh#ef05a9aa-0ac0-41d3-bd1b-aabdcd2b3267" | 1     | CKD005 -report                                                                    |
+| "http://smartlifehealth.info/smh#2319f740-2ded-4749-8bdc-40416cedb838" | 32    | CHD001 -report                                                                    |
+| "http://smartlifehealth.info/smh#a4250ea9-2eda-4cfa-846b-e92735d66db3" | 1     | AF001 -report                                                                     |
 | "http://smartlifehealth.info/smh#190efdcd-c602-400e-a688-83a5e77c5c3a" |       | CHH01                                                                             | Child Health hub conducted MISSING Enhanced Services Admin |
 | "http://smartlifehealth.info/smh#b1d5904d-f528-4708-bed7-3e6ccaf4e2b1" |       | CHH02                                                                             | MISSING Patient Reported Experience Measure (PREM) offered |
 | "http://smartlifehealth.info/smh#9333ffd5-1b09-4b78-ac1e-fe35de1e4cfd" |       | CHH03                                                                             | MISSING MDT Review |
@@ -476,8 +476,8 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#018ad403-e670-4f7c-928b-acad2314ac21" |       | COF01-ES-PAYMENT-Insertion or replacement of LNG-IUD                              |
 | "http://smartlifehealth.info/smh#797bba5d-572a-4613-a56a-b0661fb38808" |       | Activity Level Report                                                             |
 | "http://smartlifehealth.info/smh#714163dd-421d-4c7b-a438-c64b88a3be75" |       | COF00 - Non-contraceptive indication                                              |
-| "http://smartlifehealth.info/smh#84e254e1-8a58-4151-a616-e4e2ff69d042" |       | Patient List -report                                                              |
-| "http://smartlifehealth.info/smh#670f0b87-b331-47cc-ab24-e54af82c4aba" |       | DL200-Patients who could be seen under MDT Review                                 |
+| "http://smartlifehealth.info/smh#84e254e1-8a58-4151-a616-e4e2ff69d042" | 3     | Patient List -report                                                              |
+| "http://smartlifehealth.info/smh#670f0b87-b331-47cc-ab24-e54af82c4aba" | 3     | DL200-Patients who could be seen under MDT Review                                 |
 | "http://smartlifehealth.info/smh#1747f6c7-2bde-432e-9bd9-196cee09a263" |       | DL203-ES-Patients Insulin Initiated (in this Financial Year)                      |
 | "http://smartlifehealth.info/smh#28d31bb3-9846-4fc5-b3b6-9ea31652901b" |       | DL205-ES-Patients with Insulin Optimisation/Intensification (in Financial Year)   |
 | "http://smartlifehealth.info/smh#c0f1e5d1-17be-408a-9eb1-86e8545c6ef5" |       | EMDL205 -report                                                                   |
@@ -492,9 +492,9 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#4a2a3d26-d0d8-4623-8313-55a157fbc055" |       | Activity Level Report                                                             |
 | "http://smartlifehealth.info/smh#77294490-ee7f-492b-a3ef-8cfc4771f89b" |       | MH1_REG - Psychosis, schizophrenia or bipolar diagnosis                           |
 | "http://smartlifehealth.info/smh#db003ef2-aa0d-48ab-bc77-c6bcfbaa4ae8" |       | LD004 - Patients on the learning disabilities register                            |
-| "http://smartlifehealth.info/smh#89f35362-fb54-40b0-92c3-8c193b33e8ff" |       | DM017 - Patients on Diabetes QOF Register (including deceased and deducted)       |
-| "http://smartlifehealth.info/smh#4f227531-005f-4293-99b0-ad35379c4f10" |       | DM017 - Patients on Diabetes QOF Register                                         |
-| "http://smartlifehealth.info/smh#9ca9a564-c9ce-4229-acdb-15e6fa0f0b7a" |       | CKD005 - Patients on the CKD register                                             |
+| "http://smartlifehealth.info/smh#89f35362-fb54-40b0-92c3-8c193b33e8ff" | 11    | DM017 - Patients on Diabetes QOF Register (including deceased and deducted)       |
+| "http://smartlifehealth.info/smh#4f227531-005f-4293-99b0-ad35379c4f10" | 12    | DM017 - Patients on Diabetes QOF Register                                         |
+| "http://smartlifehealth.info/smh#9ca9a564-c9ce-4229-acdb-15e6fa0f0b7a" | 1     | CKD005 - Patients on the CKD register                                             |
 | "http://smartlifehealth.info/smh#80595bad-55dd-4b7e-b3f0-411535f2f111" |       | DL200a- SMI Register - Patients with SMI (MH00)                                   |
 | "http://smartlifehealth.info/smh#09cbfefd-0e3f-4592-97b4-eb2af916baa5" |       | MH001 - Patients on the mental health register                                    |
 | "http://smartlifehealth.info/smh#034565eb-d09d-4247-b898-33da8fd72cc3" |       | DL208fD-ES-Patients initated or optimised on Insulin                              |
@@ -503,8 +503,8 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#4c0f3fdb-bdb8-45e6-8fdb-f3638a28497e" |       | DL200i-Patients in a Care Home and latest HbA1c > 58                              |
 | "http://smartlifehealth.info/smh#2bc4e486-1b2d-466a-a463-4425caca1a99" |       | DL200h-Housebound Patients and latest HbA1c > 58                                  |
 | "http://smartlifehealth.info/smh#e15f736a-75d5-46b9-89f3-24297f6e5cb5" |       | DL200g-Patients aged > 65 and on Diabetic Medication and latest HbA1c<48          |
-| "http://smartlifehealth.info/smh#b782cdc9-7344-45c1-8535-a49802f96466" |       | DL200f-Patients on CKD Register                                                   |
-| "http://smartlifehealth.info/smh#8d95ca33-a3d0-42c8-bbd1-2e1cd9a07ffd" |       | DL200e-Patients with CVD                                                          |
+| "http://smartlifehealth.info/smh#b782cdc9-7344-45c1-8535-a49802f96466" | 1     | DL200f-Patients on CKD Register                                                   |
+| "http://smartlifehealth.info/smh#8d95ca33-a3d0-42c8-bbd1-2e1cd9a07ffd" | 2     | DL200e-Patients with CVD                                                          |
 | "http://smartlifehealth.info/smh#ec43ae1b-fae8-4180-91b6-9e713ee53947" |       | DL200d-Patients on at least 3 Oral Diabetic Medication and latest HbA1c > 58      |
 | "http://smartlifehealth.info/smh#e0148765-c9ce-4ee9-ba11-c52bffafa4bb" |       | DL200c- Needle Phobia-Patients with Needle Phobia                                 |
 | "http://smartlifehealth.info/smh#55f4ddb7-825a-4880-9c93-ff548b103b68" |       | DL200b- Homeless Register - Patients who are homeless                             |
@@ -730,22 +730,22 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#68cce974-1c0b-4f2c-8247-c411752714c4" |       | MH05-ES-Patients with Smoking Status recorded (in FY)                             |
 | "http://smartlifehealth.info/smh#c763e689-3c4f-4a5e-8e5c-da084bfcea68" |       | MH06-ES-Patients with Alcohol Intake recorded (in FY)                             |
 | "http://smartlifehealth.info/smh#6a2fa481-4759-44fd-967e-0c5a314db4be" |       | MH07-ES-Patients with Substance Misuse recorded (in FY)                           |
-| "http://smartlifehealth.info/smh#e5edfe2e-718d-4462-b83e-316558413ca9" |       | MH08aa-MDS-Female patient aged 25-64 with no history of hysterectomy              |
+| "http://smartlifehealth.info/smh#e5edfe2e-718d-4462-b83e-316558413ca9" | 1767  | MH08aa-MDS-Female patient aged 25-64 with no history of hysterectomy              |
 | "http://smartlifehealth.info/smh#c4e79747-511e-41f7-850d-d22b4afc4957" |       | MH08ab-ES-Patients advised about Cervical Cancer Screening (in FY)                |
 | "http://smartlifehealth.info/smh#8d856c0a-2db7-41d4-8243-bb48cca80f11" |       | MH08bb-ES-Patients advised about Breast Cancer Screening (in FY)                  |
-| "http://smartlifehealth.info/smh#4779f482-4779-43e8-9790-1789433b1015" |       | MH08ba-ES-Female patient aged 50-70                                               |
-| "http://smartlifehealth.info/smh#e7e8d0f9-3f1b-4523-a6cf-921229535df0" |       | MH08a-ES-Patients with Cervical Cancer Screening advise OR not eligible (in FY)   |
-| "http://smartlifehealth.info/smh#9d26a9cc-271a-4e14-9261-38598fae30fb" |       | MH08b-ES-Patients with Breast Cancer Screening advise OR not eligible (in FY)     |
-| "http://smartlifehealth.info/smh#7528005b-2563-43b7-b254-cca7ab475a04" |       | MH08c-ES-Patients with Bowel Cancer Screening advise OR not eligible (in FY)      |
+| "http://smartlifehealth.info/smh#4779f482-4779-43e8-9790-1789433b1015" | 774   | MH08ba-ES-Female patient aged 50-70                                               |
+| "http://smartlifehealth.info/smh#e7e8d0f9-3f1b-4523-a6cf-921229535df0" | 4712  | MH08a-ES-Patients with Cervical Cancer Screening advise OR not eligible (in FY)   |
+| "http://smartlifehealth.info/smh#9d26a9cc-271a-4e14-9261-38598fae30fb" | 5705  | MH08b-ES-Patients with Breast Cancer Screening advise OR not eligible (in FY)     |
+| "http://smartlifehealth.info/smh#7528005b-2563-43b7-b254-cca7ab475a04" | 5430  | MH08c-ES-Patients with Bowel Cancer Screening advise OR not eligible (in FY)      |
 | "http://smartlifehealth.info/smh#6435fd94-8748-4997-9063-752bef6d115d" |       | MH08cb-NUM-Patients advised about Bowel Cancer Screening (in FY)                  |
-| "http://smartlifehealth.info/smh#df2f4f67-9f48-4a98-8358-d1ccf62dfbe6" |       | MH08ca-ES-Patients aged 60-74                                                     |
+| "http://smartlifehealth.info/smh#df2f4f67-9f48-4a98-8358-d1ccf62dfbe6" | 1049  | MH08ca-ES-Patients aged 60-74                                                     |
 | "http://smartlifehealth.info/smh#f3fd8630-9c1c-4431-b63d-37ca133db5a9" |       | MH13b-ES-Patients with Lithium Monitoring recorded twice (in FY)                  |
 | "http://smartlifehealth.info/smh#3264c99f-dec3-48c5-8d64-fb4b111f0c77" |       | MH13ba-ES-Patients with Serum Lithium recorded twice (in FY)                      |
 | "http://smartlifehealth.info/smh#ba2f5dd1-2230-4172-8c99-6459b57bd612" |       | MH13bb-ES-Patients with eGFR recorded twice (in FY)                               |
 | "http://smartlifehealth.info/smh#31274d4a-0fa7-45fe-a2c3-9dbf610280cc" |       | MH13bc-ES-Patients with Serum TSH recorded twice (in FY)                          |
 | "http://smartlifehealth.info/smh#f797b595-5caa-4132-b7c6-0742368d68e4" |       | MH13a-Lithium treatment with prescription in financial year                       |
-| "http://smartlifehealth.info/smh#7970cf31-3031-4b9c-bc68-76d1b2dedd7b" |       | MH08-ES-Patients with appropriate Cancer Screening Prompts recorded (in FY)       |
-| "http://smartlifehealth.info/smh#3129af5c-5961-4a04-a352-86bb2b0c7ea4" |       | MH13-ES-Patients with Lithium monitoring recorded twice OR not on Lithium(in FY)  |
+| "http://smartlifehealth.info/smh#7970cf31-3031-4b9c-bc68-76d1b2dedd7b" | 3877  | MH08-ES-Patients with appropriate Cancer Screening Prompts recorded (in FY)       |
+| "http://smartlifehealth.info/smh#3129af5c-5961-4a04-a352-86bb2b0c7ea4" | 6479  | MH13-ES-Patients with Lithium monitoring recorded twice OR not on Lithium(in FY)  |
 | "http://smartlifehealth.info/smh#8dcc6df6-4572-4b5c-a4ab-8893a5be75ba" |       | MH02-ES-Patients with Blood pressure recorded (in FY)                             |
 | "http://smartlifehealth.info/smh#3a49e440-41b3-4bbd-8967-d70369556792" |       | MH09a-ES-Patients with RaSWP recorded (in FY)                                     |
 | "http://smartlifehealth.info/smh#fc17c357-1068-4062-a606-758ed1212532" |       | MH09b-ES-Patients with Signs Unwell recorded (in FY)                              |
@@ -754,14 +754,14 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#0b64ff55-5381-4756-be3f-8770fbf449ab" |       | MH09e-ES-Patients with Patient Goals recorded (in FY)                             |
 | "http://smartlifehealth.info/smh#ce3bbffd-094c-4393-9818-dd151e2fd7fe" |       | MH10-ES-Patients with Medication Review recorded (in FY)                          |
 | "http://smartlifehealth.info/smh#1120aa1e-4723-4da9-9928-53120bdfa196" |       | MH11a-ES-Patients with Serum Cholesterol AND on Anti Psychotics (in FY)           |
-| "http://smartlifehealth.info/smh#9d4dba41-6492-4736-99fd-ed8ae5a9d902" |       | MH11c-ES-Patients aged under 35 yrs NOT on Anti Psychotics                        |
-| "http://smartlifehealth.info/smh#5e284a71-0371-499e-b19c-4ff5074ae062" |       | MH11-ES-Patients with Serum Cholesterol recorded                                  |
+| "http://smartlifehealth.info/smh#9d4dba41-6492-4736-99fd-ed8ae5a9d902" | 1409  | MH11c-ES-Patients aged under 35 yrs NOT on Anti Psychotics                        |
+| "http://smartlifehealth.info/smh#5e284a71-0371-499e-b19c-4ff5074ae062" | 1422  | MH11-ES-Patients with Serum Cholesterol recorded                                  |
 | "http://smartlifehealth.info/smh#b1cc587e-1a28-403d-812f-86bbade71959" |       | MH12a-ES-Patients with HbA1c/Blood Glucose AND on Anti-Psychotics (in FY)         |
-| "http://smartlifehealth.info/smh#ecaea468-928c-4590-9d66-ad83dcb62178" |       | MH12b-ES-HbA1c/Blood Glucose NOT on Anti-Psychotics aged over 35 yrs(last 3yrs)   |
-| "http://smartlifehealth.info/smh#f5756947-48da-4e29-955d-c829eaf99e5d" |       | MH12-ES-Patients with HbA1c/Blood Glucose recorded                                |
+| "http://smartlifehealth.info/smh#ecaea468-928c-4590-9d66-ad83dcb62178" | 33    | MH12b-ES-HbA1c/Blood Glucose NOT on Anti-Psychotics aged over 35 yrs(last 3yrs)   |
+| "http://smartlifehealth.info/smh#f5756947-48da-4e29-955d-c829eaf99e5d" | 1422  | MH12-ES-Patients with HbA1c/Blood Glucose recorded                                |
 | "http://smartlifehealth.info/smh#734ccc18-e9f8-4b7c-b369-e3e62701d425" |       | MH15-ES-Patients with Follow Up recorded (in FY)                                  |
-| "http://smartlifehealth.info/smh#8bc47b84-e4f6-4175-8d0d-b7f8c98c5024" |       | MH11b-ES-Serum Cholesterol NOT on Anti Psychotics aged over 35 yrs(in last 3yrs)  |
-| "http://smartlifehealth.info/smh#f3a755b5-7e2e-4d5f-b837-75c69baac080" |       | MH12c-ES-Patients aged under 3yrs NOT on Anti-Psychotics (last 3yrs)              |
+| "http://smartlifehealth.info/smh#8bc47b84-e4f6-4175-8d0d-b7f8c98c5024" | 31    | MH11b-ES-Serum Cholesterol NOT on Anti Psychotics aged over 35 yrs(in last 3yrs)  |
+| "http://smartlifehealth.info/smh#f3a755b5-7e2e-4d5f-b837-75c69baac080" | 1409  | MH12c-ES-Patients aged under 3yrs NOT on Anti-Psychotics (last 3yrs)              |
 | "http://smartlifehealth.info/smh#87d5b56c-4856-491d-93fb-307e02f04448" |       | MH15a-ES-Patients with Annual Review and Follow Up recorded on the same day       |
 | "http://smartlifehealth.info/smh#ba94507d-ba09-4e28-b6cc-e42d79441605" |       | SMI Report                                                                        |
 | "http://smartlifehealth.info/smh#2abe06a7-7667-49f9-b3e3-c0504ad40726" |       | CCMI Report                                                                       |
@@ -960,22 +960,22 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#ed3183e4-ea96-4ffe-9739-3e5ad01d87bb" |       | RESP01Nf-Physical Activity (in Financial Year)                                    |
 | "http://smartlifehealth.info/smh#220c45c0-5fa6-43d8-a8e9-9e700d607e87" |       | RESP01Ng-Support for Psychosocial wellbeing (in Financial Year)                   |
 | "http://smartlifehealth.info/smh#f0d562b7-c952-4676-8740-94a3c66b8bd0" |       | RESP01Nh-Education and self-management (in Financial Year)                        |
-| "http://smartlifehealth.info/smh#38db632c-ec09-4a58-8bcf-e9264df194ad" |       | RESP02D-ES-DEN-Patients in Asthma or COPD registers                               |
-| "http://smartlifehealth.info/smh#731b3654-8e8e-447d-8a91-d7b5a81ae255" |       | EMRESP02D -report                                                                 |
+| "http://smartlifehealth.info/smh#38db632c-ec09-4a58-8bcf-e9264df194ad" | 7     | RESP02D-ES-DEN-Patients in Asthma or COPD registers                               |
+| "http://smartlifehealth.info/smh#731b3654-8e8e-447d-8a91-d7b5a81ae255" | 7     | EMRESP02D -report                                                                 |
 | "http://smartlifehealth.info/smh#9e78ca11-55b0-4f32-a893-8d02496f61d8" |       | RESP02N-ES-NUM-Patients with Inhaler Technique recorded (in Financial Yr)         |
-| "http://smartlifehealth.info/smh#aed0bf72-d448-41f2-97a9-9b1c921b2893" |       | RESP02-NHS NUMBERS-Patient level report                                           |
+| "http://smartlifehealth.info/smh#aed0bf72-d448-41f2-97a9-9b1c921b2893" | 7     | RESP02-NHS NUMBERS-Patient level report                                           |
 | "http://smartlifehealth.info/smh#8fcb4c7d-5e5a-48ef-851e-3dafb5aebe0e" |       | RESP03D-ES-DEN-Asthma patients aged 12 and over diagnosed in last 12 months       |
 | "http://smartlifehealth.info/smh#a83e4666-a1d0-4c2a-a6eb-0635af0eb31b" |       | EMRESP03D -report                                                                 |
 | "http://smartlifehealth.info/smh#4f22ddcc-5427-4af3-97fb-e45f5b993d7e" |       | RESP03N-ES-NUM-Initiated on MART or AIR Inhaled Therapy                           |
 | "http://smartlifehealth.info/smh#5a3ef6af-19f6-44e5-a338-0719b83eff9a" |       | RESP03-NHS NUMBERS-Activity level report                                          |
 | "http://smartlifehealth.info/smh#a8b24472-361f-4523-9b14-f13cd17cc053" |       | RESP01D-Antibiotics and prednisolone 5mg tablets issued same day(after 01/04/24)  |
-| "http://smartlifehealth.info/smh#3e41aecc-0868-4a7f-8160-7ca92bfa04ad" |       | COPD015 - Patients on the COPD register                                           |
+| "http://smartlifehealth.info/smh#3e41aecc-0868-4a7f-8160-7ca92bfa04ad" | 7     | COPD015 - Patients on the COPD register                                           |
 | "http://smartlifehealth.info/smh#b9d3c519-922f-40ec-8c69-bc7621a12b04" |       | AST005 - Patients on the asthma register                                          |
 | "http://smartlifehealth.info/smh#61009bab-edcd-4891-b101-579c3c8161be" |       | AST005 - Diagnosed with asthma in financial year and aged 12 and over             |
 | "http://smartlifehealth.info/smh#5dacf49f-dc51-45e9-a260-8eca7a7e63bf" |       | RESP01D-Antibiotics and prednisolone 5mg tablets issued same day in last 12m      |
 | "http://smartlifehealth.info/smh#1385b140-81b3-49f3-9b87-a16bffdad423" |       | COPD015a-Earliest unresolved COPD diagnosis                                       |
 | "http://smartlifehealth.info/smh#8b5ead71-85c8-4461-b5c3-396d5b7c22b8" |       | COPD015b-Unresolved COPD Diagnosis, spirometry below 0.7 after registration       |
-| "http://smartlifehealth.info/smh#7cdd6228-4d21-4881-b1f7-0e40af35028f" |       | COPD01-Patients diagnosed with COPD                                               |
+| "http://smartlifehealth.info/smh#7cdd6228-4d21-4881-b1f7-0e40af35028f" | 462   | COPD01-Patients diagnosed with COPD                                               |
 | "http://smartlifehealth.info/smh#82e1da77-1ce0-41ee-9ddd-47b43da45921" |       | R01-ES-Ring Pessary Consultations MISSING Enhanced Services Admin Code            |
 | "http://smartlifehealth.info/smh#94662757-7d86-4182-8ba8-a04a1b341016" |       | Anonymised - DQ Report - POTENTIAL missing Enhanced Services Admin code           |
 | "http://smartlifehealth.info/smh#7d6f158f-a35f-4e8a-a27b-f23905daf746" |       | NHS Numbers - DQ Report - POTENTIAL missing Enhanced Services Admin code          |
@@ -1116,7 +1116,7 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#a16b9fb0-459c-4fe1-9d0c-0d05090b86c8" |       | CMC001 -report                                                                    |
 | "http://smartlifehealth.info/smh#cd9c55ca-2516-4b5c-978a-bddb9dc3d37d" |       | CRM01BD                                                                           | CKD | DENOMINATOR | Patients who are likely to have CKD |
 | "http://smartlifehealth.info/smh#fe7bf3df-d775-4ab3-983a-ae062a07147d" |       | CRM01CD                                                                           | DM | DENOMINATOR | HbA1c>=48 OR Fructosamine>=228 | NOT on DM register |
-| "http://smartlifehealth.info/smh#cdc6bb06-f4b3-491f-aef7-40681de4d6b1" |       | CRM01AD                                                                           | AF | DENOMINATOR | Eligible for ECG or Pulse Rhythm Check |
+| "http://smartlifehealth.info/smh#cdc6bb06-f4b3-491f-aef7-40681de4d6b1" | 16    | CRM01AD                                                                           | AF | DENOMINATOR | Eligible for ECG or Pulse Rhythm Check |
 | "http://smartlifehealth.info/smh#40bc86ae-f304-4ca5-80d6-6080de025ea5" |       | CRM01B                                                                            | ACHIEVEMENT | Patients diagnosed and coded with CKD (in FY) |
 | "http://smartlifehealth.info/smh#0063511e-16f4-43be-8563-7bd63978e654" |       | NHS NUMBERS                                                                       | EMCRM01B | CKD Detection -report |
 | "http://smartlifehealth.info/smh#b104446e-5993-4e78-a6e6-65aa02d7b076" |       | CRM01ED                                                                           | NDH | DENOMINATOR | HbA1c>=42 & < 48 AND NO DM or NDH Diagnosis |
@@ -1124,7 +1124,7 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#da46765e-8589-42b5-aaba-0ec008597eb4" |       | NHS NUMBERS                                                                       | EMCRM01C | Diabetes detection -report |
 | "http://smartlifehealth.info/smh#ab7189f0-524a-4d2b-945b-b54ea0db3aac" |       | CRM01DD                                                                           | HYP | DEN | BP>=140/90 or DABP>=135/85 & AGED <80 or No Mod/Sev Frail |
 | "http://smartlifehealth.info/smh#1b55be61-78dc-42dd-81ce-580ac1f5b161" |       | CRM01A                                                                            | AF | ACHIEVEMENT | THIS FY | ECG or Pulse Rhythm recorded |
-| "http://smartlifehealth.info/smh#53910aef-0ae4-4e90-a006-7f2ae520fe8b" |       | NHS NUMBERS                                                                       | EMCRM01A | AF screening -report |
+| "http://smartlifehealth.info/smh#53910aef-0ae4-4e90-a006-7f2ae520fe8b" | 16    | NHS NUMBERS                                                                       | EMCRM01A | AF screening -report |
 | "http://smartlifehealth.info/smh#524524bd-728d-4e9a-9d61-f5651e38a6f4" |       | CRM01E                                                                            | NDH | ACHIEVEMENT | THIS FY | NDH or Diabetes Diagnosis or HbA1c<42 |
 | "http://smartlifehealth.info/smh#5d168c13-4de6-4bcd-aec8-8bf07f59badb" |       | NHS NUMBERS                                                                       | EMCRM01ED | NDH Detection -report |
 | "http://smartlifehealth.info/smh#9a8d2523-8fa5-4aed-8c3b-d11872d5ae3b" |       | Moderate/Severe Frailty or aged >= 80                                             |
@@ -1132,52 +1132,52 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#f3c999dc-4db6-4ded-b61a-d7461b1f3c9d" |       | NHS NUMBERS                                                                       | EMCRM01D | Hypertension Detection -report |
 | "http://smartlifehealth.info/smh#24d9f66d-5b8d-41bc-bb93-028567502746" |       | NHS NUMBERS                                                                       | EMCRM01D | Hypertension Detection -report |
 | "http://smartlifehealth.info/smh#4b94a398-7b14-4895-b29f-9a59cbf5b206" |       | CRM01D                                                                            | HYP | ACHIEVEMENT | BP>=140/90 & HYP OR BP<130/80 OR DABP<135/85 |
-| "http://smartlifehealth.info/smh#eb1c3b3d-2ec3-40a5-a5a2-a45d161d2f77" |       | *CRM02D                                                                           | DENOMINATOR | Patients on CRM Register |
+| "http://smartlifehealth.info/smh#eb1c3b3d-2ec3-40a5-a5a2-a45d161d2f77" | 38    | *CRM02D                                                                           | DENOMINATOR | Patients on CRM Register |
 | "http://smartlifehealth.info/smh#7108c178-80f7-4a06-9049-5c0b7c2fc6d9" |       | CRM02a                                                                            | All CRM | LAST 15M | HbA1c |
 | "http://smartlifehealth.info/smh#b7030c38-e670-4f8f-8e95-e5bee764ae23" |       | CRM02b                                                                            | All CRM | LAST 15M | Blood Pressure |
 | "http://smartlifehealth.info/smh#4d241291-113b-44cd-bb0b-9c8abf1c7cba" |       | CRM02c                                                                            | All CRM | LAST 15M | Lipids |
 | "http://smartlifehealth.info/smh#0b116753-228a-4ee8-b8b5-171310fced17" |       | CRM02d                                                                            | All CRM | LAST 15M | Urine ACR |
 | "http://smartlifehealth.info/smh#23ad5912-0415-43e1-bc0c-32f89d0c164a" |       | CRM02e                                                                            | All CRM | LAST 15M | eGFR |
-| "http://smartlifehealth.info/smh#9051c4a8-6de4-4991-8802-a5a5c0e63388" |       | CRM02f                                                                            | All CRM | LAST 15M | BMI |
+| "http://smartlifehealth.info/smh#9051c4a8-6de4-4991-8802-a5a5c0e63388" | 63    | CRM02f                                                                            | All CRM | LAST 15M | BMI |
 | "http://smartlifehealth.info/smh#a5fc2f35-90cc-412c-a937-015599ec0f0f" |       | CRM02g                                                                            | All CRM | LAST 15M | Waist circumference |
 | "http://smartlifehealth.info/smh#48c6e455-8d4d-4f1c-b420-4a1bfaef7afb" |       | CRM02h                                                                            | All CRM | LAST 15M | Smoking Status |
-| "http://smartlifehealth.info/smh#f381fe5e-fb8a-4db7-a7f8-5f2c70b0704d" |       | Diabetic Patients                                                                 |
+| "http://smartlifehealth.info/smh#f381fe5e-fb8a-4db7-a7f8-5f2c70b0704d" | 11    | Diabetic Patients                                                                 |
 | "http://smartlifehealth.info/smh#c53eb4fa-e396-4344-927e-869ed33f52ba" |       | Metabolic dysfunction-associated steototic disease patients                       |
-| "http://smartlifehealth.info/smh#b215b447-bcb6-4fb4-aa0c-8a2282c52e8b" |       | CRM02i                                                                            | Diabetes & Mental Health Screening in last 15m OR No Diabetes |
-| "http://smartlifehealth.info/smh#06090663-d981-40db-81b8-ebf85bd33bb8" |       | CRM02j                                                                            | Diabetes & Right & Left Feet Risk Checks in last 15m OR No Diabetes |
-| "http://smartlifehealth.info/smh#0ff746d6-1145-4ee6-b6d7-9b8e9a79f847" |       | CRM02k                                                                            | Diabetes and Retinal Screening in last 27m OR No Diabetes |
-| "http://smartlifehealth.info/smh#7c3dc9f9-5625-4c78-bb66-1f45564a7c87" |       | CRM02l                                                                            | Diabetes or MASLD & FIB-4 in last 39m OR NO Diabetes or MASLD |
-| "http://smartlifehealth.info/smh#19e97ed5-d353-4240-9714-4f4711c4e98f" |       | NO Diabetes or Metabolic dysfunction-associated steototic disease                 |
-| "http://smartlifehealth.info/smh#72e59e7d-e600-4c61-9d31-bf1f402ac69c" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes (more detailed) -report |
+| "http://smartlifehealth.info/smh#b215b447-bcb6-4fb4-aa0c-8a2282c52e8b" | 27    | CRM02i                                                                            | Diabetes & Mental Health Screening in last 15m OR No Diabetes |
+| "http://smartlifehealth.info/smh#06090663-d981-40db-81b8-ebf85bd33bb8" | 27    | CRM02j                                                                            | Diabetes & Right & Left Feet Risk Checks in last 15m OR No Diabetes |
+| "http://smartlifehealth.info/smh#0ff746d6-1145-4ee6-b6d7-9b8e9a79f847" | 27    | CRM02k                                                                            | Diabetes and Retinal Screening in last 27m OR No Diabetes |
+| "http://smartlifehealth.info/smh#7c3dc9f9-5625-4c78-bb66-1f45564a7c87" | 27    | CRM02l                                                                            | Diabetes or MASLD & FIB-4 in last 39m OR NO Diabetes or MASLD |
+| "http://smartlifehealth.info/smh#19e97ed5-d353-4240-9714-4f4711c4e98f" | 27    | NO Diabetes or Metabolic dysfunction-associated steototic disease                 |
+| "http://smartlifehealth.info/smh#72e59e7d-e600-4c61-9d31-bf1f402ac69c" | 22    | NHS NUMBERS                                                                       | CRM02 | Key Care Processes (more detailed) -report |
 | "http://smartlifehealth.info/smh#ce5d6b25-3660-4990-9a24-b7fd41ae0ba6" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes (more detailed) -report |
 | "http://smartlifehealth.info/smh#2b581c35-3b9d-4f32-b9eb-8ec1da84dfaa" |       | CRM02                                                                             | ACHIEVEMENT | Care Process Completed |
-| "http://smartlifehealth.info/smh#bdb82bcc-aa2f-49f1-9216-e37ab31657b4" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes (more detailed) -report |
-| "http://smartlifehealth.info/smh#e2be2c3d-2be1-48f4-a4c3-ab667e991dec" |       | *CRM03D                                                                           | DENOMINATOR | CKD, Diabetes or Hypertension |
-| "http://smartlifehealth.info/smh#3372f17f-6c94-445b-a27d-a5292ea696fd" |       | Patients with Moderate or Severe Frailty or aged >= 80                            |
-| "http://smartlifehealth.info/smh#8ef17baa-921c-4f4e-a4ce-84b168bd75be" |       | Patients with no Moderate or Severe Frailty or aged < 80                          |
+| "http://smartlifehealth.info/smh#bdb82bcc-aa2f-49f1-9216-e37ab31657b4" | 35    | NHS NUMBERS                                                                       | CRM02 | Key Care Processes (more detailed) -report |
+| "http://smartlifehealth.info/smh#e2be2c3d-2be1-48f4-a4c3-ab667e991dec" | 11    | *CRM03D                                                                           | DENOMINATOR | CKD, Diabetes or Hypertension |
+| "http://smartlifehealth.info/smh#3372f17f-6c94-445b-a27d-a5292ea696fd" | 1     | Patients with Moderate or Severe Frailty or aged >= 80                            |
+| "http://smartlifehealth.info/smh#8ef17baa-921c-4f4e-a4ce-84b168bd75be" | 10    | Patients with no Moderate or Severe Frailty or aged < 80                          |
 | "http://smartlifehealth.info/smh#a1a01836-55af-409b-a9e1-7c42368fa21a" |       | CRM03A                                                                            | NOT FRAIL or AGED < 80 | LAST 15M | Latest BP <= 130/80 |
 | "http://smartlifehealth.info/smh#1eff98d6-7b0e-44dc-ba39-47a5482295af" |       | CRM03B                                                                            | FRAIL or AGED >= 80 | LAST 15M | Latest BP <= 150/90 |
-| "http://smartlifehealth.info/smh#33006f69-9142-4b4e-bddc-23e7544ac54d" |       | CRM03                                                                             | NHS NUMBERS | Blood Pressure Checklist -report |
-| "http://smartlifehealth.info/smh#f39554b9-bcea-4dcf-8d87-ab1ab56dcee1" |       | CRM03                                                                             | NHS NUMBERS | Blood Pressure Checklist -report |
+| "http://smartlifehealth.info/smh#33006f69-9142-4b4e-bddc-23e7544ac54d" | 1     | CRM03                                                                             | NHS NUMBERS | Blood Pressure Checklist -report |
+| "http://smartlifehealth.info/smh#f39554b9-bcea-4dcf-8d87-ab1ab56dcee1" | 10    | CRM03                                                                             | NHS NUMBERS | Blood Pressure Checklist -report |
 | "http://smartlifehealth.info/smh#cdaa600f-9d91-4656-993b-18b425e490ed" |       | *CRM03                                                                            | ACHIEVEMENT | LAST 15M | Latest BP <= appropriate target |
-| "http://smartlifehealth.info/smh#caed1a83-81ad-4045-8201-bcaeb0a8378c" |       | CRM04D                                                                            | DEN | Either CKD, CVD, DM, HF or AF, HYP, MASLD NDH & QRISK>10% |
+| "http://smartlifehealth.info/smh#caed1a83-81ad-4045-8201-bcaeb0a8378c" | 37    | CRM04D                                                                            | DEN | Either CKD, CVD, DM, HF or AF, HYP, MASLD NDH & QRISK>10% |
 | "http://smartlifehealth.info/smh#f9e1fe78-a94c-466e-b7fb-a6b9fdcfd0fa" |       | CRM04                                                                             | ACHIEVEMENT | LAST 6M | Moderate or High Intensity Statin |
-| "http://smartlifehealth.info/smh#04f8a9e8-0055-4238-acfa-8094ebbfa0e9" |       | NHS NUMBERS                                                                       | CRM04 | Moderate or High Intensity statins -report |
-| "http://smartlifehealth.info/smh#bfca7ab3-eb98-4f5d-94d7-7f45eb521a93" |       | CRM05D                                                                            | CKD & uACR >= 30 OR Diabetes & uACR >= 3 or eGFR < 60 |
+| "http://smartlifehealth.info/smh#04f8a9e8-0055-4238-acfa-8094ebbfa0e9" | 37    | NHS NUMBERS                                                                       | CRM04 | Moderate or High Intensity statins -report |
+| "http://smartlifehealth.info/smh#bfca7ab3-eb98-4f5d-94d7-7f45eb521a93" | 1     | CRM05D                                                                            | CKD & uACR >= 30 OR Diabetes & uACR >= 3 or eGFR < 60 |
 | "http://smartlifehealth.info/smh#ff2a2d71-fb03-4379-aba5-3fa1374ec046" |       | CRM05                                                                             | ACHIEVE | LAST 6M | ACE inhibitor/Angiotensin Receptor Blocker |
-| "http://smartlifehealth.info/smh#50a1c728-d533-44ca-b90f-0529f5b0aa04" |       | NHS NUMBERS                                                                       | CRM05 | ACE Inhibitor/Angiotensin Receptor Blocker -report |
+| "http://smartlifehealth.info/smh#50a1c728-d533-44ca-b90f-0529f5b0aa04" | 1     | NHS NUMBERS                                                                       | CRM05 | ACE Inhibitor/Angiotensin Receptor Blocker -report |
 | "http://smartlifehealth.info/smh#b4d81b9c-8e13-4dcc-8bc0-dce4e6054d4b" |       | CRM06D                                                                            | CKD & eGFR btwn 20&45 OR CKD & uACR>=22.6 & eGFR btn 45&90 OR T2D OR HF |
 | "http://smartlifehealth.info/smh#366f7a8d-ff95-414b-bda2-857301b5264a" |       | CRM06N                                                                            | ACHIEVE | LAST 6M | SGLT-2 inhibitors |
 | "http://smartlifehealth.info/smh#1dae5ade-7c1f-48a0-85f5-6b2d5d8dc707" |       | NHS NUMBERS                                                                       | CRM06 | SGLT-2 inhibitors -report |
-| "http://smartlifehealth.info/smh#82b3b158-ccd2-439e-a763-b54734f535e9" |       | CRM07D                                                                            | DEN | Groups 1 or 2 CRM |
+| "http://smartlifehealth.info/smh#82b3b158-ccd2-439e-a763-b54734f535e9" | 35    | CRM07D                                                                            | DEN | Groups 1 or 2 CRM |
 | "http://smartlifehealth.info/smh#38dec5e0-8d0b-4efa-987c-e98292707fc8" |       | CRM07a                                                                            | LAST 15M | Care Plan |
-| "http://smartlifehealth.info/smh#8553a2f5-6270-47c6-9f8c-322da32c0f03" |       | CRM07b                                                                            | LAST 15M | Eat |
+| "http://smartlifehealth.info/smh#8553a2f5-6270-47c6-9f8c-322da32c0f03" | 2     | CRM07b                                                                            | LAST 15M | Eat |
 | "http://smartlifehealth.info/smh#986963e8-bc12-4153-bc02-b27f0e82f29e" |       | CRM07c                                                                            | LAST 15M | Physical Activity |
 | "http://smartlifehealth.info/smh#45570161-959b-43a0-80e3-bdd8f8d74f01" |       | CRM07d                                                                            | LAST 15M | Sleep Pattern |
 | "http://smartlifehealth.info/smh#b937b240-02ca-4981-8152-d28743d8dae8" |       | CRM07e                                                                            | LAST 15M | Relax |
 | "http://smartlifehealth.info/smh#6798a54a-9819-4e88-82d1-b65562075e81" |       | CRM07f                                                                            | LAST 15M | Connect |
 | "http://smartlifehealth.info/smh#17d41241-c9db-4007-91fe-61f4b2f110d5" |       | CRM07g                                                                            | LAST 15M | Avoid harmful substances |
-| "http://smartlifehealth.info/smh#95114e7c-6389-49b5-a863-3c1ddd85f4b9" |       | NHS NUMBERS                                                                       | CRM07 | Holistic Care Plan -report |
+| "http://smartlifehealth.info/smh#95114e7c-6389-49b5-a863-3c1ddd85f4b9" | 46    | NHS NUMBERS                                                                       | CRM07 | Holistic Care Plan -report |
 | "http://smartlifehealth.info/smh#a9aa276f-9b81-4516-9eee-8f145e490cb2" |       | CRM07                                                                             | ACHIEVEMENT | LAST 15M | Holistic Care Plan completed |
 | "http://smartlifehealth.info/smh#d7fac25c-d35a-460a-af46-0fc02aafaaf2" |       | CRM08AD                                                                           | Groups 1 or 2 | DEN | Earliest Inactive or moderate inactive |
 | "http://smartlifehealth.info/smh#1fed0619-0176-42dc-a0a1-9bf270ead7b0" |       | CRM08BD                                                                           | Groups 1 or 2 | DEN | Earliest BMI |
@@ -1190,19 +1190,19 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#224bf28c-1960-45f8-b7aa-47c8a667a4df" |       | CRM08C                                                                            | ACHIEVEMENT | Latest Non-Smoker or Ex-Smoker |
 | "http://smartlifehealth.info/smh#ee61cd31-4b8c-4006-9388-9b810f6960f9" |       | NHS NUMBERS                                                                       | CRM08C | Smoking -report |
 | "http://smartlifehealth.info/smh#08c83240-3567-411b-9706-4e1fef2ff7db" |       | CRM08                                                                             | ACHIEVEMENT | Improvement in Exercise status, BMI or Smoker |
-| "http://smartlifehealth.info/smh#7b4c8c67-cbd9-4bf4-9433-f665ecf65776" |       | Age80+                                                                            |
-| "http://smartlifehealth.info/smh#1afe95ec-cc9a-44e0-b5e5-0a83ddfa41a0" |       | 08. Upload 1of1 NWL CRM 08IHF v3.260814 -report                                   |
-| "http://smartlifehealth.info/smh#631983cd-4ba9-415f-8a98-c3447df6df28" |       | CRM09D                                                                            | DEN | Groups 1 or 2 |
+| "http://smartlifehealth.info/smh#7b4c8c67-cbd9-4bf4-9433-f665ecf65776" | 300   | Age80+                                                                            |
+| "http://smartlifehealth.info/smh#1afe95ec-cc9a-44e0-b5e5-0a83ddfa41a0" | 300   | 08. Upload 1of1 NWL CRM 08IHF v3.260814 -report                                   |
+| "http://smartlifehealth.info/smh#631983cd-4ba9-415f-8a98-c3447df6df28" | 35    | CRM09D                                                                            | DEN | Groups 1 or 2 |
 | "http://smartlifehealth.info/smh#b81d2d71-20b2-4d32-a953-a51e6881ff0e" |       | CRM09                                                                             | ACHIEVEMENT | 2 Health Confidence Score recorded at least 1 month apart |
-| "http://smartlifehealth.info/smh#4271685e-d567-4615-9515-2c73f76d5558" |       | NHS NUMBERS                                                                       | CRM09 | 2 Health Confidence Scores -report |
-| "http://smartlifehealth.info/smh#c2ba2f3c-a9e6-4217-bbb9-4417344eea65" |       | CRM10                                                                             | DENOMINATOR | Diabetes QOF Register |
+| "http://smartlifehealth.info/smh#4271685e-d567-4615-9515-2c73f76d5558" | 35    | NHS NUMBERS                                                                       | CRM09 | 2 Health Confidence Scores -report |
+| "http://smartlifehealth.info/smh#c2ba2f3c-a9e6-4217-bbb9-4417344eea65" | 11    | CRM10                                                                             | DENOMINATOR | Diabetes QOF Register |
 | "http://smartlifehealth.info/smh#2124bcd3-e7ee-4f18-bc85-d8c9826c42b6" |       | CRM10b                                                                            | NUMERATOR | LAST 15M | Latest BP <= appropriate target |
 | "http://smartlifehealth.info/smh#39d2e9f0-2295-44a3-85ae-4bf65f59da33" |       | CRM10c                                                                            | NUMERATOR | LAST 15M | Latest Non HDL Cholesterol Ratio<=3 |
-| "http://smartlifehealth.info/smh#9bf6a123-4647-4771-b477-a21c7a31a703" |       | Patients with Moderate/Severe Frailty or aged >= 80                               |
-| "http://smartlifehealth.info/smh#cef34a38-2d60-4a89-9732-b808139c791e" |       | Patients with no Moderate/Severe Frailty or aged < 80                             |
+| "http://smartlifehealth.info/smh#9bf6a123-4647-4771-b477-a21c7a31a703" | 1     | Patients with Moderate/Severe Frailty or aged >= 80                               |
+| "http://smartlifehealth.info/smh#cef34a38-2d60-4a89-9732-b808139c791e" | 10    | Patients with no Moderate/Severe Frailty or aged < 80                             |
 | "http://smartlifehealth.info/smh#cdaeb57a-d65d-42c7-b316-126afe65314c" |       | CRM10a                                                                            | NUMERATOR | LAST 15M | Latest HbA1c <= appropriate target |
-| "http://smartlifehealth.info/smh#c86d41b9-54d4-4186-9462-fcd7a0d02f30" |       | NHS NUMBERS                                                                       | Patients with 3 Treatment Targets Checklist -report |
-| "http://smartlifehealth.info/smh#de8a44a1-984c-4497-a0d5-af1aa63716d9" |       | NHS NUMBERS                                                                       | Patients with 3 Treatment Targets Checklist -report |
+| "http://smartlifehealth.info/smh#c86d41b9-54d4-4186-9462-fcd7a0d02f30" | 1     | NHS NUMBERS                                                                       | Patients with 3 Treatment Targets Checklist -report |
+| "http://smartlifehealth.info/smh#de8a44a1-984c-4497-a0d5-af1aa63716d9" | 10    | NHS NUMBERS                                                                       | Patients with 3 Treatment Targets Checklist -report |
 | "http://smartlifehealth.info/smh#674937e0-3b94-4505-91b1-27fab2d23243" |       | *CRM10                                                                            | ACHIEVEMENT | 3 Treatment Targets Achieved |
 | "http://smartlifehealth.info/smh#68a42cea-d72a-4cdb-a0ae-ce3833ce9648" |       | CRM11D                                                                            | DENOMINATOR | Aged | 17-70 | Diabetic patients diagnosed in last 2 yrs |
 | "http://smartlifehealth.info/smh#548b4cd5-9511-4520-9b1d-40dca824ec26" |       | CRM11N                                                                            | ACHIEVED | LAST 15M | Latest HbA1c <= 48 |
@@ -1210,20 +1210,20 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#8c629b89-9400-4182-aa31-b3d33dbeb27e" |       | CRM12D                                                                            | DENOMINATOR | Hypertension | Aged < 80 | Black & Black British patients |
 | "http://smartlifehealth.info/smh#29cae157-20ac-480b-a47c-23044dc12b4a" |       | CRM12N                                                                            | ACHIEVED | LAST 12M | Latest BP <= 130/80 |
 | "http://smartlifehealth.info/smh#166af6a4-9186-4b0f-9ff0-7249a04747c3" |       | NHS NUMBERS                                                                       | Patient level report |
-| "http://smartlifehealth.info/smh#9d740916-3c6c-4e9e-90ae-7da2d23213c7" |       | AF001 -report                                                                     |
-| "http://smartlifehealth.info/smh#4f1dc7d5-159f-4359-89bb-d04b82650b80" |       | CHD001 -report                                                                    |
-| "http://smartlifehealth.info/smh#46d29a2c-dddf-44f1-9bc2-bd271d697f42" |       | CKD005 -report                                                                    |
-| "http://smartlifehealth.info/smh#4a41c877-d230-42fb-82e9-5701edcd3190" |       | DM017 -report                                                                     |
-| "http://smartlifehealth.info/smh#ecbad19a-1cc7-4533-b2b8-79931a1ba3a1" |       | DM017 - Female                                                                    |
-| "http://smartlifehealth.info/smh#2640b121-c57b-41af-9483-fdd358f31b34" |       | DM017 - Male                                                                      |
+| "http://smartlifehealth.info/smh#9d740916-3c6c-4e9e-90ae-7da2d23213c7" | 1     | AF001 -report                                                                     |
+| "http://smartlifehealth.info/smh#4f1dc7d5-159f-4359-89bb-d04b82650b80" | 32    | CHD001 -report                                                                    |
+| "http://smartlifehealth.info/smh#46d29a2c-dddf-44f1-9bc2-bd271d697f42" | 1     | CKD005 -report                                                                    |
+| "http://smartlifehealth.info/smh#4a41c877-d230-42fb-82e9-5701edcd3190" | 11    | DM017 -report                                                                     |
+| "http://smartlifehealth.info/smh#ecbad19a-1cc7-4533-b2b8-79931a1ba3a1" | 3     | DM017 - Female                                                                    |
+| "http://smartlifehealth.info/smh#2640b121-c57b-41af-9483-fdd358f31b34" | 8     | DM017 - Male                                                                      |
 | "http://smartlifehealth.info/smh#6fbe9c9f-01ba-4df6-a3e5-040afb890490" |       | HF1 -report                                                                       |
 | "http://smartlifehealth.info/smh#5f92bdac-6b0c-4bcd-86ea-a4519de8316e" |       | HYP001 - Female                                                                   |
 | "http://smartlifehealth.info/smh#4e994020-323b-4d14-8356-ead748463dc3" |       | HYP001 - Male                                                                     |
 | "http://smartlifehealth.info/smh#720f7ee9-84b8-4227-a2d6-6708eb5c8d58" |       | MDST01 -report                                                                    |
 | "http://smartlifehealth.info/smh#f5e28d84-a15e-41e5-b1d7-056d4251dcf6" |       | PAD001 -report                                                                    |
 | "http://smartlifehealth.info/smh#634d1019-0725-484b-9418-82500faa8630" |       | STIA001 -report                                                                   |
-| "http://smartlifehealth.info/smh#6dd462a8-fb65-49d9-90d1-0b145f75d0e6" |       | DM017a -report                                                                    |
-| "http://smartlifehealth.info/smh#f70295d7-45c4-4ec7-b222-941aa2f0ab75" |       | DM017b -report                                                                    |
+| "http://smartlifehealth.info/smh#6dd462a8-fb65-49d9-90d1-0b145f75d0e6" | 3     | DM017a -report                                                                    |
+| "http://smartlifehealth.info/smh#f70295d7-45c4-4ec7-b222-941aa2f0ab75" | 8     | DM017b -report                                                                    |
 | "http://smartlifehealth.info/smh#6e363bd8-1bdc-4ee1-8bd9-3dbfa110b95b" |       | NDH01 -report                                                                     |
 | "http://smartlifehealth.info/smh#cad45547-0cae-4d32-bb15-93ed735ec46b" |       | NDH01 - Female                                                                    |
 | "http://smartlifehealth.info/smh#3ba64040-f29b-4db8-92ae-ee82a4111406" |       | NDH01 - Male                                                                      |
@@ -1237,8 +1237,8 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#2b226da9-cb16-4950-acc7-eefed767a25e" |       | Age < 65                                                                          |
 | "http://smartlifehealth.info/smh#1f812e46-4f09-411e-82f5-b8b1b1621dd8" |       | Age >= 65                                                                         |
 | "http://smartlifehealth.info/smh#0c6307cb-cba2-4e3c-8828-e0632b70d81a" |       | HYP001b -report                                                                   |
-| "http://smartlifehealth.info/smh#277f9f70-de4b-4ab0-87a8-28c3ba180670" |       | EMCRM05 -report                                                                   |
-| "http://smartlifehealth.info/smh#e19cf06e-e59a-4734-9e61-6f25ce8bb59e" |       | EMCRM05 - Female                                                                  |
+| "http://smartlifehealth.info/smh#277f9f70-de4b-4ab0-87a8-28c3ba180670" | 1     | EMCRM05 -report                                                                   |
+| "http://smartlifehealth.info/smh#e19cf06e-e59a-4734-9e61-6f25ce8bb59e" | 1     | EMCRM05 - Female                                                                  |
 | "http://smartlifehealth.info/smh#bb397fca-d180-41e9-bf1c-ad22a6dd8e8d" |       | EMCRM05 - Male                                                                    |
 | "http://smartlifehealth.info/smh#d0c5aea6-031f-4ea1-baa7-fcbac0d23b59" |       | EMCRM11 -report                                                                   |
 | "http://smartlifehealth.info/smh#6c8a8d5b-55be-4fbb-8425-a268c8f9fde7" |       | Age < 60                                                                          |
@@ -1256,21 +1256,21 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#cec3374e-0ceb-4e90-94d7-0bb74eaffb20" |       | HYP001bb -report                                                                  |
 | "http://smartlifehealth.info/smh#75504975-8355-48d3-b446-79717d6c0d95" |       | EMCRM01BD -report                                                                 |
 | "http://smartlifehealth.info/smh#ff394312-865e-44e3-8e70-ccc4bf018b1e" |       | EMCRM01CD -report                                                                 |
-| "http://smartlifehealth.info/smh#2d95f886-83cb-4f1d-b9cc-22452af6ac4a" |       | EMCRM05a -report                                                                  |
+| "http://smartlifehealth.info/smh#2d95f886-83cb-4f1d-b9cc-22452af6ac4a" | 1     | EMCRM05a -report                                                                  |
 | "http://smartlifehealth.info/smh#ca1e3052-e8e7-4835-bb76-caff60ae96a3" |       | EMCRM05b -report                                                                  |
-| "http://smartlifehealth.info/smh#859bba17-e506-45cd-88ae-09949db68535" |       | EMCRM01AD -report                                                                 |
-| "http://smartlifehealth.info/smh#6c056198-96e2-4a39-88d4-7c50f42a1865" |       | EMCRM01AD - Female                                                                |
-| "http://smartlifehealth.info/smh#a63f351b-c23a-4d45-90bd-9e1268063563" |       | EMCRM01AD - Male                                                                  |
+| "http://smartlifehealth.info/smh#859bba17-e506-45cd-88ae-09949db68535" | 16    | EMCRM01AD -report                                                                 |
+| "http://smartlifehealth.info/smh#6c056198-96e2-4a39-88d4-7c50f42a1865" | 7     | EMCRM01AD - Female                                                                |
+| "http://smartlifehealth.info/smh#a63f351b-c23a-4d45-90bd-9e1268063563" | 9     | EMCRM01AD - Male                                                                  |
 | "http://smartlifehealth.info/smh#1e8c293c-ebe0-458b-946f-f5b241c731fd" |       | NDH01aa -report                                                                   |
 | "http://smartlifehealth.info/smh#d7da8f9c-cfbb-46eb-9814-33aae6a026ce" |       | NDH01ab -report                                                                   |
 | "http://smartlifehealth.info/smh#f45c5a1f-9d67-4a51-811f-ff8d34f094e8" |       | NDH01ba -report                                                                   |
 | "http://smartlifehealth.info/smh#1025a369-2d95-454b-baac-8936c9e403d4" |       | NDH01bb -report                                                                   |
-| "http://smartlifehealth.info/smh#99c6dd66-70ef-4f71-849f-116b8661028b" |       | EMCRM03 -report                                                                   |
-| "http://smartlifehealth.info/smh#b3c85fa8-38d9-46cd-acdb-eb131561ec9a" |       | EMCRM03 - Female                                                                  |
-| "http://smartlifehealth.info/smh#19fbcaf3-ba71-44c0-859a-94a6462f6226" |       | EMCRM03 - Male                                                                    |
-| "http://smartlifehealth.info/smh#a62654e3-9bd3-4749-b7bc-2d693ff3eeee" |       | EMCRM04 -report                                                                   |
-| "http://smartlifehealth.info/smh#d6765699-899b-4567-9f00-8d9db0723afc" |       | EMCRM04 - Female                                                                  |
-| "http://smartlifehealth.info/smh#3f7af787-a6df-4908-b779-b46ad84c376c" |       | EMCRM04 - Male                                                                    |
+| "http://smartlifehealth.info/smh#99c6dd66-70ef-4f71-849f-116b8661028b" | 11    | EMCRM03 -report                                                                   |
+| "http://smartlifehealth.info/smh#b3c85fa8-38d9-46cd-acdb-eb131561ec9a" | 3     | EMCRM03 - Female                                                                  |
+| "http://smartlifehealth.info/smh#19fbcaf3-ba71-44c0-859a-94a6462f6226" | 8     | EMCRM03 - Male                                                                    |
+| "http://smartlifehealth.info/smh#a62654e3-9bd3-4749-b7bc-2d693ff3eeee" | 37    | EMCRM04 -report                                                                   |
+| "http://smartlifehealth.info/smh#d6765699-899b-4567-9f00-8d9db0723afc" | 16    | EMCRM04 - Female                                                                  |
+| "http://smartlifehealth.info/smh#3f7af787-a6df-4908-b779-b46ad84c376c" | 21    | EMCRM04 - Male                                                                    |
 | "http://smartlifehealth.info/smh#94c50579-4f04-456f-a48d-a6a0f8781032" |       | EMCRM01BN -report                                                                 |
 | "http://smartlifehealth.info/smh#9f5b145a-61b5-4dcb-9c0d-ba27884d2303" |       | EMCRM01ED -report                                                                 |
 | "http://smartlifehealth.info/smh#85fcecce-2715-4ad2-aa10-3c96fe32abdd" |       | EMCRM01CN -report                                                                 |
@@ -1278,56 +1278,56 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#0c2303ac-9418-4b28-afac-bc45c0c9c934" |       | EMCRM01DD - Female                                                                |
 | "http://smartlifehealth.info/smh#4229dba1-c22c-49ad-9917-3393542f1713" |       | EMCRM01DD - Male                                                                  |
 | "http://smartlifehealth.info/smh#0a617bc7-5e1e-4e2c-bc98-74fba8a6e4a9" |       | EMCRM01AN -report                                                                 |
-| "http://smartlifehealth.info/smh#4878b806-de8d-4abe-a3b4-6b3453ea3663" |       | Age < 70                                                                          |
-| "http://smartlifehealth.info/smh#c5f8cb68-cda5-49b5-8377-418013e750df" |       | Age >= 70                                                                         |
-| "http://smartlifehealth.info/smh#131aa5ae-e67d-4315-8521-13fbfa065c08" |       | EMCRM01ADa -report                                                                |
-| "http://smartlifehealth.info/smh#f851bc8c-7b26-4588-b8d6-0537c9511223" |       | Age < 70                                                                          |
-| "http://smartlifehealth.info/smh#b81c33f7-370f-46ec-8953-b53927bfe258" |       | Age >= 70                                                                         |
-| "http://smartlifehealth.info/smh#4045a60d-c9f5-4090-8c87-4ff8b62e80ff" |       | EMCRM01ADb -report                                                                |
-| "http://smartlifehealth.info/smh#83051509-e7a1-4035-a36b-842ad070b49e" |       | Age < 65                                                                          |
-| "http://smartlifehealth.info/smh#d089b699-36b6-4598-a341-0aa2b8128b9a" |       | Age >= 65                                                                         |
-| "http://smartlifehealth.info/smh#be85b806-38b2-4c5a-8128-deafa8340840" |       | EMCRM03a -report                                                                  |
-| "http://smartlifehealth.info/smh#60935823-9270-46bd-99ff-c95038b9bd12" |       | Age < 65                                                                          |
-| "http://smartlifehealth.info/smh#27ba10e8-0534-407d-abee-ba4a5842ea5f" |       | Age >= 65                                                                         |
-| "http://smartlifehealth.info/smh#9c1728d1-dc3e-4763-86b3-42890d3688f4" |       | EMCRM03b -report                                                                  |
-| "http://smartlifehealth.info/smh#ee1c90ad-3cc0-4183-a6b9-263b416bc294" |       | Age < 70                                                                          |
-| "http://smartlifehealth.info/smh#fcc11903-f253-4190-aca1-67fdac40a8b2" |       | Age >= 70                                                                         |
-| "http://smartlifehealth.info/smh#951c7e87-d097-4049-b344-b9eb005aa670" |       | EMCRM04a -report                                                                  |
-| "http://smartlifehealth.info/smh#9c8f652d-fabc-4582-afbb-3679ef0f02a1" |       | Age < 70                                                                          |
-| "http://smartlifehealth.info/smh#961f1b0b-0669-4002-bdfb-661630212bb8" |       | Age >= 70                                                                         |
-| "http://smartlifehealth.info/smh#4a5eda55-53d0-436c-8b2a-16a492f40402" |       | EMCRM04b -report                                                                  |
+| "http://smartlifehealth.info/smh#4878b806-de8d-4abe-a3b4-6b3453ea3663" | 3     | Age < 70                                                                          |
+| "http://smartlifehealth.info/smh#c5f8cb68-cda5-49b5-8377-418013e750df" | 4     | Age >= 70                                                                         |
+| "http://smartlifehealth.info/smh#131aa5ae-e67d-4315-8521-13fbfa065c08" | 7     | EMCRM01ADa -report                                                                |
+| "http://smartlifehealth.info/smh#f851bc8c-7b26-4588-b8d6-0537c9511223" | 6     | Age < 70                                                                          |
+| "http://smartlifehealth.info/smh#b81c33f7-370f-46ec-8953-b53927bfe258" | 3     | Age >= 70                                                                         |
+| "http://smartlifehealth.info/smh#4045a60d-c9f5-4090-8c87-4ff8b62e80ff" | 9     | EMCRM01ADb -report                                                                |
+| "http://smartlifehealth.info/smh#83051509-e7a1-4035-a36b-842ad070b49e" | 2     | Age < 65                                                                          |
+| "http://smartlifehealth.info/smh#d089b699-36b6-4598-a341-0aa2b8128b9a" | 1     | Age >= 65                                                                         |
+| "http://smartlifehealth.info/smh#be85b806-38b2-4c5a-8128-deafa8340840" | 3     | EMCRM03a -report                                                                  |
+| "http://smartlifehealth.info/smh#60935823-9270-46bd-99ff-c95038b9bd12" | 7     | Age < 65                                                                          |
+| "http://smartlifehealth.info/smh#27ba10e8-0534-407d-abee-ba4a5842ea5f" | 7     | Age >= 65                                                                         |
+| "http://smartlifehealth.info/smh#9c1728d1-dc3e-4763-86b3-42890d3688f4" | 8     | EMCRM03b -report                                                                  |
+| "http://smartlifehealth.info/smh#ee1c90ad-3cc0-4183-a6b9-263b416bc294" | 12    | Age < 70                                                                          |
+| "http://smartlifehealth.info/smh#fcc11903-f253-4190-aca1-67fdac40a8b2" | 4     | Age >= 70                                                                         |
+| "http://smartlifehealth.info/smh#951c7e87-d097-4049-b344-b9eb005aa670" | 16    | EMCRM04a -report                                                                  |
+| "http://smartlifehealth.info/smh#9c8f652d-fabc-4582-afbb-3679ef0f02a1" | 18    | Age < 70                                                                          |
+| "http://smartlifehealth.info/smh#961f1b0b-0669-4002-bdfb-661630212bb8" | 3     | Age >= 70                                                                         |
+| "http://smartlifehealth.info/smh#4a5eda55-53d0-436c-8b2a-16a492f40402" | 21    | EMCRM04b -report                                                                  |
 | "http://smartlifehealth.info/smh#2a5e6437-b72a-404a-84e4-b6e889db64d7" |       | EMCRM01EN -report                                                                 |
 | "http://smartlifehealth.info/smh#b7728a3d-1bc5-4aab-8964-cfdc39294825" |       | EMCRM01DDa -report                                                                |
 | "http://smartlifehealth.info/smh#f93adfc1-190b-488a-93b5-3309f2c18c03" |       | EMCRM01DDb -report                                                                |
-| "http://smartlifehealth.info/smh#5d95deb1-aee2-4429-bdb3-f1e450b48ebc" |       | EMCRM01ADaa -report                                                               |
-| "http://smartlifehealth.info/smh#39967273-5a88-4e00-ae35-d5ebd2c9e137" |       | EMCRM01ADab -report                                                               |
-| "http://smartlifehealth.info/smh#9af53184-0d50-4687-b4b4-556bd28a7568" |       | EMCRM01ADba -report                                                               |
-| "http://smartlifehealth.info/smh#33dbd53e-3dde-45dc-937a-e02d9e0617a6" |       | EMCRM01ADbb -report                                                               |
-| "http://smartlifehealth.info/smh#7dc8f9ad-2253-480e-ab98-cfa9c55fefbf" |       | EMCRM03aa -report                                                                 |
-| "http://smartlifehealth.info/smh#a610387b-c864-4b58-ac8a-c5c48341f93b" |       | EMCRM03ab -report                                                                 |
-| "http://smartlifehealth.info/smh#5ef17f37-78e4-45bd-9446-f59119fbe2b7" |       | EMCRM03ba -report                                                                 |
-| "http://smartlifehealth.info/smh#2c51aad5-34ac-46f4-a0b1-22289d2a92b5" |       | EMCRM03bb -report                                                                 |
-| "http://smartlifehealth.info/smh#a424f124-dbc5-413b-8ba6-a373eec5dc5d" |       | EMCRM04aa -report                                                                 |
-| "http://smartlifehealth.info/smh#15f68dd1-6600-4651-8c11-7d280fba0ca3" |       | EMCRM04ab -report                                                                 |
-| "http://smartlifehealth.info/smh#456db207-3fb1-4343-afe4-d30ca88f4a85" |       | EMCRM04ba -report                                                                 |
-| "http://smartlifehealth.info/smh#3a127759-bdc9-4d19-bf5a-91864542a0bb" |       | EMCRM04bb -report                                                                 |
+| "http://smartlifehealth.info/smh#5d95deb1-aee2-4429-bdb3-f1e450b48ebc" | 3     | EMCRM01ADaa -report                                                               |
+| "http://smartlifehealth.info/smh#39967273-5a88-4e00-ae35-d5ebd2c9e137" | 4     | EMCRM01ADab -report                                                               |
+| "http://smartlifehealth.info/smh#9af53184-0d50-4687-b4b4-556bd28a7568" | 6     | EMCRM01ADba -report                                                               |
+| "http://smartlifehealth.info/smh#33dbd53e-3dde-45dc-937a-e02d9e0617a6" | 3     | EMCRM01ADbb -report                                                               |
+| "http://smartlifehealth.info/smh#7dc8f9ad-2253-480e-ab98-cfa9c55fefbf" | 2     | EMCRM03aa -report                                                                 |
+| "http://smartlifehealth.info/smh#a610387b-c864-4b58-ac8a-c5c48341f93b" | 1     | EMCRM03ab -report                                                                 |
+| "http://smartlifehealth.info/smh#5ef17f37-78e4-45bd-9446-f59119fbe2b7" | 7     | EMCRM03ba -report                                                                 |
+| "http://smartlifehealth.info/smh#2c51aad5-34ac-46f4-a0b1-22289d2a92b5" | 7     | EMCRM03bb -report                                                                 |
+| "http://smartlifehealth.info/smh#a424f124-dbc5-413b-8ba6-a373eec5dc5d" | 12    | EMCRM04aa -report                                                                 |
+| "http://smartlifehealth.info/smh#15f68dd1-6600-4651-8c11-7d280fba0ca3" | 4     | EMCRM04ab -report                                                                 |
+| "http://smartlifehealth.info/smh#456db207-3fb1-4343-afe4-d30ca88f4a85" | 18    | EMCRM04ba -report                                                                 |
+| "http://smartlifehealth.info/smh#3a127759-bdc9-4d19-bf5a-91864542a0bb" | 3     | EMCRM04bb -report                                                                 |
 | "http://smartlifehealth.info/smh#b4c95f7d-fab6-4cad-9619-8935ad7848df" |       | EMCRM01DN -report                                                                 |
-| "http://smartlifehealth.info/smh#6fd7bd04-f245-45e0-9a6c-42af1546984a" |       | EMCRM07 -report                                                                   |
+| "http://smartlifehealth.info/smh#6fd7bd04-f245-45e0-9a6c-42af1546984a" | 46    | EMCRM07 -report                                                                   |
 | "http://smartlifehealth.info/smh#18374b3d-2fd0-4e7d-a60d-48e5721735be" |       | EMCRM08A -report                                                                  |
 | "http://smartlifehealth.info/smh#7079a07a-ac08-422e-8722-3fcdafcf9bb4" |       | EMCRM08B -report                                                                  |
 | "http://smartlifehealth.info/smh#a085223b-4eb7-4d20-9747-2ede9ecbf0e9" |       | EMCRM08C -report                                                                  |
-| "http://smartlifehealth.info/smh#ed90ba8f-5db1-46d8-8424-3e9f1b4fc492" |       | EMCRM09 -report                                                                   |
-| "http://smartlifehealth.info/smh#abb15564-bc8e-43e7-9905-5a20039a1220" |       | 03. Upload 1of1 NWL CRM 03BP v3.260813 -report                                    |
-| "http://smartlifehealth.info/smh#34a1b42c-71da-41ba-a4e4-118e720aa099" |       | 02a. Upload 1of2 NWL CRM 02KCP12 v3.260730 -report                                |
-| "http://smartlifehealth.info/smh#7c307223-5d78-41c2-9b41-990b05b94bdc" |       | 02a. Upload 2of2 NWL CRM 02KCP12 v3.260730 -report                                |
-| "http://smartlifehealth.info/smh#0b42458e-7490-4c43-947b-7276184e79d4" |       | 02c. Upload 1of1 NWL CRM 02KCP08 v3.260514 -report                                |
+| "http://smartlifehealth.info/smh#ed90ba8f-5db1-46d8-8424-3e9f1b4fc492" | 35    | EMCRM09 -report                                                                   |
+| "http://smartlifehealth.info/smh#abb15564-bc8e-43e7-9905-5a20039a1220" | 11    | 03. Upload 1of1 NWL CRM 03BP v3.260813 -report                                    |
+| "http://smartlifehealth.info/smh#34a1b42c-71da-41ba-a4e4-118e720aa099" | 44    | 02a. Upload 1of2 NWL CRM 02KCP12 v3.260730 -report                                |
+| "http://smartlifehealth.info/smh#7c307223-5d78-41c2-9b41-990b05b94bdc" | 15    | 02a. Upload 2of2 NWL CRM 02KCP12 v3.260730 -report                                |
+| "http://smartlifehealth.info/smh#0b42458e-7490-4c43-947b-7276184e79d4" | 45    | 02c. Upload 1of1 NWL CRM 02KCP08 v3.260514 -report                                |
 | "http://smartlifehealth.info/smh#bc6080d2-c7d0-4efe-889d-1485133f8c30" |       | 02b. Upload 1of2 NWL CRM 02KCP09 v3.260801 -report                                |
 | "http://smartlifehealth.info/smh#e623a2a8-f912-4ae7-85e8-cc4ab5351128" |       | 02b. Upload 2of2 NWL CRM 02KCP09 v3.260801 -report                                |
-| "http://smartlifehealth.info/smh#a2f0cba6-5c04-4a45-b9ee-6bec090db9d7" |       | 09. Upload 1of1 NWL CRM 09HCS v3.260601 -report                                   |
-| "http://smartlifehealth.info/smh#c8b5b7b1-ffb9-48f7-be77-4b7f62d50825" |       | 07. Upload 1of1 NWL CRM 07HCP v3.260601 -report                                   |
+| "http://smartlifehealth.info/smh#a2f0cba6-5c04-4a45-b9ee-6bec090db9d7" | 35    | 09. Upload 1of1 NWL CRM 09HCS v3.260601 -report                                   |
+| "http://smartlifehealth.info/smh#c8b5b7b1-ffb9-48f7-be77-4b7f62d50825" | 51    | 07. Upload 1of1 NWL CRM 07HCP v3.260601 -report                                   |
 | "http://smartlifehealth.info/smh#be12ede9-1097-4540-92c6-d695d7063b51" |       | 06. Upload 1of1 NWL CRM 06SGLT2 v3.260601 -report                                 |
-| "http://smartlifehealth.info/smh#85b12f91-d54f-4d42-b1ee-2b86356ed9bd" |       | 05. Upload 1of1 NWL CRM 05ACEARB v3.260601 -report                                |
-| "http://smartlifehealth.info/smh#a321ea9b-c10b-4f1c-ab48-98bf204a18e8" |       | 04. Upload 1of1 NWL CRM 04STATIN v3.260601 -report                                |
+| "http://smartlifehealth.info/smh#85b12f91-d54f-4d42-b1ee-2b86356ed9bd" | 1     | 05. Upload 1of1 NWL CRM 05ACEARB v3.260601 -report                                |
+| "http://smartlifehealth.info/smh#a321ea9b-c10b-4f1c-ab48-98bf204a18e8" | 37    | 04. Upload 1of1 NWL CRM 04STATIN v3.260601 -report                                |
 | "http://smartlifehealth.info/smh#153eff45-2db8-461b-a17a-40f2bbe539ab" |       | 08. Upload 1of1 NWL CRM 08IHF v3.260601 -report                                   |
 | "http://smartlifehealth.info/smh#9fbf3d9c-c69c-4077-aec2-aaf2db521451" |       | AS02Na-DQ-Patients MISSING Height recorded                                        |
 | "http://smartlifehealth.info/smh#4659da95-3713-4ec2-9e07-6b1cdc5695b0" |       | AS02Nb-DQ-Patients MISSING Weight recorded                                        |
@@ -1355,69 +1355,69 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#28a0b17f-c570-4303-a08a-d078c108646f" |       | ANONYMISED - DQ - Missing Care Plan -report                                       |
 | "http://smartlifehealth.info/smh#1d65378d-1fb3-4812-87e9-48f3effcd343" |       | AS07N-ES-Patients MISSING Care Plan recorded                                      |
 | "http://smartlifehealth.info/smh#0a3f7a29-993f-4144-a2e2-94bbd864bd2c" |       | NHS NUMBERS - DQ - Missing Care Plan -report                                      |
-| "http://smartlifehealth.info/smh#a8259561-2647-47f4-b909-69598ccc661b" |       | *CRM00                                                                            | REGISTER | Patients on CRM Register |
-| "http://smartlifehealth.info/smh#ac76214a-aa87-4ba3-b631-733f6a19699a" |       | EMCRM00A -report                                                                  |
-| "http://smartlifehealth.info/smh#51b64eba-9d1d-426a-84bb-8255a846ac68" |       | *RISK00A                                                                          | Group 1 | 14 or more risk factors |
+| "http://smartlifehealth.info/smh#a8259561-2647-47f4-b909-69598ccc661b" | 38    | *CRM00                                                                            | REGISTER | Patients on CRM Register |
+| "http://smartlifehealth.info/smh#ac76214a-aa87-4ba3-b631-733f6a19699a" | 38    | EMCRM00A -report                                                                  |
+| "http://smartlifehealth.info/smh#51b64eba-9d1d-426a-84bb-8255a846ac68" | 35    | *RISK00A                                                                          | Group 1 | 14 or more risk factors |
 | "http://smartlifehealth.info/smh#b4a14007-b8cf-4038-83de-7d25c61d9e7f" |       | *RISK00B                                                                          | Group 2 | 10-13 risk factors |
-| "http://smartlifehealth.info/smh#e70d88e6-3588-4d65-8add-292593ec9089" |       | *RISK00C                                                                          | Group 3 | 0-9 risk factors |
+| "http://smartlifehealth.info/smh#e70d88e6-3588-4d65-8add-292593ec9089" | 3     | *RISK00C                                                                          | Group 3 | 0-9 risk factors |
 | "http://smartlifehealth.info/smh#eee1b46c-f27f-458f-9dee-ec58a291578c" |       | CRM00B                                                                            | LAST 15 MONTHS | Tracking | Groups 1&2 | First & Follow Up appointments |
 | "http://smartlifehealth.info/smh#76eda306-e247-4d1f-9263-c167295d15b3" |       | CRM01B                                                                            | CKD | DQ | MISSING CKD Diagnosis Code |
 | "http://smartlifehealth.info/smh#2560f6d4-d024-42bc-b06d-4bf116f7fd21" |       | CRM01C                                                                            | DM | DQ | MISSING Diabetes Diagnosis OR NDH Diagnosis OR 2nd HbA1c |
 | "http://smartlifehealth.info/smh#61609a01-0365-40c3-8432-eee28abbf27b" |       | CRM01DA                                                                           | HYP | DQ | DABP>=135/85 or 145/85 | MISSING Hypertension |
 | "http://smartlifehealth.info/smh#b372800f-21b1-4612-a52c-a9c7ea7eaf70" |       | CRM01DB                                                                           | HYP | DQ | 2 BP>=140/90 | MISSING HYP OR BP<130/80 OR DABP<135/85 |
-| "http://smartlifehealth.info/smh#df27813c-40ab-4cb9-b732-478e9e2a9e5d" |       | CRM01A                                                                            | AF | DQ | MISSING ECG or Pulse Rhythm Check |
+| "http://smartlifehealth.info/smh#df27813c-40ab-4cb9-b732-478e9e2a9e5d" | 16    | CRM01A                                                                            | AF | DQ | MISSING ECG or Pulse Rhythm Check |
 | "http://smartlifehealth.info/smh#9700cc43-dd8b-497f-99bc-1155260795c9" |       | NHS NUMBERS                                                                       | EMCRM01B | Missing CKD Diagnosis -report |
 | "http://smartlifehealth.info/smh#283f9823-77c0-4ff8-924e-90f67a4fa2f9" |       | CRM01E                                                                            | NDH | DQ | HbA1c >=42 & <47 | MISSING NDH OR DM or 2nd HbA1c |
 | "http://smartlifehealth.info/smh#80cc6d4b-edd3-48b8-a198-99ca0374bb14" |       | NHS NUMBERS                                                                       | EMCRM01C | Missing Diabetes Diagnosis OR NDH diagnosis -report |
 | "http://smartlifehealth.info/smh#1a35ceda-159c-4115-b137-6135563fe8a1" |       | NHS NUMBERS                                                                       | EMCRM01D | Missing Hypertension Diagnosis -report |
 | "http://smartlifehealth.info/smh#67a63894-3fb8-4d7e-bc36-b8e1a6fdafc0" |       | NHS NUMBERS                                                                       | EMCRM01D | Missing Hypertension Diagnosis -report |
-| "http://smartlifehealth.info/smh#47260cd2-5480-4d63-a5f5-057bceddec4d" |       | NHS NUMBERS                                                                       | EMCRM01A | Missing ECG or Pulse Rhythm Check -report |
+| "http://smartlifehealth.info/smh#47260cd2-5480-4d63-a5f5-057bceddec4d" | 16    | NHS NUMBERS                                                                       | EMCRM01A | Missing ECG or Pulse Rhythm Check -report |
 | "http://smartlifehealth.info/smh#b765d1c7-f643-4515-8aa4-c3a72706c609" |       | NHS NUMBERS                                                                       | EMCRM01E | Missing NDH or Diabetes Diagnosis -report |
 | "http://smartlifehealth.info/smh#5de3d4b2-5277-4235-bbab-79c477db1da5" |       | CRM01DC                                                                           | HYP | DQ | Earliest BP >= 140/90 | MISSING 2nd Blood Pressure |
 | "http://smartlifehealth.info/smh#c6d0eeca-3fc8-4fd0-9aa5-9825b9d2713d" |       | NHS NUMBERS                                                                       | EMCRM01D | Missing Blood pressure reading in Financial Year -report |
-| "http://smartlifehealth.info/smh#78e956c5-84a6-486d-a0bd-d2cb9ddc2cda" |       | CRM02a                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT HbA1c |
-| "http://smartlifehealth.info/smh#9785c2a4-5e1d-4ba6-a68c-a76e9581b0c2" |       | CRM02b                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Blood Pressure |
-| "http://smartlifehealth.info/smh#ff3ce5b9-c86d-4f44-aac2-487e36c120be" |       | CRM02c                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Lipids |
-| "http://smartlifehealth.info/smh#5a8fb9ce-17e6-4c10-a97c-92f793e052b1" |       | CRM02d                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Urine ACR |
-| "http://smartlifehealth.info/smh#78e501a0-721b-4a0f-9f62-9fd0dc9bfd34" |       | CRM02e                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT eGFR |
-| "http://smartlifehealth.info/smh#2920849d-1236-4ed2-8a43-db1d357cf50e" |       | CRM02f                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT BMI |
-| "http://smartlifehealth.info/smh#3b67eb54-f7e6-4698-ba88-e892579df645" |       | CRM02h                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Smoking Status |
-| "http://smartlifehealth.info/smh#6d2cf688-a3df-4a45-bcae-ed0b1f910884" |       | CRM02g                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Waist Circumference |
-| "http://smartlifehealth.info/smh#91e1f6d6-28e6-4ebc-8bbf-9e7cc155daa7" |       | CRM02i                                                                            | DIABETES | DQ | LAST 15M TO END OF FY | WITHOUT MH Screening |
-| "http://smartlifehealth.info/smh#6dd6b8fc-8f5a-49be-8e1f-f29dd3477946" |       | CRM02j                                                                            | DIABETES | DQ | LAST 15M TO END OF FY | WITHOUT Foot Check |
-| "http://smartlifehealth.info/smh#b3bd8c9f-7093-4525-a99f-38e0708c42f4" |       | CRM02k                                                                            | DIABETES | DQ | LAST 27M TO END OF FY | WITHOUT Retinal Screening |
-| "http://smartlifehealth.info/smh#c460cad3-5ae5-45fd-b56f-d9ff7e94ea95" |       | CRM02l                                                                            | DIABETES OR MASLD | DQ | LAST 39M TO END OF FY | WITHOUT FIB-4 |
-| "http://smartlifehealth.info/smh#0c495b79-261b-4f44-8f7a-f79c532bf735" |       | *CRM02                                                                            | ALL CRM | DQ | Key Care Processes NOT Completed |
-| "http://smartlifehealth.info/smh#442a5494-9281-490a-9567-a43a93074bc3" |       | Diabetic Patients                                                                 |
+| "http://smartlifehealth.info/smh#78e956c5-84a6-486d-a0bd-d2cb9ddc2cda" | 38    | CRM02a                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT HbA1c |
+| "http://smartlifehealth.info/smh#9785c2a4-5e1d-4ba6-a68c-a76e9581b0c2" | 38    | CRM02b                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Blood Pressure |
+| "http://smartlifehealth.info/smh#ff3ce5b9-c86d-4f44-aac2-487e36c120be" | 38    | CRM02c                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Lipids |
+| "http://smartlifehealth.info/smh#5a8fb9ce-17e6-4c10-a97c-92f793e052b1" | 38    | CRM02d                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Urine ACR |
+| "http://smartlifehealth.info/smh#78e501a0-721b-4a0f-9f62-9fd0dc9bfd34" | 38    | CRM02e                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT eGFR |
+| "http://smartlifehealth.info/smh#2920849d-1236-4ed2-8a43-db1d357cf50e" | 38    | CRM02f                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT BMI |
+| "http://smartlifehealth.info/smh#3b67eb54-f7e6-4698-ba88-e892579df645" | 38    | CRM02h                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Smoking Status |
+| "http://smartlifehealth.info/smh#6d2cf688-a3df-4a45-bcae-ed0b1f910884" | 38    | CRM02g                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Waist Circumference |
+| "http://smartlifehealth.info/smh#91e1f6d6-28e6-4ebc-8bbf-9e7cc155daa7" | 11    | CRM02i                                                                            | DIABETES | DQ | LAST 15M TO END OF FY | WITHOUT MH Screening |
+| "http://smartlifehealth.info/smh#6dd6b8fc-8f5a-49be-8e1f-f29dd3477946" | 11    | CRM02j                                                                            | DIABETES | DQ | LAST 15M TO END OF FY | WITHOUT Foot Check |
+| "http://smartlifehealth.info/smh#b3bd8c9f-7093-4525-a99f-38e0708c42f4" | 11    | CRM02k                                                                            | DIABETES | DQ | LAST 27M TO END OF FY | WITHOUT Retinal Screening |
+| "http://smartlifehealth.info/smh#c460cad3-5ae5-45fd-b56f-d9ff7e94ea95" | 11    | CRM02l                                                                            | DIABETES OR MASLD | DQ | LAST 39M TO END OF FY | WITHOUT FIB-4 |
+| "http://smartlifehealth.info/smh#0c495b79-261b-4f44-8f7a-f79c532bf735" | 38    | *CRM02                                                                            | ALL CRM | DQ | Key Care Processes NOT Completed |
+| "http://smartlifehealth.info/smh#442a5494-9281-490a-9567-a43a93074bc3" | 11    | Diabetic Patients                                                                 |
 | "http://smartlifehealth.info/smh#deac9699-92c5-47e7-b520-a2438a1c5612" |       | Metabolic dysfunction-associated steototic disease patients                       |
-| "http://smartlifehealth.info/smh#dcf76cc5-de1d-43c2-bb2b-3566a4c9b264" |       | NO Diabetes or Metabolic dysfunction-associated steototic disease                 |
-| "http://smartlifehealth.info/smh#20908238-648d-4ad3-86b6-b92a1ce5ffc1" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed -report |
-| "http://smartlifehealth.info/smh#5f775c3d-6a2f-4f40-884c-4cc60de28531" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed (more detailed) -report |
+| "http://smartlifehealth.info/smh#dcf76cc5-de1d-43c2-bb2b-3566a4c9b264" | 27    | NO Diabetes or Metabolic dysfunction-associated steototic disease                 |
+| "http://smartlifehealth.info/smh#20908238-648d-4ad3-86b6-b92a1ce5ffc1" | 22    | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed -report |
+| "http://smartlifehealth.info/smh#5f775c3d-6a2f-4f40-884c-4cc60de28531" | 22    | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed (more detailed) -report |
 | "http://smartlifehealth.info/smh#0ca6a127-9fd6-4794-a1e0-83d11538be4c" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed -report |
 | "http://smartlifehealth.info/smh#3ca32935-2f4c-403e-94c9-b0e035405a60" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed (more detailed) -report |
-| "http://smartlifehealth.info/smh#15e26b69-3e43-4d6b-9a97-cfc4f1f49882" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed -report |
-| "http://smartlifehealth.info/smh#652177c4-e8ff-49a9-941c-fcec0f8a7171" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed (more detailed) -report |
-| "http://smartlifehealth.info/smh#1d32a295-1c76-4616-948d-fb7dc399ee4d" |       | CRM03A                                                                            | DQ | NOT FRAIL OR AGE<79 | LAST 15M TO END OF FY | Latest BP>130/80 |
-| "http://smartlifehealth.info/smh#34a42578-8291-4fdf-a859-096d2591b3fd" |       | CRM03B                                                                            | DQ | FRAIL OR AGE>=80 | LAST 15M TO END OF FY | BP>150/90 |
-| "http://smartlifehealth.info/smh#6f802d0a-c7a1-41c2-b9e6-01c8b73d4f95" |       | CRM03                                                                             | NHS NUMBERS | Blood Pressure > 130/80 -report |
-| "http://smartlifehealth.info/smh#701898e6-16f1-4906-a1d5-5868e99e4ce6" |       | CRM03                                                                             | NHS NUMBERS | Blood Pressure > 150/90 -report |
-| "http://smartlifehealth.info/smh#0a5f4ef0-25ac-40a1-8547-c3691581c7f6" |       | CRM04                                                                             | DQ | NOT Prescribed Mod/High Intensity Statin OR Exception codes in FY |
-| "http://smartlifehealth.info/smh#200b229e-28f2-47a5-8efe-69904ffd7588" |       | CRM04a                                                                            | DQ | LAST 6M | NOT Prescribed Moderate or High Intensity Statin |
-| "http://smartlifehealth.info/smh#89eeb249-b780-4a23-b644-cf6cd6309d2f" |       | NHS NUMBERS                                                                       | DQ | Moderate or High Intensity Statins NOT Prescribed -report |
-| "http://smartlifehealth.info/smh#b09d7a79-03ea-4a11-9412-25a826ccce9b" |       | CRM05                                                                             | DQ | LAST 6M | NOT Prescribed ACE inhibitor/ARB |
-| "http://smartlifehealth.info/smh#fdded170-c932-43e6-94e8-97f903ec761a" |       | NHS NUMBERS                                                                       | DQ | ACE Inhibitor/ARB NOT Prescribed -report |
+| "http://smartlifehealth.info/smh#15e26b69-3e43-4d6b-9a97-cfc4f1f49882" | 35    | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed -report |
+| "http://smartlifehealth.info/smh#652177c4-e8ff-49a9-941c-fcec0f8a7171" | 35    | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed (more detailed) -report |
+| "http://smartlifehealth.info/smh#1d32a295-1c76-4616-948d-fb7dc399ee4d" | 10    | CRM03A                                                                            | DQ | NOT FRAIL OR AGE<79 | LAST 15M TO END OF FY | Latest BP>130/80 |
+| "http://smartlifehealth.info/smh#34a42578-8291-4fdf-a859-096d2591b3fd" | 1     | CRM03B                                                                            | DQ | FRAIL OR AGE>=80 | LAST 15M TO END OF FY | BP>150/90 |
+| "http://smartlifehealth.info/smh#6f802d0a-c7a1-41c2-b9e6-01c8b73d4f95" | 10    | CRM03                                                                             | NHS NUMBERS | Blood Pressure > 130/80 -report |
+| "http://smartlifehealth.info/smh#701898e6-16f1-4906-a1d5-5868e99e4ce6" | 1     | CRM03                                                                             | NHS NUMBERS | Blood Pressure > 150/90 -report |
+| "http://smartlifehealth.info/smh#0a5f4ef0-25ac-40a1-8547-c3691581c7f6" | 37    | CRM04                                                                             | DQ | NOT Prescribed Mod/High Intensity Statin OR Exception codes in FY |
+| "http://smartlifehealth.info/smh#200b229e-28f2-47a5-8efe-69904ffd7588" | 37    | CRM04a                                                                            | DQ | LAST 6M | NOT Prescribed Moderate or High Intensity Statin |
+| "http://smartlifehealth.info/smh#89eeb249-b780-4a23-b644-cf6cd6309d2f" | 37    | NHS NUMBERS                                                                       | DQ | Moderate or High Intensity Statins NOT Prescribed -report |
+| "http://smartlifehealth.info/smh#b09d7a79-03ea-4a11-9412-25a826ccce9b" | 1     | CRM05                                                                             | DQ | LAST 6M | NOT Prescribed ACE inhibitor/ARB |
+| "http://smartlifehealth.info/smh#fdded170-c932-43e6-94e8-97f903ec761a" | 1     | NHS NUMBERS                                                                       | DQ | ACE Inhibitor/ARB NOT Prescribed -report |
 | "http://smartlifehealth.info/smh#3a676633-74dc-430b-a6f1-1f1db487e7e8" |       | CRM06a                                                                            | DQ | LAST 6M | NOT Prescribed SGLT-2 inhibitors |
 | "http://smartlifehealth.info/smh#83fedd42-9896-4866-b5b5-c2eaed8b3e1d" |       | NHS NUMBERS                                                                       | DQ | SGLT-2 inhibitors NOT Prescribed -report |
-| "http://smartlifehealth.info/smh#63382cc2-0495-47a0-8fdb-378f1215ca05" |       | CRM07a                                                                            | DQ | LAST 15M TO END OF FY | MISSING Care Plan |
-| "http://smartlifehealth.info/smh#0ddf1915-8ff7-4661-931f-32de31a66891" |       | CRM07b                                                                            | DQ | LAST 15M TO END OF FY | MISSING Eat |
-| "http://smartlifehealth.info/smh#1b6af396-c961-4032-8df9-65f6abf80d99" |       | CRM07c                                                                            | DQ | LAST 15M TO END OF FY | MISSING Physical Activity |
-| "http://smartlifehealth.info/smh#69ae147e-1def-4216-a6d4-1e753bce72e8" |       | CRM07d                                                                            | DQ | LAST 15M TO END OF FY | MISSING Sleep Pattern |
-| "http://smartlifehealth.info/smh#b734e9db-73a1-40d5-bc0e-98117746a0cc" |       | CRM07e                                                                            | DQ | LAST 15M TO END OF FY | MISSING Relax |
-| "http://smartlifehealth.info/smh#478e2928-6db5-474d-9836-6d6ea0c0b14b" |       | CRM07f                                                                            | DQ | LAST 15M TO END OF FY | MISSING Connect |
-| "http://smartlifehealth.info/smh#df13cd79-9627-4784-90cc-154b296d0ce4" |       | CRM07                                                                             | DQ | LAST 15M TO END OF FY | Holistic Care Plan NOT Completed |
-| "http://smartlifehealth.info/smh#0c8ca3d0-72e6-4a24-9a16-3fa23f55e40e" |       | CRM07g                                                                            | DQ | LAST 15M TO END OF FY | MISSING Avoid harmful substances |
-| "http://smartlifehealth.info/smh#120c6e70-1718-4371-ae88-1e18d201eb4e" |       | NHS NUMBERS                                                                       | CRM07 | Holistic Care Plan NOT Completed -report |
-| "http://smartlifehealth.info/smh#bc26089d-f3ec-4ff1-a239-44a155fa8b95" |       | NHS NUMBERS                                                                       | CRM07 | Holistic Care Plan NOT Completed (more detailed) -report |
+| "http://smartlifehealth.info/smh#63382cc2-0495-47a0-8fdb-378f1215ca05" | 35    | CRM07a                                                                            | DQ | LAST 15M TO END OF FY | MISSING Care Plan |
+| "http://smartlifehealth.info/smh#0ddf1915-8ff7-4661-931f-32de31a66891" | 35    | CRM07b                                                                            | DQ | LAST 15M TO END OF FY | MISSING Eat |
+| "http://smartlifehealth.info/smh#1b6af396-c961-4032-8df9-65f6abf80d99" | 35    | CRM07c                                                                            | DQ | LAST 15M TO END OF FY | MISSING Physical Activity |
+| "http://smartlifehealth.info/smh#69ae147e-1def-4216-a6d4-1e753bce72e8" | 35    | CRM07d                                                                            | DQ | LAST 15M TO END OF FY | MISSING Sleep Pattern |
+| "http://smartlifehealth.info/smh#b734e9db-73a1-40d5-bc0e-98117746a0cc" | 35    | CRM07e                                                                            | DQ | LAST 15M TO END OF FY | MISSING Relax |
+| "http://smartlifehealth.info/smh#478e2928-6db5-474d-9836-6d6ea0c0b14b" | 35    | CRM07f                                                                            | DQ | LAST 15M TO END OF FY | MISSING Connect |
+| "http://smartlifehealth.info/smh#df13cd79-9627-4784-90cc-154b296d0ce4" | 35    | CRM07                                                                             | DQ | LAST 15M TO END OF FY | Holistic Care Plan NOT Completed |
+| "http://smartlifehealth.info/smh#0c8ca3d0-72e6-4a24-9a16-3fa23f55e40e" | 35    | CRM07g                                                                            | DQ | LAST 15M TO END OF FY | MISSING Avoid harmful substances |
+| "http://smartlifehealth.info/smh#120c6e70-1718-4371-ae88-1e18d201eb4e" | 43    | NHS NUMBERS                                                                       | CRM07 | Holistic Care Plan NOT Completed -report |
+| "http://smartlifehealth.info/smh#bc26089d-f3ec-4ff1-a239-44a155fa8b95" | 43    | NHS NUMBERS                                                                       | CRM07 | Holistic Care Plan NOT Completed (more detailed) -report |
 | "http://smartlifehealth.info/smh#66ca64ff-b174-4214-9cf1-70f93340d2aa" |       | CRM08Aa                                                                           | DQ | MISSING 2nd Exercise Status codes |
 | "http://smartlifehealth.info/smh#fe79527f-a76f-4a70-b698-322f6f376029" |       | CRM08Ba                                                                           | DQ | MISSING 2nd BMI |
 | "http://smartlifehealth.info/smh#bbda0fc6-133e-4707-890f-021c6b1f6dcb" |       | CRM08Ca                                                                           | DQ | MISSING 2nd Smoking Status code |
@@ -1430,66 +1430,66 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#46c65aa3-a155-4ea5-82c4-b245afdef326" |       | NHS NUMBERS                                                                       | CRM08A | No Improvement in Exercise -report |
 | "http://smartlifehealth.info/smh#8c659bcf-ec44-4718-ba25-7e49675e46d4" |       | NHS NUMBERS                                                                       | CRM08B | No Improvement in BMI -report |
 | "http://smartlifehealth.info/smh#cae3e25e-26c0-4df2-8d97-287719a80480" |       | NHS NUMBERS                                                                       | CRM08C | No Improvement in Smoking Status -report |
-| "http://smartlifehealth.info/smh#c2926175-56de-4dba-b9e0-13f50b865838" |       | CRM09a                                                                            | DQ | LAST 15M TO END OF FY | MISSING Health Confidence Score |
-| "http://smartlifehealth.info/smh#4d29ba35-a952-4c51-bde4-8285f41297f2" |       | CRM09b                                                                            | DQ | LAST 15M TO END OF FY | MISSING 2 Health Confidence Scores |
-| "http://smartlifehealth.info/smh#c281fa19-b565-40dc-9898-be10c269f9d7" |       | NHS NUMBERS                                                                       | CRM09 | 2 Health Confidence Scores -report |
-| "http://smartlifehealth.info/smh#a089c508-9982-4586-a404-0bea0425aed5" |       | NHS NUMBERS                                                                       | CRM09 | Health Confidence Score -report |
-| "http://smartlifehealth.info/smh#74b9b007-d369-4e47-a4a9-601d59175867" |       | CRM10b                                                                            | DQ | LAST 15M TO END OF FY | Latest BP > target |
-| "http://smartlifehealth.info/smh#45c7c154-f581-4a7b-8e81-a8032e908cf3" |       | CRM10c                                                                            | DQ | LAST 15M TO END OF FY | Latest Non HDL Chol > 3 |
-| "http://smartlifehealth.info/smh#67947bd4-f63f-4308-8425-c8f28e55a128" |       | CRM10a                                                                            | DQ | LAST 15M TO END OF FY | Latest HbA1c > target |
-| "http://smartlifehealth.info/smh#51fa62b2-6780-491d-9650-22d6634294dd" |       | *CRM10                                                                            | DQ | LAST 15M TO END OF FY | 3 Treatment Targets NOT Completed |
-| "http://smartlifehealth.info/smh#69a0b01f-cd0f-4487-a14d-41ab34c11f51" |       | Patients with Moderate or Severe Frailty or aged >= 80                            |
-| "http://smartlifehealth.info/smh#01b34ad2-404c-41b5-b894-a9986245f9ad" |       | Patients with no Moderate or Severe Frailty or aged < 80                          |
-| "http://smartlifehealth.info/smh#fcbe170b-33c4-4648-bb36-5728dbc4e9c7" |       | NHS NUMBERS                                                                       | DQ | 3 Treatment Targets NOT Achieved (More Detailed) -report |
-| "http://smartlifehealth.info/smh#68303c96-8bf7-49ab-828f-b9d27431fc76" |       | NHS NUMBERS                                                                       | DQ | 3 Treatment Targets NOT Achieved(More Detailed) -report |
+| "http://smartlifehealth.info/smh#c2926175-56de-4dba-b9e0-13f50b865838" | 35    | CRM09a                                                                            | DQ | LAST 15M TO END OF FY | MISSING Health Confidence Score |
+| "http://smartlifehealth.info/smh#4d29ba35-a952-4c51-bde4-8285f41297f2" | 35    | CRM09b                                                                            | DQ | LAST 15M TO END OF FY | MISSING 2 Health Confidence Scores |
+| "http://smartlifehealth.info/smh#c281fa19-b565-40dc-9898-be10c269f9d7" | 35    | NHS NUMBERS                                                                       | CRM09 | 2 Health Confidence Scores -report |
+| "http://smartlifehealth.info/smh#a089c508-9982-4586-a404-0bea0425aed5" | 35    | NHS NUMBERS                                                                       | CRM09 | Health Confidence Score -report |
+| "http://smartlifehealth.info/smh#74b9b007-d369-4e47-a4a9-601d59175867" | 11    | CRM10b                                                                            | DQ | LAST 15M TO END OF FY | Latest BP > target |
+| "http://smartlifehealth.info/smh#45c7c154-f581-4a7b-8e81-a8032e908cf3" | 11    | CRM10c                                                                            | DQ | LAST 15M TO END OF FY | Latest Non HDL Chol > 3 |
+| "http://smartlifehealth.info/smh#67947bd4-f63f-4308-8425-c8f28e55a128" | 11    | CRM10a                                                                            | DQ | LAST 15M TO END OF FY | Latest HbA1c > target |
+| "http://smartlifehealth.info/smh#51fa62b2-6780-491d-9650-22d6634294dd" | 11    | *CRM10                                                                            | DQ | LAST 15M TO END OF FY | 3 Treatment Targets NOT Completed |
+| "http://smartlifehealth.info/smh#69a0b01f-cd0f-4487-a14d-41ab34c11f51" | 1     | Patients with Moderate or Severe Frailty or aged >= 80                            |
+| "http://smartlifehealth.info/smh#01b34ad2-404c-41b5-b894-a9986245f9ad" | 10    | Patients with no Moderate or Severe Frailty or aged < 80                          |
+| "http://smartlifehealth.info/smh#fcbe170b-33c4-4648-bb36-5728dbc4e9c7" | 1     | NHS NUMBERS                                                                       | DQ | 3 Treatment Targets NOT Achieved (More Detailed) -report |
+| "http://smartlifehealth.info/smh#68303c96-8bf7-49ab-828f-b9d27431fc76" | 10    | NHS NUMBERS                                                                       | DQ | 3 Treatment Targets NOT Achieved(More Detailed) -report |
 | "http://smartlifehealth.info/smh#a68b795a-a890-44d3-ab22-c5e11fe4d7d2" |       | CRM11                                                                             | DQ | LAST 15M TO END OF FY | Diagnosed in last 2 yrs HbA1c > 48 |
 | "http://smartlifehealth.info/smh#03a4c1e6-5587-4796-be9e-a53aed34d5ad" |       | NHS NUMBERS                                                                       | Diagnosed in last 2 yrs without HbA1c <= 48 -report |
 | "http://smartlifehealth.info/smh#85a5fda8-628a-4e67-a934-2a867eeaf76f" |       | CRM12                                                                             | DQ | THIS FY | Black & Black Britsh Hypertensive WITHOUT BP <140/90 |
 | "http://smartlifehealth.info/smh#19d6d8d4-932c-4a40-8fcb-74c164d3652c" |       | NHS NUMBERS                                                                       | DQ | Black & Black British Patients MISSING latest BP <140/90 -report |
-| "http://smartlifehealth.info/smh#2e6ea49f-e644-43d8-a178-b00fb654a4e4" |       | CRM00                                                                             | BEFORE 1ST JAN NEXT YEAR | Patients on CRM Register |
+| "http://smartlifehealth.info/smh#2e6ea49f-e644-43d8-a178-b00fb654a4e4" | 38    | CRM00                                                                             | BEFORE 1ST JAN NEXT YEAR | Patients on CRM Register |
 | "http://smartlifehealth.info/smh#f5fc2342-30b2-4130-9064-b562d1a2b101" |       | PC001                                                                             | Palliative care register |
-| "http://smartlifehealth.info/smh#40bab6d7-9bb9-42cb-86b9-1b9a21ba0e0b" |       | DM017                                                                             | Diabetes Register |
+| "http://smartlifehealth.info/smh#40bab6d7-9bb9-42cb-86b9-1b9a21ba0e0b" | 11    | DM017                                                                             | Diabetes Register |
 | "http://smartlifehealth.info/smh#6a8474b7-d260-42d3-9f9e-736f7490ba40" |       | MDST01                                                                            | Metabolic dysfunction-associated steatotic disease |
-| "http://smartlifehealth.info/smh#82ef0eaa-fad2-4415-8147-8e7d3dc64732" |       | CKD005                                                                            | CKD register |
+| "http://smartlifehealth.info/smh#82ef0eaa-fad2-4415-8147-8e7d3dc64732" | 1     | CKD005                                                                            | CKD register |
 | "http://smartlifehealth.info/smh#5690fd90-c48a-48dd-ad7a-cf41b4ec2fc4" |       | HYP001                                                                            | Hypertension register |
 | "http://smartlifehealth.info/smh#f66717e6-09eb-41f6-bb5c-85e97d26fee1" |       | DM017                                                                             | Diagnosed in last 2 years | Patients on Diabetes QOF Register |
 | "http://smartlifehealth.info/smh#00dcdddf-527e-4f57-ac21-f136b5e77914" |       | PAD001                                                                            | Peripheral arterial disease register |
 | "http://smartlifehealth.info/smh#6af886e9-47f9-4478-95b2-92b7d282b882" |       | STIA001                                                                           | Stroke or TIA register |
 | "http://smartlifehealth.info/smh#0139676b-6ac9-4cf7-8900-a4e01ae82c8d" |       | NDH01                                                                             | Non-Diabetic Hyperglycaemia |
 | "http://smartlifehealth.info/smh#417eb456-7dd0-4dcb-90d9-490bf3f734a8" |       | HF1                                                                               | Unresolved diagnosis of heart failure |
-| "http://smartlifehealth.info/smh#982e9a1a-439c-4868-a342-e286279cc9df" |       | CHD001                                                                            | CHD register |
-| "http://smartlifehealth.info/smh#9a8b2cac-2628-4c49-9174-44441f056793" |       | AF001                                                                             | AF register |
-| "http://smartlifehealth.info/smh#44336586-7610-486c-94b3-8c3518a8f9f2" |       | AF001                                                                             | BEFORE 1ST JAN NEXT YEAR | AF register |
-| "http://smartlifehealth.info/smh#17fa6fa7-10f6-4277-b7b5-ba37c5e5d490" |       | CHD001                                                                            | BEFORE 1ST JAN NEXT YEAR | CHD register |
-| "http://smartlifehealth.info/smh#6289a976-21eb-43d3-aaaa-1048e1c8a38b" |       | CKD005                                                                            | BEFORE 1ST JAN NEXT YEAR | CKD register |
-| "http://smartlifehealth.info/smh#80864888-91a7-440e-87b8-03783d2d5fa1" |       | DM017                                                                             | BEFORE 1ST JAN NEXT YEAR | Diabetes Register |
+| "http://smartlifehealth.info/smh#982e9a1a-439c-4868-a342-e286279cc9df" | 50    | CHD001                                                                            | CHD register |
+| "http://smartlifehealth.info/smh#9a8b2cac-2628-4c49-9174-44441f056793" | 1     | AF001                                                                             | AF register |
+| "http://smartlifehealth.info/smh#44336586-7610-486c-94b3-8c3518a8f9f2" | 1     | AF001                                                                             | BEFORE 1ST JAN NEXT YEAR | AF register |
+| "http://smartlifehealth.info/smh#17fa6fa7-10f6-4277-b7b5-ba37c5e5d490" | 50    | CHD001                                                                            | BEFORE 1ST JAN NEXT YEAR | CHD register |
+| "http://smartlifehealth.info/smh#6289a976-21eb-43d3-aaaa-1048e1c8a38b" | 1     | CKD005                                                                            | BEFORE 1ST JAN NEXT YEAR | CKD register |
+| "http://smartlifehealth.info/smh#80864888-91a7-440e-87b8-03783d2d5fa1" | 11    | DM017                                                                             | BEFORE 1ST JAN NEXT YEAR | Diabetes Register |
 | "http://smartlifehealth.info/smh#4214365d-6802-42c0-86ba-9b16e726596b" |       | HF1                                                                               | BEFORE 1ST JAN NEXT YEAR | Unresolved diagnosis of heart failure |
 | "http://smartlifehealth.info/smh#69366236-fb6f-405e-927c-462f0dab8407" |       | HYP001                                                                            | BEFORE 1ST JAN NEXT YEAR | Hypertension register |
 | "http://smartlifehealth.info/smh#e10aa0ae-4c09-47cc-b0a5-00d5a79363d5" |       | MDST01                                                                            |BEFORE 1ST JAN NEXT YR|Metabolic dysfunction-associated steatotic disease |
 | "http://smartlifehealth.info/smh#250c626a-13f7-4013-9084-aa3940f871f0" |       | PAD001                                                                            | BEFORE 1ST JAN NEXT YEAR | Peripheral arterial disease register |
 | "http://smartlifehealth.info/smh#6d256f65-7bb2-48c6-b27b-5619a20ce72e" |       | STIA001                                                                           | BEFORE 1ST JAN NEXT YEAR | Stroke or TIA register |
-| "http://smartlifehealth.info/smh#2da4162a-b8c8-44d9-81e1-b743dc61179a" |       | Patient having unresolved diabetes code                                           |
+| "http://smartlifehealth.info/smh#2da4162a-b8c8-44d9-81e1-b743dc61179a" | 12    | Patient having unresolved diabetes code                                           |
 | "http://smartlifehealth.info/smh#5494ccc9-9434-4ab6-aacc-9dd982ee235b" |       | NDH01                                                                             | BEFORE 1ST JAN NEXT YEAR | Non-Diabetic Hyperglycaemia |
-| "http://smartlifehealth.info/smh#6bf75bfa-31bb-4ba1-b58d-d6410087443a" |       | DM017 - Patients aged 17 or over on the diabetes register                         |
-| "http://smartlifehealth.info/smh#8ff79676-8c51-4c1d-8c2f-19440890f101" |       | CRM01Aa                                                                           | AF | BEFORE START OF FY | AF register or PAF |
+| "http://smartlifehealth.info/smh#6bf75bfa-31bb-4ba1-b58d-d6410087443a" | 11    | DM017 - Patients aged 17 or over on the diabetes register                         |
+| "http://smartlifehealth.info/smh#8ff79676-8c51-4c1d-8c2f-19440890f101" | 1     | CRM01Aa                                                                           | AF | BEFORE START OF FY | AF register or PAF |
 | "http://smartlifehealth.info/smh#2d2b9d15-811f-4ae6-a88a-7e8747c36b1b" |       | CRM02ba                                                                           | LAST 15 MONTHS | Not Home | Blood Pressure reading |
 | "http://smartlifehealth.info/smh#7fdaf2b6-730a-4bd2-9188-5024dc5498f2" |       | CRM02bb                                                                           | LAST 15 MONTHS | Home | Blood Pressure reading |
-| "http://smartlifehealth.info/smh#9eaef948-8dab-4c13-96a4-7f23743b45d6" |       | CRM02Da                                                                           | CRM with NO Diabetes |
-| "http://smartlifehealth.info/smh#494d6aa4-a824-4317-93b4-e0236f8f511d" |       | CRM02Dba                                                                          | CRM with Diabetes or MASLD |
-| "http://smartlifehealth.info/smh#c27e4f52-c883-46c1-ad92-4a9ae059f5a1" |       | CRM02Dbb                                                                          | CRM with NO Diabetes or MASLD |
-| "http://smartlifehealth.info/smh#2c171ba6-5bb7-451b-ae6c-8918c2a3f373" |       | CRM03ca                                                                           | Moderate or Severe Frailty or aged >= 80 |
+| "http://smartlifehealth.info/smh#9eaef948-8dab-4c13-96a4-7f23743b45d6" | 27    | CRM02Da                                                                           | CRM with NO Diabetes |
+| "http://smartlifehealth.info/smh#494d6aa4-a824-4317-93b4-e0236f8f511d" | 11    | CRM02Dba                                                                          | CRM with Diabetes or MASLD |
+| "http://smartlifehealth.info/smh#c27e4f52-c883-46c1-ad92-4a9ae059f5a1" | 27    | CRM02Dbb                                                                          | CRM with NO Diabetes or MASLD |
+| "http://smartlifehealth.info/smh#2c171ba6-5bb7-451b-ae6c-8918c2a3f373" | 300   | CRM03ca                                                                           | Moderate or Severe Frailty or aged >= 80 |
 | "http://smartlifehealth.info/smh#e00b0fc8-2c10-4878-aaeb-caae356ab0be" |       | CRM03aa                                                                           | Not Frail | Not Home | IN LAST 15M | 130/80 Blood Pressure reading |
 | "http://smartlifehealth.info/smh#25db00e0-29cd-42d1-ac03-ee86c7995902" |       | CRM03ab                                                                           | Not Frail | Home | IN LAST 15M | 130/80 BP reading |
 | "http://smartlifehealth.info/smh#22fea025-45fd-4fc2-9d76-b26661f5717f" |       | CRM03ba                                                                           | Frail | Not Home | IN LAST 15M | 150/90 Blood Pressure reading |
 | "http://smartlifehealth.info/smh#17597095-8506-47a2-a708-af44f63bd067" |       | CRM03bb                                                                           | Frail | Home | IN LAST 15M | 150/90 Blood Pressure reading |
-| "http://smartlifehealth.info/smh#0a64ddf0-adef-4074-88b0-00ac7649d42f" |       | CRM05DBa                                                                          | Urine ACR >= 3 or eGFR < 60 |
+| "http://smartlifehealth.info/smh#0a64ddf0-adef-4074-88b0-00ac7649d42f" | 1     | CRM05DBa                                                                          | Urine ACR >= 3 or eGFR < 60 |
 | "http://smartlifehealth.info/smh#aaf09db4-e635-436f-ab7a-7cce4c95934a" |       | CRM12Na                                                                           | LAST 12M | Blood Pressure reading excluding home done 130/80 |
 | "http://smartlifehealth.info/smh#26b1bd0d-ce94-4765-9a36-e34f55c084e3" |       | CRM12Nb                                                                           | LAST 12M | Blood Pressure reading done at Home 125/75 |
-| "http://smartlifehealth.info/smh#77d165f7-dbcc-47a6-aa27-a72a971b7d66" |       | CRM03cb                                                                           | No Moderate or Severe Fraility or aged < 80 |
+| "http://smartlifehealth.info/smh#77d165f7-dbcc-47a6-aa27-a72a971b7d66" | 6179  | CRM03cb                                                                           | No Moderate or Severe Fraility or aged < 80 |
 | "http://smartlifehealth.info/smh#c9d5a571-99e5-410c-a3ab-9614fc737a28" |       | CRM08Ba                                                                           | Earliest BMI >= 15 and < 30 |
 | "http://smartlifehealth.info/smh#f186e53d-7f79-41e6-9c2f-eab9b7d56cb6" |       | CRM08Bb                                                                           | Earliest BMI >= 30 and < 50 |
 | "http://smartlifehealth.info/smh#44d957b8-2826-42dd-b46b-4b4d6f7161db" |       | CRM08Bc                                                                           | Earliest BMI >= 50 and <= 80 |
-| "http://smartlifehealth.info/smh#59f87b9c-64b7-4720-96f6-c8c5b56d70a7" |       | CRM04DA                                                                           | CKD, CVD, DM or HF Registers |
+| "http://smartlifehealth.info/smh#59f87b9c-64b7-4720-96f6-c8c5b56d70a7" | 41    | CRM04DA                                                                           | CKD, CVD, DM or HF Registers |
 | "http://smartlifehealth.info/smh#74143d77-3f63-49c5-b733-e1cbae658767" |       | CRM04DB                                                                           | Atrial Fibrillation, Hypertension, MASLD or NDH | QRISK > 10% |
 | "http://smartlifehealth.info/smh#68292750-39b5-4725-bd0b-894ea40d34d9" |       | CRM01Db                                                                           | HYP | NO FRAIL | 2 BPs>=140/90 & HYP OR BP<130/80 OR DABP<135/85 |
 | "http://smartlifehealth.info/smh#20697959-baff-466c-a634-7eab4241c092" |       | CRM01Dc                                                                           | HYP | NO FRAIL | BP<140/90 or DABP<135/85 after prev BP>=140/90 |
@@ -1509,9 +1509,9 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#29a5c106-df1a-4647-b321-ca73eba23782" |       | CRM01Cd                                                                           | DM | THIS FY | HbA1c < 42 OR DM excluded |
 | "http://smartlifehealth.info/smh#493cf048-cdf7-4a5f-bb59-b1f610977395" |       | CRM01Ea                                                                           | NDH | HbA1c =>42 &<48 before 1st Jan nxt yr AND NO DM or NDH diagnosis |
 | "http://smartlifehealth.info/smh#37136728-e3f5-4c95-9ab2-692313b537a0" |       | CRM01Ca                                                                           | DM | HbA1c >=48 or Fructosamine >= 228 & NOT on DM Register |
-| "http://smartlifehealth.info/smh#5a63d1e0-540d-4bc3-911b-490094b5fd0d" |       | CRM01Ba                                                                           | CKD | BEFORE START OF FY | Patients with CKD 1-2 or CKD 3-5 |
-| "http://smartlifehealth.info/smh#bb3b061a-4f5e-46f4-b662-18b38f437780" |       | CRM01Bb                                                                           | CKD | 2* eGFR<60 or 2*uACR>3 |
-| "http://smartlifehealth.info/smh#15f6fed1-8660-4c49-b6e4-2d5e94a8ce2f" |       | CRM01Bc                                                                           | CKD | BEFORE 1ST JAN NEXT YEAR | First eGFR<60 OR uACR>3 |
+| "http://smartlifehealth.info/smh#5a63d1e0-540d-4bc3-911b-490094b5fd0d" | 1     | CRM01Ba                                                                           | CKD | BEFORE START OF FY | Patients with CKD 1-2 or CKD 3-5 |
+| "http://smartlifehealth.info/smh#bb3b061a-4f5e-46f4-b662-18b38f437780" | 1     | CRM01Bb                                                                           | CKD | 2* eGFR<60 or 2*uACR>3 |
+| "http://smartlifehealth.info/smh#15f6fed1-8660-4c49-b6e4-2d5e94a8ce2f" | 1     | CRM01Bc                                                                           | CKD | BEFORE 1ST JAN NEXT YEAR | First eGFR<60 OR uACR>3 |
 | "http://smartlifehealth.info/smh#5b01115a-793d-42fa-8394-42f46cb5433b" |       | CRM01Dda                                                                          | HYP | NO FRAIL | Daytime Average BP>=135/85 |
 | "http://smartlifehealth.info/smh#342d24d4-c939-4137-95c2-4967c0efbd4f" |       | CRM01Dga                                                                          | HYP | FRAIL | Daytime Average BP>=145/85 |
 | "http://smartlifehealth.info/smh#1e610559-d580-4e3f-808d-780bed714c42" |       | CRM01Dba                                                                          | HYP | NO FRAIL | More than once BP>=140/90 |
@@ -1523,12 +1523,12 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#80f3104f-b935-4899-a663-c873f8a397f1" |       | CRM12Na                                                                           | DQ | THIS FY | Blood Pressure reading excluding home 130/80 |
 | "http://smartlifehealth.info/smh#5f0db3fd-70fb-4eed-8b9a-418ad801fd6f" |       | CRM12Nb                                                                           | DQ | THIS FY | Blood Pressure reading done at Home 125/75 |
 | "http://smartlifehealth.info/smh#4e2e6e50-583d-4d2a-971b-c143c505418d" |       | CRM01Baa                                                                          | CKD | BEFORE START OF FY | Patients with CKD 1-2 |
-| "http://smartlifehealth.info/smh#6a1f69b6-ce0f-4f4c-91ca-ed7dd97778f0" |       | CRM01Bab                                                                          | CKD | BEFORE START OF FY | Patients with CKD 3-5 |
-| "http://smartlifehealth.info/smh#23e9a9fe-a41a-4cbd-932e-e379f4501790" |       | CRM01Bba                                                                          | CKD | Latest eGFR<60 & 2nd eGFR <60 between 3m and 2yrs ago |
+| "http://smartlifehealth.info/smh#6a1f69b6-ce0f-4f4c-91ca-ed7dd97778f0" | 1     | CRM01Bab                                                                          | CKD | BEFORE START OF FY | Patients with CKD 3-5 |
+| "http://smartlifehealth.info/smh#23e9a9fe-a41a-4cbd-932e-e379f4501790" | 1     | CRM01Bba                                                                          | CKD | Latest eGFR<60 & 2nd eGFR <60 between 3m and 2yrs ago |
 | "http://smartlifehealth.info/smh#5059781b-bf35-4dd8-9eb6-9e1fc6d45a1a" |       | CRM01Bbb                                                                          | CKD | uACR> 3 & 2nd uACR>3 between 1 wk & 2 yrs ago |
-| "http://smartlifehealth.info/smh#a1c87095-b26e-4f54-a9a1-ea696e2cdb56" |       | CRM01Bca                                                                          | CKD | BEFORE 1ST JAN NEXT YEAR | First eGFR<60 |
+| "http://smartlifehealth.info/smh#a1c87095-b26e-4f54-a9a1-ea696e2cdb56" | 405   | CRM01Bca                                                                          | CKD | BEFORE 1ST JAN NEXT YEAR | First eGFR<60 |
 | "http://smartlifehealth.info/smh#76306d13-200f-491f-ada1-900a92c22816" |       | CRM01Bcb                                                                          | CKD | BEFORE 1ST JAN NEXT YR |1st uACR>3 OR Urine Protein/Creatine>30 |
-| "http://smartlifehealth.info/smh#9604a9bf-a3c1-4b28-8381-0bd157d0e511" |       | CRM01Caa                                                                          | DM | BEFORE START OF FY | Diabetes Register |
+| "http://smartlifehealth.info/smh#9604a9bf-a3c1-4b28-8381-0bd157d0e511" | 15    | CRM01Caa                                                                          | DM | BEFORE START OF FY | Diabetes Register |
 | "http://smartlifehealth.info/smh#4366e18f-8e46-48d4-8907-98ec9813a419" |       | CRM01Cab                                                                          | DM | BEFORE 1ST JAN NEXT YEAR | HbA1c >= 48 OR Fructosamine >= 228 |
 | "http://smartlifehealth.info/smh#c15e39d7-65e4-42ed-9c2c-e2bf36a57f16" |       | CRM01Cbb                                                                          | DM | HbA1c >= 48 OR Fructosamine >= 228 more than once |
 | "http://smartlifehealth.info/smh#945fd5bb-5540-4c76-9011-c7f2cc560bf4" |       | CRM01Cca                                                                          | DM | NDH diagnosis |
@@ -1546,7 +1546,7 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#73dbc52a-7968-4b67-b46f-8d3826320aa7" |       | CRM03ab                                                                           | DQ | Not Frail | Home | LAST 15M TO END OF FY | 130/80 BP reading |
 | "http://smartlifehealth.info/smh#080f49f8-1b8b-4d08-85dc-bd7f2b2d0c47" |       | CRM03ba                                                                           | DQ | Frail | Not Home | LAST 15M TO END OF FY | 150/90 BP reading |
 | "http://smartlifehealth.info/smh#90a60ec7-5bb1-4ec9-8b16-0e989c00d360" |       | CRM03bb                                                                           | DQ | Frail | Home | LAST 15M TO END OF FY | 150/90 BP reading |
-| "http://smartlifehealth.info/smh#ad2b54f4-c320-41b4-96b3-14138d6830b9" |       | CRM01Eaa                                                                          | NDH | BEFORE START OF FY | Diabetes or NDH or Gestational DM |
+| "http://smartlifehealth.info/smh#ad2b54f4-c320-41b4-96b3-14138d6830b9" | 12    | CRM01Eaa                                                                          | NDH | BEFORE START OF FY | Diabetes or NDH or Gestational DM |
 | "http://smartlifehealth.info/smh#e49ef0d7-dc77-4231-8993-d6a08681b10a" |       | CRM01Cb                                                                           | DM | Diabetes Diagnosis & HbA1c >=48 |
 | "http://smartlifehealth.info/smh#0acd5f75-66e9-4fba-864d-19e18b01fe28" |       | CRM01Cc                                                                           | DM | NDH Diagnosis and 2nd HbA1c btwn 42 & 47 |
 | "http://smartlifehealth.info/smh#cd739453-2926-4cd8-b1bc-3ea316f0dca1" |       | CRM01Eb                                                                           | NDH | NDH Diagnosis & HbA1c >=42 & <48 |
@@ -1563,25 +1563,25 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#a0072cb6-c91c-4aec-9cf1-d5e5f9131edf" |       | CRM01EC                                                                           | NDH | DQ | HbA1c btwn 42 & 47 | MISSING 2nd HbA1c in FY |
 | "http://smartlifehealth.info/smh#a4eca8d4-a12a-42e1-b10a-d648008100e6" |       | NHS NUMBERS                                                                       | EMCRM01C | Missing HbA1c in Financial Year -report |
 | "http://smartlifehealth.info/smh#867621b5-7e02-4749-8180-456f30a6bec5" |       | NHS NUMBERS                                                                       | EMCRM01E | Missing HbA1c in Financial Year -report |
-| "http://smartlifehealth.info/smh#6924bcc3-f3c8-41ca-a1e5-7e64663d6514" |       | CRM00A - Female                                                                   |
-| "http://smartlifehealth.info/smh#3c5d6ac5-2c10-436a-93a4-e4a586256dcf" |       | CRM00A - Male                                                                     |
-| "http://smartlifehealth.info/smh#4d2e07e1-c97b-4e82-9e48-8414c69f9fb2" |       | EMCRM00 -report                                                                   |
-| "http://smartlifehealth.info/smh#693e0db0-8139-4cf9-b1ce-cf858b60f0fd" |       | Age < 45                                                                          |
-| "http://smartlifehealth.info/smh#85a86eaa-5a62-437a-9a3d-26ffca0749dc" |       | Age >= 45 & < 58                                                                  |
-| "http://smartlifehealth.info/smh#7bf88879-fd33-466d-bd06-c1e1dafcc30a" |       | Age >= 58 & < 70                                                                  |
-| "http://smartlifehealth.info/smh#152f6206-a34d-4074-b3f6-cd3bc300b098" |       | Age >= 70                                                                         |
-| "http://smartlifehealth.info/smh#9438e69e-74fd-42ff-ad16-700f5cc06c01" |       | EMCRM00a -report                                                                  |
-| "http://smartlifehealth.info/smh#7b91c2e9-1eb4-4666-9059-83364b5e9fcc" |       | Age < 45                                                                          |
-| "http://smartlifehealth.info/smh#e2343c6a-f1d9-4e5a-b304-24503a78f10d" |       | Age >= 45 & < 58                                                                  |
-| "http://smartlifehealth.info/smh#a55b103f-2eb4-401b-9cbc-d3de60c359f5" |       | Age >= 58 & < 70                                                                  |
-| "http://smartlifehealth.info/smh#f647c758-f8e4-45af-944e-d0df4e9d1213" |       | Age >= 70                                                                         |
-| "http://smartlifehealth.info/smh#bdede5fb-c756-4092-9cb9-3a0289321a27" |       | EMCRM00b -report                                                                  |
-| "http://smartlifehealth.info/smh#27628645-4475-4cf6-99ae-4105abd26a0e" |       | EMCRM00aa -report                                                                 |
-| "http://smartlifehealth.info/smh#22db9fcd-c473-4dd1-850b-64f3875df576" |       | EMCRM00ab -report                                                                 |
-| "http://smartlifehealth.info/smh#32b1a0f7-1a0c-43ab-b6ae-3f263442fb4e" |       | EMCRM00ac -report                                                                 |
-| "http://smartlifehealth.info/smh#7b20728a-fa7a-4f55-a6d3-b7de7b079b61" |       | EMCRM00ad -report                                                                 |
-| "http://smartlifehealth.info/smh#eee3c226-1fbd-4a69-93b0-19535effcae5" |       | EMCRM00ba -report                                                                 |
-| "http://smartlifehealth.info/smh#28ffa8d7-95fe-4ec2-9dd7-07dd4d93547d" |       | EMCRM00bb -report                                                                 |
+| "http://smartlifehealth.info/smh#6924bcc3-f3c8-41ca-a1e5-7e64663d6514" | 16    | CRM00A - Female                                                                   |
+| "http://smartlifehealth.info/smh#3c5d6ac5-2c10-436a-93a4-e4a586256dcf" | 22    | CRM00A - Male                                                                     |
+| "http://smartlifehealth.info/smh#4d2e07e1-c97b-4e82-9e48-8414c69f9fb2" | 59    | EMCRM00 -report                                                                   |
+| "http://smartlifehealth.info/smh#693e0db0-8139-4cf9-b1ce-cf858b60f0fd" | 8     | Age < 45                                                                          |
+| "http://smartlifehealth.info/smh#85a86eaa-5a62-437a-9a3d-26ffca0749dc" | 2     | Age >= 45 & < 58                                                                  |
+| "http://smartlifehealth.info/smh#7bf88879-fd33-466d-bd06-c1e1dafcc30a" | 2     | Age >= 58 & < 70                                                                  |
+| "http://smartlifehealth.info/smh#152f6206-a34d-4074-b3f6-cd3bc300b098" | 4     | Age >= 70                                                                         |
+| "http://smartlifehealth.info/smh#9438e69e-74fd-42ff-ad16-700f5cc06c01" | 26    | EMCRM00a -report                                                                  |
+| "http://smartlifehealth.info/smh#7b91c2e9-1eb4-4666-9059-83364b5e9fcc" | 6     | Age < 45                                                                          |
+| "http://smartlifehealth.info/smh#e2343c6a-f1d9-4e5a-b304-24503a78f10d" | 8     | Age >= 45 & < 58                                                                  |
+| "http://smartlifehealth.info/smh#a55b103f-2eb4-401b-9cbc-d3de60c359f5" | 5     | Age >= 58 & < 70                                                                  |
+| "http://smartlifehealth.info/smh#f647c758-f8e4-45af-944e-d0df4e9d1213" | 3     | Age >= 70                                                                         |
+| "http://smartlifehealth.info/smh#bdede5fb-c756-4092-9cb9-3a0289321a27" | 32    | EMCRM00b -report                                                                  |
+| "http://smartlifehealth.info/smh#27628645-4475-4cf6-99ae-4105abd26a0e" | 9     | EMCRM00aa -report                                                                 |
+| "http://smartlifehealth.info/smh#22db9fcd-c473-4dd1-850b-64f3875df576" | 3     | EMCRM00ab -report                                                                 |
+| "http://smartlifehealth.info/smh#32b1a0f7-1a0c-43ab-b6ae-3f263442fb4e" | 4     | EMCRM00ac -report                                                                 |
+| "http://smartlifehealth.info/smh#7b20728a-fa7a-4f55-a6d3-b7de7b079b61" | 10    | EMCRM00ad -report                                                                 |
+| "http://smartlifehealth.info/smh#eee3c226-1fbd-4a69-93b0-19535effcae5" | 11    | EMCRM00ba -report                                                                 |
+| "http://smartlifehealth.info/smh#28ffa8d7-95fe-4ec2-9dd7-07dd4d93547d" | 12    | EMCRM00bb -report                                                                 |
 | "http://smartlifehealth.info/smh#885b4a61-7684-4909-b3f6-c3f4f9c44cb4" |       | EMCRM00bc -report                                                                 |
 | "http://smartlifehealth.info/smh#fe1d40dc-ab81-41ff-a999-3877753f21fa" |       | EMCRM00bd -report                                                                 |
 | "http://smartlifehealth.info/smh#45d250e6-66ba-4c83-a3d7-7f58f35a8e8d" |       | RISKA02 -report                                                                   |
@@ -1727,75 +1727,75 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#75ae18a9-db40-4b8f-9dd1-fc41165b6a2b" |       | *RESP01N-DQ-MISSING 8 Care Processes                                              |
 | "http://smartlifehealth.info/smh#388fe9b8-5051-4a2b-9d07-f4a2760e2cd6" |       | ANONYMISED-DQ-MISSING 8 Care Processes -report                                    |
 | "http://smartlifehealth.info/smh#870d44a7-ad1b-4e4b-885b-5812ed21a9e7" |       | NHS NUMBERS-DQ-MISSING 8 Care Processes -report                                   |
-| "http://smartlifehealth.info/smh#fc4945a7-6c26-4e5b-b7b9-5d63188c5e3a" |       | RESP02N-DQ-MISSING Inhaler Technique (in Financial Yr)                            |
-| "http://smartlifehealth.info/smh#0a4ec85d-2f69-4c08-aa55-69e31701aab5" |       | ANONYMISED-DQ-Missing Inhaler Technique -report                                   |
-| "http://smartlifehealth.info/smh#027bafd2-89c0-4d4d-8a9d-4f6813184edb" |       | NHS NUMBERS-DQ-Missing Inhaler Technique -report                                  |
+| "http://smartlifehealth.info/smh#fc4945a7-6c26-4e5b-b7b9-5d63188c5e3a" | 7     | RESP02N-DQ-MISSING Inhaler Technique (in Financial Yr)                            |
+| "http://smartlifehealth.info/smh#0a4ec85d-2f69-4c08-aa55-69e31701aab5" | 7     | ANONYMISED-DQ-Missing Inhaler Technique -report                                   |
+| "http://smartlifehealth.info/smh#027bafd2-89c0-4d4d-8a9d-4f6813184edb" | 7     | NHS NUMBERS-DQ-Missing Inhaler Technique -report                                  |
 | "http://smartlifehealth.info/smh#8c1096fe-0b42-4dbd-a531-6c017e8382fa" |       | RESP03-DQ-Asthma patients diagnosed in FY MISSING MART or AIR Inhaler Therapy     |
 | "http://smartlifehealth.info/smh#3e92f9c5-6c6b-4f58-8c7a-a52da66f9a58" |       | ANONYMISED-DQ-MISSING MART or AIR inhaled therapy -report                         |
 | "http://smartlifehealth.info/smh#217e6431-3062-4fb0-90dc-8d177086eb19" |       | NHS NUMBERS-DQ-MISSING MART or AIR inhaled therapy -report                        |
-| "http://smartlifehealth.info/smh#a0ec6330-ebc7-4e8a-a279-9942191e49f5" |       | *CRM00                                                                            | REGISTER | Patients on CRM Register |
-| "http://smartlifehealth.info/smh#5b7c5ee7-19c9-4eff-a668-629332c64d5c" |       | EMCRM00A -report                                                                  |
-| "http://smartlifehealth.info/smh#b23ea154-2910-4752-9e57-795c529e28f9" |       | *RISK00A                                                                          | Group 1 | 14 or more risk factors |
+| "http://smartlifehealth.info/smh#a0ec6330-ebc7-4e8a-a279-9942191e49f5" | 38    | *CRM00                                                                            | REGISTER | Patients on CRM Register |
+| "http://smartlifehealth.info/smh#5b7c5ee7-19c9-4eff-a668-629332c64d5c" | 38    | EMCRM00A -report                                                                  |
+| "http://smartlifehealth.info/smh#b23ea154-2910-4752-9e57-795c529e28f9" | 35    | *RISK00A                                                                          | Group 1 | 14 or more risk factors |
 | "http://smartlifehealth.info/smh#48425339-4a29-462c-a444-d65145a0ff20" |       | *RISK00B                                                                          | Group 2 | 10-13 risk factors |
-| "http://smartlifehealth.info/smh#165e9f22-e5bd-48ae-8d9a-5f765ed98c3c" |       | *RISK00C                                                                          | Group 3 | 0-9 risk factors |
+| "http://smartlifehealth.info/smh#165e9f22-e5bd-48ae-8d9a-5f765ed98c3c" | 3     | *RISK00C                                                                          | Group 3 | 0-9 risk factors |
 | "http://smartlifehealth.info/smh#8cd82b75-9a5d-4963-81eb-6c35473f18f4" |       | CRM00B                                                                            | LAST 15 MONTHS | Tracking | Groups 1&2 | First & Follow Up appointments |
 | "http://smartlifehealth.info/smh#d6d7c848-e08d-4cbe-8468-f9575e70ae29" |       | CRM01B                                                                            | CKD | DQ | MISSING CKD Diagnosis Code |
 | "http://smartlifehealth.info/smh#16d06725-69e9-4e9f-b409-5f4f6070e0bb" |       | CRM01C                                                                            | DM | DQ | MISSING Diabetes Diagnosis OR NDH Diagnosis OR 2nd HbA1c |
 | "http://smartlifehealth.info/smh#8488d7f5-8bf4-4115-9441-658ceb3bb2c3" |       | CRM01DA                                                                           | HYP | DQ | DABP>=135/85 or 145/85 | MISSING Hypertension |
 | "http://smartlifehealth.info/smh#5701dbd4-95ec-4e08-b7f7-421f1bbd3918" |       | CRM01DB                                                                           | HYP | DQ | 2 BP>=140/90 | MISSING HYP OR BP<130/80 OR DABP<135/85 |
-| "http://smartlifehealth.info/smh#4bdc94e9-9d51-495f-9834-27989fea2d64" |       | CRM01A                                                                            | AF | DQ | MISSING ECG or Pulse Rhythm Check |
+| "http://smartlifehealth.info/smh#4bdc94e9-9d51-495f-9834-27989fea2d64" | 16    | CRM01A                                                                            | AF | DQ | MISSING ECG or Pulse Rhythm Check |
 | "http://smartlifehealth.info/smh#58c36716-70d7-4890-8235-3037807ddfc3" |       | NHS NUMBERS                                                                       | EMCRM01B | Missing CKD Diagnosis -report |
 | "http://smartlifehealth.info/smh#3640ea3b-3b6f-47bc-8612-d84628577835" |       | CRM01E                                                                            | NDH | DQ | HbA1c >=42 & <47 | MISSING NDH OR DM or 2nd HbA1c |
 | "http://smartlifehealth.info/smh#200348d0-93b8-4c5e-bedc-8f3fccf81f35" |       | NHS NUMBERS                                                                       | EMCRM01C | Missing Diabetes Diagnosis OR NDH diagnosis -report |
 | "http://smartlifehealth.info/smh#b8c48425-23c9-4d60-bfb3-7b072efec02f" |       | NHS NUMBERS                                                                       | EMCRM01D | Missing Hypertension Diagnosis -report |
 | "http://smartlifehealth.info/smh#45ca6912-855a-407f-98c9-759c74faab9e" |       | NHS NUMBERS                                                                       | EMCRM01D | Missing Hypertension Diagnosis -report |
-| "http://smartlifehealth.info/smh#4d3ef0ed-a700-4941-ba04-5d05b97dca7c" |       | NHS NUMBERS                                                                       | EMCRM01A | Missing ECG or Pulse Rhythm Check -report |
+| "http://smartlifehealth.info/smh#4d3ef0ed-a700-4941-ba04-5d05b97dca7c" | 16    | NHS NUMBERS                                                                       | EMCRM01A | Missing ECG or Pulse Rhythm Check -report |
 | "http://smartlifehealth.info/smh#ad98d2cd-3e1a-4f89-8aac-f74b4d9b5656" |       | NHS NUMBERS                                                                       | EMCRM01E | Missing NDH or Diabetes Diagnosis -report |
 | "http://smartlifehealth.info/smh#70e29f22-d53c-4849-9dc1-1a5f9d4ec60e" |       | CRM01DC                                                                           | HYP | DQ | Earliest BP >= 140/90 | MISSING 2nd Blood Pressure |
 | "http://smartlifehealth.info/smh#1d22ee8a-59d7-4487-a7d3-cdbc48b9c6d9" |       | NHS NUMBERS                                                                       | EMCRM01D | Missing Blood pressure reading in Financial Year -report |
-| "http://smartlifehealth.info/smh#0093952a-a8bb-4425-92a4-9550f6002187" |       | CRM02a                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT HbA1c |
-| "http://smartlifehealth.info/smh#4ce172e1-d0e5-4c0d-8e61-9c435e43d9ee" |       | CRM02b                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Blood Pressure |
-| "http://smartlifehealth.info/smh#a2bc834e-8ef5-40a8-9a29-7fe548486510" |       | CRM02c                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Lipids |
-| "http://smartlifehealth.info/smh#cc6ae025-0ffb-48d1-9247-d0fecbea89c8" |       | CRM02d                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Urine ACR |
-| "http://smartlifehealth.info/smh#950f073b-b863-4612-9927-5b62960c45a4" |       | CRM02e                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT eGFR |
-| "http://smartlifehealth.info/smh#c9a5c359-3e58-43bd-8015-e95aba42cdaf" |       | CRM02f                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT BMI |
-| "http://smartlifehealth.info/smh#2861b08b-5555-49e2-b811-c10c7350fc4e" |       | CRM02h                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Smoking Status |
-| "http://smartlifehealth.info/smh#007a047e-ee5a-46a4-824a-16ef53bfc92f" |       | CRM02g                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Waist Circumference |
-| "http://smartlifehealth.info/smh#85e06e50-2ce8-44f4-b65d-b12a2b971077" |       | CRM02i                                                                            | DIABETES | DQ | LAST 15M TO END OF FY | WITHOUT MH Screening |
-| "http://smartlifehealth.info/smh#005846f3-0e7b-4faf-8cc2-022c4697c8f9" |       | CRM02j                                                                            | DIABETES | DQ | LAST 15M TO END OF FY | WITHOUT Foot Check |
-| "http://smartlifehealth.info/smh#5a5d0ea9-c05b-4143-a032-e15dfc4fcc2e" |       | CRM02k                                                                            | DIABETES | DQ | LAST 27M TO END OF FY | WITHOUT Retinal Screening |
-| "http://smartlifehealth.info/smh#c1f60e0c-4c72-4c78-9788-05d6751f6c4b" |       | CRM02l                                                                            | DIABETES OR MASLD | DQ | LAST 39M TO END OF FY | WITHOUT FIB-4 |
-| "http://smartlifehealth.info/smh#1c191ce7-896e-4cb7-a879-af4e0f536ea9" |       | *CRM02                                                                            | ALL CRM | DQ | Key Care Processes NOT Completed |
-| "http://smartlifehealth.info/smh#670644f8-ef6a-42d6-a6e3-931c5af6d87c" |       | Diabetic Patients                                                                 |
+| "http://smartlifehealth.info/smh#0093952a-a8bb-4425-92a4-9550f6002187" | 38    | CRM02a                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT HbA1c |
+| "http://smartlifehealth.info/smh#4ce172e1-d0e5-4c0d-8e61-9c435e43d9ee" | 38    | CRM02b                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Blood Pressure |
+| "http://smartlifehealth.info/smh#a2bc834e-8ef5-40a8-9a29-7fe548486510" | 38    | CRM02c                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Lipids |
+| "http://smartlifehealth.info/smh#cc6ae025-0ffb-48d1-9247-d0fecbea89c8" | 38    | CRM02d                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Urine ACR |
+| "http://smartlifehealth.info/smh#950f073b-b863-4612-9927-5b62960c45a4" | 38    | CRM02e                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT eGFR |
+| "http://smartlifehealth.info/smh#c9a5c359-3e58-43bd-8015-e95aba42cdaf" | 38    | CRM02f                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT BMI |
+| "http://smartlifehealth.info/smh#2861b08b-5555-49e2-b811-c10c7350fc4e" | 38    | CRM02h                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Smoking Status |
+| "http://smartlifehealth.info/smh#007a047e-ee5a-46a4-824a-16ef53bfc92f" | 38    | CRM02g                                                                            | ALL CRM | DQ | LAST 15M TO END OF FY | WITHOUT Waist Circumference |
+| "http://smartlifehealth.info/smh#85e06e50-2ce8-44f4-b65d-b12a2b971077" | 11    | CRM02i                                                                            | DIABETES | DQ | LAST 15M TO END OF FY | WITHOUT MH Screening |
+| "http://smartlifehealth.info/smh#005846f3-0e7b-4faf-8cc2-022c4697c8f9" | 11    | CRM02j                                                                            | DIABETES | DQ | LAST 15M TO END OF FY | WITHOUT Foot Check |
+| "http://smartlifehealth.info/smh#5a5d0ea9-c05b-4143-a032-e15dfc4fcc2e" | 11    | CRM02k                                                                            | DIABETES | DQ | LAST 27M TO END OF FY | WITHOUT Retinal Screening |
+| "http://smartlifehealth.info/smh#c1f60e0c-4c72-4c78-9788-05d6751f6c4b" | 11    | CRM02l                                                                            | DIABETES OR MASLD | DQ | LAST 39M TO END OF FY | WITHOUT FIB-4 |
+| "http://smartlifehealth.info/smh#1c191ce7-896e-4cb7-a879-af4e0f536ea9" | 38    | *CRM02                                                                            | ALL CRM | DQ | Key Care Processes NOT Completed |
+| "http://smartlifehealth.info/smh#670644f8-ef6a-42d6-a6e3-931c5af6d87c" | 11    | Diabetic Patients                                                                 |
 | "http://smartlifehealth.info/smh#4573afbc-cdab-4b77-bc20-444febb803af" |       | Metabolic dysfunction-associated steototic disease patients                       |
-| "http://smartlifehealth.info/smh#072146c4-df5a-42ad-bca7-7e8369b43e89" |       | NO Diabetes or Metabolic dysfunction-associated steototic disease                 |
-| "http://smartlifehealth.info/smh#cceb3237-889a-4926-be51-9bcac5a08b5e" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed -report |
-| "http://smartlifehealth.info/smh#26ca75bd-4f01-4e77-8c10-0c7f09b517ca" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed (more detailed) -report |
+| "http://smartlifehealth.info/smh#072146c4-df5a-42ad-bca7-7e8369b43e89" | 27    | NO Diabetes or Metabolic dysfunction-associated steototic disease                 |
+| "http://smartlifehealth.info/smh#cceb3237-889a-4926-be51-9bcac5a08b5e" | 22    | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed -report |
+| "http://smartlifehealth.info/smh#26ca75bd-4f01-4e77-8c10-0c7f09b517ca" | 22    | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed (more detailed) -report |
 | "http://smartlifehealth.info/smh#d1c8d888-8bd5-483e-992d-0659079a2ce6" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed -report |
 | "http://smartlifehealth.info/smh#8d4795a5-a77a-432c-830c-864e92fba80f" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed (more detailed) -report |
-| "http://smartlifehealth.info/smh#65b84093-4f26-4128-958f-ef3bc0a7117c" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed -report |
-| "http://smartlifehealth.info/smh#b5a21ad7-175e-46ba-ad07-f5c5f7799b99" |       | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed (more detailed) -report |
-| "http://smartlifehealth.info/smh#8c9b866b-7b23-4aef-93a0-ce309c186c6f" |       | CRM03A                                                                            | DQ | NOT FRAIL OR AGE<79 | LAST 15M TO END OF FY | Latest BP>130/80 |
-| "http://smartlifehealth.info/smh#73510d76-baad-4d5b-b154-ba39eb32d830" |       | CRM03B                                                                            | DQ | FRAIL OR AGE>=80 | LAST 15M TO END OF FY | BP>150/90 |
-| "http://smartlifehealth.info/smh#94603a5d-8809-4667-a9f5-7ab356844143" |       | CRM03                                                                             | NHS NUMBERS | Blood Pressure > 130/80 -report |
-| "http://smartlifehealth.info/smh#5094abd1-1d72-424c-97ce-0864c8fb1d33" |       | CRM03                                                                             | NHS NUMBERS | Blood Pressure > 150/90 -report |
-| "http://smartlifehealth.info/smh#baf81552-ad06-4744-bfc0-a00c42590628" |       | CRM04                                                                             | DQ | NOT Prescribed Mod/High Intensity Statin OR Exception codes in FY |
-| "http://smartlifehealth.info/smh#7fe2a0fe-ceae-41ed-a675-6eb8be70a6ef" |       | CRM04a                                                                            | DQ | LAST 6M | NOT Prescribed Moderate or High Intensity Statin |
-| "http://smartlifehealth.info/smh#5b99f11e-a07a-4b92-a76d-37546d6e4243" |       | NHS NUMBERS                                                                       | DQ | Moderate or High Intensity Statins NOT Prescribed -report |
-| "http://smartlifehealth.info/smh#3df569da-ad7f-4a26-b79c-a0ec927c82d7" |       | CRM05                                                                             | DQ | LAST 6M | NOT Prescribed ACE inhibitor/ARB |
-| "http://smartlifehealth.info/smh#fec668f1-e1d5-4487-80c9-a5f7b36d06f2" |       | NHS NUMBERS                                                                       | DQ | ACE Inhibitor/ARB NOT Prescribed -report |
+| "http://smartlifehealth.info/smh#65b84093-4f26-4128-958f-ef3bc0a7117c" | 35    | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed -report |
+| "http://smartlifehealth.info/smh#b5a21ad7-175e-46ba-ad07-f5c5f7799b99" | 35    | NHS NUMBERS                                                                       | CRM02 | Key Care Processes NOT Completed (more detailed) -report |
+| "http://smartlifehealth.info/smh#8c9b866b-7b23-4aef-93a0-ce309c186c6f" | 10    | CRM03A                                                                            | DQ | NOT FRAIL OR AGE<79 | LAST 15M TO END OF FY | Latest BP>130/80 |
+| "http://smartlifehealth.info/smh#73510d76-baad-4d5b-b154-ba39eb32d830" | 1     | CRM03B                                                                            | DQ | FRAIL OR AGE>=80 | LAST 15M TO END OF FY | BP>150/90 |
+| "http://smartlifehealth.info/smh#94603a5d-8809-4667-a9f5-7ab356844143" | 10    | CRM03                                                                             | NHS NUMBERS | Blood Pressure > 130/80 -report |
+| "http://smartlifehealth.info/smh#5094abd1-1d72-424c-97ce-0864c8fb1d33" | 1     | CRM03                                                                             | NHS NUMBERS | Blood Pressure > 150/90 -report |
+| "http://smartlifehealth.info/smh#baf81552-ad06-4744-bfc0-a00c42590628" | 37    | CRM04                                                                             | DQ | NOT Prescribed Mod/High Intensity Statin OR Exception codes in FY |
+| "http://smartlifehealth.info/smh#7fe2a0fe-ceae-41ed-a675-6eb8be70a6ef" | 37    | CRM04a                                                                            | DQ | LAST 6M | NOT Prescribed Moderate or High Intensity Statin |
+| "http://smartlifehealth.info/smh#5b99f11e-a07a-4b92-a76d-37546d6e4243" | 37    | NHS NUMBERS                                                                       | DQ | Moderate or High Intensity Statins NOT Prescribed -report |
+| "http://smartlifehealth.info/smh#3df569da-ad7f-4a26-b79c-a0ec927c82d7" | 1     | CRM05                                                                             | DQ | LAST 6M | NOT Prescribed ACE inhibitor/ARB |
+| "http://smartlifehealth.info/smh#fec668f1-e1d5-4487-80c9-a5f7b36d06f2" | 1     | NHS NUMBERS                                                                       | DQ | ACE Inhibitor/ARB NOT Prescribed -report |
 | "http://smartlifehealth.info/smh#70db1e71-989a-4454-9578-b78a2db95791" |       | CRM06a                                                                            | DQ | LAST 6M | NOT Prescribed SGLT-2 inhibitors |
 | "http://smartlifehealth.info/smh#3af34be2-e4ce-49a2-9cdd-c06204e62697" |       | NHS NUMBERS                                                                       | DQ | SGLT-2 inhibitors NOT Prescribed -report |
-| "http://smartlifehealth.info/smh#8c2c55ac-f5f1-44e8-a379-7192235bc463" |       | CRM07a                                                                            | DQ | LAST 15M TO END OF FY | MISSING Care Plan |
-| "http://smartlifehealth.info/smh#a5e4743e-126b-48d3-be05-275bdd7ba230" |       | CRM07b                                                                            | DQ | LAST 15M TO END OF FY | MISSING Eat |
-| "http://smartlifehealth.info/smh#84fd7ebf-7a17-4304-a65f-b0305c186e3a" |       | CRM07c                                                                            | DQ | LAST 15M TO END OF FY | MISSING Physical Activity |
-| "http://smartlifehealth.info/smh#941ab686-e68c-46d3-be71-d36b7e92d47c" |       | CRM07d                                                                            | DQ | LAST 15M TO END OF FY | MISSING Sleep Pattern |
-| "http://smartlifehealth.info/smh#20dcc3a2-8fc8-4e5a-87f9-e4af4dc09866" |       | CRM07e                                                                            | DQ | LAST 15M TO END OF FY | MISSING Relax |
-| "http://smartlifehealth.info/smh#1f679988-42b3-4117-b571-97cf691b276c" |       | CRM07f                                                                            | DQ | LAST 15M TO END OF FY | MISSING Connect |
-| "http://smartlifehealth.info/smh#516fa60c-11f7-46bf-a82c-775921b756b3" |       | CRM07                                                                             | DQ | LAST 15M TO END OF FY | Holistic Care Plan NOT Completed |
-| "http://smartlifehealth.info/smh#2b75e867-04a6-4438-b8e4-726cce10f9f4" |       | CRM07g                                                                            | DQ | LAST 15M TO END OF FY | MISSING Avoid harmful substances |
-| "http://smartlifehealth.info/smh#ff0cddf8-b998-4cdd-b92b-93a9955adce0" |       | NHS NUMBERS                                                                       | CRM07 | Holistic Care Plan NOT Completed -report |
-| "http://smartlifehealth.info/smh#c32efcfe-f246-4c64-bfbc-48eadf0d4d7d" |       | NHS NUMBERS                                                                       | CRM07 | Holistic Care Plan NOT Completed (more detailed) -report |
+| "http://smartlifehealth.info/smh#8c2c55ac-f5f1-44e8-a379-7192235bc463" | 35    | CRM07a                                                                            | DQ | LAST 15M TO END OF FY | MISSING Care Plan |
+| "http://smartlifehealth.info/smh#a5e4743e-126b-48d3-be05-275bdd7ba230" | 35    | CRM07b                                                                            | DQ | LAST 15M TO END OF FY | MISSING Eat |
+| "http://smartlifehealth.info/smh#84fd7ebf-7a17-4304-a65f-b0305c186e3a" | 35    | CRM07c                                                                            | DQ | LAST 15M TO END OF FY | MISSING Physical Activity |
+| "http://smartlifehealth.info/smh#941ab686-e68c-46d3-be71-d36b7e92d47c" | 35    | CRM07d                                                                            | DQ | LAST 15M TO END OF FY | MISSING Sleep Pattern |
+| "http://smartlifehealth.info/smh#20dcc3a2-8fc8-4e5a-87f9-e4af4dc09866" | 35    | CRM07e                                                                            | DQ | LAST 15M TO END OF FY | MISSING Relax |
+| "http://smartlifehealth.info/smh#1f679988-42b3-4117-b571-97cf691b276c" | 35    | CRM07f                                                                            | DQ | LAST 15M TO END OF FY | MISSING Connect |
+| "http://smartlifehealth.info/smh#516fa60c-11f7-46bf-a82c-775921b756b3" | 35    | CRM07                                                                             | DQ | LAST 15M TO END OF FY | Holistic Care Plan NOT Completed |
+| "http://smartlifehealth.info/smh#2b75e867-04a6-4438-b8e4-726cce10f9f4" | 35    | CRM07g                                                                            | DQ | LAST 15M TO END OF FY | MISSING Avoid harmful substances |
+| "http://smartlifehealth.info/smh#ff0cddf8-b998-4cdd-b92b-93a9955adce0" | 43    | NHS NUMBERS                                                                       | CRM07 | Holistic Care Plan NOT Completed -report |
+| "http://smartlifehealth.info/smh#c32efcfe-f246-4c64-bfbc-48eadf0d4d7d" | 43    | NHS NUMBERS                                                                       | CRM07 | Holistic Care Plan NOT Completed (more detailed) -report |
 | "http://smartlifehealth.info/smh#54069d37-78ba-4512-a83f-8e0667ed0b0b" |       | CRM08Aa                                                                           | DQ | MISSING 2nd Exercise Status codes |
 | "http://smartlifehealth.info/smh#064a9fa8-f730-434a-894d-8e9f9f19bec3" |       | CRM08Ba                                                                           | DQ | MISSING 2nd BMI |
 | "http://smartlifehealth.info/smh#90b6764e-bd18-42f9-bbd7-b5de8627cc87" |       | CRM08Ca                                                                           | DQ | MISSING 2nd Smoking Status code |
@@ -1808,52 +1808,52 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#4c6be480-019a-41de-b038-a6d364c85611" |       | NHS NUMBERS                                                                       | CRM08A | No Improvement in Exercise -report |
 | "http://smartlifehealth.info/smh#c8cfb9ed-0d31-4e29-b8e9-7635d268397f" |       | NHS NUMBERS                                                                       | CRM08B | No Improvement in BMI -report |
 | "http://smartlifehealth.info/smh#d4fa886a-db29-477a-b630-85562fac3683" |       | NHS NUMBERS                                                                       | CRM08C | No Improvement in Smoking Status -report |
-| "http://smartlifehealth.info/smh#9c25ba35-a6aa-47a0-8f56-d212aea802a0" |       | CRM09a                                                                            | DQ | LAST 15M TO END OF FY | MISSING Health Confidence Score |
-| "http://smartlifehealth.info/smh#edfb9fb2-e110-4dea-82e6-816c08a8531f" |       | CRM09b                                                                            | DQ | LAST 15M TO END OF FY | MISSING 2 Health Confidence Scores |
-| "http://smartlifehealth.info/smh#1aa7f440-86fb-4f69-8568-04db80c1f74d" |       | NHS NUMBERS                                                                       | CRM09 | 2 Health Confidence Scores -report |
-| "http://smartlifehealth.info/smh#bf5773fa-60d0-4e94-aae9-ee19a4ebd7d1" |       | NHS NUMBERS                                                                       | CRM09 | Health Confidence Score -report |
-| "http://smartlifehealth.info/smh#d7fcc3b3-6bea-4f26-84bd-cdc2eb60df30" |       | CRM10b                                                                            | DQ | LAST 15M TO END OF FY | Latest BP > target |
-| "http://smartlifehealth.info/smh#346f6570-92a4-4b7f-b955-e789495527b9" |       | CRM10c                                                                            | DQ | LAST 15M TO END OF FY | Latest Non HDL Chol > 3 |
-| "http://smartlifehealth.info/smh#095e9b05-2ef8-4fba-a61b-a5b0c9fa5315" |       | CRM10a                                                                            | DQ | LAST 15M TO END OF FY | Latest HbA1c > target |
-| "http://smartlifehealth.info/smh#f5a566ee-3175-4a8f-81ca-f19c7d1db9af" |       | *CRM10                                                                            | DQ | LAST 15M TO END OF FY | 3 Treatment Targets NOT Completed |
-| "http://smartlifehealth.info/smh#0721652c-834d-4dea-b054-1e301b499d3a" |       | Patients with Moderate or Severe Frailty or aged >= 80                            |
-| "http://smartlifehealth.info/smh#84a497ac-7f3e-4d1c-88d0-4aa8672b4dc2" |       | Patients with no Moderate or Severe Frailty or aged < 80                          |
-| "http://smartlifehealth.info/smh#c019c4bb-163b-4fb2-a69a-b14c14ad960d" |       | NHS NUMBERS                                                                       | DQ | 3 Treatment Targets NOT Achieved (More Detailed) -report |
-| "http://smartlifehealth.info/smh#2a51f052-5cd6-4b13-91a7-b753c9f1ee14" |       | NHS NUMBERS                                                                       | DQ | 3 Treatment Targets NOT Achieved(More Detailed) -report |
+| "http://smartlifehealth.info/smh#9c25ba35-a6aa-47a0-8f56-d212aea802a0" | 35    | CRM09a                                                                            | DQ | LAST 15M TO END OF FY | MISSING Health Confidence Score |
+| "http://smartlifehealth.info/smh#edfb9fb2-e110-4dea-82e6-816c08a8531f" | 35    | CRM09b                                                                            | DQ | LAST 15M TO END OF FY | MISSING 2 Health Confidence Scores |
+| "http://smartlifehealth.info/smh#1aa7f440-86fb-4f69-8568-04db80c1f74d" | 35    | NHS NUMBERS                                                                       | CRM09 | 2 Health Confidence Scores -report |
+| "http://smartlifehealth.info/smh#bf5773fa-60d0-4e94-aae9-ee19a4ebd7d1" | 35    | NHS NUMBERS                                                                       | CRM09 | Health Confidence Score -report |
+| "http://smartlifehealth.info/smh#d7fcc3b3-6bea-4f26-84bd-cdc2eb60df30" | 11    | CRM10b                                                                            | DQ | LAST 15M TO END OF FY | Latest BP > target |
+| "http://smartlifehealth.info/smh#346f6570-92a4-4b7f-b955-e789495527b9" | 11    | CRM10c                                                                            | DQ | LAST 15M TO END OF FY | Latest Non HDL Chol > 3 |
+| "http://smartlifehealth.info/smh#095e9b05-2ef8-4fba-a61b-a5b0c9fa5315" | 11    | CRM10a                                                                            | DQ | LAST 15M TO END OF FY | Latest HbA1c > target |
+| "http://smartlifehealth.info/smh#f5a566ee-3175-4a8f-81ca-f19c7d1db9af" | 11    | *CRM10                                                                            | DQ | LAST 15M TO END OF FY | 3 Treatment Targets NOT Completed |
+| "http://smartlifehealth.info/smh#0721652c-834d-4dea-b054-1e301b499d3a" | 1     | Patients with Moderate or Severe Frailty or aged >= 80                            |
+| "http://smartlifehealth.info/smh#84a497ac-7f3e-4d1c-88d0-4aa8672b4dc2" | 10    | Patients with no Moderate or Severe Frailty or aged < 80                          |
+| "http://smartlifehealth.info/smh#c019c4bb-163b-4fb2-a69a-b14c14ad960d" | 1     | NHS NUMBERS                                                                       | DQ | 3 Treatment Targets NOT Achieved (More Detailed) -report |
+| "http://smartlifehealth.info/smh#2a51f052-5cd6-4b13-91a7-b753c9f1ee14" | 10    | NHS NUMBERS                                                                       | DQ | 3 Treatment Targets NOT Achieved(More Detailed) -report |
 | "http://smartlifehealth.info/smh#be630c1b-08fc-4f5f-b6f2-be3c5bf746dd" |       | CRM11                                                                             | DQ | LAST 15M TO END OF FY | Diagnosed in last 2 yrs HbA1c > 48 |
 | "http://smartlifehealth.info/smh#55800475-307c-458b-998c-9612ec89c9b9" |       | NHS NUMBERS                                                                       | Diagnosed in last 2 yrs without HbA1c <= 48 -report |
 | "http://smartlifehealth.info/smh#04b721c7-9221-44b0-af92-a361c0d43dfd" |       | CRM12                                                                             | DQ | THIS FY | Black & Black Britsh Hypertensive WITHOUT BP <140/90 |
 | "http://smartlifehealth.info/smh#473b3ab1-8619-43f5-b150-fa6c754ede56" |       | NHS NUMBERS                                                                       | DQ | Black & Black British Patients MISSING latest BP <140/90 -report |
 | "http://smartlifehealth.info/smh#e258ba3b-234c-443f-912f-3702d87faa62" |       | PC001                                                                             | Palliative care register |
-| "http://smartlifehealth.info/smh#f55ebf53-3c66-49f8-8180-83e063ff7817" |       | CRM00                                                                             | BEFORE 1ST JAN NEXT YEAR | Patients on CRM Register |
-| "http://smartlifehealth.info/smh#8b5d50ca-a28f-4a25-b628-8468f73756f4" |       | DM017                                                                             | Diabetes Register |
+| "http://smartlifehealth.info/smh#f55ebf53-3c66-49f8-8180-83e063ff7817" | 38    | CRM00                                                                             | BEFORE 1ST JAN NEXT YEAR | Patients on CRM Register |
+| "http://smartlifehealth.info/smh#8b5d50ca-a28f-4a25-b628-8468f73756f4" | 11    | DM017                                                                             | Diabetes Register |
 | "http://smartlifehealth.info/smh#8ff96584-3232-4e1b-87c6-4deb5db6bc1f" |       | MDST01                                                                            | Metabolic dysfunction-associated steatotic disease |
-| "http://smartlifehealth.info/smh#39c2a993-1753-4bd5-8f6e-7c2bfc1d0040" |       | CKD005                                                                            | CKD register |
+| "http://smartlifehealth.info/smh#39c2a993-1753-4bd5-8f6e-7c2bfc1d0040" | 1     | CKD005                                                                            | CKD register |
 | "http://smartlifehealth.info/smh#0e588b39-83d9-43d7-a6c4-6f716a798696" |       | HYP001                                                                            | Hypertension register |
 | "http://smartlifehealth.info/smh#4b7f934c-8705-4aad-84fd-9223c256d4c8" |       | HF1                                                                               | Unresolved diagnosis of heart failure |
 | "http://smartlifehealth.info/smh#e1ce8dcd-e6b8-4837-b977-ccb84aeaf58b" |       | DM017                                                                             | Diagnosed in last 2 years | Patients on Diabetes QOF Register |
-| "http://smartlifehealth.info/smh#1d9f252c-b24a-4852-b45c-d8474276f7a0" |       | AF001                                                                             | AF register |
-| "http://smartlifehealth.info/smh#322e8b3f-eb28-479a-a9df-ba8e01c23500" |       | CHD001                                                                            | CHD register |
+| "http://smartlifehealth.info/smh#1d9f252c-b24a-4852-b45c-d8474276f7a0" | 1     | AF001                                                                             | AF register |
+| "http://smartlifehealth.info/smh#322e8b3f-eb28-479a-a9df-ba8e01c23500" | 50    | CHD001                                                                            | CHD register |
 | "http://smartlifehealth.info/smh#3f3186e6-eb44-4c92-b7fe-4c06b81d7eff" |       | PAD001                                                                            | Peripheral arterial disease register |
 | "http://smartlifehealth.info/smh#74a0e9ae-fed0-4a87-8996-974cf4f1b5ab" |       | STIA001                                                                           | Stroke or TIA register |
 | "http://smartlifehealth.info/smh#d2c309a6-233e-4989-93ec-f8149ef43968" |       | NDH01                                                                             | Non-Diabetic Hyperglycaemia |
-| "http://smartlifehealth.info/smh#5d05c68a-75a9-4f9c-bb5a-379deccea18f" |       | AF001                                                                             | BEFORE 1ST JAN NEXT YEAR | AF register |
-| "http://smartlifehealth.info/smh#3bc4c128-bdea-4eae-a733-95b403201a7d" |       | CHD001                                                                            | BEFORE 1ST JAN NEXT YEAR | CHD register |
-| "http://smartlifehealth.info/smh#567c3515-c57d-4bc3-b2f7-378959f9e86e" |       | CKD005                                                                            | BEFORE 1ST JAN NEXT YEAR | CKD register |
-| "http://smartlifehealth.info/smh#6ebb0948-deaf-4bd8-a54c-f0e58ee3bc32" |       | DM017                                                                             | BEFORE 1ST JAN NEXT YEAR | Diabetes Register |
+| "http://smartlifehealth.info/smh#5d05c68a-75a9-4f9c-bb5a-379deccea18f" | 1     | AF001                                                                             | BEFORE 1ST JAN NEXT YEAR | AF register |
+| "http://smartlifehealth.info/smh#3bc4c128-bdea-4eae-a733-95b403201a7d" | 50    | CHD001                                                                            | BEFORE 1ST JAN NEXT YEAR | CHD register |
+| "http://smartlifehealth.info/smh#567c3515-c57d-4bc3-b2f7-378959f9e86e" | 1     | CKD005                                                                            | BEFORE 1ST JAN NEXT YEAR | CKD register |
+| "http://smartlifehealth.info/smh#6ebb0948-deaf-4bd8-a54c-f0e58ee3bc32" | 11    | DM017                                                                             | BEFORE 1ST JAN NEXT YEAR | Diabetes Register |
 | "http://smartlifehealth.info/smh#73720a28-5751-4452-b422-6373d651693b" |       | HF1                                                                               | BEFORE 1ST JAN NEXT YEAR | Unresolved diagnosis of heart failure |
 | "http://smartlifehealth.info/smh#4ea8bf32-d40e-4903-bab1-4f5aea90aaeb" |       | HYP001                                                                            | BEFORE 1ST JAN NEXT YEAR | Hypertension register |
 | "http://smartlifehealth.info/smh#ecb11b1d-a978-4960-9ecb-cdd4ef6ed736" |       | MDST01                                                                            |BEFORE 1ST JAN NEXT YR|Metabolic dysfunction-associated steatotic disease |
 | "http://smartlifehealth.info/smh#ed4e5925-537e-457f-b30a-6541f1c4da0d" |       | PAD001                                                                            | BEFORE 1ST JAN NEXT YEAR | Peripheral arterial disease register |
 | "http://smartlifehealth.info/smh#7311db5b-e522-4d7f-a277-6453add1fd89" |       | STIA001                                                                           | BEFORE 1ST JAN NEXT YEAR | Stroke or TIA register |
-| "http://smartlifehealth.info/smh#2a6493a2-e628-4614-a64e-bffd4ed2d402" |       | Patient having unresolved diabetes code                                           |
+| "http://smartlifehealth.info/smh#2a6493a2-e628-4614-a64e-bffd4ed2d402" | 12    | Patient having unresolved diabetes code                                           |
 | "http://smartlifehealth.info/smh#60724459-600a-4917-b542-58219221b245" |       | NDH01                                                                             | BEFORE 1ST JAN NEXT YEAR | Non-Diabetic Hyperglycaemia |
-| "http://smartlifehealth.info/smh#9edfd26a-c5f1-47cd-bb82-eb609c5036b0" |       | DM017 - Patients aged 17 or over on the diabetes register                         |
-| "http://smartlifehealth.info/smh#fe7211df-be21-468b-8d83-85cf862e7385" |       | CRM01Ba                                                                           | CKD | BEFORE START OF FY | Patients with CKD 1-2 or CKD 3-5 |
-| "http://smartlifehealth.info/smh#277663a0-7bc0-44cd-9b71-1c637f161ed4" |       | CRM01Bb                                                                           | CKD | 2* eGFR<60 or 2*uACR>3 |
-| "http://smartlifehealth.info/smh#a853c224-6ad5-4c05-adb3-ebeea6a56443" |       | CRM01Bc                                                                           | CKD | BEFORE 1ST JAN NEXT YEAR | First eGFR<60 OR uACR>3 |
+| "http://smartlifehealth.info/smh#9edfd26a-c5f1-47cd-bb82-eb609c5036b0" | 11    | DM017 - Patients aged 17 or over on the diabetes register                         |
+| "http://smartlifehealth.info/smh#fe7211df-be21-468b-8d83-85cf862e7385" | 1     | CRM01Ba                                                                           | CKD | BEFORE START OF FY | Patients with CKD 1-2 or CKD 3-5 |
+| "http://smartlifehealth.info/smh#277663a0-7bc0-44cd-9b71-1c637f161ed4" | 1     | CRM01Bb                                                                           | CKD | 2* eGFR<60 or 2*uACR>3 |
+| "http://smartlifehealth.info/smh#a853c224-6ad5-4c05-adb3-ebeea6a56443" | 1     | CRM01Bc                                                                           | CKD | BEFORE 1ST JAN NEXT YEAR | First eGFR<60 OR uACR>3 |
 | "http://smartlifehealth.info/smh#aa788673-5044-4682-9d35-aa1690cba535" |       | CRM01Ca                                                                           | DM | HbA1c >=48 or Fructosamine >= 228 & NOT on DM Register |
-| "http://smartlifehealth.info/smh#b1171429-c1c9-4ca1-be75-f0d05bab651e" |       | CRM01Aa                                                                           | AF | BEFORE START OF FY | AF register or PAF |
+| "http://smartlifehealth.info/smh#b1171429-c1c9-4ca1-be75-f0d05bab651e" | 1     | CRM01Aa                                                                           | AF | BEFORE START OF FY | AF register or PAF |
 | "http://smartlifehealth.info/smh#e3a37e09-d6f9-42bd-a47d-de0d19b930dc" |       | CRM01Ea                                                                           | NDH | HbA1c =>42 &<48 before 1st Jan nxt yr AND NO DM or NDH diagnosis |
 | "http://smartlifehealth.info/smh#770b8b8c-5480-432e-aa95-875d890af174" |       | CRM01Cba                                                                          | DM | THIS FINANCIAL YEAR | Diabetes Register |
 | "http://smartlifehealth.info/smh#0f71de9e-5f7d-49e3-9223-259c65b29a9f" |       | CRM01Cca                                                                          | DM | THIS FINANCIAL YEAR | NDH diagnosis |
@@ -1865,8 +1865,8 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#5e1e6fb1-ed73-40ef-84fb-ab30ce194cfb" |       | CRM01Eba                                                                          | NDH | NDH diagnosis |
 | "http://smartlifehealth.info/smh#46526b7e-1fc3-4fd0-aced-f592dfbeefb8" |       | CRM01Eca                                                                          | NDH | Diabetes Register |
 | "http://smartlifehealth.info/smh#2d4f1ed5-6504-44cc-909c-da91983429d4" |       | CRM01Ed                                                                           | NDH | THIS FY | HbA1c < 42 OR DM excluded |
-| "http://smartlifehealth.info/smh#b4f06c34-d37d-4bce-83d1-9b72918c5430" |       | CRM03ca                                                                           | Moderate or Severe Frailty or aged >= 80 |
-| "http://smartlifehealth.info/smh#5335482b-3ff4-448c-bb03-fdca6cdf2900" |       | CRM03cb                                                                           | No Moderate or Severe Fraility or aged < 80 |
+| "http://smartlifehealth.info/smh#b4f06c34-d37d-4bce-83d1-9b72918c5430" | 300   | CRM03ca                                                                           | Moderate or Severe Frailty or aged >= 80 |
+| "http://smartlifehealth.info/smh#5335482b-3ff4-448c-bb03-fdca6cdf2900" | 6179  | CRM03cb                                                                           | No Moderate or Severe Fraility or aged < 80 |
 | "http://smartlifehealth.info/smh#b1c5b18c-c9de-4983-8fa2-bc952298e707" |       | CRM01Db                                                                           | HYP | NO FRAIL | 2 BPs>=140/90 & HYP OR BP<130/80 OR DABP<135/85 |
 | "http://smartlifehealth.info/smh#4419e326-5ccb-4344-ac83-2faf62ecab96" |       | CRM01Dc                                                                           | HYP | NO FRAIL | BP<140/90 or DABP<135/85 after prev BP>=140/90 |
 | "http://smartlifehealth.info/smh#bd7ddd46-fa0a-478e-bd2d-ca7eb57e55b3" |       | CRM01Dd                                                                           | HYP | NO FRAIL | Daytime Average BP>=135/85 AND HYP Diag in FY |
@@ -1875,16 +1875,16 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#43291cf9-3fae-4b50-ad13-e00d56d9db67" |       | CRM01Dg                                                                           | HYP | FRAIL | Daytime Average BP>=145/85 AND HYP Diag in FY |
 | "http://smartlifehealth.info/smh#7a8107ad-2a20-481d-a45a-c1f4977d3c9c" |       | CRM02ba                                                                           | LAST 15 MONTHS | Not Home | Blood Pressure reading |
 | "http://smartlifehealth.info/smh#88b89100-8d10-4c5b-b071-16034709df22" |       | CRM02bb                                                                           | LAST 15 MONTHS | Home | Blood Pressure reading |
-| "http://smartlifehealth.info/smh#323daee9-9047-4138-98a4-e60e879e8f0f" |       | CRM02Da                                                                           | CRM with NO Diabetes |
-| "http://smartlifehealth.info/smh#9bee1faa-2bc6-403b-a836-53aa1798a7db" |       | CRM02Dba                                                                          | CRM with Diabetes or MASLD |
-| "http://smartlifehealth.info/smh#c6f0574d-0f1a-4daf-95e4-b95c78916dd0" |       | CRM02Dbb                                                                          | CRM with NO Diabetes or MASLD |
+| "http://smartlifehealth.info/smh#323daee9-9047-4138-98a4-e60e879e8f0f" | 27    | CRM02Da                                                                           | CRM with NO Diabetes |
+| "http://smartlifehealth.info/smh#9bee1faa-2bc6-403b-a836-53aa1798a7db" | 11    | CRM02Dba                                                                          | CRM with Diabetes or MASLD |
+| "http://smartlifehealth.info/smh#c6f0574d-0f1a-4daf-95e4-b95c78916dd0" | 27    | CRM02Dbb                                                                          | CRM with NO Diabetes or MASLD |
 | "http://smartlifehealth.info/smh#4aef0096-ac11-4a98-a69a-d68a7e4fb8aa" |       | CRM03aa                                                                           | Not Frail | Not Home | IN LAST 15M | 130/80 Blood Pressure reading |
 | "http://smartlifehealth.info/smh#24f13419-f64d-4648-a8c7-156cdcd39666" |       | CRM03ab                                                                           | Not Frail | Home | IN LAST 15M | 130/80 BP reading |
 | "http://smartlifehealth.info/smh#02463c65-a165-4940-99f8-fcb50f04c2e8" |       | CRM03ba                                                                           | Frail | Not Home | IN LAST 15M | 150/90 Blood Pressure reading |
 | "http://smartlifehealth.info/smh#5db7f362-bc11-4ba1-9293-50b4591365b3" |       | CRM03bb                                                                           | Frail | Home | IN LAST 15M | 150/90 Blood Pressure reading |
-| "http://smartlifehealth.info/smh#54d3cfc7-58ba-4116-ae37-20abecec3694" |       | CRM04DA                                                                           | CKD, CVD, DM or HF Registers |
+| "http://smartlifehealth.info/smh#54d3cfc7-58ba-4116-ae37-20abecec3694" | 41    | CRM04DA                                                                           | CKD, CVD, DM or HF Registers |
 | "http://smartlifehealth.info/smh#e5bbab94-4288-4f8d-985e-8bf016f333db" |       | CRM04DB                                                                           | Atrial Fibrillation, Hypertension, MASLD or NDH | QRISK > 10% |
-| "http://smartlifehealth.info/smh#cd9a69bf-0ee5-4524-9e6d-a367aace6494" |       | CRM05DBa                                                                          | Urine ACR >= 3 or eGFR < 60 |
+| "http://smartlifehealth.info/smh#cd9a69bf-0ee5-4524-9e6d-a367aace6494" | 1     | CRM05DBa                                                                          | Urine ACR >= 3 or eGFR < 60 |
 | "http://smartlifehealth.info/smh#3fea7162-7478-4b6d-a694-6ca7f0e8dcc9" |       | CRM08Ba                                                                           | Earliest BMI >= 15 and < 30 |
 | "http://smartlifehealth.info/smh#dc452271-761a-4870-afe8-27c2e2f4585e" |       | CRM08Bb                                                                           | Earliest BMI >= 30 and < 50 |
 | "http://smartlifehealth.info/smh#c6650a48-c15d-489e-9862-792d983982e7" |       | CRM08Bc                                                                           | Earliest BMI >= 50 and <= 80 |
@@ -1901,12 +1901,12 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#a0513368-d684-4a30-8f2e-9ffc08d2a62a" |       | CRM12Na                                                                           | DQ | THIS FY | Blood Pressure reading excluding home 130/80 |
 | "http://smartlifehealth.info/smh#32939ebb-ab90-43eb-99a7-fb98e13a45e9" |       | CRM12Nb                                                                           | DQ | THIS FY | Blood Pressure reading done at Home 125/75 |
 | "http://smartlifehealth.info/smh#8026f073-5476-41e6-939d-e55c2eb9b448" |       | CRM01Baa                                                                          | CKD | BEFORE START OF FY | Patients with CKD 1-2 |
-| "http://smartlifehealth.info/smh#440e442c-dc8d-4cbf-aeb3-cf72b90abd09" |       | CRM01Bab                                                                          | CKD | BEFORE START OF FY | Patients with CKD 3-5 |
-| "http://smartlifehealth.info/smh#3627c5f5-9d3d-4e0d-9ac6-cd8fec41c433" |       | CRM01Bba                                                                          | CKD | Latest eGFR<60 & 2nd eGFR <60 between 3m and 2yrs ago |
+| "http://smartlifehealth.info/smh#440e442c-dc8d-4cbf-aeb3-cf72b90abd09" | 1     | CRM01Bab                                                                          | CKD | BEFORE START OF FY | Patients with CKD 3-5 |
+| "http://smartlifehealth.info/smh#3627c5f5-9d3d-4e0d-9ac6-cd8fec41c433" | 1     | CRM01Bba                                                                          | CKD | Latest eGFR<60 & 2nd eGFR <60 between 3m and 2yrs ago |
 | "http://smartlifehealth.info/smh#220a32c1-5349-42dd-aa63-58d2dbc6f6c0" |       | CRM01Bbb                                                                          | CKD | uACR> 3 & 2nd uACR>3 between 1 wk & 2 yrs ago |
-| "http://smartlifehealth.info/smh#e6a0e400-234e-41e6-a65d-71b9be491755" |       | CRM01Bca                                                                          | CKD | BEFORE 1ST JAN NEXT YEAR | First eGFR<60 |
+| "http://smartlifehealth.info/smh#e6a0e400-234e-41e6-a65d-71b9be491755" | 405   | CRM01Bca                                                                          | CKD | BEFORE 1ST JAN NEXT YEAR | First eGFR<60 |
 | "http://smartlifehealth.info/smh#2a8f42fe-79ba-44ea-85fe-3b4e3c806368" |       | CRM01Bcb                                                                          | CKD | BEFORE 1ST JAN NEXT YR |1st uACR>3 OR Urine Protein/Creatine>30 |
-| "http://smartlifehealth.info/smh#53d7a311-70ad-494f-900d-cd07be2ad325" |       | CRM01Caa                                                                          | DM | BEFORE START OF FY | Diabetes Register |
+| "http://smartlifehealth.info/smh#53d7a311-70ad-494f-900d-cd07be2ad325" | 15    | CRM01Caa                                                                          | DM | BEFORE START OF FY | Diabetes Register |
 | "http://smartlifehealth.info/smh#799ac512-2854-4b67-9a9e-09915d38f85a" |       | CRM01Cab                                                                          | DM | BEFORE 1ST JAN NEXT YEAR | HbA1c >= 48 OR Fructosamine >= 228 |
 | "http://smartlifehealth.info/smh#8cdee1bd-67d2-44bd-a900-d7feec778dd8" |       | CRM01Cbb                                                                          | DM | HbA1c >= 48 OR Fructosamine >= 228 more than once |
 | "http://smartlifehealth.info/smh#101b069c-2a3e-4321-a7b9-3d4d1b5535f0" |       | CRM01Cca                                                                          | DM | NDH diagnosis |
@@ -1924,7 +1924,7 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#7a94023c-8770-4e42-9c9f-3285cbfb117c" |       | CRM03ab                                                                           | DQ | Not Frail | Home | LAST 15M TO END OF FY | 130/80 BP reading |
 | "http://smartlifehealth.info/smh#1c515674-06ce-4329-b5df-4f7df52f4da0" |       | CRM03ba                                                                           | DQ | Frail | Not Home | LAST 15M TO END OF FY | 150/90 BP reading |
 | "http://smartlifehealth.info/smh#451f1c4d-0fe2-4c1a-bf78-fd88fff5f335" |       | CRM03bb                                                                           | DQ | Frail | Home | LAST 15M TO END OF FY | 150/90 BP reading |
-| "http://smartlifehealth.info/smh#4b5b2457-6dbb-432f-8ea7-c4e64867afdf" |       | CRM01Eaa                                                                          | NDH | BEFORE START OF FY | Diabetes or NDH or Gestational DM |
+| "http://smartlifehealth.info/smh#4b5b2457-6dbb-432f-8ea7-c4e64867afdf" | 12    | CRM01Eaa                                                                          | NDH | BEFORE START OF FY | Diabetes or NDH or Gestational DM |
 | "http://smartlifehealth.info/smh#42cfa117-f165-4586-9109-b91d5defd0db" |       | CRM01Cb                                                                           | DM | Diabetes Diagnosis & HbA1c >=48 |
 | "http://smartlifehealth.info/smh#ec7c2ba5-c89c-4b56-8517-9241ccf28d9d" |       | CRM01Cc                                                                           | DM | NDH Diagnosis and 2nd HbA1c btwn 42 & 47 |
 | "http://smartlifehealth.info/smh#6c69e400-b317-43f4-ac52-0037ebd4c9c4" |       | CRM01Eb                                                                           | NDH | NDH Diagnosis & HbA1c >=42 & <48 |
@@ -1941,38 +1941,38 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#5b5fa960-a00e-4210-abb2-29f2eb3f0ca7" |       | CRM01EC                                                                           | NDH | DQ | HbA1c btwn 42 & 47 | MISSING 2nd HbA1c in FY |
 | "http://smartlifehealth.info/smh#f6e9633c-39dc-41b9-b83d-a8340b9db919" |       | NHS NUMBERS                                                                       | EMCRM01C | Missing HbA1c in Financial Year -report |
 | "http://smartlifehealth.info/smh#235b8b9b-b1b9-4c08-aa10-8f10119165fe" |       | NHS NUMBERS                                                                       | EMCRM01E | Missing HbA1c in Financial Year -report |
-| "http://smartlifehealth.info/smh#24efe363-c2e6-47ce-8a37-3ba78e0e04e5" |       | CRM00A - Female                                                                   |
-| "http://smartlifehealth.info/smh#c4828d0a-4832-4aa1-b713-03dfc650b75e" |       | CRM00A - Male                                                                     |
-| "http://smartlifehealth.info/smh#bc7d0f2b-4300-4791-b5a9-7486271881ac" |       | EMCRM00 -report                                                                   |
-| "http://smartlifehealth.info/smh#99317a7d-40d0-4759-8972-f9e16c514266" |       | Age < 45                                                                          |
-| "http://smartlifehealth.info/smh#d981b237-af88-4609-a264-05300cf5843e" |       | Age >= 45 & < 58                                                                  |
-| "http://smartlifehealth.info/smh#3499fc76-fd96-4910-a3f8-37fb76c49d11" |       | Age >= 58 & < 70                                                                  |
-| "http://smartlifehealth.info/smh#cf2167be-bf1f-4b8b-8049-c2ea37997e21" |       | Age >= 70                                                                         |
-| "http://smartlifehealth.info/smh#022b8522-7248-4941-9f88-77b6e3517ba2" |       | EMCRM00a -report                                                                  |
-| "http://smartlifehealth.info/smh#665529ad-4089-4d95-b211-b007d8ad6cea" |       | Age < 45                                                                          |
-| "http://smartlifehealth.info/smh#2062e6b5-0910-4193-8634-a09af3414d05" |       | Age >= 45 & < 58                                                                  |
-| "http://smartlifehealth.info/smh#212c8a65-9570-4112-85cd-d9ff13a51db7" |       | Age >= 58 & < 70                                                                  |
-| "http://smartlifehealth.info/smh#dc340629-745d-4285-970d-95487ae84d54" |       | Age >= 70                                                                         |
-| "http://smartlifehealth.info/smh#fb507523-c6a7-43bb-ab0a-ef3e84072c1c" |       | EMCRM00b -report                                                                  |
-| "http://smartlifehealth.info/smh#dbad0b92-e35e-4280-b06d-9e43da1d79cf" |       | EMCRM00aa -report                                                                 |
-| "http://smartlifehealth.info/smh#df10a18f-a80d-4528-8242-adf64bd3815e" |       | EMCRM00ab -report                                                                 |
-| "http://smartlifehealth.info/smh#980b5d56-4812-4771-89b9-9f8b8960fbdd" |       | EMCRM00ac -report                                                                 |
-| "http://smartlifehealth.info/smh#0e07725c-4d32-4fc7-9593-de5aa3422523" |       | EMCRM00ad -report                                                                 |
-| "http://smartlifehealth.info/smh#a09c20ac-91a0-41c7-9ae6-246f18ab2624" |       | EMCRM00ba -report                                                                 |
-| "http://smartlifehealth.info/smh#6473d5a0-4bbf-4eb7-beb9-ca2506afe20c" |       | EMCRM00bb -report                                                                 |
-| "http://smartlifehealth.info/smh#8d720c6b-a936-403b-9dd9-1d3ba85d372e" |       | EMCRM00bc -report                                                                 |
-| "http://smartlifehealth.info/smh#201ae84f-069b-4f85-9ab1-cd6cb06f84cd" |       | EMCRM00bd -report                                                                 |
-| "http://smartlifehealth.info/smh#134c64a6-9e08-4993-8c2a-31d50ba41053" |       | RISKA02 -report                                                                   |
+| "http://smartlifehealth.info/smh#24efe363-c2e6-47ce-8a37-3ba78e0e04e5" | 16    | CRM00A - Female                                                                   |
+| "http://smartlifehealth.info/smh#c4828d0a-4832-4aa1-b713-03dfc650b75e" | 22    | CRM00A - Male                                                                     |
+| "http://smartlifehealth.info/smh#bc7d0f2b-4300-4791-b5a9-7486271881ac" | 59    | EMCRM00 -report                                                                   |
+| "http://smartlifehealth.info/smh#99317a7d-40d0-4759-8972-f9e16c514266" | 8     | Age < 45                                                                          |
+| "http://smartlifehealth.info/smh#d981b237-af88-4609-a264-05300cf5843e" | 2     | Age >= 45 & < 58                                                                  |
+| "http://smartlifehealth.info/smh#3499fc76-fd96-4910-a3f8-37fb76c49d11" | 2     | Age >= 58 & < 70                                                                  |
+| "http://smartlifehealth.info/smh#cf2167be-bf1f-4b8b-8049-c2ea37997e21" | 4     | Age >= 70                                                                         |
+| "http://smartlifehealth.info/smh#022b8522-7248-4941-9f88-77b6e3517ba2" | 26    | EMCRM00a -report                                                                  |
+| "http://smartlifehealth.info/smh#665529ad-4089-4d95-b211-b007d8ad6cea" | 6     | Age < 45                                                                          |
+| "http://smartlifehealth.info/smh#2062e6b5-0910-4193-8634-a09af3414d05" | 8     | Age >= 45 & < 58                                                                  |
+| "http://smartlifehealth.info/smh#212c8a65-9570-4112-85cd-d9ff13a51db7" | 5     | Age >= 58 & < 70                                                                  |
+| "http://smartlifehealth.info/smh#dc340629-745d-4285-970d-95487ae84d54" | 3     | Age >= 70                                                                         |
+| "http://smartlifehealth.info/smh#fb507523-c6a7-43bb-ab0a-ef3e84072c1c" | 32    | EMCRM00b -report                                                                  |
+| "http://smartlifehealth.info/smh#dbad0b92-e35e-4280-b06d-9e43da1d79cf" | 9     | EMCRM00aa -report                                                                 |
+| "http://smartlifehealth.info/smh#df10a18f-a80d-4528-8242-adf64bd3815e" | 3     | EMCRM00ab -report                                                                 |
+| "http://smartlifehealth.info/smh#980b5d56-4812-4771-89b9-9f8b8960fbdd" | 4     | EMCRM00ac -report                                                                 |
+| "http://smartlifehealth.info/smh#0e07725c-4d32-4fc7-9593-de5aa3422523" | 10    | EMCRM00ad -report                                                                 |
+| "http://smartlifehealth.info/smh#a09c20ac-91a0-41c7-9ae6-246f18ab2624" | 11    | EMCRM00ba -report                                                                 |
+| "http://smartlifehealth.info/smh#6473d5a0-4bbf-4eb7-beb9-ca2506afe20c" | 12    | EMCRM00bb -report                                                                 |
+| "http://smartlifehealth.info/smh#8d720c6b-a936-403b-9dd9-1d3ba85d372e" | 6     | EMCRM00bc -report                                                                 |
+| "http://smartlifehealth.info/smh#201ae84f-069b-4f85-9ab1-cd6cb06f84cd" | 3     | EMCRM00bd -report                                                                 |
+| "http://smartlifehealth.info/smh#134c64a6-9e08-4993-8c2a-31d50ba41053" | 35    | RISKA02 -report                                                                   |
 | "http://smartlifehealth.info/smh#ef34897b-c56b-447f-9eef-bd7248f74bf2" |       | RISKB02 -report                                                                   |
-| "http://smartlifehealth.info/smh#ed26cbc9-4de5-4ab0-bee5-f82d294b1d0e" |       | RISKC02 -report                                                                   |
-| "http://smartlifehealth.info/smh#6ee12c6c-9e5b-461d-9500-6a1bff9f8ba3" |       | RISKC02 - Female                                                                  |
+| "http://smartlifehealth.info/smh#ed26cbc9-4de5-4ab0-bee5-f82d294b1d0e" | 3     | RISKC02 -report                                                                   |
+| "http://smartlifehealth.info/smh#6ee12c6c-9e5b-461d-9500-6a1bff9f8ba3" | 3     | RISKC02 - Female                                                                  |
 | "http://smartlifehealth.info/smh#6a9e524a-dfa2-4da9-ba65-7ee9a463fa25" |       | RISKC02 - Male                                                                    |
-| "http://smartlifehealth.info/smh#755863d6-035b-45e6-b0c1-2b01287e979c" |       | RISKC02a -report                                                                  |
+| "http://smartlifehealth.info/smh#755863d6-035b-45e6-b0c1-2b01287e979c" | 3     | RISKC02a -report                                                                  |
 | "http://smartlifehealth.info/smh#00946e04-e58a-4746-9c36-17568dd0b923" |       | RISKC02b -report                                                                  |
-| "http://smartlifehealth.info/smh#0611c30b-e601-4f79-97b8-90eb87eb9c10" |       | CRM00Ba                                                                           | BETWEEN JAN LAST YR & MAR NEXT YEAR | First appointment |
-| "http://smartlifehealth.info/smh#fce73623-46e2-4447-9a25-889f31813a06" |       | CRM00Bb                                                                           | BETWEEN JAN LAST YR & MAR NEXT YEAR | Follow Up appointment |
-| "http://smartlifehealth.info/smh#cf077b55-88f3-4cfc-ad9e-5a76ffac8bfe" |       | NHS NUMBERS                                                                       | DQ | MISSING First Appointment -report |
-| "http://smartlifehealth.info/smh#834374b6-cc87-4c08-a8a0-0447904bb28b" |       | NHS NUMBERS                                                                       | DQ | MISSING Follow Up appointment -report |
+| "http://smartlifehealth.info/smh#0611c30b-e601-4f79-97b8-90eb87eb9c10" | 35    | CRM00Ba                                                                           | BETWEEN JAN LAST YR & MAR NEXT YEAR | First appointment |
+| "http://smartlifehealth.info/smh#fce73623-46e2-4447-9a25-889f31813a06" | 35    | CRM00Bb                                                                           | BETWEEN JAN LAST YR & MAR NEXT YEAR | Follow Up appointment |
+| "http://smartlifehealth.info/smh#cf077b55-88f3-4cfc-ad9e-5a76ffac8bfe" | 35    | NHS NUMBERS                                                                       | DQ | MISSING First Appointment -report |
+| "http://smartlifehealth.info/smh#834374b6-cc87-4c08-a8a0-0447904bb28b" | 35    | NHS NUMBERS                                                                       | DQ | MISSING Follow Up appointment -report |
 | "http://smartlifehealth.info/smh#26b525ab-8e9c-4ef3-8ee6-bfbbae611ae6" |       | CRM02a                                                                            | ALL CRM | ACHIEVED | LAST 15M TO END OF FY | HbA1c |
 | "http://smartlifehealth.info/smh#e3dc71bc-0cc4-4afe-b762-14223a92a68f" |       | CRM02b                                                                            | ALL CRM | ACHIEVED | LAST 15M TO END OF FY | Blood Pressure |
 | "http://smartlifehealth.info/smh#2269a9c8-708d-4e49-a8af-5c4df7528668" |       | CRM02c                                                                            | ALL CRM | ACHIEVED | LAST 15M TO END OF FY | Lipids |
@@ -1981,10 +1981,10 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#1988caaf-bf8f-42d7-892f-5a738261e30f" |       | CRM02f                                                                            | ALL CRM | ACHIEVED | LAST 15M TO END OF FY | BMI |
 | "http://smartlifehealth.info/smh#f2b2d221-b488-40ae-9886-6032b83bdb0e" |       | CRM02h                                                                            | ALL CRM | ACHIEVED | LAST 15M TO END OF FY | Smoking Status |
 | "http://smartlifehealth.info/smh#acc8086e-2f29-4274-a346-d3c71bce96eb" |       | CRM02g                                                                            | ALL CRM | ACHIEVED | LAST 15M TO END OF FY | Waist circumference |
-| "http://smartlifehealth.info/smh#ef10bd81-ba3f-46de-89f3-b7abfc6a6694" |       | CRM02i                                                                            | DIABETES | ACHIEVED | LAST 15M TO END OF FY | MH Screening |
-| "http://smartlifehealth.info/smh#7dd8692a-ae41-4fe9-9f85-7c963b2452ab" |       | CRM02j                                                                            | DIABETES | ACHIEVED | LAST 15M TO END OF FY | Foot Check |
-| "http://smartlifehealth.info/smh#3748b220-62f4-4fba-9435-a7c9516caa9b" |       | CRM02k                                                                            | DIABETES | ACHIEVED | LAST 27M TO END OF FY | Retinal Screening |
-| "http://smartlifehealth.info/smh#a406470a-871d-4fcb-bf46-4835aa237d1f" |       | CRM02l                                                                            | DIABETES & MASLD | ACHIEVED | LAST 39M TO END OF FY | FIB-4 |
+| "http://smartlifehealth.info/smh#ef10bd81-ba3f-46de-89f3-b7abfc6a6694" | 27    | CRM02i                                                                            | DIABETES | ACHIEVED | LAST 15M TO END OF FY | MH Screening |
+| "http://smartlifehealth.info/smh#7dd8692a-ae41-4fe9-9f85-7c963b2452ab" | 27    | CRM02j                                                                            | DIABETES | ACHIEVED | LAST 15M TO END OF FY | Foot Check |
+| "http://smartlifehealth.info/smh#3748b220-62f4-4fba-9435-a7c9516caa9b" | 27    | CRM02k                                                                            | DIABETES | ACHIEVED | LAST 27M TO END OF FY | Retinal Screening |
+| "http://smartlifehealth.info/smh#a406470a-871d-4fcb-bf46-4835aa237d1f" | 27    | CRM02l                                                                            | DIABETES & MASLD | ACHIEVED | LAST 39M TO END OF FY | FIB-4 |
 | "http://smartlifehealth.info/smh#a867c511-d04a-4f09-9db0-85d16552034f" |       | CRM02                                                                             | ACHIEVED | Care Processes Completed |
 | "http://smartlifehealth.info/smh#cd564160-3cd4-4d7a-85bf-c3578d147a87" |       | CRM03A                                                                            | NOT FRAIL & AGE<80 | ACHIEVED | LAST 15M TO END FY | Latest BP<=130/80 |
 | "http://smartlifehealth.info/smh#5791ba4c-9224-41e1-8ad1-3c3e40b5c422" |       | CRM03B                                                                            | FRAIL & AGE>=80 | ACHIEVED | LAST 15M TO END OF FY | Latest BP<=150/90 |
@@ -2004,20 +2004,20 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#3a4c2479-2df9-477b-aa23-6b9cd02ac41b" |       | *CRM10                                                                            | ACHIEVED | LAST 15M TO END OF FY | 3 Treatment Targets |
 | "http://smartlifehealth.info/smh#922a7198-6c64-4f20-b2d4-16c5d366b01f" |       | CRM11                                                                             | ACHIEVED | LAST 15M TO END OF FY | Diagnosed in last 2 yrs HbA1c<=48 |
 | "http://smartlifehealth.info/smh#f3ddb706-b678-45ab-9e35-a1807cebe07e" |       | CRM                                                                               | AF QOF register | AF001 - Patients on the AF register |
-| "http://smartlifehealth.info/smh#195a0c45-741d-4d85-8713-fe2f8edf922c" |       | CRM                                                                               | AGE00a | Age | DOB between 17 and 28 years ago |
-| "http://smartlifehealth.info/smh#31e53393-eb3b-426b-b125-6f3a42438bed" |       | CRM                                                                               | AGE00b | Age | DOB between 17 and 30 years ago |
-| "http://smartlifehealth.info/smh#50dabdef-1ebb-45e5-87f9-4dbdf3a8ccbb" |       | CRM                                                                               | AGE00c | Age | DOB between 17 and 35 years ago |
-| "http://smartlifehealth.info/smh#0d8f5e10-d6e1-4ca9-9ffc-9e303bc74e5e" |       | CRM                                                                               | AGE00d | Age | DOB between 17 and 38 years ago |
-| "http://smartlifehealth.info/smh#480034fc-97b4-4b3a-979b-a74d3c952501" |       | CRM                                                                               | AGE00e | Age | DOB between 17 and 40 years ago |
-| "http://smartlifehealth.info/smh#41268ab4-6f1f-4156-87d6-04701876d6ba" |       | CRM                                                                               | AGE00f | Age | DOB between 17 and 43 years ago |
-| "http://smartlifehealth.info/smh#9a8566d6-86e9-4458-b747-c77f04a7f44e" |       | CRM                                                                               | AGE00g | Age | DOB between 17 and 45 years ago |
-| "http://smartlifehealth.info/smh#f6ee9d5b-d290-43fe-a6e8-d993c166d703" |       | CRM                                                                               | AGE00h | Age | DOB between 17 and 50 years ago |
-| "http://smartlifehealth.info/smh#b3ba6769-134f-457d-b5af-eda76341294d" |       | CRM                                                                               | AGE00i | Age | DOB between 17 and 53 years ago |
-| "http://smartlifehealth.info/smh#b39c0432-9023-4b77-a8e6-4b10b82150b8" |       | CRM                                                                               | AGE00j | Age | DOB between 17 and 55 years ago |
-| "http://smartlifehealth.info/smh#c4f0f4dd-3669-4d30-9c1d-6942f4a06b98" |       | CRM                                                                               | AGE00k | Age | DOB between 17 and 58 years ago |
-| "http://smartlifehealth.info/smh#62718481-b6d4-4e70-a45b-159dfe0d0184" |       | CRM                                                                               | AGE00l | Age | DOB between 17 and 60 years ago |
-| "http://smartlifehealth.info/smh#8cc3aa8c-e295-4109-9c04-2e81a60b3d5e" |       | CRM                                                                               | AGE00m | Age | DOB between 17 and 65 years ago |
-| "http://smartlifehealth.info/smh#c93d5b24-5c96-4157-8511-5c9b9903525b" |       | CRM                                                                               | AGE00n | Age | DOB between 17 and 70 years ago |
+| "http://smartlifehealth.info/smh#195a0c45-741d-4d85-8713-fe2f8edf922c" | 881   | CRM                                                                               | AGE00a | Age | DOB between 17 and 28 years ago |
+| "http://smartlifehealth.info/smh#31e53393-eb3b-426b-b125-6f3a42438bed" | 1048  | CRM                                                                               | AGE00b | Age | DOB between 17 and 30 years ago |
+| "http://smartlifehealth.info/smh#50dabdef-1ebb-45e5-87f9-4dbdf3a8ccbb" | 1512  | CRM                                                                               | AGE00c | Age | DOB between 17 and 35 years ago |
+| "http://smartlifehealth.info/smh#0d8f5e10-d6e1-4ca9-9ffc-9e303bc74e5e" | 1802  | CRM                                                                               | AGE00d | Age | DOB between 17 and 38 years ago |
+| "http://smartlifehealth.info/smh#480034fc-97b4-4b3a-979b-a74d3c952501" | 1924  | CRM                                                                               | AGE00e | Age | DOB between 17 and 40 years ago |
+| "http://smartlifehealth.info/smh#41268ab4-6f1f-4156-87d6-04701876d6ba" | 2160  | CRM                                                                               | AGE00f | Age | DOB between 17 and 43 years ago |
+| "http://smartlifehealth.info/smh#9a8566d6-86e9-4458-b747-c77f04a7f44e" | 2340  | CRM                                                                               | AGE00g | Age | DOB between 17 and 45 years ago |
+| "http://smartlifehealth.info/smh#f6ee9d5b-d290-43fe-a6e8-d993c166d703" | 2949  | CRM                                                                               | AGE00h | Age | DOB between 17 and 50 years ago |
+| "http://smartlifehealth.info/smh#b3ba6769-134f-457d-b5af-eda76341294d" | 3251  | CRM                                                                               | AGE00i | Age | DOB between 17 and 53 years ago |
+| "http://smartlifehealth.info/smh#b39c0432-9023-4b77-a8e6-4b10b82150b8" | 3412  | CRM                                                                               | AGE00j | Age | DOB between 17 and 55 years ago |
+| "http://smartlifehealth.info/smh#c4f0f4dd-3669-4d30-9c1d-6942f4a06b98" | 3652  | CRM                                                                               | AGE00k | Age | DOB between 17 and 58 years ago |
+| "http://smartlifehealth.info/smh#62718481-b6d4-4e70-a45b-159dfe0d0184" | 3823  | CRM                                                                               | AGE00l | Age | DOB between 17 and 60 years ago |
+| "http://smartlifehealth.info/smh#8cc3aa8c-e295-4109-9c04-2e81a60b3d5e" | 4233  | CRM                                                                               | AGE00m | Age | DOB between 17 and 65 years ago |
+| "http://smartlifehealth.info/smh#c93d5b24-5c96-4157-8511-5c9b9903525b" | 4581  | CRM                                                                               | AGE00n | Age | DOB between 17 and 70 years ago |
 | "http://smartlifehealth.info/smh#63cf0b36-3348-46fe-93f9-5f0c6ecb5164" |       | CRM                                                                               | Antihypertensive medications | AHM01 | Prescribed in last 6 months |
 | "http://smartlifehealth.info/smh#cf5fda8a-1251-4239-9ef6-21e9f435ee7d" |       | CRM                                                                               | BMI00a | BMI > 50 |
 | "http://smartlifehealth.info/smh#2debc7ea-819b-4fa8-9dfb-0812571078f6" |       | CRM                                                                               | BMI00b | BMI > 48 |
@@ -2054,7 +2054,7 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#6755280e-1a1b-4127-ada1-3e7f67ffa46c" |       | CRM                                                                               | SMOK01b | Moderate or Unclassified Smoker |
 | "http://smartlifehealth.info/smh#733b9d17-3a10-4139-9958-84a9525fd882" |       | CRM                                                                               | SMOK01c | Light Smoker |
 | "http://smartlifehealth.info/smh#28b274ed-26c0-4cd9-a271-ea7d329ae1f2" |       | CRM                                                                               | Systemic lupus erythematosus |
-| "http://smartlifehealth.info/smh#a2b8f404-04fc-4b20-9cee-825b324c55e4" |       | RISK00b                                                                           | Gender | Male |
+| "http://smartlifehealth.info/smh#a2b8f404-04fc-4b20-9cee-825b324c55e4" | 3262  | RISK00b                                                                           | Gender | Male |
 | "http://smartlifehealth.info/smh#38229d9e-f6a9-4c95-87db-0b7fe2437ff3" |       | RISK00c                                                                           | Ethnicity | Black & Black British patients |
 | "http://smartlifehealth.info/smh#3d3b8f65-d263-4d96-9534-18f0dde9733d" |       | RISK00j                                                                           | Rheumatoid arthritis |
 | "http://smartlifehealth.info/smh#1537ca6f-637f-4d92-8bf6-af4a07f28e37" |       | RISK00l                                                                           | Migraine |
@@ -2062,10 +2062,10 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#b3fcc870-1eb2-44db-a9b5-b9b0c7fc626e" |       | RISK00ge                                                                          | Atrial Fibrillation | Age < 30 |
 | "http://smartlifehealth.info/smh#37c63556-7a2c-470a-80bd-dcb49f01f68a" |       | RISK00gc                                                                          | Atrial Fibrillation | Age < 40 |
 | "http://smartlifehealth.info/smh#6afa8fc6-fdfa-46e3-9332-afa938648230" |       | RISK00gb                                                                          | Atrial Fibrillation | Age < 50 |
-| "http://smartlifehealth.info/smh#ab80dc5b-e7bb-4ca0-bf4c-4286d0305476" |       | RISK00ac                                                                          | Age | Age < 60 |
+| "http://smartlifehealth.info/smh#ab80dc5b-e7bb-4ca0-bf4c-4286d0305476" | 3823  | RISK00ac                                                                          | Age | Age < 60 |
 | "http://smartlifehealth.info/smh#f9ddb749-25bb-4bdf-846b-627c8dee5af2" |       | RISK00ga                                                                          | Atrial Fibrillation | Age < 60 |
-| "http://smartlifehealth.info/smh#6b9e2402-38dd-4488-98ed-11693756878d" |       | RISK00ab                                                                          | Age | Age < 65 |
-| "http://smartlifehealth.info/smh#48dd5f94-df56-49fe-8555-592b92b9d8fe" |       | RISK00aa                                                                          | Age | Age < 70 |
+| "http://smartlifehealth.info/smh#6b9e2402-38dd-4488-98ed-11693756878d" | 4233  | RISK00ab                                                                          | Age | Age < 65 |
+| "http://smartlifehealth.info/smh#48dd5f94-df56-49fe-8555-592b92b9d8fe" | 4581  | RISK00aa                                                                          | Age | Age < 70 |
 | "http://smartlifehealth.info/smh#51d3895b-c005-49eb-800c-49092ab0eeaf" |       | RISK00ha                                                                          | Antihypertensive medication | Age < 65 |
 | "http://smartlifehealth.info/smh#f8a9e03e-1929-4d95-88e5-4aba06de35e5" |       | RISK00hb                                                                          | Antihypertensive medication | Age < 58 |
 | "http://smartlifehealth.info/smh#92a0789e-3ab1-45db-b17a-15d0388c560d" |       | RISK00hc                                                                          | Antihypertensive medication | Age < 50 |
@@ -2097,7 +2097,7 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#18531a79-920f-47a4-973b-14b41e397bf2" |       | RISK00qe                                                                          | Cholesterol:HDL Ratio > 4.0 | Age < 53 |
 | "http://smartlifehealth.info/smh#1bb465cd-89f3-494c-ac4b-48997e72e303" |       | CRM                                                                               | CKD Undiagnosed | CKD01Df | Patients with 2* eGFR<60 or 2*uACR>3 |
 | "http://smartlifehealth.info/smh#20cc8965-bc46-4e71-bb1d-24c2d4bebaab" |       | CRM                                                                               | DM QOF register | DM017 - Patients > = aged 17 on the diabetes register |
-| "http://smartlifehealth.info/smh#8d030092-0422-410e-8fb2-994e563e560e" |       | CRM                                                                               | ETH00a | Not South Asian Ethnicity |
+| "http://smartlifehealth.info/smh#8d030092-0422-410e-8fb2-994e563e560e" | 6479  | CRM                                                                               | ETH00a | Not South Asian Ethnicity |
 | "http://smartlifehealth.info/smh#7dd2f4a2-f15e-40d1-8e76-f118bac02289" |       | RISK00ea                                                                          | Family history of heart disease < 60 | Age < 60 |
 | "http://smartlifehealth.info/smh#cf8e94fa-6823-4ac7-8de1-6fdb8949384e" |       | RISK00eb                                                                          | Family history of heart disease < 60 | Age < 53 |
 | "http://smartlifehealth.info/smh#f470bb30-0735-4c43-b293-030353209fb8" |       | RISK00ec                                                                          | Family history of heart disease < 60 | Age < 45 |
@@ -2139,55 +2139,55 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#75f67f5e-46c7-4f43-976c-c65a35cb6a3a" |       | RISK00fa                                                                          | CKD | Age < 65 |
 | "http://smartlifehealth.info/smh#946e7e5a-1d71-4d66-ada2-a94949f81943" |       | RISK00fb                                                                          | CKD | Age < 58 |
 | "http://smartlifehealth.info/smh#61190920-c39c-4407-80f6-173af739019d" |       | RISK00fc                                                                          | CKD | Age < 50 |
-| "http://smartlifehealth.info/smh#f9803051-cda6-4adc-a2df-a54cf4e877de" |       | CRM                                                                               | AF QOF register | AF001 - Patients on the AF register |
+| "http://smartlifehealth.info/smh#f9803051-cda6-4adc-a2df-a54cf4e877de" | 1     | CRM                                                                               | AF QOF register | AF001 - Patients on the AF register |
 | "http://smartlifehealth.info/smh#12d56ad9-d6dd-444d-bda7-a9d2f82b2a08" |       | CRM                                                                               | Antihypertensive medications | AHM01 | Prescribed in last 6 months |
-| "http://smartlifehealth.info/smh#9612a4e6-5a9e-4d27-af6a-777e8a9942a6" |       | CRM                                                                               | BMI00a | BMI > 50 |
-| "http://smartlifehealth.info/smh#9386f41c-8294-4edc-a1b1-29b4517ced90" |       | CRM                                                                               | BMI00b | BMI > 48 |
-| "http://smartlifehealth.info/smh#7397ffd7-a47d-4787-aae6-c8330c633fb2" |       | CRM                                                                               | BMI00c | BMI > 45 |
-| "http://smartlifehealth.info/smh#9b7f12b8-f429-4832-bc26-c0eb8bd8c99f" |       | CRM                                                                               | BMI00d | BMI > 43 |
-| "http://smartlifehealth.info/smh#e7d880dc-c557-4b05-98b2-a46cd0f23835" |       | CRM                                                                               | BMI00e | BMI > 40 |
-| "http://smartlifehealth.info/smh#37177c24-1828-47ec-ba99-d642c07f3d36" |       | CRM                                                                               | BMI00f | BMI > 38 |
-| "http://smartlifehealth.info/smh#10cb18c0-f4d8-4da3-a7c4-33bd0d3945dc" |       | CRM                                                                               | BMI00g | BMI > 35 |
-| "http://smartlifehealth.info/smh#86786890-f110-41a8-9495-1b450f9ebef8" |       | CRM                                                                               | BMI00h | BMI > 33 |
-| "http://smartlifehealth.info/smh#15f46d26-4ec1-41cc-809f-e6aa9d38114e" |       | CRM                                                                               | BMI00i | BMI > 30 |
-| "http://smartlifehealth.info/smh#6dae9307-f6e3-4cc7-a7f7-ef032cc7eb55" |       | CRM                                                                               | BMI00j | BMI > 28 |
+| "http://smartlifehealth.info/smh#9612a4e6-5a9e-4d27-af6a-777e8a9942a6" | 142   | CRM                                                                               | BMI00a | BMI > 50 |
+| "http://smartlifehealth.info/smh#9386f41c-8294-4edc-a1b1-29b4517ced90" | 145   | CRM                                                                               | BMI00b | BMI > 48 |
+| "http://smartlifehealth.info/smh#7397ffd7-a47d-4787-aae6-c8330c633fb2" | 148   | CRM                                                                               | BMI00c | BMI > 45 |
+| "http://smartlifehealth.info/smh#9b7f12b8-f429-4832-bc26-c0eb8bd8c99f" | 151   | CRM                                                                               | BMI00d | BMI > 43 |
+| "http://smartlifehealth.info/smh#e7d880dc-c557-4b05-98b2-a46cd0f23835" | 152   | CRM                                                                               | BMI00e | BMI > 40 |
+| "http://smartlifehealth.info/smh#37177c24-1828-47ec-ba99-d642c07f3d36" | 159   | CRM                                                                               | BMI00f | BMI > 38 |
+| "http://smartlifehealth.info/smh#10cb18c0-f4d8-4da3-a7c4-33bd0d3945dc" | 162   | CRM                                                                               | BMI00g | BMI > 35 |
+| "http://smartlifehealth.info/smh#86786890-f110-41a8-9495-1b450f9ebef8" | 181   | CRM                                                                               | BMI00h | BMI > 33 |
+| "http://smartlifehealth.info/smh#15f46d26-4ec1-41cc-809f-e6aa9d38114e" | 204   | CRM                                                                               | BMI00i | BMI > 30 |
+| "http://smartlifehealth.info/smh#6dae9307-f6e3-4cc7-a7f7-ef032cc7eb55" | 213   | CRM                                                                               | BMI00j | BMI > 28 |
 | "http://smartlifehealth.info/smh#6d07d8b2-c0c5-4fe0-933b-e7d34fb17ab1" |       | CRM                                                                               | BP001a | Systolic Blood Pressure > 179 |
 | "http://smartlifehealth.info/smh#7af33663-f2e3-4b6e-acda-9ff610bfa12d" |       | CRM                                                                               | BP001b | Systolic Blood Pressure > 162 |
 | "http://smartlifehealth.info/smh#1ad6b44b-e5d6-45da-b955-988f4f361180" |       | CRM                                                                               | BP001c | Systolic Blood Pressure > 145 |
-| "http://smartlifehealth.info/smh#d1c231e7-bbda-4ccd-9d98-afa86694083b" |       | CRM                                                                               | CHOL00a | Cholesterol:HDL Ratio > 8.5 |
-| "http://smartlifehealth.info/smh#d94c2db3-a903-4676-be58-71cc5b15f361" |       | CRM                                                                               | CHOL00b | Cholesterol:HDL Ratio > 8.0 |
-| "http://smartlifehealth.info/smh#ec3e6a93-adb7-486a-94c3-0c594cc6573b" |       | CRM                                                                               | CHOL00c | Cholesterol:HDL Ratio > 7.5 |
-| "http://smartlifehealth.info/smh#2272f0ac-e339-415e-94ec-a25e8faab515" |       | CRM                                                                               | CHOL00d | Cholesterol:HDL Ratio > 7.0 |
-| "http://smartlifehealth.info/smh#9f332cbf-d57b-4a7e-bd59-753b373bd87b" |       | CRM                                                                               | CHOL00e | Cholesterol:HDL Ratio > 6.5 |
-| "http://smartlifehealth.info/smh#df769768-ab0c-477e-9b3a-34ea47f10421" |       | CRM                                                                               | CHOL00f | Cholesterol:HDL Ratio > 6.0 |
-| "http://smartlifehealth.info/smh#9868d31c-70de-4faf-86fd-5fddef44636a" |       | CRM                                                                               | CHOL00g | Cholesterol:HDL Ratio > 5.5 |
-| "http://smartlifehealth.info/smh#49e6bde9-8948-4c18-a252-7ec2a797c7c7" |       | CRM                                                                               | CHOL00h | Cholesterol:HDL Ratio > 5.0 |
-| "http://smartlifehealth.info/smh#bc0fe12f-ac9b-4542-ac1b-e2de2b0c86c6" |       | CRM                                                                               | CHOL00i | Cholesterol:HDL Ratio > 4.5 |
-| "http://smartlifehealth.info/smh#7a449521-8576-47d8-a022-eb804764d26a" |       | CRM                                                                               | CHOL00j | Cholesterol:HDL Ratio > 4.0 |
-| "http://smartlifehealth.info/smh#e722461f-bd9d-4974-b72a-13892834fe1e" |       | CRM                                                                               | CKD QOF register | CKD005 - Patients on the CKD register |
-| "http://smartlifehealth.info/smh#a6e1868b-1d7e-4e9c-8fe9-f4cfdaec656d" |       | CRM                                                                               | CKD Undiagnosed | CKD01Dd | Latest eGFR<60 & 2nd eGFR<60 btwn 3m &2yrs ago |
+| "http://smartlifehealth.info/smh#d1c231e7-bbda-4ccd-9d98-afa86694083b" | 16    | CRM                                                                               | CHOL00a | Cholesterol:HDL Ratio > 8.5 |
+| "http://smartlifehealth.info/smh#d94c2db3-a903-4676-be58-71cc5b15f361" | 16    | CRM                                                                               | CHOL00b | Cholesterol:HDL Ratio > 8.0 |
+| "http://smartlifehealth.info/smh#ec3e6a93-adb7-486a-94c3-0c594cc6573b" | 16    | CRM                                                                               | CHOL00c | Cholesterol:HDL Ratio > 7.5 |
+| "http://smartlifehealth.info/smh#2272f0ac-e339-415e-94ec-a25e8faab515" | 16    | CRM                                                                               | CHOL00d | Cholesterol:HDL Ratio > 7.0 |
+| "http://smartlifehealth.info/smh#9f332cbf-d57b-4a7e-bd59-753b373bd87b" | 16    | CRM                                                                               | CHOL00e | Cholesterol:HDL Ratio > 6.5 |
+| "http://smartlifehealth.info/smh#df769768-ab0c-477e-9b3a-34ea47f10421" | 17    | CRM                                                                               | CHOL00f | Cholesterol:HDL Ratio > 6.0 |
+| "http://smartlifehealth.info/smh#9868d31c-70de-4faf-86fd-5fddef44636a" | 17    | CRM                                                                               | CHOL00g | Cholesterol:HDL Ratio > 5.5 |
+| "http://smartlifehealth.info/smh#49e6bde9-8948-4c18-a252-7ec2a797c7c7" | 17    | CRM                                                                               | CHOL00h | Cholesterol:HDL Ratio > 5.0 |
+| "http://smartlifehealth.info/smh#bc0fe12f-ac9b-4542-ac1b-e2de2b0c86c6" | 18    | CRM                                                                               | CHOL00i | Cholesterol:HDL Ratio > 4.5 |
+| "http://smartlifehealth.info/smh#7a449521-8576-47d8-a022-eb804764d26a" | 20    | CRM                                                                               | CHOL00j | Cholesterol:HDL Ratio > 4.0 |
+| "http://smartlifehealth.info/smh#e722461f-bd9d-4974-b72a-13892834fe1e" | 1     | CRM                                                                               | CKD QOF register | CKD005 - Patients on the CKD register |
+| "http://smartlifehealth.info/smh#a6e1868b-1d7e-4e9c-8fe9-f4cfdaec656d" | 1     | CRM                                                                               | CKD Undiagnosed | CKD01Dd | Latest eGFR<60 & 2nd eGFR<60 btwn 3m &2yrs ago |
 | "http://smartlifehealth.info/smh#013ad17c-0e0c-43ac-8197-51718e60ae73" |       | CRM                                                                               | CKD Undiagnosed | CKD01De | uACR> 3 & 2nd uACR>3 btwn 1 wk & 2 yrs ago |
-| "http://smartlifehealth.info/smh#6d2cd232-81e8-4e7e-a9a8-389099486244" |       | CRM                                                                               | DM | Patient having unresolved diabetes code |
+| "http://smartlifehealth.info/smh#6d2cd232-81e8-4e7e-a9a8-389099486244" | 12    | CRM                                                                               | DM | Patient having unresolved diabetes code |
 | "http://smartlifehealth.info/smh#0c160ab8-8fd7-4d9e-9fbe-ef4438dcdf37" |       | CRM                                                                               | ETH00b | South Asian Ethnicity |
-| "http://smartlifehealth.info/smh#7a8dcd1a-fe91-4bd7-ad26-5f54f3920b90" |       | CRM                                                                               | FHFD01 | Family history of heart disease < 60 |
+| "http://smartlifehealth.info/smh#7a8dcd1a-fe91-4bd7-ad26-5f54f3920b90" | 3     | CRM                                                                               | FHFD01 | Family history of heart disease < 60 |
 | "http://smartlifehealth.info/smh#5c4983af-c5e3-490a-8867-dd35e738661e" |       | CRM                                                                               | Mental health QOF register | MH1_REG - Psychosis, schizophrenia or bipolar |
 | "http://smartlifehealth.info/smh#9b5f701b-aed9-4bb5-afd1-913be87c5494" |       | CRM                                                                               | Mental health QOF register | MH2_REG - Lithium treatment in last 6m |
 | "http://smartlifehealth.info/smh#ac64c6a7-2b35-48f7-9af7-bb0f78ca6a54" |       | CRM                                                                               | SMOK01a | Heavy Smoker |
-| "http://smartlifehealth.info/smh#cbc7aa66-b150-4ec5-b1e9-362280cf17e5" |       | CRM                                                                               | SMOK01b | Moderate or Unclassified Smoker |
-| "http://smartlifehealth.info/smh#e8e42d2c-e3fa-4386-9679-25a4880ba770" |       | CRM                                                                               | SMOK01c | Light Smoker |
+| "http://smartlifehealth.info/smh#cbc7aa66-b150-4ec5-b1e9-362280cf17e5" | 4     | CRM                                                                               | SMOK01b | Moderate or Unclassified Smoker |
+| "http://smartlifehealth.info/smh#e8e42d2c-e3fa-4386-9679-25a4880ba770" | 1     | CRM                                                                               | SMOK01c | Light Smoker |
 | "http://smartlifehealth.info/smh#ffd659bf-c26b-4818-b560-5072363bf363" |       | CRM                                                                               | Systemic lupus erythematosus |
-| "http://smartlifehealth.info/smh#8fa3fea8-5081-49f5-bead-f9702568e723" |       | RISK00b                                                                           | Gender | Male |
+| "http://smartlifehealth.info/smh#8fa3fea8-5081-49f5-bead-f9702568e723" | 3262  | RISK00b                                                                           | Gender | Male |
 | "http://smartlifehealth.info/smh#dd63450b-1f0f-49c6-982b-58e9d1b1ead0" |       | RISK00c                                                                           | Ethnicity | Black & Black British patients |
-| "http://smartlifehealth.info/smh#33ea1af2-3574-4ca2-8a83-00bb4b4a9d9e" |       | RISK00j                                                                           | Rheumatoid arthritis |
-| "http://smartlifehealth.info/smh#2d19e698-1bad-47ec-a570-d16a908c62b0" |       | RISK00l                                                                           | Migraine |
-| "http://smartlifehealth.info/smh#a99e9b9f-f5bf-476d-a45f-3b59c6bab872" |       | RISK00ac                                                                          | Age | Age < 60 |
-| "http://smartlifehealth.info/smh#f516af2c-9414-4afc-90be-ec967b3ce91d" |       | RISK00ab                                                                          | Age | Age < 65 |
-| "http://smartlifehealth.info/smh#8a22dd73-88b0-4d89-81bb-816634a6777a" |       | RISK00aa                                                                          | Age | Age < 70 |
-| "http://smartlifehealth.info/smh#c32f9ed9-6b5a-4777-9478-85f5bc7109a8" |       | RISK00ga                                                                          | Atrial Fibrillation | Age < 60 |
-| "http://smartlifehealth.info/smh#557e812a-3aff-4339-82fa-a7ee48404a32" |       | RISK00gb                                                                          | Atrial Fibrillation | Age < 50 |
-| "http://smartlifehealth.info/smh#2754a719-25f4-4cc2-8f50-f75f1d13cd4a" |       | RISK00gc                                                                          | Atrial Fibrillation | Age < 40 |
-| "http://smartlifehealth.info/smh#283677c4-b26a-4711-a341-6a62878f63ce" |       | RISK00gd                                                                          | Atrial Fibrillation | Age < 35 |
-| "http://smartlifehealth.info/smh#8a8df430-f321-414a-b6fe-f75800f7d582" |       | RISK00ge                                                                          | Atrial Fibrillation | Age < 30 |
+| "http://smartlifehealth.info/smh#33ea1af2-3574-4ca2-8a83-00bb4b4a9d9e" | 6     | RISK00j                                                                           | Rheumatoid arthritis |
+| "http://smartlifehealth.info/smh#2d19e698-1bad-47ec-a570-d16a908c62b0" | 7     | RISK00l                                                                           | Migraine |
+| "http://smartlifehealth.info/smh#a99e9b9f-f5bf-476d-a45f-3b59c6bab872" | 3823  | RISK00ac                                                                          | Age | Age < 60 |
+| "http://smartlifehealth.info/smh#f516af2c-9414-4afc-90be-ec967b3ce91d" | 4233  | RISK00ab                                                                          | Age | Age < 65 |
+| "http://smartlifehealth.info/smh#8a22dd73-88b0-4d89-81bb-816634a6777a" | 4581  | RISK00aa                                                                          | Age | Age < 70 |
+| "http://smartlifehealth.info/smh#c32f9ed9-6b5a-4777-9478-85f5bc7109a8" | 1     | RISK00ga                                                                          | Atrial Fibrillation | Age < 60 |
+| "http://smartlifehealth.info/smh#557e812a-3aff-4339-82fa-a7ee48404a32" | 1     | RISK00gb                                                                          | Atrial Fibrillation | Age < 50 |
+| "http://smartlifehealth.info/smh#2754a719-25f4-4cc2-8f50-f75f1d13cd4a" | 1     | RISK00gc                                                                          | Atrial Fibrillation | Age < 40 |
+| "http://smartlifehealth.info/smh#283677c4-b26a-4711-a341-6a62878f63ce" | 1     | RISK00gd                                                                          | Atrial Fibrillation | Age < 35 |
+| "http://smartlifehealth.info/smh#8a8df430-f321-414a-b6fe-f75800f7d582" | 1     | RISK00ge                                                                          | Atrial Fibrillation | Age < 30 |
 | "http://smartlifehealth.info/smh#2b9a0252-c96c-43a3-ba46-7c4ba3a3d92c" |       | RISK00ha                                                                          | Antihypertensive medication | Age < 65 |
 | "http://smartlifehealth.info/smh#1a4cd147-9d57-4ada-a853-44b81b251a57" |       | RISK00hb                                                                          | Antihypertensive medication | Age < 58 |
 | "http://smartlifehealth.info/smh#fbf15255-0bf3-43e4-8af5-0301b511139f" |       | RISK00hc                                                                          | Antihypertensive medication | Age < 50 |
@@ -2202,26 +2202,26 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#f64fa208-839f-4742-889c-a7b3c0e6163e" |       | RISK00rf                                                                          | Systolic Blood Pressure > 145 |
 | "http://smartlifehealth.info/smh#8341b462-b327-4890-aa47-bac1d0841b6c" |       | RISK00rg                                                                          | Systolic Blood Pressure > 145 | Age < 50 |
 | "http://smartlifehealth.info/smh#412da09e-5673-4e8b-8c1b-478d71e105b4" |       | RISK00rh                                                                          | Systolic Blood Pressure > 145 | Age < 35 |
-| "http://smartlifehealth.info/smh#5ac0b65f-d01d-443c-a614-6720d71640a2" |       | RISK00pa                                                                          | Cholesterol:HDL Ratio > 8.5 |
-| "http://smartlifehealth.info/smh#f3885f92-bdd9-492c-9958-46527c48998d" |       | RISK00pb                                                                          | Cholesterol:HDL Ratio > 8.0 |
-| "http://smartlifehealth.info/smh#41156818-1d49-4860-882d-173a85ebd7e8" |       | RISK00qa                                                                          | Cholesterol:HDL Ratio > 8.0 | Age < 53 |
-| "http://smartlifehealth.info/smh#b9011e01-14cd-451d-8f28-e151e31c0843" |       | RISK00pc                                                                          | Cholesterol:HDL Ratio > 7.5 |
-| "http://smartlifehealth.info/smh#d2cad24c-d6c7-49ba-9a21-f58da5f4180f" |       | RISK00pd                                                                          | Cholesterol:HDL Ratio > 7.0 |
-| "http://smartlifehealth.info/smh#a76a2c71-a68a-4997-8253-e51fdb03f6b8" |       | RISK00qb                                                                          | Cholesterol:HDL Ratio > 7.0 | Age < 53 |
-| "http://smartlifehealth.info/smh#1d5df425-021c-489f-8efb-86f08f2c7289" |       | RISK00pe                                                                          | Cholesterol:HDL Ratio > 6.5 |
-| "http://smartlifehealth.info/smh#63731174-cff3-48c4-ad0e-58f0dd4066ed" |       | RISK00pf                                                                          | Cholesterol:HDL Ratio > 6.0 |
-| "http://smartlifehealth.info/smh#aa1dcfce-26fe-448f-ab9b-6a12fe9679bf" |       | RISK00qc                                                                          | Cholesterol:HDL Ratio > 6.0 | Age < 53 |
-| "http://smartlifehealth.info/smh#5cc036f2-fc77-412c-93f5-3cfa77478ecc" |       | RISK00pg                                                                          | Cholesterol:HDL Ratio > 5.5 |
-| "http://smartlifehealth.info/smh#cd36a572-746d-4094-a8da-271a495ae194" |       | RISK00ph                                                                          | Cholesterol:HDL Ratio > 5.0 |
-| "http://smartlifehealth.info/smh#d623e3a6-8e0a-44a1-9845-4327e505093d" |       | RISK00qd                                                                          | Cholesterol:HDL Ratio > 5.0 | Age < 53 |
-| "http://smartlifehealth.info/smh#59e306c9-762d-4df3-9280-547f65ecb9e2" |       | RISK00pi                                                                          | Cholesterol:HDL Ratio > 4.5 |
-| "http://smartlifehealth.info/smh#8b6810a7-36d2-43c1-b701-305b0d763128" |       | RISK00pj                                                                          | Cholesterol:HDL Ratio > 4.0 |
-| "http://smartlifehealth.info/smh#20188221-ab8e-448a-8b65-fcf8aa08bbac" |       | RISK00qe                                                                          | Cholesterol:HDL Ratio > 4.0 | Age < 53 |
-| "http://smartlifehealth.info/smh#39f8d5f9-8303-4884-bbd8-f73190daa866" |       | CRM                                                                               | CKD Undiagnosed | CKD01Df | Patients with 2* eGFR<60 or 2*uACR>3 |
-| "http://smartlifehealth.info/smh#ac7ab4f0-b98d-4a7d-b1c3-4e5e752cbd46" |       | CRM                                                                               | DM QOF register | DM017 - Patients > = aged 17 on the diabetes register |
-| "http://smartlifehealth.info/smh#cd028c61-eb9d-4bc2-b2a4-a0e0b6f2a8d2" |       | CRM                                                                               | ETH00a | Not South Asian Ethnicity |
-| "http://smartlifehealth.info/smh#a3c0d435-af8c-4c8c-8dff-82ffa4f3ac4f" |       | RISK00ea                                                                          | Family history of heart disease < 60 | Age < 60 |
-| "http://smartlifehealth.info/smh#ff4177a7-cbeb-412e-9c27-29317631f771" |       | RISK00eb                                                                          | Family history of heart disease < 60 | Age < 53 |
+| "http://smartlifehealth.info/smh#5ac0b65f-d01d-443c-a614-6720d71640a2" | 1     | RISK00pa                                                                          | Cholesterol:HDL Ratio > 8.5 |
+| "http://smartlifehealth.info/smh#f3885f92-bdd9-492c-9958-46527c48998d" | 1     | RISK00pb                                                                          | Cholesterol:HDL Ratio > 8.0 |
+| "http://smartlifehealth.info/smh#41156818-1d49-4860-882d-173a85ebd7e8" | 1     | RISK00qa                                                                          | Cholesterol:HDL Ratio > 8.0 | Age < 53 |
+| "http://smartlifehealth.info/smh#b9011e01-14cd-451d-8f28-e151e31c0843" | 1     | RISK00pc                                                                          | Cholesterol:HDL Ratio > 7.5 |
+| "http://smartlifehealth.info/smh#d2cad24c-d6c7-49ba-9a21-f58da5f4180f" | 1     | RISK00pd                                                                          | Cholesterol:HDL Ratio > 7.0 |
+| "http://smartlifehealth.info/smh#a76a2c71-a68a-4997-8253-e51fdb03f6b8" | 1     | RISK00qb                                                                          | Cholesterol:HDL Ratio > 7.0 | Age < 53 |
+| "http://smartlifehealth.info/smh#1d5df425-021c-489f-8efb-86f08f2c7289" | 1     | RISK00pe                                                                          | Cholesterol:HDL Ratio > 6.5 |
+| "http://smartlifehealth.info/smh#63731174-cff3-48c4-ad0e-58f0dd4066ed" | 1     | RISK00pf                                                                          | Cholesterol:HDL Ratio > 6.0 |
+| "http://smartlifehealth.info/smh#aa1dcfce-26fe-448f-ab9b-6a12fe9679bf" | 1     | RISK00qc                                                                          | Cholesterol:HDL Ratio > 6.0 | Age < 53 |
+| "http://smartlifehealth.info/smh#5cc036f2-fc77-412c-93f5-3cfa77478ecc" | 1     | RISK00pg                                                                          | Cholesterol:HDL Ratio > 5.5 |
+| "http://smartlifehealth.info/smh#cd36a572-746d-4094-a8da-271a495ae194" | 1     | RISK00ph                                                                          | Cholesterol:HDL Ratio > 5.0 |
+| "http://smartlifehealth.info/smh#d623e3a6-8e0a-44a1-9845-4327e505093d" | 1     | RISK00qd                                                                          | Cholesterol:HDL Ratio > 5.0 | Age < 53 |
+| "http://smartlifehealth.info/smh#59e306c9-762d-4df3-9280-547f65ecb9e2" | 1     | RISK00pi                                                                          | Cholesterol:HDL Ratio > 4.5 |
+| "http://smartlifehealth.info/smh#8b6810a7-36d2-43c1-b701-305b0d763128" | 1     | RISK00pj                                                                          | Cholesterol:HDL Ratio > 4.0 |
+| "http://smartlifehealth.info/smh#20188221-ab8e-448a-8b65-fcf8aa08bbac" | 1     | RISK00qe                                                                          | Cholesterol:HDL Ratio > 4.0 | Age < 53 |
+| "http://smartlifehealth.info/smh#39f8d5f9-8303-4884-bbd8-f73190daa866" | 1     | CRM                                                                               | CKD Undiagnosed | CKD01Df | Patients with 2* eGFR<60 or 2*uACR>3 |
+| "http://smartlifehealth.info/smh#ac7ab4f0-b98d-4a7d-b1c3-4e5e752cbd46" | 11    | CRM                                                                               | DM QOF register | DM017 - Patients > = aged 17 on the diabetes register |
+| "http://smartlifehealth.info/smh#cd028c61-eb9d-4bc2-b2a4-a0e0b6f2a8d2" | 6479  | CRM                                                                               | ETH00a | Not South Asian Ethnicity |
+| "http://smartlifehealth.info/smh#a3c0d435-af8c-4c8c-8dff-82ffa4f3ac4f" | 1     | RISK00ea                                                                          | Family history of heart disease < 60 | Age < 60 |
+| "http://smartlifehealth.info/smh#ff4177a7-cbeb-412e-9c27-29317631f771" | 1     | RISK00eb                                                                          | Family history of heart disease < 60 | Age < 53 |
 | "http://smartlifehealth.info/smh#a91c5706-04e0-4c5b-87c2-6c69601ab2fc" |       | RISK00ec                                                                          | Family history of heart disease < 60 | Age < 45 |
 | "http://smartlifehealth.info/smh#5e724c03-5231-43e4-87ea-db02faef2337" |       | RISK00ed                                                                          | Family history of heart disease < 60 | Age < 38 |
 | "http://smartlifehealth.info/smh#96bf7bea-39d3-4463-a3a1-57cfd0fd52f2" |       | RISK00ee                                                                          | Family history of heart disease < 60 | Age < 30 |
@@ -2231,38 +2231,38 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#29b3558a-0f02-4a9c-9d60-738a7e8f7132" |       | RISK00mc                                                                          | Heavy Smoker | Age < 53 |
 | "http://smartlifehealth.info/smh#073e14d6-6ff9-45aa-be43-78d0cd563e44" |       | RISK00md                                                                          | Heavy Smoker | Age < 38 |
 | "http://smartlifehealth.info/smh#a5d2f98c-ad29-409a-a4c0-2573b6d5e99c" |       | RISK00me                                                                          | Heavy Smoker | Age < 30 |
-| "http://smartlifehealth.info/smh#f62c5af3-9703-4593-b588-f9e03176fa7f" |       | RISK00na                                                                          | Moderate or Unclassified Smoker |
-| "http://smartlifehealth.info/smh#f245ac54-ec00-4748-a587-336c732f567f" |       | RISK00nb                                                                          | Moderate or Unclassified Smoker | Age < 65 |
-| "http://smartlifehealth.info/smh#6ccdf77a-ba54-481d-bccc-0454656e71c5" |       | RISK00nc                                                                          | Moderate or Unclassified Smoker | Age < 53 |
-| "http://smartlifehealth.info/smh#f9bd95ab-3e11-41f9-9020-ea0e3b23aecd" |       | RISK00nd                                                                          | Moderate or Unclassified Smoker | Age < 38 |
-| "http://smartlifehealth.info/smh#8ae692b4-3dba-471d-ac82-d95b2c01bc8e" |       | RISK00ne                                                                          | Moderate or Unclassified Smoker | Age < 30 |
-| "http://smartlifehealth.info/smh#7a3658f4-eabb-445a-a095-3c90332bd74a" |       | RISK00o                                                                           | Light Smoker |
+| "http://smartlifehealth.info/smh#f62c5af3-9703-4593-b588-f9e03176fa7f" | 4     | RISK00na                                                                          | Moderate or Unclassified Smoker |
+| "http://smartlifehealth.info/smh#f245ac54-ec00-4748-a587-336c732f567f" | 1     | RISK00nb                                                                          | Moderate or Unclassified Smoker | Age < 65 |
+| "http://smartlifehealth.info/smh#6ccdf77a-ba54-481d-bccc-0454656e71c5" | 1     | RISK00nc                                                                          | Moderate or Unclassified Smoker | Age < 53 |
+| "http://smartlifehealth.info/smh#f9bd95ab-3e11-41f9-9020-ea0e3b23aecd" | 1     | RISK00nd                                                                          | Moderate or Unclassified Smoker | Age < 38 |
+| "http://smartlifehealth.info/smh#8ae692b4-3dba-471d-ac82-d95b2c01bc8e" | 1     | RISK00ne                                                                          | Moderate or Unclassified Smoker | Age < 30 |
+| "http://smartlifehealth.info/smh#7a3658f4-eabb-445a-a095-3c90332bd74a" | 1     | RISK00o                                                                           | Light Smoker |
 | "http://smartlifehealth.info/smh#a04a508e-eaf2-4633-8582-9b0d24db4ad7" |       | RISK00ia                                                                          | Systemic lupus erythematosus |
 | "http://smartlifehealth.info/smh#f06ff682-ad6d-47f4-b939-92a508159506" |       | RISK00ib                                                                          | Systemic lupus erythematosus | Age < 45 |
 | "http://smartlifehealth.info/smh#3d4a6ba3-0490-4432-b57a-21c49ed195b4" |       | RISK00ic                                                                          | Systemic lupus erythematosus | Age < 30 |
-| "http://smartlifehealth.info/smh#00641af4-21aa-4caa-949d-a916a0714dfe" |       | CRM                                                                               | CKD Undiagnosed | CKD01D | Patients who are likely to have CKD |
+| "http://smartlifehealth.info/smh#00641af4-21aa-4caa-949d-a916a0714dfe" | 1     | CRM                                                                               | CKD Undiagnosed | CKD01D | Patients who are likely to have CKD |
 | "http://smartlifehealth.info/smh#a26aa36c-c626-4b4f-9dff-945c7a05afb8" |       | RISK00da                                                                          | Diabetes | Type 1 Diabetes |
-| "http://smartlifehealth.info/smh#712d6974-2f1c-435a-a53e-b5f11d35adaf" |       | RISK00db                                                                          | Diabetes | Type 2 Diabetes |
-| "http://smartlifehealth.info/smh#b18bf0f0-4a4e-4944-ab70-50d3e3083660" |       | RISK00dc                                                                          | Diabetes | Age < 65 |
-| "http://smartlifehealth.info/smh#b2f56f3d-1d45-4763-96c2-4e9d5a559ab2" |       | RISK00dd                                                                          | Diabetes | Age < 60 |
-| "http://smartlifehealth.info/smh#2d325458-09fd-4b30-b080-37a1a5c4b9d2" |       | RISK00de                                                                          | Diabetes | Age < 55 |
-| "http://smartlifehealth.info/smh#e2f9f966-4981-4aa2-a27b-2da30e01a4c1" |       | RISK00df                                                                          | Diabetes | Age < 50 |
-| "http://smartlifehealth.info/smh#52e32e7d-98e5-467e-adc9-a52185b04067" |       | RISK00dg                                                                          | Diabetes | Age < 45 |
-| "http://smartlifehealth.info/smh#f306777b-e370-4165-b05c-68ef6b3621fc" |       | RISK00dh                                                                          | Diabetes | Age < 40 |
-| "http://smartlifehealth.info/smh#7b48e216-4f95-4716-a82b-c78fa5d1ff06" |       | RISK00di                                                                          | Diabetes | Age < 35 |
+| "http://smartlifehealth.info/smh#712d6974-2f1c-435a-a53e-b5f11d35adaf" | 1     | RISK00db                                                                          | Diabetes | Type 2 Diabetes |
+| "http://smartlifehealth.info/smh#b18bf0f0-4a4e-4944-ab70-50d3e3083660" | 9     | RISK00dc                                                                          | Diabetes | Age < 65 |
+| "http://smartlifehealth.info/smh#b2f56f3d-1d45-4763-96c2-4e9d5a559ab2" | 8     | RISK00dd                                                                          | Diabetes | Age < 60 |
+| "http://smartlifehealth.info/smh#2d325458-09fd-4b30-b080-37a1a5c4b9d2" | 6     | RISK00de                                                                          | Diabetes | Age < 55 |
+| "http://smartlifehealth.info/smh#e2f9f966-4981-4aa2-a27b-2da30e01a4c1" | 5     | RISK00df                                                                          | Diabetes | Age < 50 |
+| "http://smartlifehealth.info/smh#52e32e7d-98e5-467e-adc9-a52185b04067" | 2     | RISK00dg                                                                          | Diabetes | Age < 45 |
+| "http://smartlifehealth.info/smh#f306777b-e370-4165-b05c-68ef6b3621fc" | 1     | RISK00dh                                                                          | Diabetes | Age < 40 |
+| "http://smartlifehealth.info/smh#7b48e216-4f95-4716-a82b-c78fa5d1ff06" | 1     | RISK00di                                                                          | Diabetes | Age < 35 |
 | "http://smartlifehealth.info/smh#360373ff-0177-4f04-ac10-f163837bc876" |       | RISK00dj                                                                          | Diabetes | Age < 30 |
-| "http://smartlifehealth.info/smh#5bf4f0c0-4e9e-40c0-8ce5-8654b7033058" |       | RISK00sa                                                                          | BMI > 50 or South Asian and BMI > 48 |
-| "http://smartlifehealth.info/smh#020ee455-1c4c-43d2-b174-ac746a51824a" |       | RISK00sb                                                                          | BMI > 45 or South Asian and BMI > 43 |
-| "http://smartlifehealth.info/smh#2a690027-b4bb-490f-8c9d-1a59ef8687da" |       | RISK00sc                                                                          | BMI > 40 or South Asian and BMI > 38 |
-| "http://smartlifehealth.info/smh#bfd3e415-2db5-47e5-baee-929d8327f166" |       | RISK00sd                                                                          | BMI > 35 or South Asian and BMI > 33 |
-| "http://smartlifehealth.info/smh#b76c138b-7317-45f2-9ff2-665e7a8eeb27" |       | RISK00se                                                                          | BMI > 30 or South Asian and BMI > 28 |
+| "http://smartlifehealth.info/smh#5bf4f0c0-4e9e-40c0-8ce5-8654b7033058" | 16    | RISK00sa                                                                          | BMI > 50 or South Asian and BMI > 48 |
+| "http://smartlifehealth.info/smh#020ee455-1c4c-43d2-b174-ac746a51824a" | 16    | RISK00sb                                                                          | BMI > 45 or South Asian and BMI > 43 |
+| "http://smartlifehealth.info/smh#2a690027-b4bb-490f-8c9d-1a59ef8687da" | 16    | RISK00sc                                                                          | BMI > 40 or South Asian and BMI > 38 |
+| "http://smartlifehealth.info/smh#bfd3e415-2db5-47e5-baee-929d8327f166" | 16    | RISK00sd                                                                          | BMI > 35 or South Asian and BMI > 33 |
+| "http://smartlifehealth.info/smh#b76c138b-7317-45f2-9ff2-665e7a8eeb27" | 16    | RISK00se                                                                          | BMI > 30 or South Asian and BMI > 28 |
 | "http://smartlifehealth.info/smh#db84a295-8b8b-4c57-be26-95e861ac14ca" |       | RISK00k                                                                           | Serious Mental Illness |
-| "http://smartlifehealth.info/smh#12048079-cdb9-414a-b79b-149dc45571d5" |       | CRM                                                                               | CKD QOF register OR CKD undiagnosed | CKD005 or CKD01D |
+| "http://smartlifehealth.info/smh#12048079-cdb9-414a-b79b-149dc45571d5" | 1     | CRM                                                                               | CKD QOF register OR CKD undiagnosed | CKD005 or CKD01D |
 | "http://smartlifehealth.info/smh#f24c3871-ea8d-4033-b59b-c1b220d3c04f" |       | RISK00fa                                                                          | CKD | Age < 65 |
 | "http://smartlifehealth.info/smh#29eedc02-70f2-4a4c-bf04-b6e827c96b96" |       | RISK00fb                                                                          | CKD | Age < 58 |
 | "http://smartlifehealth.info/smh#52ad0830-99b8-4ef5-9991-aa40e8079105" |       | RISK00fc                                                                          | CKD | Age < 50 |
-| "http://smartlifehealth.info/smh#8ff39c58-020c-4150-a9d4-260d4f561cad" |       | RISK00Ca                                                                          | Low Risk | Option 3 | 0-9 |
-| "http://smartlifehealth.info/smh#0dea3d61-dd26-443c-a89f-af59efdec3b8" |       | RISK00d                                                                           | No Risk | Option 3 |
+| "http://smartlifehealth.info/smh#8ff39c58-020c-4150-a9d4-260d4f561cad" | 35    | RISK00Ca                                                                          | Low Risk | Option 3 | 0-9 |
+| "http://smartlifehealth.info/smh#0dea3d61-dd26-443c-a89f-af59efdec3b8" | 3     | RISK00d                                                                           | No Risk | Option 3 |
 | "http://smartlifehealth.info/smh#5c0d72af-3495-4076-8f6a-1e60ede2b145" |       | DL206f-Patients discussed at MDT MISSING Referral to Weight Management            |
 | "http://smartlifehealth.info/smh#0b5cd658-f39e-4501-82c9-866183ed2daf" |       | DL206g-Patients discussed at MDT MISSING Referral to ARRS Team                    |
 | "http://smartlifehealth.info/smh#e313723a-ff65-471f-a2e4-16e1e853c415" |       | NHS Numbers - DQ Report - MISSING Referral to Weight Mangement                    |
@@ -2281,10 +2281,10 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#b7746a39-0c87-4361-89b9-665c1c18754b" |       | *MH00-ES-PAYMENT-Patients with Payable Follow Up AND ALL required MDS Completed   |
 | "http://smartlifehealth.info/smh#06fe77a6-f19b-4ef0-9428-c64c4fd048c8" |       | MH00aa-ES-Patients with Annual Review AND ALL required MDS Completed              |
 | "http://smartlifehealth.info/smh#90bae7d5-b40f-4c60-af3b-5def53186785" |       | MH00ab-ES-Patients with Follow Up AND ALL required MDS Completed                  |
-| "http://smartlifehealth.info/smh#b31ab7c5-b1ee-4008-b4f0-2f6f02f4d235" |       | CRM00Ba                                                                           | BETWEEN JAN LAST YR & MAR NEXT YEAR | First appointment |
-| "http://smartlifehealth.info/smh#525298b6-65d8-4ae6-ba14-ef960a0cb325" |       | CRM00Bb                                                                           | BETWEEN JAN LAST YR & MAR NEXT YEAR | Follow Up appointment |
-| "http://smartlifehealth.info/smh#dbd9b57d-1a85-4ea1-a91a-6e14d7b6ec56" |       | NHS NUMBERS                                                                       | DQ | MISSING First Appointment -report |
-| "http://smartlifehealth.info/smh#e16cb942-afa8-452d-97b6-261287f437e4" |       | NHS NUMBERS                                                                       | DQ | MISSING Follow Up appointment -report |
+| "http://smartlifehealth.info/smh#b31ab7c5-b1ee-4008-b4f0-2f6f02f4d235" | 35    | CRM00Ba                                                                           | BETWEEN JAN LAST YR & MAR NEXT YEAR | First appointment |
+| "http://smartlifehealth.info/smh#525298b6-65d8-4ae6-ba14-ef960a0cb325" | 35    | CRM00Bb                                                                           | BETWEEN JAN LAST YR & MAR NEXT YEAR | Follow Up appointment |
+| "http://smartlifehealth.info/smh#dbd9b57d-1a85-4ea1-a91a-6e14d7b6ec56" | 35    | NHS NUMBERS                                                                       | DQ | MISSING First Appointment -report |
+| "http://smartlifehealth.info/smh#e16cb942-afa8-452d-97b6-261287f437e4" | 35    | NHS NUMBERS                                                                       | DQ | MISSING Follow Up appointment -report |
 | "http://smartlifehealth.info/smh#807099a8-3cef-40a8-99aa-075d4891a585" |       | CRM02a                                                                            | ALL CRM | ACHIEVED | LAST 15M TO END OF FY | HbA1c |
 | "http://smartlifehealth.info/smh#546f4fea-3428-4654-ba54-bf0e081bbf5a" |       | CRM02b                                                                            | ALL CRM | ACHIEVED | LAST 15M TO END OF FY | Blood Pressure |
 | "http://smartlifehealth.info/smh#5b1a5c59-beab-426c-a5bf-57ee4f8f963f" |       | CRM02c                                                                            | ALL CRM | ACHIEVED | LAST 15M TO END OF FY | Lipids |
@@ -2293,10 +2293,10 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#e0052f2a-31c6-4329-8672-79a61305247b" |       | CRM02f                                                                            | ALL CRM | ACHIEVED | LAST 15M TO END OF FY | BMI |
 | "http://smartlifehealth.info/smh#fdea415d-c97d-49d8-9cf3-78dc24b6eb00" |       | CRM02h                                                                            | ALL CRM | ACHIEVED | LAST 15M TO END OF FY | Smoking Status |
 | "http://smartlifehealth.info/smh#cc2ffe51-9a41-4622-8a9e-186252012d8c" |       | CRM02g                                                                            | ALL CRM | ACHIEVED | LAST 15M TO END OF FY | Waist circumference |
-| "http://smartlifehealth.info/smh#828d0110-5726-41a4-92ab-b0aba5972f55" |       | CRM02i                                                                            | DIABETES | ACHIEVED | LAST 15M TO END OF FY | MH Screening |
-| "http://smartlifehealth.info/smh#a594cedc-eba2-44e3-97fb-3ebc74e737fd" |       | CRM02j                                                                            | DIABETES | ACHIEVED | LAST 15M TO END OF FY | Foot Check |
-| "http://smartlifehealth.info/smh#37b1a5c2-2b0f-48c2-bcb2-b44acc75cb66" |       | CRM02k                                                                            | DIABETES | ACHIEVED | LAST 27M TO END OF FY | Retinal Screening |
-| "http://smartlifehealth.info/smh#dfc5b4a9-412d-4d08-8c26-84a36c8b88a1" |       | CRM02l                                                                            | DIABETES & MASLD | ACHIEVED | LAST 39M TO END OF FY | FIB-4 |
+| "http://smartlifehealth.info/smh#828d0110-5726-41a4-92ab-b0aba5972f55" | 27    | CRM02i                                                                            | DIABETES | ACHIEVED | LAST 15M TO END OF FY | MH Screening |
+| "http://smartlifehealth.info/smh#a594cedc-eba2-44e3-97fb-3ebc74e737fd" | 27    | CRM02j                                                                            | DIABETES | ACHIEVED | LAST 15M TO END OF FY | Foot Check |
+| "http://smartlifehealth.info/smh#37b1a5c2-2b0f-48c2-bcb2-b44acc75cb66" | 27    | CRM02k                                                                            | DIABETES | ACHIEVED | LAST 27M TO END OF FY | Retinal Screening |
+| "http://smartlifehealth.info/smh#dfc5b4a9-412d-4d08-8c26-84a36c8b88a1" | 27    | CRM02l                                                                            | DIABETES & MASLD | ACHIEVED | LAST 39M TO END OF FY | FIB-4 |
 | "http://smartlifehealth.info/smh#c013d85b-1cc9-40c2-9012-63d493a974c6" |       | CRM02                                                                             | ACHIEVED | Care Processes Completed |
 | "http://smartlifehealth.info/smh#f0088005-dac8-4be0-b17a-85f35cad8a2a" |       | CRM03A                                                                            | NOT FRAIL & AGE<80 | ACHIEVED | LAST 15M TO END FY | Latest BP<=130/80 |
 | "http://smartlifehealth.info/smh#7be54fe8-5a27-4cae-9432-2ac375622f1b" |       | CRM03B                                                                            | FRAIL & AGE>=80 | ACHIEVED | LAST 15M TO END OF FY | Latest BP<=150/90 |
@@ -2316,20 +2316,20 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#878afc87-d22d-4646-967b-af60b6cf4255" |       | *CRM10                                                                            | ACHIEVED | LAST 15M TO END OF FY | 3 Treatment Targets |
 | "http://smartlifehealth.info/smh#c99bc6be-6bf6-43ef-b80b-a734bd42d407" |       | CRM11                                                                             | ACHIEVED | LAST 15M TO END OF FY | Diagnosed in last 2 yrs HbA1c<=48 |
 | "http://smartlifehealth.info/smh#1e6d522d-51b0-470d-89bf-a9c30717e483" |       | CRM                                                                               | AF QOF register | AF001 - Patients on the AF register |
-| "http://smartlifehealth.info/smh#28db62a9-80fc-4476-ad65-323f5a5d8b7d" |       | CRM                                                                               | AGE00a | Age | DOB between 17 and 28 years ago |
-| "http://smartlifehealth.info/smh#ccd3c180-5c87-4445-bc01-9ffe47ab72fd" |       | CRM                                                                               | AGE00b | Age | DOB between 17 and 30 years ago |
-| "http://smartlifehealth.info/smh#d3463e4c-91fb-4234-a7ab-1bdd7ca69671" |       | CRM                                                                               | AGE00c | Age | DOB between 17 and 35 years ago |
-| "http://smartlifehealth.info/smh#b1586fe1-5e3d-4e33-816f-b1a872782661" |       | CRM                                                                               | AGE00d | Age | DOB between 17 and 38 years ago |
-| "http://smartlifehealth.info/smh#1024dc6f-a68a-46eb-8ac0-8408a36205be" |       | CRM                                                                               | AGE00e | Age | DOB between 17 and 40 years ago |
-| "http://smartlifehealth.info/smh#ea115015-fc24-4fad-8c8c-9a46d28aff8b" |       | CRM                                                                               | AGE00f | Age | DOB between 17 and 43 years ago |
-| "http://smartlifehealth.info/smh#c65ca242-94b9-473a-b1cf-d180c6b884cf" |       | CRM                                                                               | AGE00g | Age | DOB between 17 and 45 years ago |
-| "http://smartlifehealth.info/smh#ddc76caf-ddbd-4349-a4cf-16c79b28e53f" |       | CRM                                                                               | AGE00h | Age | DOB between 17 and 50 years ago |
-| "http://smartlifehealth.info/smh#5eb3496f-d8b7-469c-b52b-ab05fb1b9a43" |       | CRM                                                                               | AGE00i | Age | DOB between 17 and 53 years ago |
-| "http://smartlifehealth.info/smh#ffe4beb7-eb3d-470e-a508-351144c2a42b" |       | CRM                                                                               | AGE00j | Age | DOB between 17 and 55 years ago |
-| "http://smartlifehealth.info/smh#69aeb370-9384-40c2-bc33-b488fadaa4a2" |       | CRM                                                                               | AGE00k | Age | DOB between 17 and 58 years ago |
-| "http://smartlifehealth.info/smh#b64abc12-1468-4107-b62d-7a644e74a8d1" |       | CRM                                                                               | AGE00l | Age | DOB between 17 and 60 years ago |
-| "http://smartlifehealth.info/smh#5f6694e9-b20e-408a-9c6b-c6c6f3cbe963" |       | CRM                                                                               | AGE00m | Age | DOB between 17 and 65 years ago |
-| "http://smartlifehealth.info/smh#c01d1b21-4cd9-4143-8d81-d60596d11dd8" |       | CRM                                                                               | AGE00n | Age | DOB between 17 and 70 years ago |
+| "http://smartlifehealth.info/smh#28db62a9-80fc-4476-ad65-323f5a5d8b7d" | 881   | CRM                                                                               | AGE00a | Age | DOB between 17 and 28 years ago |
+| "http://smartlifehealth.info/smh#ccd3c180-5c87-4445-bc01-9ffe47ab72fd" | 1048  | CRM                                                                               | AGE00b | Age | DOB between 17 and 30 years ago |
+| "http://smartlifehealth.info/smh#d3463e4c-91fb-4234-a7ab-1bdd7ca69671" | 1512  | CRM                                                                               | AGE00c | Age | DOB between 17 and 35 years ago |
+| "http://smartlifehealth.info/smh#b1586fe1-5e3d-4e33-816f-b1a872782661" | 1802  | CRM                                                                               | AGE00d | Age | DOB between 17 and 38 years ago |
+| "http://smartlifehealth.info/smh#1024dc6f-a68a-46eb-8ac0-8408a36205be" | 1924  | CRM                                                                               | AGE00e | Age | DOB between 17 and 40 years ago |
+| "http://smartlifehealth.info/smh#ea115015-fc24-4fad-8c8c-9a46d28aff8b" | 2160  | CRM                                                                               | AGE00f | Age | DOB between 17 and 43 years ago |
+| "http://smartlifehealth.info/smh#c65ca242-94b9-473a-b1cf-d180c6b884cf" | 2340  | CRM                                                                               | AGE00g | Age | DOB between 17 and 45 years ago |
+| "http://smartlifehealth.info/smh#ddc76caf-ddbd-4349-a4cf-16c79b28e53f" | 2949  | CRM                                                                               | AGE00h | Age | DOB between 17 and 50 years ago |
+| "http://smartlifehealth.info/smh#5eb3496f-d8b7-469c-b52b-ab05fb1b9a43" | 3251  | CRM                                                                               | AGE00i | Age | DOB between 17 and 53 years ago |
+| "http://smartlifehealth.info/smh#ffe4beb7-eb3d-470e-a508-351144c2a42b" | 3412  | CRM                                                                               | AGE00j | Age | DOB between 17 and 55 years ago |
+| "http://smartlifehealth.info/smh#69aeb370-9384-40c2-bc33-b488fadaa4a2" | 3652  | CRM                                                                               | AGE00k | Age | DOB between 17 and 58 years ago |
+| "http://smartlifehealth.info/smh#b64abc12-1468-4107-b62d-7a644e74a8d1" | 3823  | CRM                                                                               | AGE00l | Age | DOB between 17 and 60 years ago |
+| "http://smartlifehealth.info/smh#5f6694e9-b20e-408a-9c6b-c6c6f3cbe963" | 4233  | CRM                                                                               | AGE00m | Age | DOB between 17 and 65 years ago |
+| "http://smartlifehealth.info/smh#c01d1b21-4cd9-4143-8d81-d60596d11dd8" | 4581  | CRM                                                                               | AGE00n | Age | DOB between 17 and 70 years ago |
 | "http://smartlifehealth.info/smh#8718c0db-5fd4-4f58-897d-50cdd17051cf" |       | CRM                                                                               | Antihypertensive medications | AHM01 | Prescribed in last 6 months |
 | "http://smartlifehealth.info/smh#017ec630-661a-4ac6-8afe-3594d27876ed" |       | CRM                                                                               | BMI00a | BMI > 50 |
 | "http://smartlifehealth.info/smh#06f18164-22b1-435a-8ffd-d119b4bff289" |       | CRM                                                                               | BMI00b | BMI > 48 |
@@ -2366,7 +2366,7 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#34ec5af3-db57-4028-a1db-95067721bce9" |       | CRM                                                                               | SMOK01b | Moderate or Unclassified Smoker |
 | "http://smartlifehealth.info/smh#fc36a540-31cb-4293-9bf8-e264fe9c5946" |       | CRM                                                                               | SMOK01c | Light Smoker |
 | "http://smartlifehealth.info/smh#eecca5d4-7068-496f-97f2-a0214cf1f061" |       | CRM                                                                               | Systemic lupus erythematosus |
-| "http://smartlifehealth.info/smh#f3570239-7e5b-43d5-b329-45f23074a051" |       | RISK00b                                                                           | Gender | Male |
+| "http://smartlifehealth.info/smh#f3570239-7e5b-43d5-b329-45f23074a051" | 3262  | RISK00b                                                                           | Gender | Male |
 | "http://smartlifehealth.info/smh#996c95fa-f694-482c-ac5a-47cf7df68a3a" |       | RISK00c                                                                           | Ethnicity | Black & Black British patients |
 | "http://smartlifehealth.info/smh#e5e76203-c4fe-4701-a970-ee3e4d2e9615" |       | RISK00j                                                                           | Rheumatoid arthritis |
 | "http://smartlifehealth.info/smh#05f5e6a7-876c-422c-911a-589e1da68419" |       | RISK00l                                                                           | Migraine |
@@ -2374,10 +2374,10 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#c1f50471-2dda-4850-9cf4-2ce098cd11c0" |       | RISK00ge                                                                          | Atrial Fibrillation | Age < 30 |
 | "http://smartlifehealth.info/smh#026f2d3a-bd87-4b64-955e-2bad9b4f53a1" |       | RISK00gc                                                                          | Atrial Fibrillation | Age < 40 |
 | "http://smartlifehealth.info/smh#23cf8829-5d78-4633-b3f0-a653a7c52264" |       | RISK00gb                                                                          | Atrial Fibrillation | Age < 50 |
-| "http://smartlifehealth.info/smh#256c2f63-94a1-4287-8ecd-f69ac95b3831" |       | RISK00ac                                                                          | Age | Age < 60 |
+| "http://smartlifehealth.info/smh#256c2f63-94a1-4287-8ecd-f69ac95b3831" | 3823  | RISK00ac                                                                          | Age | Age < 60 |
 | "http://smartlifehealth.info/smh#018938ff-f643-44c4-af9f-2cfaa2bf5847" |       | RISK00ga                                                                          | Atrial Fibrillation | Age < 60 |
-| "http://smartlifehealth.info/smh#6d9cb51f-3a8d-4234-b5cf-6eb239b5d08d" |       | RISK00ab                                                                          | Age | Age < 65 |
-| "http://smartlifehealth.info/smh#d24f96eb-1c5b-454b-aa1d-a259a642bfad" |       | RISK00aa                                                                          | Age | Age < 70 |
+| "http://smartlifehealth.info/smh#6d9cb51f-3a8d-4234-b5cf-6eb239b5d08d" | 4233  | RISK00ab                                                                          | Age | Age < 65 |
+| "http://smartlifehealth.info/smh#d24f96eb-1c5b-454b-aa1d-a259a642bfad" | 4581  | RISK00aa                                                                          | Age | Age < 70 |
 | "http://smartlifehealth.info/smh#bf864461-55da-4570-82c1-9968dbfc086b" |       | RISK00ha                                                                          | Antihypertensive medication | Age < 65 |
 | "http://smartlifehealth.info/smh#9e984e04-2321-4ec5-a6fb-8f2a04dfb79b" |       | RISK00hb                                                                          | Antihypertensive medication | Age < 58 |
 | "http://smartlifehealth.info/smh#95172355-73fe-4a85-949d-3779bbe83bc4" |       | RISK00hc                                                                          | Antihypertensive medication | Age < 50 |
@@ -2409,7 +2409,7 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#d340ef89-b66c-41dd-a0eb-c31cb86c9cc9" |       | RISK00qe                                                                          | Cholesterol:HDL Ratio > 4.0 | Age < 53 |
 | "http://smartlifehealth.info/smh#b4370e0d-c543-491a-b329-fe4ec968b6f5" |       | CRM                                                                               | CKD Undiagnosed | CKD01Df | Patients with 2* eGFR<60 or 2*uACR>3 |
 | "http://smartlifehealth.info/smh#a67c8a5d-df02-47bf-8183-7712e29ad4f1" |       | CRM                                                                               | DM QOF register | DM017 - Patients > = aged 17 on the diabetes register |
-| "http://smartlifehealth.info/smh#4091305e-bf60-4146-860d-45191d228a92" |       | CRM                                                                               | ETH00a | Not South Asian Ethnicity |
+| "http://smartlifehealth.info/smh#4091305e-bf60-4146-860d-45191d228a92" | 6479  | CRM                                                                               | ETH00a | Not South Asian Ethnicity |
 | "http://smartlifehealth.info/smh#efcf75c6-424d-43f0-afef-31e40641b589" |       | RISK00ea                                                                          | Family history of heart disease < 60 | Age < 60 |
 | "http://smartlifehealth.info/smh#5ad77b35-b9e6-47e3-b3fd-c6f719e552f4" |       | RISK00eb                                                                          | Family history of heart disease < 60 | Age < 53 |
 | "http://smartlifehealth.info/smh#1c893b49-13d2-4720-a79d-790eeee87eb2" |       | RISK00ec                                                                          | Family history of heart disease < 60 | Age < 45 |
@@ -2451,55 +2451,55 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#c80e8c13-d6ce-4222-8963-6477773ee2a6" |       | RISK00fa                                                                          | CKD | Age < 65 |
 | "http://smartlifehealth.info/smh#ea84aa18-df78-4b59-97b3-3f33c0cce2e3" |       | RISK00fb                                                                          | CKD | Age < 58 |
 | "http://smartlifehealth.info/smh#3b8937fe-42a6-48d5-b4d8-851386071aef" |       | RISK00fc                                                                          | CKD | Age < 50 |
-| "http://smartlifehealth.info/smh#e8872f50-953b-4116-bcb4-b5ffb4f25b8f" |       | CRM                                                                               | AF QOF register | AF001 - Patients on the AF register |
+| "http://smartlifehealth.info/smh#e8872f50-953b-4116-bcb4-b5ffb4f25b8f" | 1     | CRM                                                                               | AF QOF register | AF001 - Patients on the AF register |
 | "http://smartlifehealth.info/smh#1994cf47-9da0-4192-952d-200e3586989e" |       | CRM                                                                               | Antihypertensive medications | AHM01 | Prescribed in last 6 months |
-| "http://smartlifehealth.info/smh#54e9204f-0842-406d-9ff2-965dc7c8e4e0" |       | CRM                                                                               | BMI00a | BMI > 50 |
-| "http://smartlifehealth.info/smh#e710b150-d5e9-4907-a3cf-a6afce708654" |       | CRM                                                                               | BMI00b | BMI > 48 |
-| "http://smartlifehealth.info/smh#bef8789b-f06c-4a95-a98d-c5c0761468ee" |       | CRM                                                                               | BMI00c | BMI > 45 |
-| "http://smartlifehealth.info/smh#585c884f-b795-4999-97ce-a5d39c2d37ff" |       | CRM                                                                               | BMI00d | BMI > 43 |
-| "http://smartlifehealth.info/smh#93312ceb-4cf2-484a-8fff-7c80095283ea" |       | CRM                                                                               | BMI00e | BMI > 40 |
-| "http://smartlifehealth.info/smh#5a3f1849-baf2-4c62-a664-e5ea305373eb" |       | CRM                                                                               | BMI00f | BMI > 38 |
-| "http://smartlifehealth.info/smh#5284defb-1d28-4c5a-81e2-c6ebb4ccd649" |       | CRM                                                                               | BMI00g | BMI > 35 |
-| "http://smartlifehealth.info/smh#1576cca0-6964-443b-8841-53336a0bc8e0" |       | CRM                                                                               | BMI00h | BMI > 33 |
-| "http://smartlifehealth.info/smh#3f13831c-5fb6-4beb-9cff-2097a1e5dcfc" |       | CRM                                                                               | BMI00i | BMI > 30 |
-| "http://smartlifehealth.info/smh#0f581e62-e464-454f-95a5-6e85718a438c" |       | CRM                                                                               | BMI00j | BMI > 28 |
+| "http://smartlifehealth.info/smh#54e9204f-0842-406d-9ff2-965dc7c8e4e0" | 142   | CRM                                                                               | BMI00a | BMI > 50 |
+| "http://smartlifehealth.info/smh#e710b150-d5e9-4907-a3cf-a6afce708654" | 145   | CRM                                                                               | BMI00b | BMI > 48 |
+| "http://smartlifehealth.info/smh#bef8789b-f06c-4a95-a98d-c5c0761468ee" | 148   | CRM                                                                               | BMI00c | BMI > 45 |
+| "http://smartlifehealth.info/smh#585c884f-b795-4999-97ce-a5d39c2d37ff" | 151   | CRM                                                                               | BMI00d | BMI > 43 |
+| "http://smartlifehealth.info/smh#93312ceb-4cf2-484a-8fff-7c80095283ea" | 152   | CRM                                                                               | BMI00e | BMI > 40 |
+| "http://smartlifehealth.info/smh#5a3f1849-baf2-4c62-a664-e5ea305373eb" | 159   | CRM                                                                               | BMI00f | BMI > 38 |
+| "http://smartlifehealth.info/smh#5284defb-1d28-4c5a-81e2-c6ebb4ccd649" | 162   | CRM                                                                               | BMI00g | BMI > 35 |
+| "http://smartlifehealth.info/smh#1576cca0-6964-443b-8841-53336a0bc8e0" | 181   | CRM                                                                               | BMI00h | BMI > 33 |
+| "http://smartlifehealth.info/smh#3f13831c-5fb6-4beb-9cff-2097a1e5dcfc" | 204   | CRM                                                                               | BMI00i | BMI > 30 |
+| "http://smartlifehealth.info/smh#0f581e62-e464-454f-95a5-6e85718a438c" | 213   | CRM                                                                               | BMI00j | BMI > 28 |
 | "http://smartlifehealth.info/smh#1303e408-5d7e-4e6d-9c88-009cab915f1b" |       | CRM                                                                               | BP001a | Systolic Blood Pressure > 179 |
 | "http://smartlifehealth.info/smh#bf59cd45-0b77-47e0-af00-be28a6480b5f" |       | CRM                                                                               | BP001b | Systolic Blood Pressure > 162 |
 | "http://smartlifehealth.info/smh#68db0dc5-1ed9-4bef-bca6-ca9a4e10e931" |       | CRM                                                                               | BP001c | Systolic Blood Pressure > 145 |
-| "http://smartlifehealth.info/smh#82435511-73f3-4e46-a8f7-e3a6fa22043d" |       | CRM                                                                               | CHOL00a | Cholesterol:HDL Ratio > 8.5 |
-| "http://smartlifehealth.info/smh#7322d479-0f81-4904-b793-dc8f73f26695" |       | CRM                                                                               | CHOL00b | Cholesterol:HDL Ratio > 8.0 |
-| "http://smartlifehealth.info/smh#fc0aa332-8223-42dc-a1d8-3b5e8acf7bdf" |       | CRM                                                                               | CHOL00c | Cholesterol:HDL Ratio > 7.5 |
-| "http://smartlifehealth.info/smh#45ad4d1a-48ab-44d9-a994-83da92aa1a17" |       | CRM                                                                               | CHOL00d | Cholesterol:HDL Ratio > 7.0 |
-| "http://smartlifehealth.info/smh#4245d467-2f56-4d0e-b348-b723f6eb1681" |       | CRM                                                                               | CHOL00e | Cholesterol:HDL Ratio > 6.5 |
-| "http://smartlifehealth.info/smh#758c5c5a-b259-4d66-9df4-ce6e91e47047" |       | CRM                                                                               | CHOL00f | Cholesterol:HDL Ratio > 6.0 |
-| "http://smartlifehealth.info/smh#a9995fc9-5eb0-4a80-8821-752a2d931f45" |       | CRM                                                                               | CHOL00g | Cholesterol:HDL Ratio > 5.5 |
-| "http://smartlifehealth.info/smh#f069ba26-ebc4-4c28-b917-90036c9fd9f8" |       | CRM                                                                               | CHOL00h | Cholesterol:HDL Ratio > 5.0 |
-| "http://smartlifehealth.info/smh#653fa476-de74-41d7-a8e6-223f7a10fc2c" |       | CRM                                                                               | CHOL00i | Cholesterol:HDL Ratio > 4.5 |
-| "http://smartlifehealth.info/smh#b746a9dd-5a9e-4ca8-97f0-58b077533a47" |       | CRM                                                                               | CHOL00j | Cholesterol:HDL Ratio > 4.0 |
-| "http://smartlifehealth.info/smh#1479a14e-8d57-458e-9d65-48a75c536081" |       | CRM                                                                               | CKD QOF register | CKD005 - Patients on the CKD register |
-| "http://smartlifehealth.info/smh#977cb475-2682-4abc-9377-73205e8e5cf9" |       | CRM                                                                               | CKD Undiagnosed | CKD01Dd | Latest eGFR<60 & 2nd eGFR<60 btwn 3m &2yrs ago |
+| "http://smartlifehealth.info/smh#82435511-73f3-4e46-a8f7-e3a6fa22043d" | 16    | CRM                                                                               | CHOL00a | Cholesterol:HDL Ratio > 8.5 |
+| "http://smartlifehealth.info/smh#7322d479-0f81-4904-b793-dc8f73f26695" | 16    | CRM                                                                               | CHOL00b | Cholesterol:HDL Ratio > 8.0 |
+| "http://smartlifehealth.info/smh#fc0aa332-8223-42dc-a1d8-3b5e8acf7bdf" | 16    | CRM                                                                               | CHOL00c | Cholesterol:HDL Ratio > 7.5 |
+| "http://smartlifehealth.info/smh#45ad4d1a-48ab-44d9-a994-83da92aa1a17" | 16    | CRM                                                                               | CHOL00d | Cholesterol:HDL Ratio > 7.0 |
+| "http://smartlifehealth.info/smh#4245d467-2f56-4d0e-b348-b723f6eb1681" | 16    | CRM                                                                               | CHOL00e | Cholesterol:HDL Ratio > 6.5 |
+| "http://smartlifehealth.info/smh#758c5c5a-b259-4d66-9df4-ce6e91e47047" | 17    | CRM                                                                               | CHOL00f | Cholesterol:HDL Ratio > 6.0 |
+| "http://smartlifehealth.info/smh#a9995fc9-5eb0-4a80-8821-752a2d931f45" | 17    | CRM                                                                               | CHOL00g | Cholesterol:HDL Ratio > 5.5 |
+| "http://smartlifehealth.info/smh#f069ba26-ebc4-4c28-b917-90036c9fd9f8" | 17    | CRM                                                                               | CHOL00h | Cholesterol:HDL Ratio > 5.0 |
+| "http://smartlifehealth.info/smh#653fa476-de74-41d7-a8e6-223f7a10fc2c" | 18    | CRM                                                                               | CHOL00i | Cholesterol:HDL Ratio > 4.5 |
+| "http://smartlifehealth.info/smh#b746a9dd-5a9e-4ca8-97f0-58b077533a47" | 20    | CRM                                                                               | CHOL00j | Cholesterol:HDL Ratio > 4.0 |
+| "http://smartlifehealth.info/smh#1479a14e-8d57-458e-9d65-48a75c536081" | 1     | CRM                                                                               | CKD QOF register | CKD005 - Patients on the CKD register |
+| "http://smartlifehealth.info/smh#977cb475-2682-4abc-9377-73205e8e5cf9" | 1     | CRM                                                                               | CKD Undiagnosed | CKD01Dd | Latest eGFR<60 & 2nd eGFR<60 btwn 3m &2yrs ago |
 | "http://smartlifehealth.info/smh#444d982a-5820-4264-9625-017303feb5a3" |       | CRM                                                                               | CKD Undiagnosed | CKD01De | uACR> 3 & 2nd uACR>3 btwn 1 wk & 2 yrs ago |
-| "http://smartlifehealth.info/smh#4d20ecc5-74dd-45d6-a41c-e1e16d09e1fc" |       | CRM                                                                               | DM | Patient having unresolved diabetes code |
+| "http://smartlifehealth.info/smh#4d20ecc5-74dd-45d6-a41c-e1e16d09e1fc" | 12    | CRM                                                                               | DM | Patient having unresolved diabetes code |
 | "http://smartlifehealth.info/smh#4981e0a4-d77e-4d78-8116-eadbdffd2c77" |       | CRM                                                                               | ETH00b | South Asian Ethnicity |
-| "http://smartlifehealth.info/smh#1813576d-69cf-45af-90cd-b0cdabef3dc6" |       | CRM                                                                               | FHFD01 | Family history of heart disease < 60 |
+| "http://smartlifehealth.info/smh#1813576d-69cf-45af-90cd-b0cdabef3dc6" | 3     | CRM                                                                               | FHFD01 | Family history of heart disease < 60 |
 | "http://smartlifehealth.info/smh#94346c45-82cf-45bb-8106-2d30660420b6" |       | CRM                                                                               | Mental health QOF register | MH1_REG - Psychosis, schizophrenia or bipolar |
 | "http://smartlifehealth.info/smh#6ac420fe-6fe2-40cd-b6f9-842ead110f0f" |       | CRM                                                                               | Mental health QOF register | MH2_REG - Lithium treatment in last 6m |
 | "http://smartlifehealth.info/smh#b1aad8d1-5990-453d-b1ad-ab83ffb8aded" |       | CRM                                                                               | SMOK01a | Heavy Smoker |
-| "http://smartlifehealth.info/smh#1a2c3dd9-017f-4e56-8549-e82826103444" |       | CRM                                                                               | SMOK01b | Moderate or Unclassified Smoker |
-| "http://smartlifehealth.info/smh#efcbaee0-1220-4922-8497-32e6ba022d07" |       | CRM                                                                               | SMOK01c | Light Smoker |
+| "http://smartlifehealth.info/smh#1a2c3dd9-017f-4e56-8549-e82826103444" | 4     | CRM                                                                               | SMOK01b | Moderate or Unclassified Smoker |
+| "http://smartlifehealth.info/smh#efcbaee0-1220-4922-8497-32e6ba022d07" | 1     | CRM                                                                               | SMOK01c | Light Smoker |
 | "http://smartlifehealth.info/smh#cd2d2697-ba99-442b-81f0-b8b73b6a2abe" |       | CRM                                                                               | Systemic lupus erythematosus |
-| "http://smartlifehealth.info/smh#0bc101fa-b4aa-4a05-b442-8d67747e50c0" |       | RISK00b                                                                           | Gender | Male |
+| "http://smartlifehealth.info/smh#0bc101fa-b4aa-4a05-b442-8d67747e50c0" | 3262  | RISK00b                                                                           | Gender | Male |
 | "http://smartlifehealth.info/smh#09a2c288-7ed4-4d5c-8cae-3c30f0ccd947" |       | RISK00c                                                                           | Ethnicity | Black & Black British patients |
-| "http://smartlifehealth.info/smh#440debb9-d5b0-42fb-96cd-f165233ff2e5" |       | RISK00j                                                                           | Rheumatoid arthritis |
-| "http://smartlifehealth.info/smh#4ce4e405-6095-4cee-a74e-72fecad75027" |       | RISK00l                                                                           | Migraine |
-| "http://smartlifehealth.info/smh#a47bb0b8-0e65-47e1-a0f5-cf8308111be8" |       | RISK00ac                                                                          | Age | Age < 60 |
-| "http://smartlifehealth.info/smh#d12a411c-8769-4d9a-99a1-1492223050c7" |       | RISK00ab                                                                          | Age | Age < 65 |
-| "http://smartlifehealth.info/smh#a8e21b71-5ef2-4500-a56b-60bc8d8748ce" |       | RISK00aa                                                                          | Age | Age < 70 |
-| "http://smartlifehealth.info/smh#c3f71b59-ba12-418c-8f5e-7574aef88a32" |       | RISK00ga                                                                          | Atrial Fibrillation | Age < 60 |
-| "http://smartlifehealth.info/smh#b4543422-1473-4462-a887-0c2ff2781025" |       | RISK00gb                                                                          | Atrial Fibrillation | Age < 50 |
-| "http://smartlifehealth.info/smh#c43f62e0-3734-419e-ab2d-81a8c37d67cd" |       | RISK00gc                                                                          | Atrial Fibrillation | Age < 40 |
-| "http://smartlifehealth.info/smh#a89fe035-1681-4e23-9c88-7d0f90fde121" |       | RISK00gd                                                                          | Atrial Fibrillation | Age < 35 |
-| "http://smartlifehealth.info/smh#ac473c54-0fab-4f14-b1a6-b47fc849ca13" |       | RISK00ge                                                                          | Atrial Fibrillation | Age < 30 |
+| "http://smartlifehealth.info/smh#440debb9-d5b0-42fb-96cd-f165233ff2e5" | 6     | RISK00j                                                                           | Rheumatoid arthritis |
+| "http://smartlifehealth.info/smh#4ce4e405-6095-4cee-a74e-72fecad75027" | 7     | RISK00l                                                                           | Migraine |
+| "http://smartlifehealth.info/smh#a47bb0b8-0e65-47e1-a0f5-cf8308111be8" | 3823  | RISK00ac                                                                          | Age | Age < 60 |
+| "http://smartlifehealth.info/smh#d12a411c-8769-4d9a-99a1-1492223050c7" | 4233  | RISK00ab                                                                          | Age | Age < 65 |
+| "http://smartlifehealth.info/smh#a8e21b71-5ef2-4500-a56b-60bc8d8748ce" | 4581  | RISK00aa                                                                          | Age | Age < 70 |
+| "http://smartlifehealth.info/smh#c3f71b59-ba12-418c-8f5e-7574aef88a32" | 1     | RISK00ga                                                                          | Atrial Fibrillation | Age < 60 |
+| "http://smartlifehealth.info/smh#b4543422-1473-4462-a887-0c2ff2781025" | 1     | RISK00gb                                                                          | Atrial Fibrillation | Age < 50 |
+| "http://smartlifehealth.info/smh#c43f62e0-3734-419e-ab2d-81a8c37d67cd" | 1     | RISK00gc                                                                          | Atrial Fibrillation | Age < 40 |
+| "http://smartlifehealth.info/smh#a89fe035-1681-4e23-9c88-7d0f90fde121" | 1     | RISK00gd                                                                          | Atrial Fibrillation | Age < 35 |
+| "http://smartlifehealth.info/smh#ac473c54-0fab-4f14-b1a6-b47fc849ca13" | 1     | RISK00ge                                                                          | Atrial Fibrillation | Age < 30 |
 | "http://smartlifehealth.info/smh#85dd4793-0a91-4a20-8b87-f9ed278b6f43" |       | RISK00ha                                                                          | Antihypertensive medication | Age < 65 |
 | "http://smartlifehealth.info/smh#f8e42956-3428-4b48-80a7-0334764584cb" |       | RISK00hb                                                                          | Antihypertensive medication | Age < 58 |
 | "http://smartlifehealth.info/smh#84a77ec7-fb1e-4227-a9a8-75ea7c7eb4be" |       | RISK00hc                                                                          | Antihypertensive medication | Age < 50 |
@@ -2514,26 +2514,26 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#89b868c4-f055-4855-8941-d90bdddce54b" |       | RISK00rf                                                                          | Systolic Blood Pressure > 145 |
 | "http://smartlifehealth.info/smh#53412ae0-bd8c-4532-9a5a-95327b8b35fd" |       | RISK00rg                                                                          | Systolic Blood Pressure > 145 | Age < 50 |
 | "http://smartlifehealth.info/smh#a0d71e28-c2e3-469b-8298-413985e258c6" |       | RISK00rh                                                                          | Systolic Blood Pressure > 145 | Age < 35 |
-| "http://smartlifehealth.info/smh#6fb9efde-e9a8-4a41-8b2f-7fd8c4da0626" |       | RISK00pa                                                                          | Cholesterol:HDL Ratio > 8.5 |
-| "http://smartlifehealth.info/smh#d0687a8a-37ca-4962-b4f3-45ec7757697a" |       | RISK00pb                                                                          | Cholesterol:HDL Ratio > 8.0 |
-| "http://smartlifehealth.info/smh#c6ca0856-57f8-4b05-b642-d2fabdfaa91a" |       | RISK00qa                                                                          | Cholesterol:HDL Ratio > 8.0 | Age < 53 |
-| "http://smartlifehealth.info/smh#b89192e3-2cea-4968-b463-3674529252e9" |       | RISK00pc                                                                          | Cholesterol:HDL Ratio > 7.5 |
-| "http://smartlifehealth.info/smh#3e6ab21f-1c20-4ca4-8aca-ae93ff76035f" |       | RISK00pd                                                                          | Cholesterol:HDL Ratio > 7.0 |
-| "http://smartlifehealth.info/smh#19291f75-5665-45aa-91e7-2e7330b63fa9" |       | RISK00qb                                                                          | Cholesterol:HDL Ratio > 7.0 | Age < 53 |
-| "http://smartlifehealth.info/smh#301c0790-354c-41e5-a352-52a367f355a0" |       | RISK00pe                                                                          | Cholesterol:HDL Ratio > 6.5 |
-| "http://smartlifehealth.info/smh#805c9b17-6bf1-4ca3-9204-dbf3d4be9efa" |       | RISK00pf                                                                          | Cholesterol:HDL Ratio > 6.0 |
-| "http://smartlifehealth.info/smh#30025855-6fe2-40aa-907d-04226de1238e" |       | RISK00qc                                                                          | Cholesterol:HDL Ratio > 6.0 | Age < 53 |
-| "http://smartlifehealth.info/smh#9c962ff0-4f66-45e0-a3ef-7c4e03dd9c6b" |       | RISK00pg                                                                          | Cholesterol:HDL Ratio > 5.5 |
-| "http://smartlifehealth.info/smh#b83f4529-ea3b-4232-a4ef-927b0822d816" |       | RISK00ph                                                                          | Cholesterol:HDL Ratio > 5.0 |
-| "http://smartlifehealth.info/smh#a479be77-f222-4f18-8b97-72dfdadce2e6" |       | RISK00qd                                                                          | Cholesterol:HDL Ratio > 5.0 | Age < 53 |
-| "http://smartlifehealth.info/smh#9e773ccc-45be-4966-a71d-2b47af1f26f5" |       | RISK00pi                                                                          | Cholesterol:HDL Ratio > 4.5 |
-| "http://smartlifehealth.info/smh#80516ea7-3540-431c-82c8-30ef6b711e75" |       | RISK00pj                                                                          | Cholesterol:HDL Ratio > 4.0 |
-| "http://smartlifehealth.info/smh#611e9501-203e-488b-87e0-9700b24597b4" |       | RISK00qe                                                                          | Cholesterol:HDL Ratio > 4.0 | Age < 53 |
-| "http://smartlifehealth.info/smh#ec087e3b-3af0-4d06-9116-f55f46c47e1f" |       | CRM                                                                               | CKD Undiagnosed | CKD01Df | Patients with 2* eGFR<60 or 2*uACR>3 |
-| "http://smartlifehealth.info/smh#57e16eaf-e88f-4fc8-a21c-952d923bd345" |       | CRM                                                                               | DM QOF register | DM017 - Patients > = aged 17 on the diabetes register |
-| "http://smartlifehealth.info/smh#2d6f234b-89a5-4959-a9f2-a43804fdabce" |       | CRM                                                                               | ETH00a | Not South Asian Ethnicity |
-| "http://smartlifehealth.info/smh#dde62ffa-4d08-44ee-b360-751a3081aed5" |       | RISK00ea                                                                          | Family history of heart disease < 60 | Age < 60 |
-| "http://smartlifehealth.info/smh#9c582e8b-ad64-428e-bb5a-a77674d40fb8" |       | RISK00eb                                                                          | Family history of heart disease < 60 | Age < 53 |
+| "http://smartlifehealth.info/smh#6fb9efde-e9a8-4a41-8b2f-7fd8c4da0626" | 1     | RISK00pa                                                                          | Cholesterol:HDL Ratio > 8.5 |
+| "http://smartlifehealth.info/smh#d0687a8a-37ca-4962-b4f3-45ec7757697a" | 1     | RISK00pb                                                                          | Cholesterol:HDL Ratio > 8.0 |
+| "http://smartlifehealth.info/smh#c6ca0856-57f8-4b05-b642-d2fabdfaa91a" | 1     | RISK00qa                                                                          | Cholesterol:HDL Ratio > 8.0 | Age < 53 |
+| "http://smartlifehealth.info/smh#b89192e3-2cea-4968-b463-3674529252e9" | 1     | RISK00pc                                                                          | Cholesterol:HDL Ratio > 7.5 |
+| "http://smartlifehealth.info/smh#3e6ab21f-1c20-4ca4-8aca-ae93ff76035f" | 1     | RISK00pd                                                                          | Cholesterol:HDL Ratio > 7.0 |
+| "http://smartlifehealth.info/smh#19291f75-5665-45aa-91e7-2e7330b63fa9" | 1     | RISK00qb                                                                          | Cholesterol:HDL Ratio > 7.0 | Age < 53 |
+| "http://smartlifehealth.info/smh#301c0790-354c-41e5-a352-52a367f355a0" | 1     | RISK00pe                                                                          | Cholesterol:HDL Ratio > 6.5 |
+| "http://smartlifehealth.info/smh#805c9b17-6bf1-4ca3-9204-dbf3d4be9efa" | 1     | RISK00pf                                                                          | Cholesterol:HDL Ratio > 6.0 |
+| "http://smartlifehealth.info/smh#30025855-6fe2-40aa-907d-04226de1238e" | 1     | RISK00qc                                                                          | Cholesterol:HDL Ratio > 6.0 | Age < 53 |
+| "http://smartlifehealth.info/smh#9c962ff0-4f66-45e0-a3ef-7c4e03dd9c6b" | 1     | RISK00pg                                                                          | Cholesterol:HDL Ratio > 5.5 |
+| "http://smartlifehealth.info/smh#b83f4529-ea3b-4232-a4ef-927b0822d816" | 1     | RISK00ph                                                                          | Cholesterol:HDL Ratio > 5.0 |
+| "http://smartlifehealth.info/smh#a479be77-f222-4f18-8b97-72dfdadce2e6" | 1     | RISK00qd                                                                          | Cholesterol:HDL Ratio > 5.0 | Age < 53 |
+| "http://smartlifehealth.info/smh#9e773ccc-45be-4966-a71d-2b47af1f26f5" | 1     | RISK00pi                                                                          | Cholesterol:HDL Ratio > 4.5 |
+| "http://smartlifehealth.info/smh#80516ea7-3540-431c-82c8-30ef6b711e75" | 1     | RISK00pj                                                                          | Cholesterol:HDL Ratio > 4.0 |
+| "http://smartlifehealth.info/smh#611e9501-203e-488b-87e0-9700b24597b4" | 1     | RISK00qe                                                                          | Cholesterol:HDL Ratio > 4.0 | Age < 53 |
+| "http://smartlifehealth.info/smh#ec087e3b-3af0-4d06-9116-f55f46c47e1f" | 1     | CRM                                                                               | CKD Undiagnosed | CKD01Df | Patients with 2* eGFR<60 or 2*uACR>3 |
+| "http://smartlifehealth.info/smh#57e16eaf-e88f-4fc8-a21c-952d923bd345" | 11    | CRM                                                                               | DM QOF register | DM017 - Patients > = aged 17 on the diabetes register |
+| "http://smartlifehealth.info/smh#2d6f234b-89a5-4959-a9f2-a43804fdabce" | 6479  | CRM                                                                               | ETH00a | Not South Asian Ethnicity |
+| "http://smartlifehealth.info/smh#dde62ffa-4d08-44ee-b360-751a3081aed5" | 1     | RISK00ea                                                                          | Family history of heart disease < 60 | Age < 60 |
+| "http://smartlifehealth.info/smh#9c582e8b-ad64-428e-bb5a-a77674d40fb8" | 1     | RISK00eb                                                                          | Family history of heart disease < 60 | Age < 53 |
 | "http://smartlifehealth.info/smh#cadbde8d-448c-4ed2-9497-d63f515a22f3" |       | RISK00ec                                                                          | Family history of heart disease < 60 | Age < 45 |
 | "http://smartlifehealth.info/smh#ac5f37a9-6fcf-43dd-aa92-5f4c8720b7e2" |       | RISK00ed                                                                          | Family history of heart disease < 60 | Age < 38 |
 | "http://smartlifehealth.info/smh#15fb5b68-7209-43de-99c4-23d2fa82fbc7" |       | RISK00ee                                                                          | Family history of heart disease < 60 | Age < 30 |
@@ -2543,62 +2543,62 @@ instead of its name, for every IRI in the table below.
 | "http://smartlifehealth.info/smh#3485c17e-c970-42e6-b2ab-68a086694893" |       | RISK00mc                                                                          | Heavy Smoker | Age < 53 |
 | "http://smartlifehealth.info/smh#9d564bf7-0eb3-4ee5-ad3b-90f9c3317a1f" |       | RISK00md                                                                          | Heavy Smoker | Age < 38 |
 | "http://smartlifehealth.info/smh#9f0f1668-de92-4caa-9328-95fe91ee8138" |       | RISK00me                                                                          | Heavy Smoker | Age < 30 |
-| "http://smartlifehealth.info/smh#04dfa094-9d1f-4b0e-bf6a-4a46c771c4cc" |       | RISK00na                                                                          | Moderate or Unclassified Smoker |
-| "http://smartlifehealth.info/smh#47f91599-05ce-49ae-b6a2-9a14db7b7831" |       | RISK00nb                                                                          | Moderate or Unclassified Smoker | Age < 65 |
-| "http://smartlifehealth.info/smh#26f0f993-956e-4434-bd25-860e50ea0307" |       | RISK00nc                                                                          | Moderate or Unclassified Smoker | Age < 53 |
-| "http://smartlifehealth.info/smh#cc20a6b3-b59d-4796-b5b6-6d478b18f5f6" |       | RISK00nd                                                                          | Moderate or Unclassified Smoker | Age < 38 |
-| "http://smartlifehealth.info/smh#0ead284b-4b6f-4d37-91e1-4f5d7cbf3a8f" |       | RISK00ne                                                                          | Moderate or Unclassified Smoker | Age < 30 |
-| "http://smartlifehealth.info/smh#0e1ec059-cc64-49d0-8432-eff86eea7d4f" |       | RISK00o                                                                           | Light Smoker |
+| "http://smartlifehealth.info/smh#04dfa094-9d1f-4b0e-bf6a-4a46c771c4cc" | 4     | RISK00na                                                                          | Moderate or Unclassified Smoker |
+| "http://smartlifehealth.info/smh#47f91599-05ce-49ae-b6a2-9a14db7b7831" | 1     | RISK00nb                                                                          | Moderate or Unclassified Smoker | Age < 65 |
+| "http://smartlifehealth.info/smh#26f0f993-956e-4434-bd25-860e50ea0307" | 1     | RISK00nc                                                                          | Moderate or Unclassified Smoker | Age < 53 |
+| "http://smartlifehealth.info/smh#cc20a6b3-b59d-4796-b5b6-6d478b18f5f6" | 1     | RISK00nd                                                                          | Moderate or Unclassified Smoker | Age < 38 |
+| "http://smartlifehealth.info/smh#0ead284b-4b6f-4d37-91e1-4f5d7cbf3a8f" | 1     | RISK00ne                                                                          | Moderate or Unclassified Smoker | Age < 30 |
+| "http://smartlifehealth.info/smh#0e1ec059-cc64-49d0-8432-eff86eea7d4f" | 1     | RISK00o                                                                           | Light Smoker |
 | "http://smartlifehealth.info/smh#64cc36b7-60d6-4170-b97d-840de9a255a0" |       | RISK00ia                                                                          | Systemic lupus erythematosus |
 | "http://smartlifehealth.info/smh#cc39a055-23b9-4371-899d-1fd92b6e7536" |       | RISK00ib                                                                          | Systemic lupus erythematosus | Age < 45 |
 | "http://smartlifehealth.info/smh#50f8e855-d340-4b7d-9b92-a8553a9da0d8" |       | RISK00ic                                                                          | Systemic lupus erythematosus | Age < 30 |
-| "http://smartlifehealth.info/smh#a617f373-3576-42ab-9087-b5046178ffe3" |       | CRM                                                                               | CKD Undiagnosed | CKD01D | Patients who are likely to have CKD |
+| "http://smartlifehealth.info/smh#a617f373-3576-42ab-9087-b5046178ffe3" | 1     | CRM                                                                               | CKD Undiagnosed | CKD01D | Patients who are likely to have CKD |
 | "http://smartlifehealth.info/smh#798713c1-f660-4acd-81b1-51090665491a" |       | RISK00da                                                                          | Diabetes | Type 1 Diabetes |
-| "http://smartlifehealth.info/smh#54cc5f0c-cb82-48ea-b972-6ab090d0aa3b" |       | RISK00db                                                                          | Diabetes | Type 2 Diabetes |
-| "http://smartlifehealth.info/smh#b662f0a6-435a-4986-ac8c-5957b4237c11" |       | RISK00dc                                                                          | Diabetes | Age < 65 |
-| "http://smartlifehealth.info/smh#967b08fe-61fe-4de3-acc6-571ed7f046d6" |       | RISK00dd                                                                          | Diabetes | Age < 60 |
-| "http://smartlifehealth.info/smh#19539f3f-38ca-4068-92dc-9b8ca4ca0bc1" |       | RISK00de                                                                          | Diabetes | Age < 55 |
-| "http://smartlifehealth.info/smh#c3641daf-f17b-4a84-8724-1c918eccee80" |       | RISK00df                                                                          | Diabetes | Age < 50 |
-| "http://smartlifehealth.info/smh#67bcfc43-08ec-43b6-968b-d039c011fcd9" |       | RISK00dg                                                                          | Diabetes | Age < 45 |
-| "http://smartlifehealth.info/smh#328f516b-61b2-4a20-b37b-da9329989828" |       | RISK00dh                                                                          | Diabetes | Age < 40 |
-| "http://smartlifehealth.info/smh#0ec13858-7e1a-4d5a-a291-6f327347390a" |       | RISK00di                                                                          | Diabetes | Age < 35 |
+| "http://smartlifehealth.info/smh#54cc5f0c-cb82-48ea-b972-6ab090d0aa3b" | 1     | RISK00db                                                                          | Diabetes | Type 2 Diabetes |
+| "http://smartlifehealth.info/smh#b662f0a6-435a-4986-ac8c-5957b4237c11" | 9     | RISK00dc                                                                          | Diabetes | Age < 65 |
+| "http://smartlifehealth.info/smh#967b08fe-61fe-4de3-acc6-571ed7f046d6" | 8     | RISK00dd                                                                          | Diabetes | Age < 60 |
+| "http://smartlifehealth.info/smh#19539f3f-38ca-4068-92dc-9b8ca4ca0bc1" | 6     | RISK00de                                                                          | Diabetes | Age < 55 |
+| "http://smartlifehealth.info/smh#c3641daf-f17b-4a84-8724-1c918eccee80" | 5     | RISK00df                                                                          | Diabetes | Age < 50 |
+| "http://smartlifehealth.info/smh#67bcfc43-08ec-43b6-968b-d039c011fcd9" | 2     | RISK00dg                                                                          | Diabetes | Age < 45 |
+| "http://smartlifehealth.info/smh#328f516b-61b2-4a20-b37b-da9329989828" | 1     | RISK00dh                                                                          | Diabetes | Age < 40 |
+| "http://smartlifehealth.info/smh#0ec13858-7e1a-4d5a-a291-6f327347390a" | 1     | RISK00di                                                                          | Diabetes | Age < 35 |
 | "http://smartlifehealth.info/smh#a1c7d371-c6ce-4252-8c14-ec979633b3a5" |       | RISK00dj                                                                          | Diabetes | Age < 30 |
-| "http://smartlifehealth.info/smh#e1a2db51-ad42-41ba-89c5-02f262484729" |       | RISK00sa                                                                          | BMI > 50 or South Asian and BMI > 48 |
-| "http://smartlifehealth.info/smh#694f3adf-dde7-402f-a15c-50b86349ffdf" |       | RISK00sb                                                                          | BMI > 45 or South Asian and BMI > 43 |
-| "http://smartlifehealth.info/smh#bd0c0c29-eff6-40e3-9388-5c5926d82e5c" |       | RISK00sc                                                                          | BMI > 40 or South Asian and BMI > 38 |
-| "http://smartlifehealth.info/smh#f3f44660-016e-4db6-8e44-eaf50e715267" |       | RISK00sd                                                                          | BMI > 35 or South Asian and BMI > 33 |
-| "http://smartlifehealth.info/smh#302435fa-048c-45dc-96b2-97458b1a0887" |       | RISK00se                                                                          | BMI > 30 or South Asian and BMI > 28 |
+| "http://smartlifehealth.info/smh#e1a2db51-ad42-41ba-89c5-02f262484729" | 16    | RISK00sa                                                                          | BMI > 50 or South Asian and BMI > 48 |
+| "http://smartlifehealth.info/smh#694f3adf-dde7-402f-a15c-50b86349ffdf" | 16    | RISK00sb                                                                          | BMI > 45 or South Asian and BMI > 43 |
+| "http://smartlifehealth.info/smh#bd0c0c29-eff6-40e3-9388-5c5926d82e5c" | 16    | RISK00sc                                                                          | BMI > 40 or South Asian and BMI > 38 |
+| "http://smartlifehealth.info/smh#f3f44660-016e-4db6-8e44-eaf50e715267" | 16    | RISK00sd                                                                          | BMI > 35 or South Asian and BMI > 33 |
+| "http://smartlifehealth.info/smh#302435fa-048c-45dc-96b2-97458b1a0887" | 16    | RISK00se                                                                          | BMI > 30 or South Asian and BMI > 28 |
 | "http://smartlifehealth.info/smh#10a6219a-43ad-44ce-babb-31db09c157b7" |       | RISK00k                                                                           | Serious Mental Illness |
-| "http://smartlifehealth.info/smh#1e8b15e7-1a4e-41a3-a5e9-2f74c912f885" |       | CRM                                                                               | CKD QOF register OR CKD undiagnosed | CKD005 or CKD01D |
+| "http://smartlifehealth.info/smh#1e8b15e7-1a4e-41a3-a5e9-2f74c912f885" | 1     | CRM                                                                               | CKD QOF register OR CKD undiagnosed | CKD005 or CKD01D |
 | "http://smartlifehealth.info/smh#6b631abe-a185-464d-975e-730bc530d0a5" |       | RISK00fa                                                                          | CKD | Age < 65 |
 | "http://smartlifehealth.info/smh#8943d397-1048-4dee-8bb3-affe43a9cec7" |       | RISK00fb                                                                          | CKD | Age < 58 |
 | "http://smartlifehealth.info/smh#4d464655-9f35-44e2-9b3a-d5fb5104b47e" |       | RISK00fc                                                                          | CKD | Age < 50 |
-| "http://smartlifehealth.info/smh#8b2ecda6-cbc5-40f7-aeae-2ede2a76843d" |       | RISK00Ca                                                                          | Low Risk | Option 3 | 0-9 |
-| "http://smartlifehealth.info/smh#40a58782-97fc-47ce-b80f-2ae844bfc881" |       | RISK00d                                                                           | No Risk | Option 3 |
+| "http://smartlifehealth.info/smh#8b2ecda6-cbc5-40f7-aeae-2ede2a76843d" | 35    | RISK00Ca                                                                          | Low Risk | Option 3 | 0-9 |
+| "http://smartlifehealth.info/smh#40a58782-97fc-47ce-b80f-2ae844bfc881" | 3     | RISK00d                                                                           | No Risk | Option 3 |
 | "http://smartlifehealth.info/smh#6a0a8b7e-1e71-4faa-bb39-55bba11f3149" |       | RISK00A                                                                           | Group 1 | Care Plan | 14 or more risk factors |
 | "http://smartlifehealth.info/smh#8c5ff01f-5da6-4642-8a68-a082a2c84ed4" |       | RISK00B                                                                           | Group 2 | Care Plan | 10 to 13 risk factors |
 | "http://smartlifehealth.info/smh#46cc1dd8-16ea-497e-85c7-6dd67ad7bf3b" |       | RISK00C                                                                           | Group 3 | Care Plan | 0 to 9 risk factors |
 | "http://smartlifehealth.info/smh#d66f1929-a4b7-4aaf-b2bb-31b9442da29b" |       | CRM00                                                                             | CRM Patients | LAST 15M TO END OF FY | First appointment recorded |
 | "http://smartlifehealth.info/smh#2fd94ff7-08bf-445c-b594-a8277342da74" |       | RISK00Ca                                                                          | Group 3 | Care Plan | 1 to 9 risk factors |
 | "http://smartlifehealth.info/smh#0ff9fd11-4456-4680-8350-f347bfafb168" |       | RISK00Cb                                                                          | Group 3 | Care Plan | 0 Risk Factors |
-| "http://smartlifehealth.info/smh#93662ef1-2a07-4e8a-b61b-a9a59407e3b6" |       | RISK00A                                                                           | Group 1 | No Care Plan | 14 or more risk factors |
+| "http://smartlifehealth.info/smh#93662ef1-2a07-4e8a-b61b-a9a59407e3b6" | 35    | RISK00A                                                                           | Group 1 | No Care Plan | 14 or more risk factors |
 | "http://smartlifehealth.info/smh#d533a052-cad6-44c0-b560-a275207d2719" |       | RISK00B                                                                           | Group 2 | No Care Plan | 10 to 13 risk factors |
-| "http://smartlifehealth.info/smh#6b3a54a1-ee17-487b-914b-20214a503880" |       | RISK00C                                                                           | Group 3 | No Care Plan | 0 to 9 risk factors |
-| "http://smartlifehealth.info/smh#e69c1bab-b502-4e2e-885d-74cd1bffa82a" |       | CRM00                                                                             | CRM Patients | LAST 15M TO END OF FY | First appointment NOT recorded |
-| "http://smartlifehealth.info/smh#862b990d-1079-4cb5-b36e-4f6fc27d9319" |       | RISK00Ca                                                                          | Group 3 | No Care Plan | 1 to 9 risk factors |
-| "http://smartlifehealth.info/smh#1be1bf95-c25c-42b6-b7bc-1687c4205ab7" |       | RISK00Cb                                                                          | Group 3 | No Care Plan | 0 Risk Factors |
+| "http://smartlifehealth.info/smh#6b3a54a1-ee17-487b-914b-20214a503880" | 3     | RISK00C                                                                           | Group 3 | No Care Plan | 0 to 9 risk factors |
+| "http://smartlifehealth.info/smh#e69c1bab-b502-4e2e-885d-74cd1bffa82a" | 38    | CRM00                                                                             | CRM Patients | LAST 15M TO END OF FY | First appointment NOT recorded |
+| "http://smartlifehealth.info/smh#862b990d-1079-4cb5-b36e-4f6fc27d9319" | 35    | RISK00Ca                                                                          | Group 3 | No Care Plan | 1 to 9 risk factors |
+| "http://smartlifehealth.info/smh#1be1bf95-c25c-42b6-b7bc-1687c4205ab7" | 3     | RISK00Cb                                                                          | Group 3 | No Care Plan | 0 Risk Factors |
 | "http://smartlifehealth.info/smh#39e92ef1-43a4-4070-b8ac-40c61ffbdee2" |       | RISK00A                                                                           | Group 1 | Care Plan | 14 or more risk factors |
 | "http://smartlifehealth.info/smh#27991fb9-e532-481e-a414-35482cd02e41" |       | RISK00B                                                                           | Group 2 | Care Plan | 10 to 13 risk factors |
 | "http://smartlifehealth.info/smh#e16f7235-ffc5-464c-8fa9-feb082d873f1" |       | RISK00C                                                                           | Group 3 | Care Plan | 0 to 9 risk factors |
 | "http://smartlifehealth.info/smh#0fe3c82c-182e-4f9d-9adf-2b294ad9742c" |       | CRM00                                                                             | CRM Patients | LAST 15M TO END OF FY | First appointment recorded |
 | "http://smartlifehealth.info/smh#411c2cfa-bce7-444e-87b5-f9950a0813bd" |       | RISK00Ca                                                                          | Group 3 | Care Plan | 1 to 9 risk factors |
 | "http://smartlifehealth.info/smh#7b45558b-eeba-42ac-a674-d253c844c2af" |       | RISK00Cb                                                                          | Group 3 | Care Plan | 0 Risk Factors |
-| "http://smartlifehealth.info/smh#037216d4-c5df-412f-b8ed-3277f411cbb1" |       | RISK00A                                                                           | Group 1 | No Care Plan | 14 or more risk factors |
+| "http://smartlifehealth.info/smh#037216d4-c5df-412f-b8ed-3277f411cbb1" | 35    | RISK00A                                                                           | Group 1 | No Care Plan | 14 or more risk factors |
 | "http://smartlifehealth.info/smh#afe08cd1-4bbe-49a8-96cb-cc068e3de323" |       | RISK00B                                                                           | Group 2 | No Care Plan | 10 to 13 risk factors |
-| "http://smartlifehealth.info/smh#f4bafba2-c332-4e75-a80b-7b66fb594b10" |       | RISK00C                                                                           | Group 3 | No Care Plan | 0 to 9 risk factors |
-| "http://smartlifehealth.info/smh#f879bec0-a4a0-4947-a9c8-9d43d79f52bc" |       | CRM00                                                                             | CRM Patients | LAST 15M TO END OF FY | First appointment NOT recorded |
-| "http://smartlifehealth.info/smh#cb81af06-b922-4131-95b0-c1d3b1a262ec" |       | RISK00Ca                                                                          | Group 3 | No Care Plan | 1 to 9 risk factors |
-| "http://smartlifehealth.info/smh#d2ab04f2-bce3-4ff9-a271-44ce61e24dfa" |       | RISK00Cb                                                                          | Group 3 | No Care Plan | 0 Risk Factors |
+| "http://smartlifehealth.info/smh#f4bafba2-c332-4e75-a80b-7b66fb594b10" | 3     | RISK00C                                                                           | Group 3 | No Care Plan | 0 to 9 risk factors |
+| "http://smartlifehealth.info/smh#f879bec0-a4a0-4947-a9c8-9d43d79f52bc" | 38    | CRM00                                                                             | CRM Patients | LAST 15M TO END OF FY | First appointment NOT recorded |
+| "http://smartlifehealth.info/smh#cb81af06-b922-4131-95b0-c1d3b1a262ec" | 35    | RISK00Ca                                                                          | Group 3 | No Care Plan | 1 to 9 risk factors |
+| "http://smartlifehealth.info/smh#d2ab04f2-bce3-4ff9-a271-44ce61e24dfa" | 3     | RISK00Cb                                                                          | Group 3 | No Care Plan | 0 Risk Factors |
 
 ## Run query for <iri>
 
